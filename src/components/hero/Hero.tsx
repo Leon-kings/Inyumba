@@ -1,4 +1,3 @@
-
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 // import React, { useState, useRef, useEffect } from "react";
 // import { motion, AnimatePresence } from "framer-motion";
@@ -1358,7 +1357,7 @@
 //                   initial={{ y: 20, opacity: 0 }}
 //                   animate={{ y: 0, opacity: 1 }}
 //                   transition={{ delay: 0.4 }}
-//                   className="text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl text-white/90"
+//                   className="text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl text-black"
 //                 >
 //                   {heroImages[currentSlide].subtitle}
 //                 </motion.p>
@@ -2286,19 +2285,6 @@
 //   );
 // };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -2339,12 +2325,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import PhoneIcon from "@mui/icons-material/Phone";
-import EmailIcon from "@mui/icons-material/Email";
-import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import TwitterIcon from "@mui/icons-material/Twitter";
-import FacebookIcon from "@mui/icons-material/Facebook";
+
 
 // ============================================================
 // 1. DATA FROM THE PROVIDED DOCUMENTS
@@ -2399,9 +2380,18 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "11010104",
     rooms: 4,
     bathrooms: 2,
-    image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
-    description: "Modern student house in Gihanga, near UR-CST campus. Fully furnished with study area.",
-    amenities: ["WiFi", "Kitchen", "Security", "Parking", "Study Room", "Laundry"],
+    image:
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
+    description:
+      "Modern student house in Gihanga, near UR-CST campus. Fully furnished with study area.",
+    amenities: [
+      "WiFi",
+      "Kitchen",
+      "Security",
+      "Parking",
+      "Study Room",
+      "Laundry",
+    ],
     owner: "Ntwari Jean Rene",
     contact: "+250 780414088",
     bookingStatus: "available",
@@ -2427,7 +2417,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "11010105",
     rooms: 2,
     bathrooms: 1,
-    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
     description: "Spacious apartments near UR-CST, perfect for students.",
     amenities: ["WiFi", "Kitchen", "Security", "Water Heater"],
     owner: "Mukamana Alice",
@@ -2455,7 +2446,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "11010106",
     rooms: 5,
     bathrooms: 2,
-    image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop",
     description: "Large student house with garden, near UR-CST.",
     amenities: ["WiFi", "Kitchen", "Garden", "Parking", "Study Area", "BBQ"],
     owner: "Habimana Jean",
@@ -2483,7 +2475,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "11010202",
     rooms: 1,
     bathrooms: 1,
-    image: "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
     description: "Affordable single rooms for students near UR-CST.",
     amenities: ["WiFi", "Shared Kitchen", "Security", "Common Area"],
     owner: "Uwimana Marie",
@@ -2511,7 +2504,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "11010203",
     rooms: 2,
     bathrooms: 1,
-    image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
     description: "Modern student apartments in Amayaga, close to UR-CST.",
     amenities: ["WiFi", "Kitchenette", "Security", "Study Desk", "Laundry"],
     owner: "Niyonkuru David",
@@ -2539,8 +2533,10 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "11090301",
     rooms: 2,
     bathrooms: 1,
-    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
-    description: "Premium student apartments in Kiyovu, walking distance to UR-CST.",
+    image:
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
+    description:
+      "Premium student apartments in Kiyovu, walking distance to UR-CST.",
     amenities: ["WiFi", "Kitchen", "Security", "Elevator", "Study Area"],
     owner: "Rukundo Jean",
     contact: "+250 788444666",
@@ -2567,7 +2563,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "12070101",
     rooms: 3,
     bathrooms: 2,
-    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
     description: "Student apartments near University of Kigali in Kamatamu.",
     amenities: ["WiFi", "Kitchen", "Security", "Parking", "Study Room"],
     owner: "Kagabo Eric",
@@ -2595,7 +2592,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "12040201",
     rooms: 4,
     bathrooms: 2,
-    image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop",
     description: "Spacious student house near ULK in Gisozi.",
     amenities: ["WiFi", "Kitchen", "Garden", "Parking", "Study Area"],
     owner: "Muhire Jean",
@@ -2623,7 +2621,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "12090301",
     rooms: 1,
     bathrooms: 1,
-    image: "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
     description: "Affordable student rooms near AUCA in Masoro.",
     amenities: ["WiFi", "Shared Kitchen", "Security", "Common Area"],
     owner: "Dusabimana Grace",
@@ -2651,7 +2650,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "12110101",
     rooms: 2,
     bathrooms: 1,
-    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
     description: "Premium student apartments near CMU-Africa in Ndera.",
     amenities: ["WiFi", "Kitchen", "Security", "Elevator", "Study Area"],
     owner: "Niyomugabo Eric",
@@ -2679,7 +2679,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "13030106",
     rooms: 4,
     bathrooms: 2,
-    image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
     description: "Spacious student house near UR-CBE in Gikondo.",
     amenities: ["WiFi", "Kitchen", "Garden", "Parking", "Study Room"],
     owner: "Niyomugabo Eric",
@@ -2707,7 +2708,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "13090201",
     rooms: 1,
     bathrooms: 1,
-    image: "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
     description: "Affordable rooms for IPRC Kigali students.",
     amenities: ["WiFi", "Shared Kitchen", "Security", "Study Area"],
     owner: "Rwabugiri John",
@@ -2735,7 +2737,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "24090101",
     rooms: 2,
     bathrooms: 1,
-    image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
     description: "Student apartments near UR Huye campus in Ruhande.",
     amenities: ["WiFi", "Kitchenette", "Security", "Study Area"],
     owner: "Niyigena Jean",
@@ -2763,7 +2766,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "24090102",
     rooms: 3,
     bathrooms: 2,
-    image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop",
     description: "Student house in Butare, walking distance to UR Huye campus.",
     amenities: ["WiFi", "Kitchen", "Garden", "Parking", "Study Room"],
     owner: "Mukeshimana Anna",
@@ -2791,7 +2795,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "24090402",
     rooms: 1,
     bathrooms: 1,
-    image: "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
     description: "Affordable rooms for IPRC Huye students.",
     amenities: ["WiFi", "Shared Kitchen", "Security", "Study Area"],
     owner: "Rwabugiri John",
@@ -2819,7 +2824,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "27020201",
     rooms: 1,
     bathrooms: 1,
-    image: "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
     description: "Affordable student rooms near ICK in Kabgayi.",
     amenities: ["WiFi", "Shared Kitchen", "Security", "Study Area"],
     owner: "Uwimana Jean",
@@ -2847,7 +2853,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "26090101",
     rooms: 3,
     bathrooms: 2,
-    image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop",
     description: "Student house near University of Gitwe.",
     amenities: ["WiFi", "Kitchen", "Garden", "Parking"],
     owner: "Niyomugabo Jean",
@@ -2875,9 +2882,18 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "43080101",
     rooms: 4,
     bathrooms: 2,
-    image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
-    description: "Modern student house near INES-Ruhengeri, 5 min walk to campus.",
-    amenities: ["WiFi", "Kitchen", "Security", "Parking", "Study Room", "Laundry"],
+    image:
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
+    description:
+      "Modern student house near INES-Ruhengeri, 5 min walk to campus.",
+    amenities: [
+      "WiFi",
+      "Kitchen",
+      "Security",
+      "Parking",
+      "Study Room",
+      "Laundry",
+    ],
     owner: "Ntwari Jean Rene",
     contact: "+250 780414088",
     bookingStatus: "available",
@@ -2903,7 +2919,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "43080201",
     rooms: 3,
     bathrooms: 1,
-    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
     description: "Spacious apartments for students, close to INES-Ruhengeri.",
     amenities: ["WiFi", "Kitchen", "Security", "Parking", "Water Heater"],
     owner: "Mukamana Alice",
@@ -2931,7 +2948,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "43080401",
     rooms: 1,
     bathrooms: 1,
-    image: "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
     description: "Affordable single rooms for students in central Ruhengeri.",
     amenities: ["WiFi", "Shared Kitchen", "Security", "Common Area"],
     owner: "Uwimana Marie",
@@ -2959,7 +2977,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "43010101",
     rooms: 3,
     bathrooms: 2,
-    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
     description: "Student apartments near UR-CAVM campus in Busogo.",
     amenities: ["WiFi", "Kitchen", "Security", "Parking", "Study Room"],
     owner: "Kagabo Eric",
@@ -2987,7 +3006,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "43080301",
     rooms: 1,
     bathrooms: 1,
-    image: "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
     description: "Affordable student rooms near IPRC Musanze campus.",
     amenities: ["WiFi", "Shared Kitchen", "Security", "Common Area"],
     owner: "Dusabimana Grace",
@@ -3015,7 +3035,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "44020502",
     rooms: 2,
     bathrooms: 1,
-    image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
     description: "Student apartments near University of Global Health Equity.",
     amenities: ["WiFi", "Kitchen", "Security", "Study Room", "Laundry"],
     owner: "Rukundo Paul",
@@ -3043,7 +3064,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "54100201",
     rooms: 2,
     bathrooms: 1,
-    image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
     description: "Student housing near UR-CE campus in Rwamagana.",
     amenities: ["WiFi", "Kitchen", "Security", "Parking"],
     owner: "Uwimana Jean",
@@ -3071,7 +3093,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "52100703",
     rooms: 3,
     bathrooms: 2,
-    image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop",
     description: "Student house near UR Nyagatare campus.",
     amenities: ["WiFi", "Kitchen", "Garden", "Parking"],
     owner: "Muhirwa Albert",
@@ -3099,7 +3122,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "57010101",
     rooms: 1,
     bathrooms: 1,
-    image: "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
     description: "Student rooms near RICA in Gashora.",
     amenities: ["WiFi", "Shared Kitchen", "Security", "Study Area"],
     owner: "Mukamana Alice",
@@ -3127,7 +3151,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "31010703",
     rooms: 1,
     bathrooms: 1,
-    image: "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
     description: "Affordable student rooms near IPRC Karongi.",
     amenities: ["WiFi", "Shared Kitchen", "Security"],
     owner: "Uwimana Marie",
@@ -3155,7 +3180,8 @@ const studentHousesData: StudentHouse[] = [
     code_vil_1: "33040201",
     rooms: 3,
     bathrooms: 2,
-    image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop",
+    image:
+      "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop",
     description: "Student house near UTB in Gisenyi, close to Lake Kivu.",
     amenities: ["WiFi", "Kitchen", "Garden", "Parking", "Study Room"],
     owner: "Habimana Jean",
@@ -3191,7 +3217,8 @@ const getTranslations = (lang: string) => {
       addGuests: "Number of students",
       helpCenter: "Help Center",
       becomeHost: "List Your House",
-      becomeHostDesc: "It's easy to list your student house and earn extra income.",
+      becomeHostDesc:
+        "It's easy to list your student house and earn extra income.",
       referHost: "Refer a Host",
       findCoHost: "Find a co-host",
       giftCards: "Gift cards",
@@ -3321,7 +3348,8 @@ const getTranslations = (lang: string) => {
       addGuests: "Nombre d'étudiants",
       helpCenter: "Centre d'aide",
       becomeHost: "Listez votre maison",
-      becomeHostDesc: "Il est facile de lister votre maison étudiante et de gagner un revenu supplémentaire.",
+      becomeHostDesc:
+        "Il est facile de lister votre maison étudiante et de gagner un revenu supplémentaire.",
       referHost: "Parrainer un hôte",
       findCoHost: "Trouver un co-hôte",
       giftCards: "Cartes cadeaux",
@@ -3451,7 +3479,8 @@ const getTranslations = (lang: string) => {
       addGuests: "Umubare w'abanyeshuri",
       helpCenter: "Ikigo cy'ubufasha",
       becomeHost: "Tangaza inzu yawe",
-      becomeHostDesc: "Birakoroshye gutangaza inzu yawe kubanyeshuri kandi ukungura.",
+      becomeHostDesc:
+        "Birakoroshye gutangaza inzu yawe kubanyeshuri kandi ukungura.",
       referHost: "Vuga abandi bakire",
       findCoHost: "Shakisha uwakwakira n'uwundi",
       giftCards: "Ikarita z'impano",
@@ -3572,6 +3601,224 @@ const getTranslations = (lang: string) => {
   return translations[lang as keyof typeof translations] || translations.en;
 };
 
+const InyumbaLogo = ({ className = "h-12 w-12" }: { className?: string }) => (
+  <motion.svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 500 560"
+    className={className}
+    whileHover={{
+      rotate: [-2, 2, -2, 2, 0],
+      transition: { duration: 0.45 },
+    }}
+  >
+    {/* ================= OUTER RINGS ================= */}
+
+    <path
+      d="M90 120 A180 180 0 0 0 90 430"
+      fill="none"
+      stroke="#36B25A"
+      strokeWidth="7"
+      strokeLinecap="round"
+    />
+
+    <path
+      d="M410 120 A180 180 0 0 1 410 430"
+      fill="none"
+      stroke="#36B25A"
+      strokeWidth="7"
+      strokeLinecap="round"
+    />
+
+    <path
+      d="M105 135 A165 165 0 0 0 105 415"
+      fill="none"
+      stroke="#1B4E91"
+      strokeWidth="5"
+      strokeLinecap="round"
+    />
+
+    <path
+      d="M395 135 A165 165 0 0 1 395 415"
+      fill="none"
+      stroke="#1B4E91"
+      strokeWidth="5"
+      strokeLinecap="round"
+    />
+
+    <path
+      d="M165 475 A120 120 0 0 0 335 475"
+      fill="none"
+      stroke="#36B25A"
+      strokeWidth="7"
+      strokeLinecap="round"
+    />
+
+    <path
+      d="M180 462 A104 104 0 0 0 320 462"
+      fill="none"
+      stroke="#1B4E91"
+      strokeWidth="5"
+      strokeLinecap="round"
+    />
+
+    {/* ================= COMPASS ================= */}
+
+    <g transform="translate(250 95)">
+      <text
+        x="0"
+        y="-18"
+        fontSize="34"
+        fontWeight="800"
+        textAnchor="middle"
+        fill="#1B4E91"
+      >
+        N
+      </text>
+
+      <circle r="58" fill="none" stroke="#1B4E91" strokeWidth="7" />
+
+      <polygon points="0,-58 10,-10 0,-22 -10,-10" fill="#1B4E91" />
+
+      <polygon points="0,58 10,10 0,22 -10,10" fill="#1B4E91" />
+
+      <polygon points="-58,0 -10,-10 -22,0 -10,10" fill="#1B4E91" />
+
+      <polygon points="58,0 10,-10 22,0 10,10" fill="#1B4E91" />
+
+      <polygon points="-40,-40 -8,-12 -12,-8" fill="#1B4E91" />
+
+      <polygon points="40,-40 8,-12 12,-8" fill="#1B4E91" />
+
+      <polygon points="-40,40 -8,12 -12,8" fill="#1B4E91" />
+
+      <polygon points="40,40 8,12 12,8" fill="#1B4E91" />
+    </g>
+
+    {/* ================= HOUSE ================= */}
+
+    <g>
+      <path
+        d="M150 215 L250 135 L350 215"
+        fill="none"
+        stroke="#36B25A"
+        strokeWidth="14"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+
+      <rect x="188" y="215" width="124" height="90" rx="3" fill="#36B25A" />
+
+      <rect x="305" y="175" width="18" height="55" fill="#36B25A" />
+    </g>
+
+    {/* ================= LOCATION PIN ================= */}
+
+    <motion.g
+      animate={{
+        scale: [1, 1.08, 1],
+      }}
+      transition={{
+        repeat: Infinity,
+        duration: 2,
+      }}
+      transform="translate(250 252)"
+    >
+      <path
+        d="M0-32
+           C-23-32 -38-15 -38 8
+           C-38 38 0 72 0 72
+           C0 72 38 38 38 8
+           C38-15 23-32 0-32"
+        fill="#1B4E91"
+      />
+
+      <circle r="13" cy="-3" fill="white" />
+    </motion.g>
+
+    {/* ================= OPEN BOOK ================= */}
+
+    <g transform="translate(250 320)">
+      <path
+        d="M0 0
+           C-28 -16 -82 -18 -132 -4
+           C-120 10 -120 26 -132 40
+           C-82 20 -30 22 0 42"
+        fill="#1B4E91"
+      />
+
+      <path
+        d="M0 0
+           C28 -16 82 -18 132 -4
+           C120 10 120 26 132 40
+           C82 20 30 22 0 42"
+        fill="#1B4E91"
+      />
+
+      <path
+        d="M0 14
+           C-28 -2 -78 -4 -120 8"
+        stroke="white"
+        strokeWidth="2"
+        fill="none"
+      />
+
+      <path
+        d="M0 14
+           C28 -2 78 -4 120 8"
+        stroke="white"
+        strokeWidth="2"
+        fill="none"
+      />
+    </g>
+
+    {/* ================= TEXT ================= */}
+
+    <text
+      x="250"
+      y="430"
+      textAnchor="middle"
+      fontSize="60"
+      fontWeight="900"
+      fill="#1B4E91"
+      letterSpacing="2"
+      style={{
+        fontFamily: "Poppins, Montserrat, Arial, sans-serif",
+      }}
+    >
+      INYUMBA
+    </text>
+
+    <text
+      x="250"
+      y="462"
+      textAnchor="middle"
+      fontSize="20"
+      fontWeight="700"
+      fill="#36B25A"
+      style={{
+        fontFamily: "Poppins, Arial, sans-serif",
+      }}
+    >
+      STUDENT ACCOMMODATION
+    </text>
+
+    <text
+      x="250"
+      y="530"
+      textAnchor="middle"
+      fontSize="24"
+      fontWeight="800"
+      letterSpacing="5"
+      fill="#1B4E91"
+      style={{
+        fontFamily: "Poppins, Arial, sans-serif",
+      }}
+    >
+      RWANDA
+    </text>
+  </motion.svg>
+);
+
 // ============================================================
 // 3. MAIN COMPONENT
 // ============================================================
@@ -3580,13 +3827,48 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
   const t = getTranslations(language);
 
   const categories = [
-    { id: "all", name: t.all || "All Houses", icon: <HomeIcon />, color: "from-[#FF385C] to-pink-400" },
-    { id: "student", name: t.student || "Student Houses", icon: <SchoolIcon />, color: "from-blue-400 to-cyan-500" },
-    { id: "apartments", name: t.apartments || "Apartments", icon: <ApartmentIcon />, color: "from-green-400 to-emerald-500" },
-    { id: "single", name: t.single || "Single Rooms", icon: <BedIcon />, color: "from-orange-400 to-red-500" },
-    { id: "shared", name: t.shared || "Shared Houses", icon: <PeopleAltIcon />, color: "from-purple-400 to-pink-500" },
-    { id: "furnished", name: t.furnished || "Furnished", icon: <HotelIcon />, color: "from-yellow-400 to-amber-500" },
-    { id: "nearcampus", name: t.nearcampus || "Near Campus", icon: <LocationCityIcon />, color: "from-teal-400 to-cyan-500" },
+    {
+      id: "all",
+      name: t.all || "All Houses",
+      icon: <HomeIcon />,
+      color: "from-[#FF385C] to-pink-400",
+    },
+    {
+      id: "student",
+      name: t.student || "Student Houses",
+      icon: <SchoolIcon />,
+      color: "from-blue-400 to-cyan-500",
+    },
+    {
+      id: "apartments",
+      name: t.apartments || "Apartments",
+      icon: <ApartmentIcon />,
+      color: "from-green-400 to-emerald-500",
+    },
+    {
+      id: "single",
+      name: t.single || "Single Rooms",
+      icon: <BedIcon />,
+      color: "from-orange-400 to-red-500",
+    },
+    {
+      id: "shared",
+      name: t.shared || "Shared Houses",
+      icon: <PeopleAltIcon />,
+      color: "from-purple-400 to-pink-500",
+    },
+    {
+      id: "furnished",
+      name: t.furnished || "Furnished",
+      icon: <HotelIcon />,
+      color: "from-yellow-400 to-amber-500",
+    },
+    {
+      id: "nearcampus",
+      name: t.nearcampus || "Near Campus",
+      icon: <LocationCityIcon />,
+      color: "from-teal-400 to-cyan-500",
+    },
   ];
 
   // ===== State =====
@@ -3600,7 +3882,8 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
   const [selectedVillage, setSelectedVillage] = useState("");
   const [maxMinutesFromCampus, setMaxMinutesFromCampus] = useState<number>(30);
   const [isAdvancedSearchOpen, setIsAdvancedSearchOpen] = useState(false);
-  const [filteredHouses, setFilteredHouses] = useState<StudentHouse[]>(studentHousesData);
+  const [filteredHouses, setFilteredHouses] =
+    useState<StudentHouse[]>(studentHousesData);
 
   const [minPrice, setMinPrice] = useState<number>(0);
   const [maxPrice, setMaxPrice] = useState<number>(200000);
@@ -3626,7 +3909,9 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
 
   const [momoNumber, setMomoNumber] = useState("");
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [paymentResult, setPaymentResult] = useState<"success" | "fail" | null>(null);
+  const [paymentResult, setPaymentResult] = useState<"success" | "fail" | null>(
+    null,
+  );
   const [showPaymentResult, setShowPaymentResult] = useState(false);
 
   const [loginEmail, setLoginEmail] = useState("");
@@ -3669,7 +3954,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
             h.cell.toLowerCase().includes(query) ||
             h.village.toLowerCase().includes(query) ||
             h.province.toLowerCase().includes(query) ||
-            h.code_vil_1?.includes(query)
+            h.code_vil_1?.includes(query),
         );
       }
 
@@ -3684,7 +3969,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
             h.village.toLowerCase().includes(location) ||
             h.name.toLowerCase().includes(location) ||
             h.province.toLowerCase().includes(location) ||
-            h.code_vil_1?.includes(location)
+            h.code_vil_1?.includes(location),
         );
       }
 
@@ -3709,7 +3994,9 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
       }
 
       if (maxMinutesFromCampus) {
-        filtered = filtered.filter((h) => h.minutesFromCampus <= maxMinutesFromCampus);
+        filtered = filtered.filter(
+          (h) => h.minutesFromCampus <= maxMinutesFromCampus,
+        );
       }
 
       if (minPrice > 0) {
@@ -3768,7 +4055,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
   const totalPages = Math.ceil(filteredHouses.length / itemsPerPage);
   const paginatedHouses = filteredHouses.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   const goToPage = (page: number) => {
@@ -3809,10 +4096,17 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(currentYear, currentMonth, day);
       const isToday = date.toDateString() === today.toDateString();
-      const isCheckIn = tempCheckIn && date.toDateString() === tempCheckIn.toDateString();
-      const isCheckOut = tempCheckOut && date.toDateString() === tempCheckOut.toDateString();
-      const isInRange = tempCheckIn && tempCheckOut && date > tempCheckIn && date < tempCheckOut;
-      const isPast = date < today && date.toDateString() !== today.toDateString();
+      const isCheckIn =
+        tempCheckIn && date.toDateString() === tempCheckIn.toDateString();
+      const isCheckOut =
+        tempCheckOut && date.toDateString() === tempCheckOut.toDateString();
+      const isInRange =
+        tempCheckIn &&
+        tempCheckOut &&
+        date > tempCheckIn &&
+        date < tempCheckOut;
+      const isPast =
+        date < today && date.toDateString() !== today.toDateString();
 
       days.push(
         <motion.button
@@ -3825,19 +4119,19 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
             isPast
               ? "text-gray-300 cursor-not-allowed"
               : isCheckIn || isCheckOut
-              ? "bg-[#FF385C] text-white"
-              : isInRange
-              ? "bg-[#FF385C]/20 text-gray-900"
-              : isToday
-              ? "border-2 border-[#FF385C] text-gray-900"
-              : "text-gray-700"
+                ? "bg-[#FF385C] text-white"
+                : isInRange
+                  ? "bg-[#FF385C]/20 text-gray-900"
+                  : isToday
+                    ? "border-2 border-[#FF385C] text-gray-900"
+                    : "text-gray-700"
           }`}
         >
           {day}
           {isToday && !isCheckIn && !isCheckOut && (
             <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-[#FF385C] rounded-full"></span>
           )}
-        </motion.button>
+        </motion.button>,
       );
     }
 
@@ -3863,7 +4157,9 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
     setCheckOut(tempCheckOut);
     setIsDatePickerOpen(false);
     if (tempCheckIn && tempCheckOut) {
-      toast.success(`📅 ${tempCheckIn.toLocaleDateString()} - ${tempCheckOut.toLocaleDateString()}`);
+      toast.success(
+        `📅 ${tempCheckIn.toLocaleDateString()} - ${tempCheckOut.toLocaleDateString()}`,
+      );
     }
   };
 
@@ -3911,7 +4207,9 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
       onSearch(searchParams);
     }
 
-    toast.info(`🔍 ${t.search}: ${searchLocation || selectedUniversity || "All universities in Rwanda"}`);
+    toast.info(
+      `🔍 ${t.search}: ${searchLocation || selectedUniversity || "All universities in Rwanda"}`,
+    );
     setIsLocationModalOpen(false);
     setIsDatePickerOpen(false);
     setIsGuestModalOpen(false);
@@ -4023,7 +4321,12 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
   };
 
   const handleRegister = () => {
-    if (!registerName || !registerEmail || !registerPhone || !registerPassword) {
+    if (
+      !registerName ||
+      !registerEmail ||
+      !registerPhone ||
+      !registerPassword
+    ) {
       toast.error("Please fill in all fields");
       return;
     }
@@ -4102,191 +4405,249 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "available": return "bg-green-100 text-green-800";
-      case "booked": return "bg-red-100 text-red-800";
-      case "pending": return "bg-yellow-100 text-yellow-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "available":
+        return "bg-green-100 text-green-800";
+      case "booked":
+        return "bg-red-100 text-red-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case "available": return t.statusAvailable;
-      case "booked": return t.statusBooked;
-      case "pending": return t.statusPending;
-      default: return status;
+      case "available":
+        return t.statusAvailable;
+      case "booked":
+        return t.statusBooked;
+      case "pending":
+        return t.statusPending;
+      default:
+        return status;
     }
   };
 
-  const uniqueUniversities = [...new Set(studentHousesData.map(h => h.university))];
-  const uniqueDistricts = [...new Set(studentHousesData.map(h => h.district))];
-  const uniqueSectors = [...new Set(studentHousesData.map(h => h.sector))];
-  const uniqueCells = [...new Set(studentHousesData.map(h => h.cell))];
-  const uniqueVillages = [...new Set(studentHousesData.map(h => h.village))];
+  const uniqueUniversities = [
+    ...new Set(studentHousesData.map((h) => h.university)),
+  ];
+  const uniqueDistricts = [
+    ...new Set(studentHousesData.map((h) => h.district)),
+  ];
+  const uniqueSectors = [...new Set(studentHousesData.map((h) => h.sector))];
+  const uniqueCells = [...new Set(studentHousesData.map((h) => h.cell))];
+  const uniqueVillages = [...new Set(studentHousesData.map((h) => h.village))];
 
   return (
     <div className="w-full">
-      {/* ===== PROJECT HEADER WITH PERMANENT ABOUT SECTION ===== */}
-      <div className="bg-gray-400 text-white py-6 md:py-8">
+      {/* ===== PROJECT HEADER WITH PERMANENT ABOUT SECTION - WHITE BACKGROUND ===== */}
+      <div className="bg-white py-8 md:py-12 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-2xl md:text-4xl font-bold mb-2">INYUMBA PROJECT</h1>
-            <p className="text-sm md:text-lg text-white/90 max-w-3xl mx-auto">
-              {language === 'rw' 
-                ? 'GUKORA URUBUGA ABANYESHURI BA KAMINUZA BAZAJYA BAJYAHO BAKABONA AMAZU YO GUKONDESHA KUBURYO BUBOREHEYE'
-                : language === 'fr'
-                ? 'Location de maisons pour étudiants près des universités au Rwanda'
-                : 'Student housing rental platform near universities in Rwanda'}
-            </p>
-            <div className="mt-3 flex flex-wrap justify-center gap-2 text-xs md:text-sm">
-              <span className="bg-white/20 px-3 py-1 rounded-full">🎓 31+ Universities</span>
-              <span className="bg-white/20 px-3 py-1 rounded-full">🏠 28+ Houses</span>
-              <span className="bg-white/20 px-3 py-1 rounded-full">📍 5+ Provinces</span>
+          {/* Header Title */}
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <InyumbaLogo className="h-12 w-12 sm:h-12 sm:w-12" />
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
+                INYUMBA
+              </h1>
             </div>
+            <p className="text-base md:text-lg text-gray-600 max-w-3xl mx-auto">
+              {language === "rw"
+                ? "GUKORA URUBUGA ABANYESHURI BA KAMINUZA BAZAJYA BAJYAHO BAKABONA AMAZU YO GUKONDESHA KUBURYO BUBOREHEYE"
+                : language === "fr"
+                  ? "Location de maisons pour étudiants près des universités au Rwanda"
+                  : "Student housing rental platform near universities in Rwanda"}
+            </p>
           </div>
 
-          {/* ===== PERMANENT ABOUT SECTION - ALWAYS VISIBLE ===== */}
-          <div className="mt-6">
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-white border border-white/20">
-              {/* Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
-                  <div className="text-3xl font-bold">5+</div>
-                  <div className="text-sm text-white/80">{t.yearsOfExperience}</div>
+          {/* ===== PERMANENT ABOUT SECTION - WHITE BACKGROUND WITH ATTRACTIVE DESIGN ===== */}
+          <div className="mt-4">
+            {/* Stats Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-5 text-center border border-blue-200 hover:shadow-lg transition-shadow duration-300">
+                <div className="text-3xl font-bold text-blue-600">5+</div>
+                <div className="text-sm text-gray-600 font-medium mt-1">
+                  {t.yearsOfExperience}
                 </div>
-                <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
-                  <div className="text-3xl font-bold">500+</div>
-                  <div className="text-sm text-white/80">{t.happyStudents}</div>
+                <div className="text-xs text-gray-400 mt-0.5">Since 2021</div>
+              </div>
+              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-5 text-center border border-green-200 hover:shadow-lg transition-shadow duration-300">
+                <div className="text-3xl font-bold text-green-600">500+</div>
+                <div className="text-sm text-gray-600 font-medium mt-1">
+                  {t.happyStudents}
                 </div>
-                <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
-                  <div className="text-3xl font-bold">31+</div>
-                  <div className="text-sm text-white/80">{t.partnerUniversities}</div>
-                </div>
-                <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
-                  <div className="text-3xl font-bold">28+</div>
-                  <div className="text-sm text-white/80">{t.propertiesAvailable}</div>
+                <div className="text-xs text-gray-400 mt-0.5">
+                  Across Rwanda
                 </div>
               </div>
-
-              {/* Mission, Vision, Expectations */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
-                  <h4 className="text-lg font-bold mb-2 flex items-center gap-2">
-                    <span className="text-2xl">🎯</span> {t.ourMission}
-                  </h4>
-                  <p className="text-sm text-white/90 leading-relaxed">
-                    {language === 'rw'
-                      ? 'Intego yacu ni uguhuza abanyeshuri n\'amazu meza, ari hafi ya kaminuza, ku giciro gito.'
-                      : language === 'fr'
-                      ? 'Notre mission est de mettre en relation les étudiants avec des logements de qualité, proches des universités, à des prix abordables.'
-                      : 'Our mission is to connect students with quality housing, close to universities, at affordable prices.'}
-                  </p>
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-5 text-center border border-purple-200 hover:shadow-lg transition-shadow duration-300">
+                <div className="text-3xl font-bold text-purple-600">31+</div>
+                <div className="text-sm text-gray-600 font-medium mt-1">
+                  {t.partnerUniversities}
                 </div>
-                <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
-                  <h4 className="text-lg font-bold mb-2 flex items-center gap-2">
-                    <span className="text-2xl">👁️</span> {t.ourVision}
-                  </h4>
-                  <p className="text-sm text-white/90 leading-relaxed">
-                    {language === 'rw'
-                      ? 'Icyerekezo cyacu ni ukugira urubuga rw\'amazu y\'abanyeshuri ruzwi cyane mu Rwanda.'
-                      : language === 'fr'
-                      ? 'Notre vision est de devenir la plateforme de référence pour le logement étudiant au Rwanda.'
-                      : 'Our vision is to become the leading student housing platform in Rwanda.'}
-                  </p>
-                </div>
-                <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
-                  <h4 className="text-lg font-bold mb-2 flex items-center gap-2">
-                    <span className="text-2xl">⭐</span> {t.ourExpectations}
-                  </h4>
-                  <ul className="text-sm text-white/90 leading-relaxed list-disc list-inside space-y-1">
-                    {language === 'rw' ? (
-                      <>
-                        <li>Gutanga amazu meza kubanyeshuri bose</li>
-                        <li>Urubuga rworoheje rwo gushakisha</li>
-                        <li>Gukoresha ikoranabuhanga riheza</li>
-                      </>
-                    ) : language === 'fr' ? (
-                      <>
-                        <li>Fournir des logements de qualité</li>
-                        <li>Plateforme facile à utiliser</li>
-                        <li>Technologie moderne</li>
-                      </>
-                    ) : (
-                      <>
-                        <li>Provide quality housing to all students</li>
-                        <li>Easy-to-use platform for searching</li>
-                        <li>Use modern technology</li>
-                      </>
-                    )}
-                  </ul>
-                </div>
+                <div className="text-xs text-gray-400 mt-0.5">Nationwide</div>
               </div>
+              <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-5 text-center border border-orange-200 hover:shadow-lg transition-shadow duration-300">
+                <div className="text-3xl font-bold text-orange-600">28+</div>
+                <div className="text-sm text-gray-600 font-medium mt-1">
+                  {t.propertiesAvailable}
+                </div>
+                <div className="text-xs text-gray-400 mt-0.5">And growing</div>
+              </div>
+            </div>
 
-              {/* What We Provide & Values */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
-                  <h4 className="text-lg font-bold mb-2 flex items-center gap-2">
-                    <span className="text-2xl">🎁</span> {t.whatWeProvide}
-                  </h4>
-                  <div className="grid grid-cols-2 gap-2 text-sm text-white/90">
-                    <div>🏠 Student Houses</div>
-                    <div>📱 Easy Search</div>
-                    <div>💰 Fair Prices</div>
-                    <div>🤝 Support</div>
+            {/* Mission, Vision, Expectations - 3 Column Grid with Icons */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-2xl p-6 border border-red-200 hover:shadow-lg transition-shadow duration-300 group">
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-red-500/30 group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-2xl">🎯</span>
                   </div>
-                </div>
-                <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
-                  <h4 className="text-lg font-bold mb-2 flex items-center gap-2">
-                    <span className="text-2xl">💎</span> {t.ourValues}
-                  </h4>
-                  <div className="grid grid-cols-3 gap-2 text-center text-sm text-white/90">
-                    <div>
-                      <div className="text-2xl">💎</div>
-                      <div className="text-xs">Quality</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl">🤝</div>
-                      <div className="text-xs">Respect</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl">🚀</div>
-                      <div className="text-xs">Innovation</div>
-                    </div>
+                  <div>
+                    <h4 className="text-lg font-bold text-gray-800 mb-2">
+                      {t.ourMission}
+                    </h4>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {language === "rw"
+                        ? "Intego yacu ni uguhuza abanyeshuri n'amazu meza, ari hafi ya kaminuza, ku giciro gito."
+                        : language === "fr"
+                          ? "Notre mission est de mettre en relation les étudiants avec des logements de qualité, proches des universités, à des prix abordables."
+                          : "Our mission is to connect students with quality housing, close to universities, at affordable prices."}
+                    </p>
                   </div>
                 </div>
               </div>
 
-              {/* Contact */}
-              <div className="border-t border-white/20 pt-4 mt-2">
-                <h4 className="font-semibold text-sm mb-3">📞 {t.contact}</h4>
-                <div className="flex flex-wrap gap-3 text-sm">
-                  <a href="tel:+250780414088" className="flex items-center gap-2 text-white/90 hover:text-white transition-colors">
-                    <PhoneIcon className="w-4 h-4" />
-                    +250 780 414 088
-                  </a>
-                  <a href="mailto:info@inyumbaproject.com" className="flex items-center gap-2 text-white/90 hover:text-white transition-colors">
-                    <EmailIcon className="w-4 h-4" />
-                    info@inyumbaproject.com
-                  </a>
-                  <a href="#" className="flex items-center gap-2 text-white/90 hover:text-white transition-colors">
-                    <WhatsAppIcon className="w-4 h-4" />
-                    WhatsApp
-                  </a>
-                  <a href="#" className="flex items-center gap-2 text-white/90 hover:text-white transition-colors">
-                    <FacebookIcon className="w-4 h-4" />
-                    Facebook
-                  </a>
-                  <a href="#" className="flex items-center gap-2 text-white/90 hover:text-white transition-colors">
-                    <InstagramIcon className="w-4 h-4" />
-                    Instagram
-                  </a>
-                  <a href="#" className="flex items-center gap-2 text-white/90 hover:text-white transition-colors">
-                    <TwitterIcon className="w-4 h-4" />
-                    Twitter
-                  </a>
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border border-blue-200 hover:shadow-lg transition-shadow duration-300 group">
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-2xl">👁️</span>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-bold text-gray-800 mb-2">
+                      {t.ourVision}
+                    </h4>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {language === "rw"
+                        ? "Icyerekezo cyacu ni ukugira urubuga rw'amazu y'abanyeshuri ruzwi cyane mu Rwanda."
+                        : language === "fr"
+                          ? "Notre vision est de devenir la plateforme de référence pour le logement étudiant au Rwanda."
+                          : "Our vision is to become the leading student housing platform in Rwanda."}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl p-6 border border-amber-200 hover:shadow-lg transition-shadow duration-300 group">
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-2xl">⭐</span>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-bold text-gray-800 mb-2">
+                      {t.ourExpectations}
+                    </h4>
+                    <ul className="text-sm text-gray-600 leading-relaxed list-disc list-inside space-y-1">
+                      {language === "rw" ? (
+                        <>
+                          <li>Gutanga amazu meza kubanyeshuri bose</li>
+                          <li>Urubuga rworoheje rwo gushakisha</li>
+                          <li>Gukoresha ikoranabuhanga riheza</li>
+                        </>
+                      ) : language === "fr" ? (
+                        <>
+                          <li>Fournir des logements de qualité</li>
+                          <li>Plateforme facile à utiliser</li>
+                          <li>Technologie moderne</li>
+                        </>
+                      ) : (
+                        <>
+                          <li>Provide quality housing to all students</li>
+                          <li>Easy-to-use platform for searching</li>
+                          <li>Use modern technology</li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
+
+            {/* What We Provide & Values - 2 Column Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 border border-green-200 hover:shadow-lg transition-shadow duration-300">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/30">
+                    <span className="text-lg">🎁</span>
+                  </div>
+                  <h4 className="text-lg font-bold text-gray-800">
+                    {t.whatWeProvide}
+                  </h4>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-white/70 rounded-xl p-3 text-center">
+                    <div className="text-2xl">🏠</div>
+                    <div className="text-xs font-medium text-gray-700 mt-1">
+                      Student Houses
+                    </div>
+                  </div>
+                  <div className="bg-white/70 rounded-xl p-3 text-center">
+                    <div className="text-2xl">📱</div>
+                    <div className="text-xs font-medium text-gray-700 mt-1">
+                      Easy Search
+                    </div>
+                  </div>
+                  <div className="bg-white/70 rounded-xl p-3 text-center">
+                    <div className="text-2xl">💰</div>
+                    <div className="text-xs font-medium text-gray-700 mt-1">
+                      Fair Prices
+                    </div>
+                  </div>
+                  <div className="bg-white/70 rounded-xl p-3 text-center">
+                    <div className="text-2xl">🤝</div>
+                    <div className="text-xs font-medium text-gray-700 mt-1">
+                      Support
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-2xl p-6 border border-pink-200 hover:shadow-lg transition-shadow duration-300">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg shadow-pink-500/30">
+                    <span className="text-lg">💎</span>
+                  </div>
+                  <h4 className="text-lg font-bold text-gray-800">
+                    {t.ourValues}
+                  </h4>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="bg-white/70 rounded-xl p-4 text-center">
+                    <div className="text-3xl">💎</div>
+                    <div className="text-xs font-semibold text-gray-700 mt-1">
+                      Quality
+                    </div>
+                    <div className="text-[10px] text-gray-500">Excellence</div>
+                  </div>
+                  <div className="bg-white/70 rounded-xl p-4 text-center">
+                    <div className="text-3xl">🤝</div>
+                    <div className="text-xs font-semibold text-gray-700 mt-1">
+                      Respect
+                    </div>
+                    <div className="text-[10px] text-gray-500">Integrity</div>
+                  </div>
+                  <div className="bg-white/70 rounded-xl p-4 text-center">
+                    <div className="text-3xl">🚀</div>
+                    <div className="text-xs font-semibold text-gray-700 mt-1">
+                      Innovation
+                    </div>
+                    <div className="text-[10px] text-gray-500">Growth</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -4306,10 +4667,14 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                   onClick={() => setIsLocationModalOpen(true)}
                   className="w-full text-left p-2 sm:p-3 rounded-xl transition-colors hover:bg-gray-50"
                 >
-                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">{t.where}</div>
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t.where}
+                  </div>
                   <div className="text-sm sm:text-base text-gray-700 truncate">
                     <SchoolIcon className="w-4 h-4 inline mr-1 text-[#FF385C]" />
-                    {searchLocation || selectedUniversity || "Any university in Rwanda"}
+                    {searchLocation ||
+                      selectedUniversity ||
+                      "Any university in Rwanda"}
                   </div>
                 </button>
               </div>
@@ -4319,8 +4684,12 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                   onClick={() => setIsDatePickerOpen(true)}
                   className="w-full text-left p-2 sm:p-3 rounded-xl transition-colors hover:bg-gray-50"
                 >
-                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">{t.when}</div>
-                  <div className="text-sm sm:text-base text-gray-700 truncate">{getDateRange()}</div>
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t.when}
+                  </div>
+                  <div className="text-sm sm:text-base text-gray-700 truncate">
+                    {getDateRange()}
+                  </div>
                 </button>
               </div>
 
@@ -4329,7 +4698,9 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                   onClick={() => setIsGuestModalOpen(true)}
                   className="w-full text-left p-2 sm:p-3 rounded-xl transition-colors hover:bg-gray-50"
                 >
-                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">{t.who}</div>
+                  <div className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t.who}
+                  </div>
                   <div className="text-sm sm:text-base text-gray-700 truncate">
                     <PeopleAltIcon className="w-4 h-4 inline mr-1 text-[#FF385C]" />
                     {getStudentCount()}
@@ -4367,7 +4738,9 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                 >
                   <div className="border-t border-gray-200 mt-3 pt-3 grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-3">
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.university}</label>
+                      <label className="text-xs font-medium text-gray-500">
+                        {t.university}
+                      </label>
                       <select
                         value={selectedUniversity}
                         onChange={(e) => setSelectedUniversity(e.target.value)}
@@ -4375,13 +4748,17 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                       >
                         <option value="">All Universities</option>
                         {uniqueUniversities.map((uni) => (
-                          <option key={uni} value={uni}>{uni}</option>
+                          <option key={uni} value={uni}>
+                            {uni}
+                          </option>
                         ))}
                       </select>
                     </div>
 
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.district}</label>
+                      <label className="text-xs font-medium text-gray-500">
+                        {t.district}
+                      </label>
                       <select
                         value={selectedDistrict}
                         onChange={(e) => setSelectedDistrict(e.target.value)}
@@ -4389,13 +4766,17 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                       >
                         <option value="">All Districts</option>
                         {uniqueDistricts.map((d) => (
-                          <option key={d} value={d}>{d}</option>
+                          <option key={d} value={d}>
+                            {d}
+                          </option>
                         ))}
                       </select>
                     </div>
 
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.sector}</label>
+                      <label className="text-xs font-medium text-gray-500">
+                        {t.sector}
+                      </label>
                       <select
                         value={selectedSector}
                         onChange={(e) => setSelectedSector(e.target.value)}
@@ -4403,13 +4784,17 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                       >
                         <option value="">All Sectors</option>
                         {uniqueSectors.map((s) => (
-                          <option key={s} value={s}>{s}</option>
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
                         ))}
                       </select>
                     </div>
 
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.cell}</label>
+                      <label className="text-xs font-medium text-gray-500">
+                        {t.cell}
+                      </label>
                       <select
                         value={selectedCell}
                         onChange={(e) => setSelectedCell(e.target.value)}
@@ -4417,13 +4802,17 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                       >
                         <option value="">All Cells</option>
                         {uniqueCells.map((c) => (
-                          <option key={c} value={c}>{c}</option>
+                          <option key={c} value={c}>
+                            {c}
+                          </option>
                         ))}
                       </select>
                     </div>
 
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.village}</label>
+                      <label className="text-xs font-medium text-gray-500">
+                        {t.village}
+                      </label>
                       <select
                         value={selectedVillage}
                         onChange={(e) => setSelectedVillage(e.target.value)}
@@ -4431,28 +4820,38 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                       >
                         <option value="">All Villages</option>
                         {uniqueVillages.map((v) => (
-                          <option key={v} value={v}>{v}</option>
+                          <option key={v} value={v}>
+                            {v}
+                          </option>
                         ))}
                       </select>
                     </div>
 
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.minutesFromCampus}</label>
+                      <label className="text-xs font-medium text-gray-500">
+                        {t.minutesFromCampus}
+                      </label>
                       <div className="flex items-center gap-2 mt-1">
                         <input
                           type="range"
                           min="0"
                           max="60"
                           value={maxMinutesFromCampus}
-                          onChange={(e) => setMaxMinutesFromCampus(parseInt(e.target.value))}
+                          onChange={(e) =>
+                            setMaxMinutesFromCampus(parseInt(e.target.value))
+                          }
                           className="flex-1 accent-[#FF385C]"
                         />
-                        <span className="text-sm font-medium text-gray-700 min-w-[30px]">{maxMinutesFromCampus}m</span>
+                        <span className="text-sm font-medium text-gray-700 min-w-[30px]">
+                          {maxMinutesFromCampus}m
+                        </span>
                       </div>
                     </div>
 
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.priceRange}</label>
+                      <label className="text-xs font-medium text-gray-500">
+                        {t.priceRange}
+                      </label>
                       <div className="flex items-center gap-2 mt-1">
                         <input
                           type="number"
@@ -4473,7 +4872,9 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                     </div>
 
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.sortBy}</label>
+                      <label className="text-xs font-medium text-gray-500">
+                        {t.sortBy}
+                      </label>
                       <select
                         value={sortOption}
                         onChange={(e) => setSortOption(e.target.value)}
@@ -4523,10 +4924,14 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                 <div
                   className={`w-6 h-6 bg-gradient-to-br ${category.color} rounded-full flex items-center justify-center text-white`}
                 >
-                  {React.cloneElement(category.icon, { className: "w-3.5 h-3.5" })}
+                  {React.cloneElement(category.icon, {
+                    className: "w-3.5 h-3.5",
+                  })}
                 </div>
               </div>
-              <span className="text-xs font-medium whitespace-nowrap">{category.name}</span>
+              <span className="text-xs font-medium whitespace-nowrap">
+                {category.name}
+              </span>
             </motion.button>
           ))}
         </div>
@@ -4609,12 +5014,16 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                     {getTranslatedType(house.type)}
                   </div>
                   <div className="absolute top-2 left-2">
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${getUniversityColor(house.university)}`}>
+                    <span
+                      className={`px-2 py-0.5 rounded text-xs font-medium ${getUniversityColor(house.university)}`}
+                    >
                       {house.university}
                     </span>
                   </div>
                   <div className="absolute top-2 left-1/2 -translate-x-1/2">
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(house.bookingStatus)}`}>
+                    <span
+                      className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(house.bookingStatus)}`}
+                    >
                       {getStatusText(house.bookingStatus)}
                     </span>
                   </div>
@@ -4630,15 +5039,21 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                 <div className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-sm sm:text-base text-gray-900 truncate">{house.name}</h3>
+                      <h3 className="font-semibold text-sm sm:text-base text-gray-900 truncate">
+                        {house.name}
+                      </h3>
                       <p className="text-xs text-gray-500 mt-0.5 truncate">
                         <LocationOnIcon className="w-3 h-3 inline mr-0.5" />
                         {house.village}, {house.sector}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs text-gray-500">{house.rooms} {t.rooms}</span>
+                        <span className="text-xs text-gray-500">
+                          {house.rooms} {t.rooms}
+                        </span>
                         <span className="text-xs text-gray-300">•</span>
-                        <span className="text-xs text-gray-500">{house.bathrooms} {t.bathrooms}</span>
+                        <span className="text-xs text-gray-500">
+                          {house.bathrooms} {t.bathrooms}
+                        </span>
                       </div>
                     </div>
                     <div className="flex flex-col items-end flex-shrink-0 ml-2">
@@ -4677,46 +5092,54 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
             </button>
 
             <div className="flex items-center gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                if (
-                  page === 1 ||
-                  page === totalPages ||
-                  Math.abs(page - currentPage) <= 1 ||
-                  (page === 2 && currentPage > 3) ||
-                  (page === totalPages - 1 && currentPage < totalPages - 2)
-                ) {
-                  return (
-                    <motion.button
-                      key={page}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => goToPage(page)}
-                      className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-all ${
-                        currentPage === page
-                          ? "bg-[#FF385C] text-white shadow-lg shadow-[#FF385C]/30"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                      }`}
-                    >
-                      {page}
-                    </motion.button>
-                  );
-                }
-                if (page === 2 && currentPage > 3) {
-                  return (
-                    <span key="ellipsis-start" className="w-9 h-9 flex items-center justify-center text-gray-400">
-                      …
-                    </span>
-                  );
-                }
-                if (page === totalPages - 1 && currentPage < totalPages - 2) {
-                  return (
-                    <span key="ellipsis-end" className="w-9 h-9 flex items-center justify-center text-gray-400">
-                      …
-                    </span>
-                  );
-                }
-                return null;
-              })}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => {
+                  if (
+                    page === 1 ||
+                    page === totalPages ||
+                    Math.abs(page - currentPage) <= 1 ||
+                    (page === 2 && currentPage > 3) ||
+                    (page === totalPages - 1 && currentPage < totalPages - 2)
+                  ) {
+                    return (
+                      <motion.button
+                        key={page}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => goToPage(page)}
+                        className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-all ${
+                          currentPage === page
+                            ? "bg-[#FF385C] text-white shadow-lg shadow-[#FF385C]/30"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        {page}
+                      </motion.button>
+                    );
+                  }
+                  if (page === 2 && currentPage > 3) {
+                    return (
+                      <span
+                        key="ellipsis-start"
+                        className="w-9 h-9 flex items-center justify-center text-gray-400"
+                      >
+                        …
+                      </span>
+                    );
+                  }
+                  if (page === totalPages - 1 && currentPage < totalPages - 2) {
+                    return (
+                      <span
+                        key="ellipsis-end"
+                        className="w-9 h-9 flex items-center justify-center text-gray-400"
+                      >
+                        …
+                      </span>
+                    );
+                  }
+                  return null;
+                },
+              )}
             </div>
 
             <button
@@ -4784,13 +5207,17 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                     )}
                   </button>
                   <div className="absolute bottom-3 left-3">
-                    <span className={`px-3 py-1 rounded text-xs font-medium ${getUniversityColor(selectedHouse.university)}`}>
+                    <span
+                      className={`px-3 py-1 rounded text-xs font-medium ${getUniversityColor(selectedHouse.university)}`}
+                    >
                       <SchoolIcon className="w-4 h-4 inline mr-1" />
                       {selectedHouse.university}
                     </span>
                   </div>
                   <div className="absolute bottom-3 right-3">
-                    <span className={`px-3 py-1 rounded text-xs font-medium ${getStatusColor(selectedHouse.bookingStatus)}`}>
+                    <span
+                      className={`px-3 py-1 rounded text-xs font-medium ${getStatusColor(selectedHouse.bookingStatus)}`}
+                    >
                       {getStatusText(selectedHouse.bookingStatus)}
                     </span>
                   </div>
@@ -4804,12 +5231,16 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                 <div className="p-6 overflow-y-auto max-h-[calc(90vh-280px)]">
                   <div className="flex flex-col md:flex-row items-start justify-between mb-4 gap-2">
                     <div>
-                      <h3 className="text-xl font-bold text-gray-900">{selectedHouse.name}</h3>
+                      <h3 className="text-xl font-bold text-gray-900">
+                        {selectedHouse.name}
+                      </h3>
                       <p className="text-sm text-gray-500 mt-1">
                         <LocationOnIcon className="w-4 h-4 inline mr-0.5" />
                         {getLocationInfo(selectedHouse)}
                       </p>
-                      <p className="text-sm text-gray-600 mt-1">{selectedHouse.description}</p>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {selectedHouse.description}
+                      </p>
                     </div>
                     <div className="flex items-center gap-1 text-lg font-medium text-gray-700 flex-shrink-0">
                       <StarIcon className="w-5 h-5 text-yellow-400 fill-current" />
@@ -4835,25 +5266,37 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                   <div className="grid grid-cols-2 gap-3 mb-4">
                     <div className="bg-gray-50 rounded-lg p-3">
                       <p className="text-xs text-gray-500">{t.province}</p>
-                      <p className="text-sm font-semibold text-gray-900">{selectedHouse.province}</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {selectedHouse.province}
+                      </p>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-3">
                       <p className="text-xs text-gray-500">{t.district}</p>
-                      <p className="text-sm font-semibold text-gray-900">{selectedHouse.district}</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {selectedHouse.district}
+                      </p>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-3">
                       <p className="text-xs text-gray-500">{t.sector}</p>
-                      <p className="text-sm font-semibold text-gray-900">{selectedHouse.sector}</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {selectedHouse.sector}
+                      </p>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-3">
                       <p className="text-xs text-gray-500">{t.cell}</p>
-                      <p className="text-sm font-semibold text-gray-900">{selectedHouse.cell}</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {selectedHouse.cell}
+                      </p>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-3 col-span-2">
                       <p className="text-xs text-gray-500">{t.village}</p>
-                      <p className="text-sm font-semibold text-gray-900">{selectedHouse.village}</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {selectedHouse.village}
+                      </p>
                       {selectedHouse.code_vil_1 && (
-                        <p className="text-xs text-gray-400 mt-0.5">Code: {selectedHouse.code_vil_1}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          Code: {selectedHouse.code_vil_1}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -4882,7 +5325,10 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                     </h4>
                     <div className="flex flex-wrap gap-2">
                       {selectedHouse.features?.map((feature) => (
-                        <span key={feature} className="px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-700">
+                        <span
+                          key={feature}
+                          className="px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-700"
+                        >
                           {feature}
                         </span>
                       ))}
@@ -4895,22 +5341,43 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                       {t.owner} & {t.contact}
                     </h4>
                     <div className="bg-gray-50 rounded-lg p-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                      <span className="text-sm font-medium text-gray-900">{selectedHouse.owner}</span>
-                      <span className="text-sm text-gray-700">📞 {selectedHouse.contact}</span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {selectedHouse.owner}
+                      </span>
+                      <span className="text-sm text-gray-700">
+                        📞 {selectedHouse.contact}
+                      </span>
                     </div>
                   </div>
 
                   <div className="border-t border-gray-200 pt-4 mt-4">
-                    <h4 className="font-semibold text-sm text-gray-900 mb-2">{t.amenities}</h4>
+                    <h4 className="font-semibold text-sm text-gray-900 mb-2">
+                      {t.amenities}
+                    </h4>
                     <div className="flex flex-wrap gap-2">
                       {selectedHouse.amenities?.map((amenity) => {
-                        let icon = <CheckCircleIcon className="w-4 h-4 text-[#FF385C]" />;
-                        if (amenity === "WiFi") icon = <WifiIcon className="w-4 h-4 text-blue-500" />;
-                        if (amenity === "Kitchen" || amenity === "Kitchenette") icon = <KitchenIcon className="w-4 h-4 text-orange-500" />;
-                        if (amenity === "Parking") icon = <LocalParkingIcon className="w-4 h-4 text-green-500" />;
-                        if (amenity === "Security") icon = <SecurityIcon className="w-4 h-4 text-red-500" />;
+                        let icon = (
+                          <CheckCircleIcon className="w-4 h-4 text-[#FF385C]" />
+                        );
+                        if (amenity === "WiFi")
+                          icon = <WifiIcon className="w-4 h-4 text-blue-500" />;
+                        if (amenity === "Kitchen" || amenity === "Kitchenette")
+                          icon = (
+                            <KitchenIcon className="w-4 h-4 text-orange-500" />
+                          );
+                        if (amenity === "Parking")
+                          icon = (
+                            <LocalParkingIcon className="w-4 h-4 text-green-500" />
+                          );
+                        if (amenity === "Security")
+                          icon = (
+                            <SecurityIcon className="w-4 h-4 text-red-500" />
+                          );
                         return (
-                          <span key={amenity} className="flex items-center gap-1 px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-700">
+                          <span
+                            key={amenity}
+                            className="flex items-center gap-1 px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-700"
+                          >
                             {icon}
                             {amenity}
                           </span>
@@ -4922,13 +5389,19 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                   <div className="border-t border-gray-200 pt-4 mt-4">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                       <div>
-                        <p className="text-sm text-gray-500">{t.price} ({t.priceInRWF})</p>
+                        <p className="text-sm text-gray-500">
+                          {t.price} ({t.priceInRWF})
+                        </p>
                         <p className="text-2xl font-bold text-gray-900">
                           {selectedHouse.priceRWF.toLocaleString()} RWF
-                          <span className="text-sm font-normal text-gray-500"> {t.perNight}</span>
+                          <span className="text-sm font-normal text-gray-500">
+                            {" "}
+                            {t.perNight}
+                          </span>
                         </p>
                         <p className="text-sm text-gray-500 mt-1">
-                          ${selectedHouse.price} USD • {selectedHouse.nights} {t.nightsTotal}
+                          ${selectedHouse.price} USD • {selectedHouse.nights}{" "}
+                          {t.nightsTotal}
                         </p>
                       </div>
                       {selectedHouse.bookingStatus === "available" && (
@@ -4975,8 +5448,13 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
             >
               <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-hidden shadow-2xl">
                 <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">{isLoginMode ? t.loginNow : t.registerNow}</h3>
-                  <button onClick={() => setIsLoginModalOpen(false)} className="p-1 rounded-full hover:bg-gray-100 transition-colors">
+                  <h3 className="text-lg font-semibold">
+                    {isLoginMode ? t.loginNow : t.registerNow}
+                  </h3>
+                  <button
+                    onClick={() => setIsLoginModalOpen(false)}
+                    className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                  >
                     <CloseIcon className="w-5 h-5" />
                   </button>
                 </div>
@@ -4985,7 +5463,9 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                     <div className="space-y-4">
                       <p className="text-sm text-gray-500">{t.loginToOrder}</p>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">{t.email}</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {t.email}
+                        </label>
                         <input
                           type="email"
                           value={loginEmail}
@@ -4995,7 +5475,9 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">{t.password}</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {t.password}
+                        </label>
                         <input
                           type="password"
                           value={loginPassword}
@@ -5015,16 +5497,23 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                       </motion.button>
                       <p className="text-center text-sm text-gray-500">
                         {t.or}{" "}
-                        <button onClick={() => setIsLoginMode(false)} className="text-[#FF385C] font-medium hover:underline">
+                        <button
+                          onClick={() => setIsLoginMode(false)}
+                          className="text-[#FF385C] font-medium hover:underline"
+                        >
                           {t.registerNow}
                         </button>
                       </p>
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      <p className="text-sm text-gray-500">Create an account to order this house</p>
+                      <p className="text-sm text-gray-500">
+                        Create an account to order this house
+                      </p>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Full Name
+                        </label>
                         <input
                           type="text"
                           value={registerName}
@@ -5034,7 +5523,9 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">{t.email}</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {t.email}
+                        </label>
                         <input
                           type="email"
                           value={registerEmail}
@@ -5044,7 +5535,9 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">{t.phone}</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {t.phone}
+                        </label>
                         <input
                           type="tel"
                           value={registerPhone}
@@ -5054,7 +5547,9 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">{t.password}</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {t.password}
+                        </label>
                         <input
                           type="password"
                           value={registerPassword}
@@ -5064,11 +5559,15 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">{t.confirmPassword}</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {t.confirmPassword}
+                        </label>
                         <input
                           type="password"
                           value={registerConfirmPassword}
-                          onChange={(e) => setRegisterConfirmPassword(e.target.value)}
+                          onChange={(e) =>
+                            setRegisterConfirmPassword(e.target.value)
+                          }
                           placeholder="••••••••"
                           className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#FF385C]"
                         />
@@ -5084,7 +5583,10 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                       </motion.button>
                       <p className="text-center text-sm text-gray-500">
                         {t.or}{" "}
-                        <button onClick={() => setIsLoginMode(true)} className="text-[#FF385C] font-medium hover:underline">
+                        <button
+                          onClick={() => setIsLoginMode(true)}
+                          className="text-[#FF385C] font-medium hover:underline"
+                        >
                           {t.loginNow}
                         </button>
                       </p>
@@ -5119,7 +5621,10 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
               <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-hidden shadow-2xl">
                 <div className="p-4 border-b border-gray-200 flex items-center justify-between">
                   <h3 className="text-lg font-semibold">{t.payWithMomo}</h3>
-                  <button onClick={closePaymentModal} className="p-1 rounded-full hover:bg-gray-100 transition-colors">
+                  <button
+                    onClick={closePaymentModal}
+                    className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                  >
                     <CloseIcon className="w-5 h-5" />
                   </button>
                 </div>
@@ -5131,8 +5636,12 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <CheckCircleIcon className="w-10 h-10 text-green-500" />
                           </div>
-                          <h4 className="text-2xl font-bold text-green-500 mb-2">{t.paymentSuccess}</h4>
-                          <p className="text-sm text-gray-500 mb-6">{t.yourBookingConfirmed}</p>
+                          <h4 className="text-2xl font-bold text-green-500 mb-2">
+                            {t.paymentSuccess}
+                          </h4>
+                          <p className="text-sm text-gray-500 mb-6">
+                            {t.yourBookingConfirmed}
+                          </p>
                           <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
@@ -5147,8 +5656,12 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                           <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <ErrorIcon className="w-10 h-10 text-red-500" />
                           </div>
-                          <h4 className="text-2xl font-bold text-red-500 mb-2">{t.paymentFailed}</h4>
-                          <p className="text-sm text-gray-500 mb-6">Please check your MOMO number and try again.</p>
+                          <h4 className="text-2xl font-bold text-red-500 mb-2">
+                            {t.paymentFailed}
+                          </h4>
+                          <p className="text-sm text-gray-500 mb-6">
+                            Please check your MOMO number and try again.
+                          </p>
                           <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
@@ -5163,7 +5676,9 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                   ) : (
                     <>
                       <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">{t.enterMomoNumber}</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          {t.enterMomoNumber}
+                        </label>
                         <input
                           type="tel"
                           value={momoNumber}
@@ -5174,14 +5689,27 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                         />
                       </div>
                       <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                        <h4 className="font-semibold text-sm text-gray-900 mb-2">{t.bookingDetails}</h4>
-                        <p className="text-xs text-gray-500">{selectedHouse?.name}</p>
-                        <p className="text-xs text-gray-500">{selectedHouse?.university}</p>
+                        <h4 className="font-semibold text-sm text-gray-900 mb-2">
+                          {t.bookingDetails}
+                        </h4>
                         <p className="text-xs text-gray-500">
-                          {selectedHouse?.nights} {t.nights} × {selectedHouse?.priceRWF.toLocaleString()} RWF = {(selectedHouse?.priceRWF || 0) * (selectedHouse?.nights || 0)} RWF
+                          {selectedHouse?.name}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {selectedHouse?.university}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {selectedHouse?.nights} {t.nights} ×{" "}
+                          {selectedHouse?.priceRWF.toLocaleString()} RWF ={" "}
+                          {(selectedHouse?.priceRWF || 0) *
+                            (selectedHouse?.nights || 0)}{" "}
+                          RWF
                         </p>
                         <p className="text-base font-bold text-gray-900 mt-2">
-                          {t.totalPrice}: {(selectedHouse?.priceRWF || 0) * (selectedHouse?.nights || 0)} RWF
+                          {t.totalPrice}:{" "}
+                          {(selectedHouse?.priceRWF || 0) *
+                            (selectedHouse?.nights || 0)}{" "}
+                          RWF
                         </p>
                       </div>
                       <motion.button
@@ -5231,7 +5759,10 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
               <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] overflow-hidden shadow-2xl">
                 <div className="p-4 border-b border-gray-200 flex items-center justify-between">
                   <h3 className="text-lg font-semibold">{t.selectLocation}</h3>
-                  <button onClick={() => setIsLocationModalOpen(false)} className="p-1 rounded-full hover:bg-gray-100 transition-colors">
+                  <button
+                    onClick={() => setIsLocationModalOpen(false)}
+                    className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                  >
                     <CloseIcon className="w-5 h-5" />
                   </button>
                 </div>
@@ -5271,7 +5802,9 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                           </button>
                         ))
                       ) : (
-                        <p className="text-sm text-gray-400 px-3 py-2">No universities found</p>
+                        <p className="text-sm text-gray-400 px-3 py-2">
+                          No universities found
+                        </p>
                       )}
                     </div>
                   </div>
@@ -5299,7 +5832,9 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                           </button>
                         ))
                       ) : (
-                        <p className="text-sm text-gray-400 px-3 py-2">No districts found</p>
+                        <p className="text-sm text-gray-400 px-3 py-2">
+                          No districts found
+                        </p>
                       )}
                     </div>
                   </div>
@@ -5333,38 +5868,66 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                 <div className="p-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-2">
                   <h3 className="text-lg font-semibold">{t.when}</h3>
                   <div className="flex items-center gap-2">
-                    <button onClick={clearDates} className="text-sm text-gray-500 hover:text-gray-700 transition-colors">
+                    <button
+                      onClick={clearDates}
+                      className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                    >
                       {t.clear}
                     </button>
-                    <button onClick={() => setIsDatePickerOpen(false)} className="p-1 rounded-full hover:bg-gray-100 transition-colors">
+                    <button
+                      onClick={() => setIsDatePickerOpen(false)}
+                      className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                    >
                       <CloseIcon className="w-5 h-5" />
                     </button>
                   </div>
                 </div>
                 <div className="p-4 overflow-y-auto">
                   <div className="flex items-center justify-between mb-4">
-                    <button onClick={() => changeMonth(-1)} className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                    <button
+                      onClick={() => changeMonth(-1)}
+                      className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                    >
                       <ArrowBackIcon className="w-5 h-5" />
                     </button>
                     <h4 className="font-semibold">
-                      {new Date(currentYear, currentMonth).toLocaleString("default", { month: "long", year: "numeric" })}
+                      {new Date(currentYear, currentMonth).toLocaleString(
+                        "default",
+                        { month: "long", year: "numeric" },
+                      )}
                     </h4>
-                    <button onClick={() => changeMonth(1)} className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                    <button
+                      onClick={() => changeMonth(1)}
+                      className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                    >
                       <ArrowForwardIcon className="w-5 h-5" />
                     </button>
                   </div>
                   <div className="grid grid-cols-7 gap-1 mb-2">
                     {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
-                      <div key={day} className="text-center text-xs font-medium text-gray-500 py-1">
+                      <div
+                        key={day}
+                        className="text-center text-xs font-medium text-gray-500 py-1"
+                      >
                         {day}
                       </div>
                     ))}
                   </div>
-                  <div className="grid grid-cols-7 gap-1">{renderCalendar()}</div>
+                  <div className="grid grid-cols-7 gap-1">
+                    {renderCalendar()}
+                  </div>
                   <div className="mt-4 flex flex-wrap items-center justify-between border-t border-gray-200 pt-4 gap-2">
                     <div className="flex flex-wrap gap-2">
-                      {tempCheckIn && <span className="text-sm">{t.checkIn}: {tempCheckIn.toLocaleDateString()}</span>}
-                      {tempCheckOut && <span className="text-sm">{t.checkOut}: {tempCheckOut.toLocaleDateString()}</span>}
+                      {tempCheckIn && (
+                        <span className="text-sm">
+                          {t.checkIn}: {tempCheckIn.toLocaleDateString()}
+                        </span>
+                      )}
+                      {tempCheckOut && (
+                        <span className="text-sm">
+                          {t.checkOut}: {tempCheckOut.toLocaleDateString()}
+                        </span>
+                      )}
                     </div>
                     <button
                       onClick={applyDates}
@@ -5406,7 +5969,10 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                     <PeopleAltIcon className="w-5 h-5 inline mr-2 text-[#FF385C]" />
                     {t.guests}
                   </h3>
-                  <button onClick={() => setIsGuestModalOpen(false)} className="p-1 rounded-full hover:bg-gray-100 transition-colors">
+                  <button
+                    onClick={() => setIsGuestModalOpen(false)}
+                    className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                  >
                     <CloseIcon className="w-5 h-5" />
                   </button>
                 </div>
@@ -5414,16 +5980,22 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <PeopleAltIcon className="w-5 h-5 text-gray-500" />
-                      <span className="font-medium">{t.students || "Students"}</span>
+                      <span className="font-medium">
+                        {t.students || "Students"}
+                      </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <button
-                        onClick={() => setStudentCount(Math.max(1, studentCount - 1))}
+                        onClick={() =>
+                          setStudentCount(Math.max(1, studentCount - 1))
+                        }
                         className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
                       >
                         <RemoveIcon className="w-4 h-4" />
                       </button>
-                      <span className="w-6 text-center font-medium">{studentCount}</span>
+                      <span className="w-6 text-center font-medium">
+                        {studentCount}
+                      </span>
                       <button
                         onClick={() => setStudentCount(studentCount + 1)}
                         className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
