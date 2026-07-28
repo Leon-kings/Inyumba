@@ -1685,36 +1685,6 @@ const teamMembers: TeamMember[] = [
   },
 ];
 
-const testimonialsData = [
-  {
-    quote:
-      "INYUMBA PROJECT helped me find the perfect house near INES-Ruhengeri. The process was so easy and the landlord was very welcoming!",
-    author: "Jean Paul Mugisha",
-    university: "INES-Ruhengeri Student",
-    rating: 5,
-  },
-  {
-    quote:
-      "I was worried about finding accommodation near UR-CAVM, but INYUMBA PROJECT made it so simple. I found a great place within my budget.",
-    author: "Marie Claire Uwimana",
-    university: "UR-CAVM Student",
-    rating: 5,
-  },
-  {
-    quote:
-      "The platform is very user-friendly and the houses are exactly as described. I highly recommend INYUMBA PROJECT to all students.",
-    author: "David Niyonzima",
-    university: "UR-Huye Campus Student",
-    rating: 5,
-  },
-  {
-    quote:
-      "Finding a student house in Kigali was stressful until I found INYUMBA PROJECT. Now I have a comfortable place near campus.",
-    author: "Grace Uwase",
-    university: "University of Kigali Student",
-    rating: 5,
-  },
-];
 
 export const About: React.FC<{ language?: "en" | "fr" | "rw" }> = ({
   language = "en",
@@ -2201,62 +2171,6 @@ export const About: React.FC<{ language?: "en" | "fr" | "rw" }> = ({
                   <p className="text-xs sm:text-sm text-gray-600 mt-1">
                     {feature.desc}
                   </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-16 bg-gradient-to-br from-[#FF385C]/5 via-white to-[#FF385C]/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-              {t.testimonials}
-            </h2>
-            <div className="w-20 h-1 bg-[#FF385C] rounded-full mx-auto mt-4"></div>
-          </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {testimonialsData.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -4 }}
-                className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100"
-              >
-                <div className="flex items-center gap-1 mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <StarIcon
-                      key={i}
-                      className="w-4 h-4 text-yellow-400 fill-current"
-                    />
-                  ))}
-                </div>
-                <p className="text-gray-700 leading-relaxed text-sm sm:text-base mb-4">
-                  "{testimonial.quote}"
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#FF385C] to-[#E31C5F] flex items-center justify-center text-white font-semibold text-sm">
-                    {testimonial.author.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900 text-sm">
-                      {testimonial.author}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {testimonial.university}
-                    </p>
-                  </div>
                 </div>
               </motion.div>
             ))}
