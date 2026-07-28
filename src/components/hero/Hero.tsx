@@ -1,0 +1,2287 @@
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+// Material-UI Icons - Only imported ones that are used
+import SearchIcon from "@mui/icons-material/Search";
+import CloseIcon from "@mui/icons-material/Close";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import StarIcon from "@mui/icons-material/Star";
+import ApartmentIcon from "@mui/icons-material/Apartment";
+import HomeIcon from "@mui/icons-material/Home";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import RemoveIcon from "@mui/icons-material/Remove";
+import AddIcon from "@mui/icons-material/Add";
+import HotelIcon from "@mui/icons-material/Hotel";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorIcon from "@mui/icons-material/Error";
+import SchoolIcon from "@mui/icons-material/School";
+import LocationCityIcon from "@mui/icons-material/LocationCity";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import BedIcon from "@mui/icons-material/Bed";
+import BathroomIcon from "@mui/icons-material/Bathroom";
+import KitchenIcon from "@mui/icons-material/Kitchen";
+import WifiIcon from "@mui/icons-material/Wifi";
+import LocalParkingIcon from "@mui/icons-material/LocalParking";
+import SecurityIcon from "@mui/icons-material/Security";
+import BookmarkIcon from "@mui/icons-material/Bookmark";
+
+// Sample hero images for slideshow - Focus on student housing
+const heroImages = [
+  {
+    url: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=1600&h=600&fit=crop",
+    title: "Find Your Perfect Student Home",
+    subtitle: "Affordable housing near universities in Rwanda & East Africa",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&h=600&fit=crop",
+    title: "Safe & Comfortable Living",
+    subtitle: "Verified student accommodations with all amenities",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=1600&h=600&fit=crop",
+    title: "Near Your Campus",
+    subtitle: "Houses and rooms located close to major universities",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=1600&h=600&fit=crop",
+    title: "Student-Friendly Prices",
+    subtitle: "Affordable rates designed for student budgets",
+  },
+];
+
+// INYUMBA PROJECT - Student Housing Data based on the documentation
+const studentHouses = [
+  // INES-Ruhengeri Area (Musanze) - Primary focus
+  {
+    id: 1,
+    name: "INES Ruhengeri Student Lodge",
+    type: "House",
+    price: 85,
+    nights: 30,
+    rating: 4.97,
+    category: "student",
+    university: "INES-Ruhengeri",
+    district: "Musanze",
+    sector: "Muhoza",
+    cell: "Cyabararika",
+    village: "Cyabararika",
+    rooms: 4,
+    bathrooms: 2,
+    image:
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
+    description:
+      "Modern student house near INES-Ruhengeri, 5 min walk to campus",
+    amenities: [
+      "WiFi",
+      "Kitchen",
+      "Security",
+      "Parking",
+      "Study Room",
+      "Laundry",
+    ],
+  },
+  {
+    id: 2,
+    name: "Muhoza Student Apartments",
+    type: "Apartment",
+    price: 70,
+    nights: 30,
+    rating: 4.85,
+    category: "student",
+    university: "INES-Ruhengeri",
+    district: "Musanze",
+    sector: "Muhoza",
+    cell: "Kigombe",
+    village: "Kigombe",
+    rooms: 3,
+    bathrooms: 1,
+    image:
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
+    description: "Spacious apartments for students, close to INES-Ruhengeri",
+    amenities: ["WiFi", "Kitchen", "Security", "Parking", "Water Heater"],
+  },
+  {
+    id: 3,
+    name: "Kigombe Student House",
+    type: "House",
+    price: 90,
+    nights: 30,
+    rating: 4.92,
+    category: "student",
+    university: "INES-Ruhengeri",
+    district: "Musanze",
+    sector: "Muhoza",
+    cell: "Kigombe",
+    village: "Gasanzwe",
+    rooms: 5,
+    bathrooms: 2,
+    image:
+      "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop",
+    description:
+      "Large student house with garden, perfect for group of students",
+    amenities: ["WiFi", "Kitchen", "Garden", "Parking", "Study Area", "BBQ"],
+  },
+  {
+    id: 4,
+    name: "Ruhengeri City Hostel",
+    type: "Room",
+    price: 50,
+    nights: 30,
+    rating: 4.78,
+    category: "student",
+    university: "INES-Ruhengeri",
+    district: "Musanze",
+    sector: "Muhoza",
+    cell: "Ruhengeri",
+    village: "Ruhengeri",
+    rooms: 1,
+    bathrooms: 1,
+    image:
+      "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
+    description: "Affordable single rooms for students in central Ruhengeri",
+    amenities: ["WiFi", "Shared Kitchen", "Security", "Common Area"],
+  },
+  {
+    id: 5,
+    name: "Cyabararika Student Lodge",
+    type: "Apartment",
+    price: 75,
+    nights: 30,
+    rating: 4.88,
+    category: "student",
+    university: "INES-Ruhengeri",
+    district: "Musanze",
+    sector: "Muhoza",
+    cell: "Cyabararika",
+    village: "Kabirizi",
+    rooms: 2,
+    bathrooms: 1,
+    image:
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
+    description: "Modern student apartments near INES-Ruhengeri campus",
+    amenities: ["WiFi", "Kitchenette", "Security", "Study Desk", "Laundry"],
+  },
+  // UR-CAVM (Musanze) Area
+  {
+    id: 6,
+    name: "UR-CAVM Student Village",
+    type: "Apartment",
+    price: 80,
+    nights: 30,
+    rating: 4.9,
+    category: "student",
+    university: "UR-CAVM",
+    district: "Musanze",
+    sector: "Busogo",
+    cell: "Busogo",
+    village: "Busogo",
+    rooms: 3,
+    bathrooms: 2,
+    image:
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
+    description: "Student apartments near UR-CAVM campus, Busogo",
+    amenities: ["WiFi", "Kitchen", "Security", "Parking", "Study Room"],
+  },
+  {
+    id: 7,
+    name: "Busogo Student House",
+    type: "House",
+    price: 95,
+    nights: 30,
+    rating: 4.84,
+    category: "student",
+    university: "UR-CAVM",
+    district: "Musanze",
+    sector: "Busogo",
+    cell: "Busogo",
+    village: "Busogo",
+    rooms: 4,
+    bathrooms: 2,
+    image:
+      "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop",
+    description: "Spacious student house with garden, near UR-CAVM",
+    amenities: ["WiFi", "Kitchen", "Garden", "Parking", "Laundry"],
+  },
+  // IPRC Musanze Area
+  {
+    id: 8,
+    name: "IPRC Musanze Hostel",
+    type: "Room",
+    price: 55,
+    nights: 30,
+    rating: 4.75,
+    category: "student",
+    university: "IPRC Musanze",
+    district: "Musanze",
+    sector: "Muhoza",
+    cell: "Kigombe",
+    village: "Muhe",
+    rooms: 1,
+    bathrooms: 1,
+    image:
+      "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
+    description: "Affordable student rooms near IPRC Musanze campus",
+    amenities: ["WiFi", "Shared Kitchen", "Security", "Common Area"],
+  },
+  // UR-Huye Campus Area
+  {
+    id: 9,
+    name: "UR Huye Student Flats",
+    type: "Apartment",
+    price: 72,
+    nights: 30,
+    rating: 4.82,
+    category: "student",
+    university: "UR-Huye Campus",
+    district: "Huye",
+    sector: "Ngoma",
+    cell: "Butare",
+    village: "Ruhande",
+    rooms: 2,
+    bathrooms: 1,
+    image:
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
+    description: "Student apartments near UR Huye campus, Ruhande",
+    amenities: ["WiFi", "Kitchenette", "Security", "Study Area"],
+  },
+  {
+    id: 10,
+    name: "Butare Student Lodge",
+    type: "House",
+    price: 88,
+    nights: 30,
+    rating: 4.79,
+    category: "student",
+    university: "UR-Huye Campus",
+    district: "Huye",
+    sector: "Ngoma",
+    cell: "Butare",
+    village: "Butare",
+    rooms: 3,
+    bathrooms: 2,
+    image:
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
+    description: "Student house in Butare, walking distance to UR Huye",
+    amenities: ["WiFi", "Kitchen", "Garden", "Parking", "Study Room"],
+  },
+  {
+    id: 11,
+    name: "IPRC Huye Hostel",
+    type: "Room",
+    price: 48,
+    nights: 30,
+    rating: 4.7,
+    category: "student",
+    university: "IPRC Huye",
+    district: "Huye",
+    sector: "Ngoma",
+    cell: "Ngoma",
+    village: "Ngoma",
+    rooms: 1,
+    bathrooms: 1,
+    image:
+      "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
+    description: "Affordable rooms for IPRC Huye students",
+    amenities: ["WiFi", "Shared Kitchen", "Security", "Study Area"],
+  },
+  // UR-CE (Rwamagana) Area
+  {
+    id: 12,
+    name: "UR-CE Student Village",
+    type: "Apartment",
+    price: 68,
+    nights: 30,
+    rating: 4.76,
+    category: "student",
+    university: "UR-CE (Education)",
+    district: "Rwamagana",
+    sector: "Rukara",
+    cell: "Rukara",
+    village: "Rukara",
+    rooms: 2,
+    bathrooms: 1,
+    image:
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
+    description: "Student housing near UR-CE campus in Rwamagana",
+    amenities: ["WiFi", "Kitchen", "Security", "Parking"],
+  },
+  // UR-Nyagatare Area
+  {
+    id: 13,
+    name: "Nyagatare Student Lodge",
+    type: "House",
+    price: 65,
+    nights: 30,
+    rating: 4.74,
+    category: "student",
+    university: "UR-Nyagatare Campus",
+    district: "Nyagatare",
+    sector: "Nyagatare",
+    cell: "Nyagatare",
+    village: "Nyagatare",
+    rooms: 3,
+    bathrooms: 2,
+    image:
+      "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop",
+    description: "Student house near UR Nyagatare campus",
+    amenities: ["WiFi", "Kitchen", "Garden", "Parking"],
+  },
+  // Kigali Universities Area
+  {
+    id: 14,
+    name: "Nyarugenge Student Apartments",
+    type: "Apartment",
+    price: 95,
+    nights: 30,
+    rating: 4.89,
+    category: "student",
+    university: "UR-CST",
+    district: "Nyarugenge",
+    sector: "Nyarugenge",
+    cell: "Kiyovu",
+    village: "Kiyovu",
+    rooms: 2,
+    bathrooms: 1,
+    image:
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
+    description: "Modern student apartments near UR-CST in Kiyovu",
+    amenities: ["WiFi", "Kitchen", "Security", "Elevator", "Study Area"],
+  },
+  {
+    id: 15,
+    name: "Kicukiro Student House",
+    type: "House",
+    price: 100,
+    nights: 30,
+    rating: 4.92,
+    category: "student",
+    university: "UR-CBE",
+    district: "Kicukiro",
+    sector: "Gikondo",
+    cell: "Mburabuturo",
+    village: "Mburabuturo",
+    rooms: 4,
+    bathrooms: 2,
+    image:
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
+    description: "Spacious student house near UR-CBE, Gikondo",
+    amenities: ["WiFi", "Kitchen", "Garden", "Parking", "Study Room"],
+  },
+  {
+    id: 16,
+    name: "Gasabo Student Apartments",
+    type: "Apartment",
+    price: 88,
+    nights: 30,
+    rating: 4.86,
+    category: "student",
+    university: "University of Kigali",
+    district: "Gasabo",
+    sector: "Kacyiru",
+    cell: "Kamatamu",
+    village: "Kamatamu",
+    rooms: 2,
+    bathrooms: 1,
+    image:
+      "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop",
+    description: "Student apartments near University of Kigali in Kamatamu",
+    amenities: ["WiFi", "Kitchenette", "Security", "Parking", "Study Area"],
+  },
+  {
+    id: 17,
+    name: "Gisozi Student Lodge",
+    type: "Room",
+    price: 60,
+    nights: 30,
+    rating: 4.8,
+    category: "student",
+    university: "Kigali Independent University",
+    district: "Gasabo",
+    sector: "Gisozi",
+    cell: "Ruhango",
+    village: "Ruhango",
+    rooms: 1,
+    bathrooms: 1,
+    image:
+      "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
+    description: "Student rooms near Kigali Independent University (ULK)",
+    amenities: ["WiFi", "Shared Kitchen", "Security", "Common Area"],
+  },
+  {
+    id: 18,
+    name: "Ndera Student Village",
+    type: "Apartment",
+    price: 78,
+    nights: 30,
+    rating: 4.85,
+    category: "student",
+    university: "Adventist University (AUCA)",
+    district: "Gasabo",
+    sector: "Ndera",
+    cell: "Ndera",
+    village: "Ndera",
+    rooms: 2,
+    bathrooms: 1,
+    image:
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
+    description: "Student apartments near AUCA in Ndera",
+    amenities: ["WiFi", "Kitchen", "Security", "Parking", "Study Area"],
+  },
+  // Regional Universities
+  {
+    id: 19,
+    name: "Muhanga Student Hostel",
+    type: "Room",
+    price: 45,
+    nights: 30,
+    rating: 4.72,
+    category: "student",
+    university: "Catholic Institute (ICK)",
+    district: "Muhanga",
+    sector: "Cyiza",
+    cell: "Kabgayi",
+    village: "Kabgayi",
+    rooms: 1,
+    bathrooms: 1,
+    image:
+      "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
+    description: "Affordable student rooms near ICK in Kabgayi",
+    amenities: ["WiFi", "Shared Kitchen", "Security", "Study Area"],
+  },
+  {
+    id: 20,
+    name: "Ruhango Student House",
+    type: "House",
+    price: 70,
+    nights: 30,
+    rating: 4.76,
+    category: "student",
+    university: "University of Gitwe",
+    district: "Ruhango",
+    sector: "Ruhango",
+    cell: "Ruhango",
+    village: "Ruhango",
+    rooms: 3,
+    bathrooms: 2,
+    image:
+      "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop",
+    description: "Student house near University of Gitwe",
+    amenities: ["WiFi", "Kitchen", "Garden", "Parking"],
+  },
+  {
+    id: 21,
+    name: "Butaro Student Village",
+    type: "Apartment",
+    price: 82,
+    nights: 30,
+    rating: 4.88,
+    category: "student",
+    university: "Univ. of Global Health Equity",
+    district: "Burera",
+    sector: "Butaro",
+    cell: "Butaro",
+    village: "Butaro",
+    rooms: 2,
+    bathrooms: 1,
+    image:
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
+    description: "Student apartments near University of Global Health Equity",
+    amenities: ["WiFi", "Kitchen", "Security", "Study Room", "Laundry"],
+  },
+  {
+    id: 22,
+    name: "Byumba Student Lodge",
+    type: "Room",
+    price: 50,
+    nights: 30,
+    rating: 4.74,
+    category: "student",
+    university: "UTAB",
+    district: "Gicumbi",
+    sector: "Byumba",
+    cell: "Byumba",
+    village: "Byumba",
+    rooms: 1,
+    bathrooms: 1,
+    image:
+      "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop",
+    description: "Student rooms near UTAB in Byumba",
+    amenities: ["WiFi", "Shared Kitchen", "Security"],
+  },
+  {
+    id: 23,
+    name: "Tumba Student Apartments",
+    type: "Apartment",
+    price: 65,
+    nights: 30,
+    rating: 4.8,
+    category: "student",
+    university: "IPRC Tumba",
+    district: "Rulindo",
+    sector: "Tumba",
+    cell: "Tumba",
+    village: "Tumba",
+    rooms: 2,
+    bathrooms: 1,
+    image:
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
+    description: "Student apartments near IPRC Tumba",
+    amenities: ["WiFi", "Kitchenette", "Security", "Parking", "Study Area"],
+  },
+  {
+    id: 24,
+    name: "Gisenyi Student House",
+    type: "House",
+    price: 75,
+    nights: 30,
+    rating: 4.82,
+    category: "student",
+    university: "UTB",
+    district: "Rubavu",
+    sector: "Gisenyi",
+    cell: "Gisenyi",
+    village: "Gisenyi",
+    rooms: 3,
+    bathrooms: 2,
+    image:
+      "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop",
+    description: "Student house near UTB in Gisenyi, near Lake Kivu",
+    amenities: ["WiFi", "Kitchen", "Garden", "Parking", "Study Room"],
+  },
+];
+
+// Categories based on documentation
+const getCategories = (t: any) => [
+  {
+    id: "all",
+    name: t.all || "All Houses",
+    icon: <HomeIcon />,
+    color: "from-[#FF385C] to-pink-400",
+  },
+  {
+    id: "student",
+    name: t.student || "Student Houses",
+    icon: <SchoolIcon />,
+    color: "from-blue-400 to-cyan-500",
+  },
+  {
+    id: "apartments",
+    name: t.apartments || "Apartments",
+    icon: <ApartmentIcon />,
+    color: "from-green-400 to-emerald-500",
+  },
+  {
+    id: "single",
+    name: t.single || "Single Rooms",
+    icon: <BedIcon />,
+    color: "from-orange-400 to-red-500",
+  },
+  {
+    id: "shared",
+    name: t.shared || "Shared Houses",
+    icon: <PeopleAltIcon />,
+    color: "from-purple-400 to-pink-500",
+  },
+  {
+    id: "furnished",
+    name: t.furnished || "Furnished",
+    icon: <HotelIcon />,
+    color: "from-yellow-400 to-amber-500",
+  },
+  {
+    id: "nearcampus",
+    name: t.nearcampus || "Near Campus",
+    icon: <LocationCityIcon />,
+    color: "from-teal-400 to-cyan-500",
+  },
+];
+
+// University locations based on documentation
+const universityLocations = [
+  "INES-Ruhengeri (Musanze)",
+  "UR-CAVM (Musanze)",
+  "IPRC Musanze",
+  "UR-Huye Campus",
+  "IPRC Huye",
+  "UR-CE (Rwamagana)",
+  "UR-Nyagatare Campus",
+  "UR-CST (Kigali)",
+  "UR-CBE (Kigali)",
+  "University of Kigali",
+  "Kigali Independent University",
+  "Adventist University (AUCA)",
+  "Catholic Institute (ICK)",
+  "University of Gitwe",
+  "Univ. of Global Health Equity",
+  "UTAB (Byumba)",
+  "IPRC Tumba",
+  "UTB (Gisenyi)",
+];
+
+// Location suggestions based on documentation
+const locationSuggestions = [
+  // Musanze Area
+  "Cyabararika, Muhoza, Musanze",
+  "Kigombe, Muhoza, Musanze",
+  "Ruhengeri, Muhoza, Musanze",
+  "Kabirizi, Cyabararika, Musanze",
+  "Busogo, Musanze",
+  // Huye Area
+  "Butare, Huye",
+  "Ruhande, Huye",
+  "Ngoma, Huye",
+  // Kigali Area
+  "Kiyovu, Nyarugenge, Kigali",
+  "Mburabuturo, Gikondo, Kigali",
+  "Kamatamu, Kacyiru, Kigali",
+  "Ruhango, Gisozi, Kigali",
+  "Ndera, Gasabo, Kigali",
+  // Other Areas
+  "Rukara, Rwamagana",
+  "Nyagatare, Nyagatare",
+  "Kabgayi, Muhanga",
+  "Ruhango, Ruhango",
+  "Butaro, Burera",
+  "Byumba, Gicumbi",
+  "Tumba, Rulindo",
+  "Gisenyi, Rubavu",
+];
+
+interface HeroProps {
+  onSearch?: (params: any) => void;
+  language?: "en" | "fr" | "rw";
+}
+
+interface StudentHouse {
+  id: number;
+  name: string;
+  type: string;
+  price: number;
+  nights: number;
+  rating: number;
+  category: string;
+  university: string;
+  district: string;
+  sector: string;
+  cell: string;
+  village: string;
+  rooms: number;
+  bathrooms: number;
+  image: string;
+  description: string;
+  amenities: string[];
+}
+
+// Get translations based on language
+const getTranslations = (lang: string) => {
+  const translations: Record<string, any> = {
+    en: {
+      popularHomes: "Student Houses Available",
+      room: "Room",
+      apartment: "Apartment",
+      nights: "months",
+      where: "Location",
+      searchDestinations: "Search universities or locations in Rwanda",
+      when: "Move-in Date",
+      addDates: "Select move-in date",
+      who: "Students",
+      addGuests: "Number of students",
+      helpCenter: "Help Center",
+      becomeHost: "List Your House",
+      becomeHostDesc:
+        "It's easy to list your student house and earn extra income.",
+      referHost: "Refer a Host",
+      findCoHost: "Find a co-host",
+      giftCards: "Gift cards",
+      login: "Log in",
+      signup: "Sign up",
+      selectLocation: "Select Location",
+      popularLocations: "Popular University Locations",
+      guests: "Students",
+      adults: "Students",
+      children: "Children",
+      infants: "Infants",
+      pets: "Pets",
+      apply: "Apply",
+      clear: "Clear",
+      checkIn: "Move-in",
+      checkOut: "Move-out",
+      search: "Search",
+      bookNow: "Book Now",
+      payWithMomo: "Pay with MOMO",
+      bookingDetails: "Booking Details",
+      totalPrice: "Total Price",
+      favorites: "Saved",
+      removeFavorite: "Remove from saved",
+      addFavorite: "Add to saved",
+      paymentSuccess: "Payment Successful!",
+      paymentFailed: "Payment Failed",
+      enterMomoNumber: "Enter MOMO Number",
+      processingPayment: "Processing Payment...",
+      searchProperties: "Search houses...",
+      noResults: "No houses found matching your criteria.",
+      nightsTotal: "months total",
+      all: "All Houses",
+      student: "Student Houses",
+      apartments: "Apartments",
+      single: "Single Rooms",
+      shared: "Shared Houses",
+      furnished: "Furnished",
+      nearcampus: "Near Campus",
+      price: "Price",
+      perNight: "/ month",
+      amenities: "Amenities",
+      done: "Done",
+      tryAgain: "Try Again",
+      yourBookingConfirmed: "Your booking has been confirmed!",
+      propertyType: "Property Type",
+      location: "in",
+      from: "from",
+      perNightShort: "/month",
+      prev: "Previous",
+      next: "Next",
+      university: "University",
+      district: "District",
+      sector: "Sector",
+      cell: "Cell",
+      village: "Village",
+      rooms: "Rooms",
+      bathrooms: "Bathrooms",
+      viewDetails: "View Details",
+    },
+    fr: {
+      popularHomes: "Maisons étudiantes disponibles",
+      room: "Chambre",
+      apartment: "Appartement",
+      nights: "mois",
+      where: "Emplacement",
+      searchDestinations: "Rechercher des universités ou lieux au Rwanda",
+      when: "Date d'emménagement",
+      addDates: "Sélectionner la date demménagement",
+      who: "Étudiants",
+      addGuests: "Nombre d'étudiants",
+      helpCenter: "Centre d'aide",
+      becomeHost: "Listez votre maison",
+      becomeHostDesc:
+        "Il est facile de lister votre maison étudiante et de gagner un revenu supplémentaire.",
+      referHost: "Parrainer un hôte",
+      findCoHost: "Trouver un co-hôte",
+      giftCards: "Cartes cadeaux",
+      login: "Se connecter",
+      signup: "S'inscrire",
+      selectLocation: "Choisir un emplacement",
+      popularLocations: "Emplacements universitaires populaires",
+      guests: "Étudiants",
+      adults: "Étudiants",
+      children: "Enfants",
+      infants: "Nourrissons",
+      pets: "Animaux",
+      apply: "Appliquer",
+      clear: "Effacer",
+      checkIn: "Arrivée",
+      checkOut: "Départ",
+      search: "Rechercher",
+      bookNow: "Réserver",
+      payWithMomo: "Payer avec MOMO",
+      bookingDetails: "Détails de réservation",
+      totalPrice: "Prix total",
+      favorites: "Favoris",
+      removeFavorite: "Retirer des favoris",
+      addFavorite: "Ajouter aux favoris",
+      paymentSuccess: "Paiement réussi !",
+      paymentFailed: "Paiement échoué",
+      enterMomoNumber: "Entrez le numéro MOMO",
+      processingPayment: "Traitement du paiement...",
+      searchProperties: "Rechercher des maisons...",
+      noResults: "Aucune maison trouvée correspondant à vos critères.",
+      nightsTotal: "mois au total",
+      all: "Toutes les maisons",
+      student: "Maisons étudiantes",
+      apartments: "Appartements",
+      single: "Chambres individuelles",
+      shared: "Maisons partagées",
+      furnished: "Meublé",
+      nearcampus: "Près du campus",
+      price: "Prix",
+      perNight: "/ mois",
+      amenities: "Équipements",
+      done: "Terminé",
+      tryAgain: "Réessayer",
+      yourBookingConfirmed: "Votre réservation a été confirmée !",
+      propertyType: "Type de propriété",
+      location: "à",
+      from: "à partir de",
+      perNightShort: "/mois",
+      prev: "Précédent",
+      next: "Suivant",
+      university: "Université",
+      district: "District",
+      sector: "Secteur",
+      cell: "Cellule",
+      village: "Village",
+      rooms: "Chambres",
+      bathrooms: "Salles de bain",
+      viewDetails: "Voir les détails",
+    },
+    rw: {
+      popularHomes: "Amazu y'abanyeshuri ariboneka",
+      room: "Icyumba",
+      apartment: "Aparitama",
+      nights: "amezi",
+      where: "Aho gihe",
+      searchDestinations: "Shakisha kaminuza cyangwa aho gihe mu Rwanda",
+      when: "Itariki yo kwinjira",
+      addDates: "Hitamo itariki yo kwinjira",
+      who: "Abanyeshuri",
+      addGuests: "Umubare w'abanyeshuri",
+      helpCenter: "Ikigo cy'ubufasha",
+      becomeHost: "Tangaza inzu yawe",
+      becomeHostDesc:
+        "Birakoroshye gutangaza inzu yawe kubanyeshuri kandi ukungura.",
+      referHost: "Vuga abandi bakire",
+      findCoHost: "Shakisha uwakwakira n'uwundi",
+      giftCards: "Ikarita z'impano",
+      login: "Kwinjira",
+      signup: "Kwiyandikisha",
+      selectLocation: "Hitamo aho gihe",
+      popularLocations: "Aho bakunze kujya mu Rwanda",
+      guests: "Abanyeshuri",
+      adults: "Abanyeshuri",
+      children: "Abana",
+      infants: "Impinja",
+      pets: "Amatungo",
+      apply: "Kora",
+      clear: "Kuraho",
+      checkIn: "Kwinjira",
+      checkOut: "Kuvamo",
+      search: "Shakisha",
+      bookNow: "Icyemezo",
+      payWithMomo: "Tanga imbaraga MOMO",
+      bookingDetails: "Ibanga",
+      totalPrice: "Igiciro cyose",
+      favorites: "Ibyakiriwe",
+      removeFavorite: "Kuraho kubyakiriwe",
+      addFavorite: "Ongeraho kubyakiriwe",
+      paymentSuccess: "Ubwishyu bwakunze!",
+      paymentFailed: "Ubwishyu bwananiranye",
+      enterMomoNumber: "Injiza numero ya MOMO",
+      processingPayment: "Ubwishyu burakora...",
+      searchProperties: "Shakisha amazu...",
+      noResults: "Nta mazu yabonetse.",
+      nightsTotal: "amezi yose",
+      all: "Amazu yose",
+      student: "Amazu y'abanyeshuri",
+      apartments: "Aparitama",
+      single: "Ibyumba byonyine",
+      shared: "Amazu asangiwe",
+      furnished: "Ifite ibikoresho",
+      nearcampus: "Hafi ya kaminuza",
+      price: "Igiciro",
+      perNight: "/ ukwezi",
+      amenities: "Ibikoresho",
+      done: "Byakozwe",
+      tryAgain: "Ongera ugerageze",
+      yourBookingConfirmed: "Icyemezo cyawe cyakiriwe!",
+      propertyType: "Ubwoko bw'azu",
+      location: "i",
+      from: "kuva",
+      perNightShort: "/ukwezi",
+      prev: "Ibibanziriza",
+      next: "Ibikurikira",
+      university: "Kaminuza",
+      district: "Akarere",
+      sector: "Umurenge",
+      cell: "Akagari",
+      village: "Umudugudu",
+      rooms: "Ibyumba",
+      bathrooms: "Ahabagirirwa",
+      viewDetails: "Reba ibindi",
+    },
+  };
+  return translations[lang as keyof typeof translations] || translations.en;
+};
+
+export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
+  const t = getTranslations(language);
+  const categories = getCategories(t);
+
+  // State for search
+  const [searchLocation, setSearchLocation] = useState("");
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedUniversity, setSelectedUniversity] = useState("");
+  const [filteredHouses, setFilteredHouses] =
+    useState<StudentHouse[]>(studentHouses);
+
+  // State for dates
+  const [checkIn, setCheckIn] = useState<Date | null>(null);
+  const [checkOut, setCheckOut] = useState<Date | null>(null);
+  const [tempCheckIn, setTempCheckIn] = useState<Date | null>(null);
+  const [tempCheckOut, setTempCheckOut] = useState<Date | null>(null);
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+
+  // State for students
+  const [studentCount, setStudentCount] = useState(2);
+
+  // State for hero slideshow
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const slideIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // State for property modal
+  const [selectedHouse, setSelectedHouse] = useState<StudentHouse | null>(null);
+  const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
+
+  // State for payment
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [momoNumber, setMomoNumber] = useState("");
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentResult, setPaymentResult] = useState<"success" | "fail" | null>(
+    null,
+  );
+  const [showPaymentResult, setShowPaymentResult] = useState(false);
+
+  // State for favorites
+  const [favorites, setFavorites] = useState<number[]>(() => {
+    const saved = localStorage.getItem("favorites");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  // Filter houses when category, search, location, or university changes
+  useEffect(() => {
+    const filterHouses = () => {
+      let filtered = [...studentHouses];
+
+      if (selectedCategory !== "all") {
+        filtered = filtered.filter((h) => h.category === selectedCategory);
+      }
+
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase().trim();
+        filtered = filtered.filter(
+          (h) =>
+            h.name.toLowerCase().includes(query) ||
+            h.type.toLowerCase().includes(query) ||
+            h.description?.toLowerCase().includes(query) ||
+            h.university.toLowerCase().includes(query) ||
+            h.district.toLowerCase().includes(query) ||
+            h.sector.toLowerCase().includes(query) ||
+            h.cell.toLowerCase().includes(query) ||
+            h.village.toLowerCase().includes(query),
+        );
+      }
+
+      if (searchLocation) {
+        const location = searchLocation.toLowerCase().trim();
+        filtered = filtered.filter(
+          (h) =>
+            h.university.toLowerCase().includes(location) ||
+            h.district.toLowerCase().includes(location) ||
+            h.sector.toLowerCase().includes(location) ||
+            h.cell.toLowerCase().includes(location) ||
+            h.village.toLowerCase().includes(location) ||
+            h.name.toLowerCase().includes(location),
+        );
+      }
+
+      if (selectedUniversity) {
+        filtered = filtered.filter((h) => h.university === selectedUniversity);
+      }
+
+      setFilteredHouses(filtered);
+      setCurrentPage(1);
+    };
+
+    filterHouses();
+  }, [selectedCategory, searchQuery, searchLocation, selectedUniversity]);
+
+  // Save favorites to localStorage
+  useEffect(() => {
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+  }, [favorites]);
+
+  // Handle body overflow for modals
+  useEffect(() => {
+    if (isPropertyModalOpen || isPaymentModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isPropertyModalOpen, isPaymentModalOpen]);
+
+  // Auto-play slideshow
+  useEffect(() => {
+    if (isAutoPlaying) {
+      slideIntervalRef.current = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+      }, 5000);
+    }
+    return () => {
+      if (slideIntervalRef.current) {
+        clearInterval(slideIntervalRef.current);
+      }
+    };
+  }, [isAutoPlaying]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredHouses.length / itemsPerPage);
+  const paginatedHouses = filteredHouses.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  );
+
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      goToPage(currentPage + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (currentPage > 1) {
+      goToPage(currentPage - 1);
+    }
+  };
+
+  // Generate calendar days
+  const getDaysInMonth = (month: number, year: number) => {
+    return new Date(year, month + 1, 0).getDate();
+  };
+
+  const getFirstDayOfMonth = (month: number, year: number) => {
+    return new Date(year, month, 1).getDay();
+  };
+
+  const renderCalendar = () => {
+    const daysInMonth = getDaysInMonth(currentMonth, currentYear);
+    const firstDay = getFirstDayOfMonth(currentMonth, currentYear);
+    const today = new Date();
+    const days = [];
+
+    for (let i = 0; i < firstDay; i++) {
+      days.push(<div key={`empty-${i}`} className="h-10"></div>);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(currentYear, currentMonth, day);
+      const isToday = date.toDateString() === today.toDateString();
+      const isCheckIn =
+        tempCheckIn && date.toDateString() === tempCheckIn.toDateString();
+      const isCheckOut =
+        tempCheckOut && date.toDateString() === tempCheckOut.toDateString();
+      const isInRange =
+        tempCheckIn &&
+        tempCheckOut &&
+        date > tempCheckIn &&
+        date < tempCheckOut;
+      const isPast =
+        date < today && date.toDateString() !== today.toDateString();
+
+      days.push(
+        <motion.button
+          key={day}
+          whileHover={{ scale: isPast ? 1 : 1.05 }}
+          whileTap={{ scale: isPast ? 1 : 0.95 }}
+          onClick={() => handleDateSelect(date)}
+          disabled={isPast}
+          className={`h-10 w-full rounded-full text-sm font-medium transition-colors relative ${
+            isPast
+              ? "text-gray-300 cursor-not-allowed"
+              : isCheckIn || isCheckOut
+                ? "bg-[#FF385C] text-white"
+                : isInRange
+                  ? "bg-[#FF385C]/20 text-gray-900"
+                  : isToday
+                    ? "border-2 border-[#FF385C] text-gray-900"
+                    : "text-gray-700"
+          }`}
+        >
+          {day}
+          {isToday && !isCheckIn && !isCheckOut && (
+            <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-[#FF385C] rounded-full"></span>
+          )}
+        </motion.button>,
+      );
+    }
+
+    return days;
+  };
+
+  const handleDateSelect = (date: Date) => {
+    if (!tempCheckIn || (tempCheckIn && tempCheckOut)) {
+      setTempCheckIn(date);
+      setTempCheckOut(null);
+    } else if (tempCheckIn && !tempCheckOut) {
+      if (date < tempCheckIn) {
+        setTempCheckOut(tempCheckIn);
+        setTempCheckIn(date);
+      } else {
+        setTempCheckOut(date);
+      }
+    }
+  };
+
+  const applyDates = () => {
+    setCheckIn(tempCheckIn);
+    setCheckOut(tempCheckOut);
+    setIsDatePickerOpen(false);
+    if (tempCheckIn && tempCheckOut) {
+      toast.success(
+        `📅 ${tempCheckIn.toLocaleDateString()} - ${tempCheckOut.toLocaleDateString()}`,
+      );
+    }
+  };
+
+  const clearDates = () => {
+    setTempCheckIn(null);
+    setTempCheckOut(null);
+    setCheckIn(null);
+    setCheckOut(null);
+    setIsDatePickerOpen(false);
+  };
+
+  const changeMonth = (delta: number) => {
+    const newMonth = currentMonth + delta;
+    if (newMonth < 0) {
+      setCurrentMonth(11);
+      setCurrentYear(currentYear - 1);
+    } else if (newMonth > 11) {
+      setCurrentMonth(0);
+      setCurrentYear(currentYear + 1);
+    } else {
+      setCurrentMonth(newMonth);
+    }
+  };
+
+  const handleSearch = () => {
+    const searchParams = {
+      location: searchLocation,
+      checkIn,
+      checkOut,
+      students: studentCount,
+      category: selectedCategory,
+      query: searchQuery,
+      university: selectedUniversity,
+    };
+
+    if (onSearch) {
+      onSearch(searchParams);
+    }
+
+    toast.info(
+      `🔍 ${t.search}: ${searchLocation || "All universities in Rwanda"}`,
+    );
+    setIsLocationModalOpen(false);
+    setIsDatePickerOpen(false);
+    setIsGuestModalOpen(false);
+  };
+
+  const getStudentCount = () => {
+    return `${studentCount} ${studentCount !== 1 ? t.guests.toLowerCase() : t.guests.slice(0, -1)}`;
+  };
+
+  const getDateRange = () => {
+    if (checkIn && checkOut) {
+      return `${checkIn.toLocaleDateString()} - ${checkOut.toLocaleDateString()}`;
+    }
+    return t.addDates;
+  };
+
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index);
+    setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide(
+      (prev) => (prev - 1 + heroImages.length) % heroImages.length,
+    );
+  };
+
+  const toggleFavorite = (houseId: number) => {
+    setFavorites((prev) => {
+      if (prev.includes(houseId)) {
+        toast.info(`💔 ${t.removeFavorite}`);
+        return prev.filter((id) => id !== houseId);
+      } else {
+        toast.success(`❤️ ${t.addFavorite}`);
+        return [...prev, houseId];
+      }
+    });
+  };
+
+  const openHouseModal = (house: StudentHouse) => {
+    setSelectedHouse(house);
+    setIsPropertyModalOpen(true);
+  };
+
+  const closeHouseModal = () => {
+    setIsPropertyModalOpen(false);
+    setSelectedHouse(null);
+  };
+
+  const closePaymentModal = () => {
+    setIsPaymentModalOpen(false);
+    setMomoNumber("");
+    setPaymentResult(null);
+    setShowPaymentResult(false);
+  };
+
+  const processPayment = () => {
+    if (!momoNumber || momoNumber.length < 9) {
+      toast.error("Please enter a valid MOMO number");
+      return;
+    }
+
+    setIsProcessingPayment(true);
+
+    setTimeout(() => {
+      setIsProcessingPayment(false);
+      const isSuccess = Math.random() > 0.2;
+      setPaymentResult(isSuccess ? "success" : "fail");
+      setShowPaymentResult(true);
+
+      if (isSuccess) {
+        toast.success(`✅ ${t.paymentSuccess}`);
+      } else {
+        toast.error(`❌ ${t.paymentFailed}`);
+      }
+    }, 2000);
+  };
+
+  const resetPaymentModal = () => {
+    if (paymentResult === "success") {
+      closePaymentModal();
+    } else {
+      setPaymentResult(null);
+      setShowPaymentResult(false);
+      setIsProcessingPayment(false);
+    }
+  };
+
+  // Get translated type
+  const getTranslatedType = (type: string) => {
+    if (type === "Room") return t.room;
+    if (type === "Apartment") return t.apartment;
+    if (type === "House") return t.student;
+    if (type === "Villa") return "Villa";
+    return type;
+  };
+
+  // Get location info from house
+  const getLocationInfo = (house: StudentHouse) => {
+    return `${house.village}, ${house.cell}, ${house.sector}, ${house.district}`;
+  };
+
+  // Get university badge color
+  const getUniversityColor = (university: string) => {
+    const colors: { [key: string]: string } = {
+      "INES-Ruhengeri": "bg-blue-100 text-blue-800",
+      "UR-CAVM": "bg-green-100 text-green-800",
+      "IPRC Musanze": "bg-orange-100 text-orange-800",
+      "UR-Huye Campus": "bg-purple-100 text-purple-800",
+      "IPRC Huye": "bg-pink-100 text-pink-800",
+      "UR-CE (Education)": "bg-indigo-100 text-indigo-800",
+      "UR-Nyagatare Campus": "bg-teal-100 text-teal-800",
+      "UR-CST": "bg-red-100 text-red-800",
+      "UR-CBE": "bg-yellow-100 text-yellow-800",
+      "University of Kigali": "bg-cyan-100 text-cyan-800",
+      "Kigali Independent University": "bg-amber-100 text-amber-800",
+      "Adventist University (AUCA)": "bg-lime-100 text-lime-800",
+      "Catholic Institute (ICK)": "bg-rose-100 text-rose-800",
+      "University of Gitwe": "bg-emerald-100 text-emerald-800",
+      "Univ. of Global Health Equity": "bg-sky-100 text-sky-800",
+      UTAB: "bg-violet-100 text-violet-800",
+      "IPRC Tumba": "bg-fuchsia-100 text-fuchsia-800",
+      UTB: "bg-slate-100 text-slate-800",
+    };
+    return colors[university] || "bg-gray-100 text-gray-800";
+  };
+
+  return (
+    <div className="w-full">
+      {/* Hero Slideshow - Responsive */}
+      <div className="relative w-full h-[250px] xs:h-[300px] sm:h-[400px] md:h-[500px] lg:h-[550px] xl:h-[600px] 2xl:h-[650px] overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSlide}
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.7 }}
+            className="absolute inset-0"
+          >
+            <div
+              className="w-full h-full bg-cover bg-center"
+              style={{
+                backgroundImage: `url(${heroImages[currentSlide].url})`,
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+              <div className="absolute bottom-8 xs:bottom-10 sm:bottom-12 md:bottom-16 lg:bottom-20 left-0 right-0 text-center text-white px-4">
+                <motion.h2
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-1 sm:mb-2"
+                >
+                  {heroImages[currentSlide].title}
+                </motion.h2>
+                <motion.p
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl text-white/90"
+                >
+                  {heroImages[currentSlide].subtitle}
+                </motion.p>
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Slide Navigation Arrows */}
+        <button
+          onClick={prevSlide}
+          className="absolute left-1 xs:left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white/80 p-1 xs:p-1.5 sm:p-2 rounded-full shadow-lg transition-all hover:scale-110 z-10"
+        >
+          <ArrowBackIcon className="w-3 h-3 xs:w-4 xs:h-4 sm:w-5 sm:h-5 text-gray-800" />
+        </button>
+        <button
+          onClick={nextSlide}
+          className="absolute right-1 xs:right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white/80 p-1 xs:p-1.5 sm:p-2 rounded-full shadow-lg transition-all hover:scale-110 z-10"
+        >
+          <ArrowForwardIcon className="w-3 h-3 xs:w-4 xs:h-4 sm:w-5 sm:h-5 text-gray-800" />
+        </button>
+
+        {/* Slide Dots */}
+        <div className="absolute bottom-2 xs:bottom-3 left-1/2 -translate-x-1/2 flex gap-1 xs:gap-1.5 sm:gap-2 z-10">
+          {heroImages.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              className={`h-1 xs:h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
+                currentSlide === index
+                  ? "w-4 xs:w-5 sm:w-6 md:w-8 bg-white"
+                  : "w-1 xs:w-1.5 sm:w-2 bg-white/50 hover:bg-white/80"
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Search Bar - Floating - Responsive */}
+      <div className="relative z-20 -mt-6 xs:-mt-8 sm:-mt-10 md:-mt-12 px-2 xs:px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white rounded-xl xs:rounded-2xl shadow-2xl p-2 xs:p-3 sm:p-4 md:p-5"
+          >
+            <div className="flex flex-col sm:flex-row gap-1 xs:gap-2 sm:gap-3">
+              {/* Where */}
+              <div className="flex-1 min-w-0">
+                <button
+                  onClick={() => setIsLocationModalOpen(true)}
+                  className="w-full text-left p-1.5 xs:p-2 sm:p-3 rounded-lg xs:rounded-xl transition-colors group"
+                >
+                  <div className="text-[10px] xs:text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t.where}
+                  </div>
+                  <div className="text-xs xs:text-sm sm:text-base text-gray-700 truncate">
+                    <SchoolIcon className="w-3 h-3 xs:w-4 xs:h-4 inline mr-1 text-[#FF385C]" />
+                    {searchLocation ||
+                      selectedUniversity ||
+                      "Any university in Rwanda"}
+                  </div>
+                </button>
+              </div>
+
+              {/* When */}
+              <div className="flex-1 min-w-0">
+                <button
+                  onClick={() => setIsDatePickerOpen(true)}
+                  className="w-full text-left p-1.5 xs:p-2 sm:p-3 rounded-lg xs:rounded-xl transition-colors group"
+                >
+                  <div className="text-[10px] xs:text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t.when}
+                  </div>
+                  <div className="text-xs xs:text-sm sm:text-base text-gray-700 truncate">
+                    {getDateRange()}
+                  </div>
+                </button>
+              </div>
+
+              {/* Who */}
+              <div className="flex-1 min-w-0">
+                <button
+                  onClick={() => setIsGuestModalOpen(true)}
+                  className="w-full text-left p-1.5 xs:p-2 sm:p-3 rounded-lg xs:rounded-xl transition-colors group"
+                >
+                  <div className="text-[10px] xs:text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t.who}
+                  </div>
+                  <div className="text-xs xs:text-sm sm:text-base text-gray-700 truncate">
+                    <PeopleAltIcon className="w-3 h-3 xs:w-4 xs:h-4 inline mr-1 text-[#FF385C]" />
+                    {getStudentCount()}
+                  </div>
+                </button>
+              </div>
+
+              {/* Search Button */}
+              <div className="sm:self-center">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleSearch}
+                  className="w-full sm:w-auto bg-[#FF385C] text-white px-4 xs:px-6 sm:px-8 py-2 xs:py-2.5 sm:py-3 rounded-lg xs:rounded-xl font-medium hover:bg-[#E31C5F] transition-colors flex items-center justify-center gap-1 xs:gap-2 shadow-lg shadow-[#FF385C]/30 text-xs xs:text-sm sm:text-base"
+                >
+                  <SearchIcon className="w-3 h-3 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
+                  <span>{t.search}</span>
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Categories - Responsive */}
+      <div className="max-w-7xl mx-auto px-2 xs:px-4 sm:px-6 lg:px-8 mt-6 xs:mt-8 sm:mt-12">
+        <div className="flex gap-2 xs:gap-3 sm:gap-4 overflow-x-auto pb-3 xs:pb-4 scrollbar-hide">
+          {categories.map((category) => (
+            <motion.button
+              key={category.id}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setSelectedCategory(category.id)}
+              className={`flex-shrink-0 flex flex-col items-center gap-1 xs:gap-1.5 px-3 xs:px-4 sm:px-5 py-1.5 xs:py-2 sm:py-3 rounded-lg xs:rounded-xl transition-all ${
+                selectedCategory === category.id
+                  ? "border-b-2 border-[#FF385C] text-[#FF385C]"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <div className="w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 flex items-center justify-center">
+                <div
+                  className={`w-5 h-5 xs:w-5.5 xs:h-5.5 sm:w-6 sm:h-6 bg-gradient-to-br ${category.color} rounded-full flex items-center justify-center text-white`}
+                >
+                  {React.cloneElement(category.icon, {
+                    className: "w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4",
+                  })}
+                </div>
+              </div>
+              <span className="text-[10px] xs:text-xs font-medium whitespace-nowrap">
+                {category.name}
+              </span>
+            </motion.button>
+          ))}
+        </div>
+      </div>
+
+      {/* Search Input for filtering - Responsive */}
+      <div className="max-w-7xl mx-auto px-2 xs:px-4 sm:px-6 lg:px-8 mt-3 xs:mt-4">
+        <div className="relative max-w-xs xs:max-w-sm sm:max-w-md">
+          <SearchIcon className="absolute left-2 xs:left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 xs:w-5 xs:h-5" />
+          <input
+            type="text"
+            placeholder={t.searchProperties}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-8 xs:pl-10 pr-3 xs:pr-4 py-1.5 xs:py-2 text-xs xs:text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#FF385C] focus:ring-1 focus:ring-[#FF385C] placeholder-gray-400"
+          />
+        </div>
+      </div>
+
+      {/* Houses Grid - Responsive with Pagination */}
+      <div className="max-w-7xl mx-auto px-2 xs:px-4 sm:px-6 lg:px-8 py-6 xs:py-8 sm:py-12">
+        <div className="flex flex-wrap justify-between items-center mb-4 xs:mb-6 sm:mb-8">
+          <div>
+            <h2 className="text-base xs:text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
+              {filteredHouses.length} {t.popularHomes}
+            </h2>
+            {selectedUniversity && (
+              <p className="text-xs xs:text-sm text-gray-500 mt-1">
+                <SchoolIcon className="w-3 h-3 xs:w-4 xs:h-4 inline mr-1" />
+                {selectedUniversity}
+              </p>
+            )}
+          </div>
+          <div className="flex items-center gap-1 xs:gap-2">
+            <span className="text-xs xs:text-sm text-gray-500">
+              <BookmarkIcon className="w-3 h-3 xs:w-4 xs:h-4 inline mr-1" />
+              {favorites.length} {t.favorites}
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 xs:gap-4 sm:gap-6">
+          {paginatedHouses.map((house) => (
+            <motion.div
+              key={house.id}
+              whileHover={{ y: -4 }}
+              transition={{ duration: 0.3 }}
+              className="group cursor-pointer"
+              onClick={() => openHouseModal(house)}
+            >
+              <div className="bg-white rounded-lg xs:rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <img
+                    src={house.image}
+                    alt={house.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute top-1 xs:top-2 right-1 xs:right-2 flex gap-0.5 xs:gap-1">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFavorite(house.id);
+                      }}
+                      className="bg-white rounded-full p-1 xs:p-1.5 shadow-lg hover:scale-110 transition-transform"
+                    >
+                      {favorites.includes(house.id) ? (
+                        <FavoriteIcon className="w-3 h-3 xs:w-4 xs:h-4 text-[#FF385C]" />
+                      ) : (
+                        <FavoriteBorderIcon className="w-3 h-3 xs:w-4 xs:h-4 text-gray-600" />
+                      )}
+                    </button>
+                  </div>
+                  <div className="absolute bottom-1 xs:bottom-2 left-1 xs:left-2 bg-black/70 text-white px-1.5 xs:px-2 py-0.5 rounded text-[10px] xs:text-xs">
+                    {getTranslatedType(house.type)}
+                  </div>
+                  <div className="absolute top-1 xs:top-2 left-1 xs:left-2">
+                    <span
+                      className={`px-1.5 xs:px-2 py-0.5 rounded text-[8px] xs:text-[10px] font-medium ${getUniversityColor(house.university)}`}
+                    >
+                      {house.university}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-2 xs:p-3 sm:p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-semibold text-xs xs:text-sm sm:text-base text-gray-900 truncate">
+                        {house.name}
+                      </h3>
+                      <p className="text-[10px] xs:text-xs text-gray-500 mt-0.5 truncate">
+                        <LocationOnIcon className="w-2.5 h-2.5 xs:w-3 xs:h-3 inline mr-0.5" />
+                        {house.village}, {house.sector}
+                      </p>
+                      <div className="flex items-center gap-1 xs:gap-2 mt-0.5 xs:mt-1">
+                        <span className="text-[10px] xs:text-xs text-gray-500">
+                          {house.rooms} {t.rooms}
+                        </span>
+                        <span className="text-[10px] xs:text-xs text-gray-300">
+                          •
+                        </span>
+                        <span className="text-[10px] xs:text-xs text-gray-500">
+                          {house.bathrooms} {t.bathrooms}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end flex-shrink-0 ml-1">
+                      <div className="flex items-center gap-0.5 xs:gap-1 text-xs xs:text-sm font-medium text-gray-700">
+                        <StarIcon className="w-2.5 h-2.5 xs:w-3 xs:h-3 sm:w-3.5 sm:h-3.5 text-yellow-400 fill-current" />
+                        {house.rating}
+                      </div>
+                      <p className="text-[10px] xs:text-xs font-semibold text-[#FF385C]">
+                        ${house.price}
+                        {t.perNightShort}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-wrap items-center justify-center gap-2 mt-8 xs:mt-10 sm:mt-12"
+          >
+            <button
+              onClick={prevPage}
+              disabled={currentPage === 1}
+              className={`flex items-center gap-1 px-3 xs:px-4 py-1.5 xs:py-2 rounded-lg text-xs xs:text-sm font-medium transition-all ${
+                currentPage === 1
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105"
+              }`}
+            >
+              <ArrowBackIcon className="w-3.5 h-3.5 xs:w-4 xs:h-4" />
+              {t.prev}
+            </button>
+
+            <div className="flex items-center gap-1 xs:gap-1.5">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => {
+                  if (
+                    page === 1 ||
+                    page === totalPages ||
+                    Math.abs(page - currentPage) <= 1 ||
+                    (page === 2 && currentPage > 3) ||
+                    (page === totalPages - 1 && currentPage < totalPages - 2)
+                  ) {
+                    return (
+                      <motion.button
+                        key={page}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => goToPage(page)}
+                        className={`w-8 h-8 xs:w-9 xs:h-9 flex items-center justify-center rounded-lg text-xs xs:text-sm font-medium transition-all ${
+                          currentPage === page
+                            ? "bg-[#FF385C] text-white shadow-lg shadow-[#FF385C]/30"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        {page}
+                      </motion.button>
+                    );
+                  }
+                  if (page === 2 && currentPage > 3) {
+                    return (
+                      <span
+                        key="ellipsis-start"
+                        className="w-8 h-8 flex items-center justify-center text-gray-400"
+                      >
+                        …
+                      </span>
+                    );
+                  }
+                  if (page === totalPages - 1 && currentPage < totalPages - 2) {
+                    return (
+                      <span
+                        key="ellipsis-end"
+                        className="w-8 h-8 flex items-center justify-center text-gray-400"
+                      >
+                        …
+                      </span>
+                    );
+                  }
+                  return null;
+                },
+              )}
+            </div>
+
+            <button
+              onClick={nextPage}
+              disabled={currentPage === totalPages}
+              className={`flex items-center gap-1 px-3 xs:px-4 py-1.5 xs:py-2 rounded-lg text-xs xs:text-sm font-medium transition-all ${
+                currentPage === totalPages
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105"
+              }`}
+            >
+              {t.next}
+              <ArrowForwardIcon className="w-3.5 h-3.5 xs:w-4 xs:h-4" />
+            </button>
+          </motion.div>
+        )}
+
+        {filteredHouses.length === 0 && (
+          <div className="text-center py-8 xs:py-12">
+            <p className="text-gray-500 text-sm xs:text-base">
+              {t.noResults}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* House Detail Modal - Responsive */}
+      <AnimatePresence>
+        {isPropertyModalOpen && selectedHouse && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[300]"
+              onClick={closeHouseModal}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="fixed inset-2 xs:inset-4 z-[301] flex items-center justify-center"
+            >
+              <div className="bg-white rounded-xl xs:rounded-2xl w-full max-w-2xl max-h-[95vh] xs:max-h-[90vh] overflow-hidden shadow-2xl">
+                <div className="relative">
+                  <img
+                    src={selectedHouse.image}
+                    alt={selectedHouse.name}
+                    className="w-full h-40 xs:h-48 sm:h-56 md:h-64 object-cover"
+                  />
+                  <button
+                    onClick={closeHouseModal}
+                    className="absolute top-2 xs:top-3 right-2 xs:right-3 bg-white/90 p-1.5 xs:p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
+                  >
+                    <CloseIcon className="w-4 h-4 xs:w-5 xs:h-5 text-gray-800" />
+                  </button>
+                  <button
+                    onClick={() => toggleFavorite(selectedHouse.id)}
+                    className="absolute top-2 xs:top-3 right-10 xs:right-14 bg-white/90 p-1.5 xs:p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
+                  >
+                    {favorites.includes(selectedHouse.id) ? (
+                      <FavoriteIcon className="w-4 h-4 xs:w-5 xs:h-5 text-[#FF385C]" />
+                    ) : (
+                      <FavoriteBorderIcon className="w-4 h-4 xs:w-5 xs:h-5 text-gray-800" />
+                    )}
+                  </button>
+                  <div className="absolute bottom-2 xs:bottom-3 left-2 xs:left-3">
+                    <span
+                      className={`px-2 xs:px-3 py-0.5 xs:py-1 rounded text-[10px] xs:text-xs font-medium ${getUniversityColor(selectedHouse.university)}`}
+                    >
+                      <SchoolIcon className="w-3 h-3 xs:w-4 xs:h-4 inline mr-1" />
+                      {selectedHouse.university}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-3 xs:p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-200px)] xs:max-h-[calc(90vh-220px)]">
+                  <div className="flex flex-col xs:flex-row items-start justify-between mb-3 xs:mb-4 gap-2">
+                    <div>
+                      <h3 className="text-base xs:text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
+                        {selectedHouse.name}
+                      </h3>
+                      <p className="text-xs xs:text-sm text-gray-500 mt-0.5 xs:mt-1">
+                        <LocationOnIcon className="w-3 h-3 xs:w-4 xs:h-4 inline mr-0.5" />
+                        {getLocationInfo(selectedHouse)}
+                      </p>
+                      <p className="text-xs xs:text-sm text-gray-600 mt-1">
+                        {selectedHouse.description}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-0.5 xs:gap-1 text-sm xs:text-base md:text-lg font-medium text-gray-700 flex-shrink-0">
+                      <StarIcon className="w-4 h-4 xs:w-5 xs:h-5 text-yellow-400 fill-current" />
+                      {selectedHouse.rating}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 xs:gap-3 mb-3 xs:mb-4">
+                    <div className="bg-gray-50 rounded-lg p-2 xs:p-3">
+                      <p className="text-[10px] xs:text-xs text-gray-500">
+                        {t.rooms}
+                      </p>
+                      <p className="text-sm xs:text-base font-semibold text-gray-900">
+                        <BedIcon className="w-3 h-3 xs:w-4 xs:h-4 inline mr-1" />
+                        {selectedHouse.rooms}
+                      </p>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-2 xs:p-3">
+                      <p className="text-[10px] xs:text-xs text-gray-500">
+                        {t.bathrooms}
+                      </p>
+                      <p className="text-sm xs:text-base font-semibold text-gray-900">
+                        <BathroomIcon className="w-3 h-3 xs:w-4 xs:h-4 inline mr-1" />
+                        {selectedHouse.bathrooms}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-gray-200 pt-3 xs:pt-4 mt-3 xs:mt-4">
+                    <h4 className="font-semibold text-sm xs:text-base text-gray-900 mb-1.5 xs:mb-2">
+                      {t.amenities}
+                    </h4>
+                    <div className="flex flex-wrap gap-1.5 xs:gap-2">
+                      {selectedHouse.amenities?.map((amenity) => {
+                        let icon = (
+                          <CheckCircleIcon className="w-3 h-3 xs:w-4 xs:h-4 text-[#FF385C]" />
+                        );
+                        if (amenity === "WiFi")
+                          icon = (
+                            <WifiIcon className="w-3 h-3 xs:w-4 xs:h-4 text-blue-500" />
+                          );
+                        if (amenity === "Kitchen" || amenity === "Kitchenette")
+                          icon = (
+                            <KitchenIcon className="w-3 h-3 xs:w-4 xs:h-4 text-orange-500" />
+                          );
+                        if (amenity === "Parking")
+                          icon = (
+                            <LocalParkingIcon className="w-3 h-3 xs:w-4 xs:h-4 text-green-500" />
+                          );
+                        if (amenity === "Security")
+                          icon = (
+                            <SecurityIcon className="w-3 h-3 xs:w-4 xs:h-4 text-red-500" />
+                          );
+                        return (
+                          <span
+                            key={amenity}
+                            className="flex items-center gap-0.5 xs:gap-1 px-2 xs:px-3 py-0.5 xs:py-1 bg-gray-100 rounded-full text-[10px] xs:text-xs sm:text-sm text-gray-700"
+                          >
+                            {icon}
+                            {amenity}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="border-t border-gray-200 pt-3 xs:pt-4 pb-6 mt-3 xs:mt-4">
+                    <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-3 xs:gap-4">
+                      <div>
+                        <p className="text-xs xs:text-sm text-gray-500">
+                          {t.price}
+                        </p>
+                        <p className="text-lg xs:text-xl md:text-2xl font-bold text-gray-900">
+                          ${selectedHouse.price}{" "}
+                          <span className="text-xs xs:text-sm font-normal text-gray-500">
+                            {t.perNight}
+                          </span>
+                        </p>
+                        <p className="text-xs xs:text-sm text-gray-500 mt-0.5 xs:mt-1">
+                          {selectedHouse.nights} {t.nightsTotal}: $
+                          {selectedHouse.price * selectedHouse.nights}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Payment Modal - Responsive */}
+      <AnimatePresence>
+        {isPaymentModalOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[400]"
+              onClick={closePaymentModal}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="fixed inset-2 xs:inset-4 z-[401] flex items-center justify-center"
+            >
+              <div className="bg-white rounded-xl xs:rounded-2xl w-full max-w-md max-h-[95vh] xs:max-h-[90vh] overflow-hidden shadow-2xl">
+                <div className="p-3 xs:p-4 border-b border-gray-200 flex items-center justify-between">
+                  <h3 className="text-base xs:text-lg font-semibold">
+                    {t.payWithMomo}
+                  </h3>
+                  <button
+                    onClick={closePaymentModal}
+                    className="p-1 rounded-full transition-colors"
+                  >
+                    <CloseIcon className="w-4 h-4 xs:w-5 xs:h-5" />
+                  </button>
+                </div>
+                <div className="p-3 xs:p-4 sm:p-6">
+                  {showPaymentResult ? (
+                    <div className="text-center py-6 xs:py-8">
+                      {paymentResult === "success" ? (
+                        <div>
+                          <div className="w-16 h-16 xs:w-20 xs:h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 xs:mb-4">
+                            <CheckCircleIcon className="w-8 h-8 xs:w-10 xs:h-10 text-green-500" />
+                          </div>
+                          <h4 className="text-xl xs:text-2xl font-bold text-green-500 mb-1 xs:mb-2">
+                            {t.paymentSuccess}
+                          </h4>
+                          <p className="text-xs xs:text-sm text-gray-500 mb-4 xs:mb-6">
+                            {t.yourBookingConfirmed}
+                          </p>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={resetPaymentModal}
+                            className="px-4 xs:px-6 py-1.5 xs:py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition-colors text-sm xs:text-base"
+                          >
+                            {t.done}
+                          </motion.button>
+                        </div>
+                      ) : (
+                        <div>
+                          <div className="w-16 h-16 xs:w-20 xs:h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 xs:mb-4">
+                            <ErrorIcon className="w-8 h-8 xs:w-10 xs:h-10 text-red-500" />
+                          </div>
+                          <h4 className="text-xl xs:text-2xl font-bold text-red-500 mb-1 xs:mb-2">
+                            {t.paymentFailed}
+                          </h4>
+                          <p className="text-xs xs:text-sm text-gray-500 mb-4 xs:mb-6">
+                            Please check your MOMO number and try again.
+                          </p>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={resetPaymentModal}
+                            className="px-4 xs:px-6 py-1.5 xs:py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors text-sm xs:text-base"
+                          >
+                            {t.tryAgain}
+                          </motion.button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <>
+                      <div className="mb-3 xs:mb-4">
+                        <label className="block text-xs xs:text-sm font-medium text-gray-700 mb-1 xs:mb-2">
+                          {t.enterMomoNumber}
+                        </label>
+                        <input
+                          type="tel"
+                          value={momoNumber}
+                          onChange={(e) => setMomoNumber(e.target.value)}
+                          placeholder="07XX XXX XXX"
+                          className="w-full px-3 xs:px-4 py-2 xs:py-3 text-sm xs:text-base border border-gray-300 rounded-lg focus:outline-none focus:border-[#FF385C] focus:ring-1 focus:ring-[#FF385C]"
+                          disabled={isProcessingPayment}
+                        />
+                      </div>
+                      <div className="bg-gray-50 rounded-lg p-3 xs:p-4 mb-4 xs:mb-6">
+                        <h4 className="font-semibold text-xs xs:text-sm text-gray-900 mb-1 xs:mb-2">
+                          {t.bookingDetails}
+                        </h4>
+                        <p className="text-[10px] xs:text-xs text-gray-500">
+                          {selectedHouse?.name}
+                        </p>
+                        <p className="text-[10px] xs:text-xs text-gray-500">
+                          {selectedHouse?.university}
+                        </p>
+                        <p className="text-[10px] xs:text-xs text-gray-500">
+                          {selectedHouse?.nights} {t.nights} × $
+                          {selectedHouse?.price} = $
+                          {selectedHouse?.price && selectedHouse?.nights
+                            ? selectedHouse.price * selectedHouse.nights
+                            : 0}
+                        </p>
+                        <p className="text-sm xs:text-base md:text-lg font-bold text-gray-900 mt-1 xs:mt-2">
+                          {t.totalPrice}: $
+                          {selectedHouse?.price && selectedHouse?.nights
+                            ? selectedHouse.price * selectedHouse.nights
+                            : 0}
+                        </p>
+                      </div>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={processPayment}
+                        disabled={isProcessingPayment}
+                        className="w-full py-2.5 xs:py-3 bg-[#FF385C] text-white rounded-lg font-medium hover:bg-[#E31C5F] transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm xs:text-base"
+                      >
+                        {isProcessingPayment ? (
+                          <>
+                            <div className="w-4 h-4 xs:w-5 xs:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            {t.processingPayment}
+                          </>
+                        ) : (
+                          t.payWithMomo
+                        )}
+                      </motion.button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Location Modal - Responsive */}
+      <AnimatePresence>
+        {isLocationModalOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200]"
+              onClick={() => setIsLocationModalOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="fixed inset-2 xs:inset-4 z-[201] flex items-center justify-center p-2 xs:p-4"
+            >
+              <div className="bg-white rounded-xl xs:rounded-2xl w-full max-w-md max-h-[80vh] overflow-hidden shadow-2xl">
+                <div className="p-3 xs:p-4 border-b border-gray-200 flex items-center justify-between">
+                  <h3 className="text-base xs:text-lg font-semibold">
+                    {t.selectLocation}
+                  </h3>
+                  <button
+                    onClick={() => setIsLocationModalOpen(false)}
+                    className="p-1 rounded-full transition-colors"
+                  >
+                    <CloseIcon className="w-4 h-4 xs:w-5 xs:h-5" />
+                  </button>
+                </div>
+                <div className="p-3 xs:p-4">
+                  <div className="relative mb-3 xs:mb-4">
+                    <LocationOnIcon className="absolute left-2.5 xs:left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 xs:w-5 xs:h-5" />
+                    <input
+                      type="text"
+                      placeholder={t.searchDestinations}
+                      value={searchLocation}
+                      onChange={(e) => setSearchLocation(e.target.value)}
+                      className="w-full pl-8 xs:pl-10 pr-3 xs:pr-4 py-2 xs:py-2.5 text-sm xs:text-base border border-gray-300 rounded-lg focus:outline-none focus:border-[#FF385C] focus:ring-1 focus:ring-[#FF385C] placeholder-gray-400"
+                      autoFocus
+                    />
+                  </div>
+
+                  <div className="mb-3 xs:mb-4">
+                    <h4 className="text-xs xs:text-sm font-medium text-gray-500 mb-1.5 xs:mb-2">
+                      <SchoolIcon className="w-3 h-3 xs:w-4 xs:h-4 inline mr-1" />
+                      {t.popularLocations}
+                    </h4>
+                    <div className="max-h-40 overflow-y-auto space-y-0.5">
+                      {universityLocations.map((uni) => (
+                        <button
+                          key={uni}
+                          onClick={() => {
+                            setSelectedUniversity(uni);
+                            setSearchLocation(uni);
+                            setIsLocationModalOpen(false);
+                          }}
+                          className="w-full text-left px-2 xs:px-3 py-1.5 xs:py-2 rounded-lg transition-colors flex items-center gap-1.5 xs:gap-2"
+                        >
+                          <SchoolIcon className="w-3.5 h-3.5 xs:w-4 xs:h-4 text-[#FF385C]" />
+                          <span className="text-xs xs:text-sm">
+                            {uni}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-xs xs:text-sm font-medium text-gray-500 mb-1.5 xs:mb-2">
+                      <LocationCityIcon className="w-3 h-3 xs:w-4 xs:h-4 inline mr-1" />
+                      Locations in Rwanda
+                    </h4>
+                    <div className="max-h-40 overflow-y-auto space-y-0.5">
+                      {locationSuggestions.map((location) => (
+                        <button
+                          key={location}
+                          onClick={() => {
+                            setSearchLocation(location);
+                            setSelectedUniversity("");
+                            setIsLocationModalOpen(false);
+                          }}
+                          className="w-full text-left px-2 xs:px-3 py-1.5 xs:py-2 rounded-lg transition-colors flex items-center gap-1.5 xs:gap-2"
+                        >
+                          <LocationOnIcon className="w-3.5 h-3.5 xs:w-4 xs:h-4 text-[#FF385C]" />
+                          <span className="text-xs xs:text-sm">
+                            {location}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Date Picker Modal - Responsive */}
+      <AnimatePresence>
+        {isDatePickerOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200]"
+              onClick={() => setIsDatePickerOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="fixed inset-2 xs:inset-4 z-[201] flex items-center justify-center p-2 xs:p-4"
+            >
+              <div className="bg-white rounded-xl xs:rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl">
+                <div className="p-3 xs:p-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-2">
+                  <h3 className="text-base xs:text-lg font-semibold">
+                    {t.when}
+                  </h3>
+                  <div className="flex items-center gap-1 xs:gap-2">
+                    <button
+                      onClick={clearDates}
+                      className="text-xs xs:text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                    >
+                      {t.clear}
+                    </button>
+                    <button
+                      onClick={() => setIsDatePickerOpen(false)}
+                      className="p-1 rounded-full transition-colors"
+                    >
+                      <CloseIcon className="w-4 h-4 xs:w-5 xs:h-5" />
+                    </button>
+                  </div>
+                </div>
+                <div className="p-3 xs:p-4 overflow-y-auto">
+                  <div className="flex items-center justify-between mb-3 xs:mb-4">
+                    <button
+                      onClick={() => changeMonth(-1)}
+                      className="p-1.5 xs:p-2 rounded-full transition-colors"
+                    >
+                      <ArrowBackIcon className="w-4 h-4 xs:w-5 xs:h-5" />
+                    </button>
+                    <h4 className="font-semibold text-sm xs:text-base">
+                      {new Date(currentYear, currentMonth).toLocaleString(
+                        "default",
+                        { month: "long", year: "numeric" },
+                      )}
+                    </h4>
+                    <button
+                      onClick={() => changeMonth(1)}
+                      className="p-1.5 xs:p-2 rounded-full transition-colors"
+                    >
+                      <ArrowForwardIcon className="w-4 h-4 xs:w-5 xs:h-5" />
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-7 gap-0.5 xs:gap-1 mb-1.5 xs:mb-2">
+                    {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
+                      <div
+                        key={day}
+                        className="text-center text-[10px] xs:text-xs font-medium text-gray-500 py-0.5 xs:py-1"
+                      >
+                        {day}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-7 gap-0.5 xs:gap-1">
+                    {renderCalendar()}
+                  </div>
+                  <div className="mt-3 xs:mt-4 flex flex-wrap items-center justify-between border-t border-gray-200 pt-3 xs:pt-4 gap-2">
+                    <div className="flex flex-wrap gap-1 xs:gap-2">
+                      {tempCheckIn && (
+                        <span className="text-[10px] xs:text-xs sm:text-sm">
+                          {t.checkIn}: {tempCheckIn.toLocaleDateString()}
+                        </span>
+                      )}
+                      {tempCheckOut && (
+                        <span className="text-[10px] xs:text-xs sm:text-sm">
+                          {t.checkOut}: {tempCheckOut.toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={applyDates}
+                      disabled={!tempCheckIn || !tempCheckOut}
+                      className="px-3 xs:px-4 py-1.5 xs:py-2 bg-[#FF385C] text-white rounded-lg font-medium hover:bg-[#E31C5F] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs xs:text-sm"
+                    >
+                      {t.apply}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Guest/Student Modal - Responsive */}
+      <AnimatePresence>
+        {isGuestModalOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200]"
+              onClick={() => setIsGuestModalOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="fixed inset-2 xs:inset-4 z-[201] flex items-center justify-center p-2 xs:p-4"
+            >
+              <div className="bg-white rounded-xl xs:rounded-2xl w-full max-w-md max-h-[80vh] overflow-hidden shadow-2xl">
+                <div className="p-3 xs:p-4 border-b border-gray-200 flex items-center justify-between">
+                  <h3 className="text-base xs:text-lg font-semibold">
+                    <PeopleAltIcon className="w-4 h-4 xs:w-5 xs:h-5 inline mr-2 text-[#FF385C]" />
+                    {t.guests}
+                  </h3>
+                  <button
+                    onClick={() => setIsGuestModalOpen(false)}
+                    className="p-1 rounded-full transition-colors"
+                  >
+                    <CloseIcon className="w-4 h-4 xs:w-5 xs:h-5" />
+                  </button>
+                </div>
+                <div className="p-3 xs:p-4 space-y-3 xs:space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 xs:gap-2">
+                      <div className="text-gray-500">
+                        <PeopleAltIcon className="w-4 h-4 xs:w-5 xs:h-5" />
+                      </div>
+                      <span className="font-medium text-sm xs:text-base">
+                        {t.students || "Students"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 xs:gap-3">
+                      <button
+                        onClick={() =>
+                          setStudentCount(Math.max(1, studentCount - 1))
+                        }
+                        className="w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 rounded-full border border-gray-300 flex items-center justify-center transition-colors"
+                      >
+                        <RemoveIcon className="w-3 h-3 xs:w-4 xs:h-4" />
+                      </button>
+                      <span className="w-5 xs:w-6 text-center font-medium text-sm xs:text-base">
+                        {studentCount}
+                      </span>
+                      <button
+                        onClick={() => setStudentCount(studentCount + 1)}
+                        className="w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 rounded-full border border-gray-300 flex items-center justify-center transition-colors"
+                      >
+                        <AddIcon className="w-3 h-3 xs:w-4 xs:h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setIsGuestModalOpen(false);
+                      toast.success(`👥 ${getStudentCount()}`);
+                    }}
+                    className="w-full py-2.5 xs:py-3 bg-[#FF385C] text-white rounded-lg font-medium hover:bg-[#E31C5F] transition-colors text-sm xs:text-base"
+                  >
+                    {t.apply}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};

@@ -1,0 +1,102 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 560" width="500" height="560">
+
+    <!-- White Background -->
+    <rect width="500" height="560" fill="white"></rect>
+
+    <!-- Outer Green Rings -->
+    <path d="M90 120 A180 180 0 0 0 90 430" fill="none" stroke="#36B25A" stroke-width="7" stroke-linecap="round"></path>
+
+    <path d="M410 120 A180 180 0 0 1 410 430" fill="none" stroke="#36B25A" stroke-width="7" stroke-linecap="round"></path>
+
+    <!-- Inner Blue Rings -->
+    <path d="M105 135 A165 165 0 0 0 105 415" fill="none" stroke="#1B4E91" stroke-width="5" stroke-linecap="round"></path>
+
+    <path d="M395 135 A165 165 0 0 1 395 415" fill="none" stroke="#1B4E91" stroke-width="5" stroke-linecap="round"></path>
+
+    <!-- Bottom Rings -->
+    <path d="M165 475 A120 120 0 0 0 335 475" fill="none" stroke="#36B25A" stroke-width="7" stroke-linecap="round"></path>
+
+    <path d="M180 462 A104 104 0 0 0 320 462" fill="none" stroke="#1B4E91" stroke-width="5" stroke-linecap="round"></path>
+
+    <!-- Compass -->
+    <g transform="translate(250 95)">
+
+        <text x="0" y="-18" text-anchor="middle" font-size="34" font-weight="800" fill="#1B4E91" font-family="Arial">
+            N
+        </text>
+
+        <circle r="58" fill="none" stroke="#1B4E91" stroke-width="7"></circle>
+
+        <polygon points="0,-58 10,-10 0,-22 -10,-10" fill="#1B4E91"></polygon>
+
+        <polygon points="0,58 10,10 0,22 -10,10" fill="#1B4E91"></polygon>
+
+        <polygon points="-58,0 -10,-10 -22,0 -10,10" fill="#1B4E91"></polygon>
+
+        <polygon points="58,0 10,-10 22,0 10,10" fill="#1B4E91"></polygon>
+
+        <polygon points="-40,-40 -8,-12 -12,-8" fill="#1B4E91"></polygon>
+
+        <polygon points="40,-40 8,-12 12,-8" fill="#1B4E91"></polygon>
+
+        <polygon points="-40,40 -8,12 -12,8" fill="#1B4E91"></polygon>
+
+        <polygon points="40,40 8,12 12,8" fill="#1B4E91"></polygon>
+
+    </g>
+
+    <!-- Roof -->
+    <path d="M150 215 L250 135 L350 215" fill="none" stroke="#36B25A" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"></path>
+
+    <!-- Chimney -->
+    <rect x="305" y="175" width="18" height="55" fill="#36B25A"></rect>
+
+    <!-- House -->
+    <rect x="188" y="215" width="124" height="90" fill="#36B25A"></rect>
+
+    <!-- Location Pin -->
+    <path d="
+            M250 220
+            C225 220 208 238 208 262
+            C208 292 250 330 250 330
+            C250 330 292 292 292 262
+            C292 238 275 220 250 220
+            Z
+        " fill="#1B4E91"></path>
+
+    <circle cx="250" cy="255" r="14" fill="white"></circle>
+
+    <!-- Book -->
+    <path d="
+            M250 320
+            C220 305 170 302 118 316
+            C128 328 128 346 118 360
+            C170 340 220 342 250 362
+            Z
+        " fill="#1B4E91"></path>
+
+    <path d="
+            M250 320
+            C280 305 330 302 382 316
+            C372 328 372 346 382 360
+            C330 340 280 342 250 362
+            Z
+        " fill="#1B4E91"></path>
+
+    <path d="M250 320 L250 362" stroke="#FFFFFF" stroke-width="3"></path>
+
+    <!-- Text -->
+    <text x="250" y="430" text-anchor="middle" font-size="60" font-family="Poppins,Arial,sans-serif" font-weight="900" fill="#1B4E91">
+        INYUMBA
+    </text>
+
+    <text x="250" y="462" text-anchor="middle" font-size="20" font-family="Poppins,Arial,sans-serif" font-weight="700" fill="#36B25A">
+        STUDENT ACCOMMODATION
+    </text>
+
+    <text x="250" y="530" text-anchor="middle" font-size="24" font-family="Poppins,Arial,sans-serif" font-weight="800" letter-spacing="5" fill="#1B4E91">
+        RWANDA
+    </text>
+
+</svg>
