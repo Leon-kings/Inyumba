@@ -4127,7 +4127,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
   return (
     <div className="w-full">
       {/* ===== PROJECT HEADER WITH PERMANENT ABOUT SECTION ===== */}
-      <div className="bg-gradient-to-r from-[#FF385C] to-pink-500 text-white py-6 md:py-8">
+      <div className="bg-gray-400 text-white py-6 md:py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-2xl md:text-4xl font-bold mb-2">INYUMBA PROJECT</h1>
