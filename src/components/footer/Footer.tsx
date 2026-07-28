@@ -1,4 +1,3 @@
- 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -18,6 +17,7 @@ import GavelIcon from "@mui/icons-material/Gavel";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import PaymentIcon from "@mui/icons-material/Payment";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CodeIcon from "@mui/icons-material/Code";
 
 // Google Maps location - Musanze, INES-Ruhengeri
 const MAP_EMBED_URL =
@@ -50,8 +50,8 @@ const translations = {
     email: "inyumba@yahoo.fr",
     followUs: "Follow Us",
     rights: "All rights reserved.",
-    designedBy: "Designed with ❤️ by",
-    company: "INYUMBA PROJECT",
+    designedBy: "Designed by",
+    company: "INYUMBA",
     privacyTitle: "Privacy Policy",
     termsTitle: "Terms and Conditions",
     privacyLastUpdated: "Last Updated: January 2024",
@@ -82,8 +82,8 @@ const translations = {
     email: "inyumba@yahoo.fr",
     followUs: "Suivez-Nous",
     rights: "Tous droits réservés.",
-    designedBy: "Conçu avec ❤️ par",
-    company: "INYUMBA PROJECT",
+    designedBy: "Conçu par",
+    company: "INYUMBA",
     privacyTitle: "Politique de Confidentialité",
     termsTitle: "Conditions Générales",
     privacyLastUpdated: "Dernière mise à jour: Janvier 2024",
@@ -114,8 +114,8 @@ const translations = {
     email: "inyumba@yahoo.fr",
     followUs: "Dukurikire",
     rights: "Uburenganzira bwose buraharanwa.",
-    designedBy: "Byakozwe n'umutima ❤️ na",
-    company: "INYUMBA PROJECT",
+    designedBy: "Byakozwe na",
+    company: "INYUMBA",
     privacyTitle: "Amategeko Y'ibanga",
     termsTitle: "Amategeko n'Amabwiriza",
     privacyLastUpdated: "Byavuguruwe: Mutarama 2024",
@@ -383,8 +383,6 @@ const InyumbaLogo = ({
   </motion.svg>
 );
 
-
-
 export const Footer: React.FC<FooterProps> = ({ language = "en" }) => {
   const [lang, setLang] = useState(language);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
@@ -413,7 +411,7 @@ export const Footer: React.FC<FooterProps> = ({ language = "en" }) => {
     setIsTermsOpen(true);
   };
 
-  const currentYear = new Date().getFullYear();
+  const currentYear = 2026;
 
   return (
     <>
@@ -423,7 +421,7 @@ export const Footer: React.FC<FooterProps> = ({ language = "en" }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* About Section */}
             <div>
-             <div className="text-[#FF385C]">
+              <div className="text-[#FF385C]">
                 <InyumbaLogo className="h-12 w-12 sm:h-12 sm:w-12 rounded-2xl" />
               </div>
               <p className="text-sm text-gray-400 leading-relaxed mb-4">
@@ -594,14 +592,24 @@ export const Footer: React.FC<FooterProps> = ({ language = "en" }) => {
                 </a>
               </div>
             </div>
-            <div className="text-sm text-gray-500 text-center">
-              © {currentYear} {t.company}. {t.rights}
-              <br className="sm:hidden" />
-              <span className="hidden sm:inline"> | </span>
-              <span>
-                {t.designedBy}{" "}
-                <span className="text-[#FF385C]">{t.company}</span>
-              </span>
+            
+            {/* Copyright and Designer Credit */}
+            <div className="text-center">
+              <div className="text-sm text-gray-50">
+               <span className='text-blue-400 font-bold'> © {currentYear}</span> {t.company}. {t.rights}
+              </div>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1 }}
+                className="mt-1 pt-1 flex items-center justify-center gap-2"
+              >
+                <CodeIcon className="w-4 h-4 text-green-400" />
+                <span className="text-xs text-gray-400">{t.designedBy}</span>
+                <span className="text-sm font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                  Leon
+                </span>
+              </motion.div>
             </div>
           </div>
         </div>
