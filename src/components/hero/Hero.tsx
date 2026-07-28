@@ -2306,7 +2306,6 @@ import BedIcon from "@mui/icons-material/Bed";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import ErrorIcon from "@mui/icons-material/Error";
 import SchoolIcon from "@mui/icons-material/School";
 import LocationCityIcon from "@mui/icons-material/LocationCity";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
@@ -2321,11 +2320,10 @@ import HotelIcon from "@mui/icons-material/Hotel";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import ClearIcon from "@mui/icons-material/Clear";
 import LoginIcon from "@mui/icons-material/Login";
-import PersonIcon from "@mui/icons-material/Person";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-
+import SaveIcon from "@mui/icons-material/Save";
 
 // ============================================================
 // 1. DATA FROM THE PROVIDED DOCUMENTS
@@ -3334,6 +3332,10 @@ const getTranslations = (lang: string) => {
       confirmPassword: "Confirm Password",
       phone: "Phone",
       showLess: "Show Less",
+      save: "Save",
+      saving: "Saving...",
+      saveSuccess: "Saved successfully!",
+      saveFailed: "Failed to save. Please try again.",
     },
     fr: {
       popularHomes: "Maisons étudiantes disponibles",
@@ -3465,6 +3467,10 @@ const getTranslations = (lang: string) => {
       confirmPassword: "Confirmer le mot de passe",
       phone: "Téléphone",
       showLess: "Afficher moins",
+      save: "Enregistrer",
+      saving: "Enregistrement...",
+      saveSuccess: "Enregistré avec succès !",
+      saveFailed: "Échec de l'enregistrement. Veuillez réessayer.",
     },
     rw: {
       popularHomes: "Amazu y'abanyeshuri ariboneka",
@@ -3596,6 +3602,10 @@ const getTranslations = (lang: string) => {
       confirmPassword: "Emeza ijambo ryibanga",
       phone: "Telefone",
       showLess: "Garuka",
+      save: "Bika",
+      saving: "Birabikwa...",
+      saveSuccess: "Byabitswe neza!",
+      saveFailed: "Ntabwo byabitswe. Ongera ugerageze.",
     },
   };
   return translations[lang as keyof typeof translations] || translations.en;
@@ -3902,27 +3912,10 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] = useState(false);
 
   const [selectedHouse, setSelectedHouse] = useState<StudentHouse | null>(null);
-
-  const [momoNumber, setMomoNumber] = useState("");
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [paymentResult, setPaymentResult] = useState<"success" | "fail" | null>(
-    null,
-  );
-  const [showPaymentResult, setShowPaymentResult] = useState(false);
-
-  const [loginEmail, setLoginEmail] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
-  const [registerName, setRegisterName] = useState("");
-  const [registerEmail, setRegisterEmail] = useState("");
-  const [registerPhone, setRegisterPhone] = useState("");
-  const [registerPassword, setRegisterPassword] = useState("");
-  const [registerConfirmPassword, setRegisterConfirmPassword] = useState("");
-  const [isLoginMode, setIsLoginMode] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [favorites, setFavorites] = useState<number[]>(() => {
     const saved = localStorage.getItem("favorites");
@@ -4041,7 +4034,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
   }, [favorites]);
 
   useEffect(() => {
-    if (isPropertyModalOpen || isPaymentModalOpen || isLoginModalOpen) {
+    if (isPropertyModalOpen || isLoginRequiredModalOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
@@ -4049,7 +4042,30 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [isPropertyModalOpen, isPaymentModalOpen, isLoginModalOpen]);
+  }, [isPropertyModalOpen, isLoginRequiredModalOpen]);
+
+  // ===== API Call Function =====
+  const saveOrderToAPI = async (orderData: any) => {
+    try {
+      const response = await fetch("https://your-api-endpoint.com/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error saving order:", error);
+      throw error;
+    }
+  };
 
   // ===== Handlers =====
   const totalPages = Math.ceil(filteredHouses.length / itemsPerPage);
@@ -4268,85 +4284,42 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
     setSelectedHouse(null);
   };
 
-  const closePaymentModal = () => {
-    setIsPaymentModalOpen(false);
-    setMomoNumber("");
-    setPaymentResult(null);
-    setShowPaymentResult(false);
-  };
-
-  const processPayment = () => {
-    if (!momoNumber || momoNumber.length < 9) {
-      toast.error("Please enter a valid MOMO number");
-      return;
-    }
-
-    setIsProcessingPayment(true);
-
-    setTimeout(() => {
-      setIsProcessingPayment(false);
-      const isSuccess = Math.random() > 0.2;
-      setPaymentResult(isSuccess ? "success" : "fail");
-      setShowPaymentResult(true);
-
-      if (isSuccess) {
-        toast.success(`✅ ${t.paymentSuccess}`);
-      } else {
-        toast.error(`❌ ${t.paymentFailed}`);
-      }
-    }, 2000);
-  };
-
-  const resetPaymentModal = () => {
-    if (paymentResult === "success") {
-      closePaymentModal();
-    } else {
-      setPaymentResult(null);
-      setShowPaymentResult(false);
-      setIsProcessingPayment(false);
-    }
-  };
-
-  const handleLogin = () => {
-    if (!loginEmail || !loginPassword) {
-      toast.error("Please fill in all fields");
-      return;
-    }
-    setIsLoggedIn(true);
-    setIsLoginModalOpen(false);
-    toast.success("🎉 Login successful!");
-    if (selectedHouse) {
-      setIsPaymentModalOpen(true);
-    }
-  };
-
-  const handleRegister = () => {
-    if (
-      !registerName ||
-      !registerEmail ||
-      !registerPhone ||
-      !registerPassword
-    ) {
-      toast.error("Please fill in all fields");
-      return;
-    }
-    if (registerPassword !== registerConfirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
-    setIsLoggedIn(true);
-    setIsLoginModalOpen(false);
-    toast.success("🎉 Registration successful!");
-    if (selectedHouse) {
-      setIsPaymentModalOpen(true);
-    }
-  };
-
   const handleOrderClick = () => {
-    if (isLoggedIn) {
-      setIsPaymentModalOpen(true);
-    } else {
-      setIsLoginModalOpen(true);
+    setIsLoginRequiredModalOpen(true);
+  };
+
+  const handleSaveOrder = async () => {
+    if (!selectedHouse) return;
+
+    setIsSaving(true);
+    try {
+      const orderData = {
+        houseId: selectedHouse.id,
+        houseName: selectedHouse.name,
+        priceRWF: selectedHouse.priceRWF,
+        nights: selectedHouse.nights,
+        totalPrice: selectedHouse.priceRWF * selectedHouse.nights,
+        university: selectedHouse.university,
+        district: selectedHouse.district,
+        sector: selectedHouse.sector,
+        cell: selectedHouse.cell,
+        village: selectedHouse.village,
+        checkIn: checkIn ? checkIn.toISOString() : null,
+        checkOut: checkOut ? checkOut.toISOString() : null,
+        students: studentCount,
+        timestamp: new Date().toISOString(),
+      };
+
+      const response = await saveOrderToAPI(orderData);
+      toast.success(`✅ ${t.saveSuccess}`);
+      console.log("Order saved successfully:", response);
+      setIsLoginRequiredModalOpen(false);
+      closeHouseModal();
+    } catch (error) {
+      toast.error(`❌ ${t.saveFailed}`);
+      console.error("Save error:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -5335,20 +5308,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
                     </div>
                   </div>
 
-                  <div className="border-t border-gray-200 pt-4 mt-4">
-                    <h4 className="font-semibold text-sm text-gray-900 mb-2">
-                      <PersonIcon className="w-4 h-4 inline mr-1 text-[#FF385C]" />
-                      {t.owner} & {t.contact}
-                    </h4>
-                    <div className="bg-gray-50 rounded-lg p-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                      <span className="text-sm font-medium text-gray-900">
-                        {selectedHouse.owner}
-                      </span>
-                      <span className="text-sm text-gray-700">
-                        📞 {selectedHouse.contact}
-                      </span>
-                    </div>
-                  </div>
+                  {/* Owner section removed as requested */}
 
                   <div className="border-t border-gray-200 pt-4 mt-4">
                     <h4 className="font-semibold text-sm text-gray-900 mb-2">
@@ -5428,17 +5388,17 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
       </AnimatePresence>
 
       {/* ============================================================
-          LOGIN / REGISTER MODAL
+          LOGIN REQUIRED MODAL (Simplified - no login/register forms)
           ============================================================ */}
       <AnimatePresence>
-        {isLoginModalOpen && (
+        {isLoginRequiredModalOpen && selectedHouse && (
           <>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[350]"
-              onClick={() => setIsLoginModalOpen(false)}
+              onClick={() => setIsLoginRequiredModalOpen(false)}
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -5448,288 +5408,60 @@ export const Hero: React.FC<HeroProps> = ({ onSearch, language = "en" }) => {
             >
               <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-hidden shadow-2xl">
                 <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">
-                    {isLoginMode ? t.loginNow : t.registerNow}
-                  </h3>
+                  <h3 className="text-lg font-semibold">{t.loginRequired}</h3>
                   <button
-                    onClick={() => setIsLoginModalOpen(false)}
-                    className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-                  >
-                    <CloseIcon className="w-5 h-5" />
-                  </button>
-                </div>
-                <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
-                  {isLoginMode ? (
-                    <div className="space-y-4">
-                      <p className="text-sm text-gray-500">{t.loginToOrder}</p>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.email}
-                        </label>
-                        <input
-                          type="email"
-                          value={loginEmail}
-                          onChange={(e) => setLoginEmail(e.target.value)}
-                          placeholder="you@example.com"
-                          className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#FF385C]"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.password}
-                        </label>
-                        <input
-                          type="password"
-                          value={loginPassword}
-                          onChange={(e) => setLoginPassword(e.target.value)}
-                          placeholder="••••••••"
-                          className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#FF385C]"
-                        />
-                      </div>
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={handleLogin}
-                        className="w-full py-3 bg-[#FF385C] text-white rounded-lg font-medium hover:bg-[#E31C5F] transition-colors flex items-center justify-center gap-2"
-                      >
-                        <LoginIcon className="w-4 h-4" />
-                        {t.loginNow}
-                      </motion.button>
-                      <p className="text-center text-sm text-gray-500">
-                        {t.or}{" "}
-                        <button
-                          onClick={() => setIsLoginMode(false)}
-                          className="text-[#FF385C] font-medium hover:underline"
-                        >
-                          {t.registerNow}
-                        </button>
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <p className="text-sm text-gray-500">
-                        Create an account to order this house
-                      </p>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Full Name
-                        </label>
-                        <input
-                          type="text"
-                          value={registerName}
-                          onChange={(e) => setRegisterName(e.target.value)}
-                          placeholder="John Doe"
-                          className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#FF385C]"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.email}
-                        </label>
-                        <input
-                          type="email"
-                          value={registerEmail}
-                          onChange={(e) => setRegisterEmail(e.target.value)}
-                          placeholder="you@example.com"
-                          className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#FF385C]"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.phone}
-                        </label>
-                        <input
-                          type="tel"
-                          value={registerPhone}
-                          onChange={(e) => setRegisterPhone(e.target.value)}
-                          placeholder="07XX XXX XXX"
-                          className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#FF385C]"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.password}
-                        </label>
-                        <input
-                          type="password"
-                          value={registerPassword}
-                          onChange={(e) => setRegisterPassword(e.target.value)}
-                          placeholder="••••••••"
-                          className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#FF385C]"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.confirmPassword}
-                        </label>
-                        <input
-                          type="password"
-                          value={registerConfirmPassword}
-                          onChange={(e) =>
-                            setRegisterConfirmPassword(e.target.value)
-                          }
-                          placeholder="••••••••"
-                          className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#FF385C]"
-                        />
-                      </div>
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={handleRegister}
-                        className="w-full py-3 bg-[#FF385C] text-white rounded-lg font-medium hover:bg-[#E31C5F] transition-colors flex items-center justify-center gap-2"
-                      >
-                        <PersonIcon className="w-4 h-4" />
-                        {t.registerNow}
-                      </motion.button>
-                      <p className="text-center text-sm text-gray-500">
-                        {t.or}{" "}
-                        <button
-                          onClick={() => setIsLoginMode(true)}
-                          className="text-[#FF385C] font-medium hover:underline"
-                        >
-                          {t.loginNow}
-                        </button>
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* ============================================================
-          PAYMENT MODAL
-          ============================================================ */}
-      <AnimatePresence>
-        {isPaymentModalOpen && selectedHouse && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[400]"
-              onClick={closePaymentModal}
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="fixed inset-4 z-[401] flex items-center justify-center"
-            >
-              <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-hidden shadow-2xl">
-                <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">{t.payWithMomo}</h3>
-                  <button
-                    onClick={closePaymentModal}
+                    onClick={() => setIsLoginRequiredModalOpen(false)}
                     className="p-1 rounded-full hover:bg-gray-100 transition-colors"
                   >
                     <CloseIcon className="w-5 h-5" />
                   </button>
                 </div>
                 <div className="p-6">
-                  {showPaymentResult ? (
-                    <div className="text-center py-8">
-                      {paymentResult === "success" ? (
-                        <div>
-                          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <CheckCircleIcon className="w-10 h-10 text-green-500" />
-                          </div>
-                          <h4 className="text-2xl font-bold text-green-500 mb-2">
-                            {t.paymentSuccess}
-                          </h4>
-                          <p className="text-sm text-gray-500 mb-6">
-                            {t.yourBookingConfirmed}
-                          </p>
-                          <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={resetPaymentModal}
-                            className="px-6 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition-colors"
-                          >
-                            {t.done}
-                          </motion.button>
-                        </div>
-                      ) : (
-                        <div>
-                          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <ErrorIcon className="w-10 h-10 text-red-500" />
-                          </div>
-                          <h4 className="text-2xl font-bold text-red-500 mb-2">
-                            {t.paymentFailed}
-                          </h4>
-                          <p className="text-sm text-gray-500 mb-6">
-                            Please check your MOMO number and try again.
-                          </p>
-                          <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={resetPaymentModal}
-                            className="px-6 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors"
-                          >
-                            {t.tryAgain}
-                          </motion.button>
-                        </div>
-                      )}
+                  <div className="text-center mb-6">
+                    <div className="w-20 h-20 bg-[#FF385C]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <LoginIcon className="w-10 h-10 text-[#FF385C]" />
                     </div>
-                  ) : (
-                    <>
-                      <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          {t.enterMomoNumber}
-                        </label>
-                        <input
-                          type="tel"
-                          value={momoNumber}
-                          onChange={(e) => setMomoNumber(e.target.value)}
-                          placeholder="07XX XXX XXX"
-                          className="w-full px-4 py-3 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#FF385C]"
-                          disabled={isProcessingPayment}
-                        />
-                      </div>
-                      <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                        <h4 className="font-semibold text-sm text-gray-900 mb-2">
-                          {t.bookingDetails}
-                        </h4>
-                        <p className="text-xs text-gray-500">
-                          {selectedHouse?.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {selectedHouse?.university}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {selectedHouse?.nights} {t.nights} ×{" "}
-                          {selectedHouse?.priceRWF.toLocaleString()} RWF ={" "}
-                          {(selectedHouse?.priceRWF || 0) *
-                            (selectedHouse?.nights || 0)}{" "}
-                          RWF
-                        </p>
-                        <p className="text-base font-bold text-gray-900 mt-2">
-                          {t.totalPrice}:{" "}
-                          {(selectedHouse?.priceRWF || 0) *
-                            (selectedHouse?.nights || 0)}{" "}
-                          RWF
-                        </p>
-                      </div>
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={processPayment}
-                        disabled={isProcessingPayment}
-                        className="w-full py-3 bg-[#FF385C] text-white rounded-lg font-medium hover:bg-[#E31C5F] transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                      >
-                        {isProcessingPayment ? (
-                          <>
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            {t.processingPayment}
-                          </>
-                        ) : (
-                          t.payWithMomo
-                        )}
-                      </motion.button>
-                    </>
-                  )}
+                    <h4 className="text-xl font-bold text-gray-900 mb-2">
+                      {t.loginRequired}
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      {t.loginToOrder}
+                    </p>
+                    <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                      <p className="text-xs text-gray-500">
+                        <strong>{selectedHouse.name}</strong> •{" "}
+                        {selectedHouse.priceRWF.toLocaleString()} RWF/month
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleSaveOrder}
+                      disabled={isSaving}
+                      className="w-full py-3 bg-[#FF385C] text-white rounded-lg font-medium hover:bg-[#E31C5F] transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {isSaving ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          {t.saving}
+                        </>
+                      ) : (
+                        <>
+                          <SaveIcon className="w-4 h-4" />
+                          {t.save}
+                        </>
+                      )}
+                    </motion.button>
+                    <button
+                      onClick={() => setIsLoginRequiredModalOpen(false)}
+                      className="w-full py-2.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                    >
+                      {t.done}
+                    </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
