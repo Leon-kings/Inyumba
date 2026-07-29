@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -270,7 +269,7 @@ export const UserDashboard: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   // User statistics
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     totalBookings: 12,
     activeBookings: 3,
     completedBookings: 8,
@@ -280,7 +279,7 @@ export const UserDashboard: React.FC = () => {
   });
 
   // Booking data for charts
-  const [bookingData, setBookingData] = useState([
+  const [bookingData] = useState([
     { month: "Jan", bookings: 2, spent: 250000 },
     { month: "Feb", bookings: 1, spent: 110500 },
     { month: "Mar", bookings: 3, spent: 330000 },
