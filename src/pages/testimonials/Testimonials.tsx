@@ -4,6 +4,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
+import Cookies from 'js-cookie';
 
 // Material-UI Icons
 import StarIcon from '@mui/icons-material/Star';
@@ -37,10 +38,6 @@ interface Testimonial {
   helpful: number;
   notHelpful: number;
   houseName?: string;
-}
-
-interface TestimonialsProps {
-  language?: 'en' | 'fr' | 'rw';
 }
 
 const translations = {
@@ -281,8 +278,15 @@ const testimonialsData: Testimonial[] = [
   }
 ];
 
-export const Testimonials: React.FC<TestimonialsProps> = ({ language = 'en' }) => {
-  const [lang, setLang] = useState(language);
+// Helper function to get language from cookies
+const getLanguageFromCookies = (): 'en' | 'fr' | 'rw' => {
+  const lang = Cookies.get('language') as 'en' | 'fr' | 'rw';
+  return lang || 'en';
+};
+
+export const Testimonials: React.FC = () => {
+  // Get language from cookies
+  const [lang, setLang] = useState<'en' | 'fr' | 'rw'>(getLanguageFromCookies());
   const [filteredTestimonials, setFilteredTestimonials] = useState<Testimonial[]>(testimonialsData);
   const [selectedUniversity, setSelectedUniversity] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('newest');
@@ -301,6 +305,20 @@ export const Testimonials: React.FC<TestimonialsProps> = ({ language = 'en' }) =
   // Get unique universities
   const universities = ['all', ...new Set(testimonialsData.map(t => t.university))];
 
+  // Listen for language changes in cookies
+  useEffect(() => {
+    const handleCookieChange = () => {
+      const newLang = getLanguageFromCookies();
+      if (newLang !== lang) {
+        setLang(newLang);
+      }
+    };
+
+    // Check for cookie changes every second (polling)
+    const interval = setInterval(handleCookieChange, 1000);
+    return () => clearInterval(interval);
+  }, [lang]);
+
   // Handle responsive items per slide
   useEffect(() => {
     const handleResize = () => {
@@ -318,24 +336,12 @@ export const Testimonials: React.FC<TestimonialsProps> = ({ language = 'en' }) =
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => {
-    const handleLanguageChange = () => {
-      const savedLang = (localStorage.getItem('language') as 'en' | 'fr' | 'rw') || 'en';
-      setLang(savedLang);
-    };
-
-    window.addEventListener('languageChanged', handleLanguageChange);
-    return () => window.removeEventListener('languageChanged', handleLanguageChange);
-  }, []);
-
   // Auto-slide effect
   useEffect(() => {
     if (isPlaying && filteredTestimonials.length > itemsPerSlide) {
       slideIntervalRef.current = setInterval(() => {
         setSlideIndex((prev) => {
-        
           const nextIndex = prev + itemsPerSlide;
-          // Reset to 0 when reaching the end
           return nextIndex >= filteredTestimonials.length ? 0 : nextIndex;
         });
       }, 4000);
@@ -418,7 +424,6 @@ export const Testimonials: React.FC<TestimonialsProps> = ({ language = 'en' }) =
     setSelectedTestimonial(testimonial);
     setIsModalOpen(true);
     document.body.style.overflow = 'hidden';
-    // Pause autoplay when modal is open
     setIsPlaying(false);
   };
 
@@ -426,7 +431,6 @@ export const Testimonials: React.FC<TestimonialsProps> = ({ language = 'en' }) =
     setIsModalOpen(false);
     setSelectedTestimonial(null);
     document.body.style.overflow = 'auto';
-    // Resume autoplay when modal is closed
     setIsPlaying(true);
   };
 
@@ -447,7 +451,6 @@ export const Testimonials: React.FC<TestimonialsProps> = ({ language = 'en' }) =
   };
 
   const nextSlide = () => {
-    
     const nextIndex = slideIndex + itemsPerSlide;
     setSlideIndex(nextIndex >= filteredTestimonials.length ? 0 : nextIndex);
   };

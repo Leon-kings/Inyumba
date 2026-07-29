@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Cookies from 'js-cookie';
 
 // Material-UI Icons
 import FacebookIcon from "@mui/icons-material/Facebook";
@@ -22,10 +23,6 @@ import CodeIcon from "@mui/icons-material/Code";
 // Google Maps location - Musanze, INES-Ruhengeri
 const MAP_EMBED_URL =
   "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7989.457174818556!2d29.62835915!3d-1.5022738499999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dca8c8d129807f%3A0x6feccec1255c8e9d!2sINES-Ruhengeri!5e0!3m2!1sen!2srw!4v1700000000000";
-
-interface FooterProps {
-  language?: "en" | "fr" | "rw";
-}
 
 const translations = {
   en: {
@@ -124,6 +121,12 @@ const translations = {
     findUs: "Turebe",
     visitUs: "Udukerere",
   },
+};
+
+// Helper function to get language from cookies
+const getLanguageFromCookies = (): 'en' | 'fr' | 'rw' => {
+  const lang = Cookies.get('language') as 'en' | 'fr' | 'rw';
+  return lang || 'en';
 };
 
 const InyumbaLogo = ({
@@ -383,25 +386,27 @@ const InyumbaLogo = ({
   </motion.svg>
 );
 
-export const Footer: React.FC<FooterProps> = ({ language = "en" }) => {
-  const [lang, setLang] = useState(language);
+export const Footer: React.FC = () => {
+  // Get language from cookies
+  const [lang, setLang] = useState<'en' | 'fr' | 'rw'>(getLanguageFromCookies());
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
 
   const t = translations[lang];
 
-  // Listen for language changes
-  React.useEffect(() => {
-    const handleLanguageChange = () => {
-      const savedLang =
-        (localStorage.getItem("language") as "en" | "fr" | "rw") || "en";
-      setLang(savedLang);
+  // Listen for language changes in cookies
+  useEffect(() => {
+    const handleCookieChange = () => {
+      const newLang = getLanguageFromCookies();
+      if (newLang !== lang) {
+        setLang(newLang);
+      }
     };
 
-    window.addEventListener("languageChanged", handleLanguageChange);
-    return () =>
-      window.removeEventListener("languageChanged", handleLanguageChange);
-  }, []);
+    // Check for cookie changes every second (polling)
+    const interval = setInterval(handleCookieChange, 1000);
+    return () => clearInterval(interval);
+  }, [lang]);
 
   const handlePrivacyClick = () => {
     setIsPrivacyOpen(true);
@@ -952,3 +957,4 @@ export const Footer: React.FC<FooterProps> = ({ language = "en" }) => {
     </>
   );
 };
+

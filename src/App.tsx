@@ -68,6 +68,11 @@ import { Help } from "./components/faq/Help";
 import { Navbar } from "./components/navbar/Navbar";
 import { Footer } from "./components/footer/Footer";
 import { UserManagement } from "./components/dashboard/admin/components/users/UserManagement";
+import { RequestManagement } from "./components/dashboard/admin/components/request/RequestManagement";
+import { MessageManagement } from "./components/dashboard/admin/components/messages/MessageManagement";
+import { BookingManagement } from "./components/dashboard/admin/components/bookings/BookingManagement";
+import { UserDashboard } from "./components/dashboard/users/UserDashboard";
+import { HostDashboard } from "./components/dashboard/host/HostDashboard";
 
 // Types
 interface UserData {
@@ -161,22 +166,22 @@ const Sidebar = ({
       path: "/dashboard/users",
     },
     {
-      id: "expenses",
-      label: "Expenses",
+      id: "booking",
+      label: "Bookings",
       icon: <AttachMoneyIcon />,
-      path: "/dashboard/expenses",
+      path: "/dashboard/bookings",
     },
     {
-      id: "income",
-      label: "Income",
+      id: "request",
+      label: "Request",
       icon: <TrendingUpIcon />,
-      path: "/dashboard/income",
+      path: "/dashboard/request",
     },
     {
-      id: "savings",
-      label: "Savings",
+      id: "messages",
+      label: "Messages",
       icon: <SavingsIcon />,
-      path: "/dashboard/savings",
+      path: "/dashboard/messages",
     },
     {
       id: "budget",
@@ -613,20 +618,46 @@ export default function App() {
             }
           />
 
+          <Route
+            path="/dashboard/messages"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <DashboardLayout>
+                  <MessageManagement />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/bookings"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <DashboardLayout>
+                  <BookingManagement />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard/request"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <DashboardLayout>
+                  <RequestManagement />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+
           {/* User Dashboard Routes */}
           <Route
             path="/user/dashboard"
             element={
               <ProtectedRoute allowedRoles={["user"]}>
                 <DashboardLayout>
-                  <div className="p-4">
-                    <h2 className="text-2xl font-bold text-gray-800">
-                      User Dashboard
-                    </h2>
-                    <p className="text-gray-600 mt-2">
-                      Welcome to your personal dashboard.
-                    </p>
-                  </div>
+                  <UserDashboard />
                 </DashboardLayout>
               </ProtectedRoute>
             }
@@ -638,14 +669,7 @@ export default function App() {
             element={
               <ProtectedRoute allowedRoles={["host"]}>
                 <DashboardLayout>
-                  <div className="p-4">
-                    <h2 className="text-2xl font-bold text-gray-800">
-                      Host Dashboard
-                    </h2>
-                    <p className="text-gray-600 mt-2">
-                      Welcome to your hosting dashboard.
-                    </p>
-                  </div>
+                  <HostDashboard />
                 </DashboardLayout>
               </ProtectedRoute>
             }

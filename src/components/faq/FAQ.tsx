@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
+import Cookies from 'js-cookie';
 
 // Material-UI Icons
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -150,10 +151,15 @@ interface FAQItem {
   icon: React.ReactNode;
 }
 
-export const FAQ: React.FC<{ language?: "en" | "fr" | "rw" }> = ({
-  language = "en",
-}) => {
-  const [lang, setLang] = useState(language);
+// Helper function to get language from cookies
+const getLanguageFromCookies = (): 'en' | 'fr' | 'rw' => {
+  const lang = Cookies.get('language') as 'en' | 'fr' | 'rw';
+  return lang || 'en';
+};
+
+export const FAQ: React.FC = () => {
+  // Get language from cookies
+  const [lang, setLang] = useState<'en' | 'fr' | 'rw'>(getLanguageFromCookies());
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<
     "all" | "general" | "booking" | "housing" | "landlord" | "university"
@@ -180,18 +186,19 @@ export const FAQ: React.FC<{ language?: "en" | "fr" | "rw" }> = ({
 
   const t = translations[lang];
 
-  // Listen for language changes
+  // Listen for language changes in cookies
   useEffect(() => {
-    const handleLanguageChange = () => {
-      const savedLang =
-        (localStorage.getItem("language") as "en" | "fr" | "rw") || "en";
-      setLang(savedLang);
+    const handleCookieChange = () => {
+      const newLang = getLanguageFromCookies();
+      if (newLang !== lang) {
+        setLang(newLang);
+      }
     };
 
-    window.addEventListener("languageChanged", handleLanguageChange);
-    return () =>
-      window.removeEventListener("languageChanged", handleLanguageChange);
-  }, []);
+    // Check for cookie changes every second (polling)
+    const interval = setInterval(handleCookieChange, 1000);
+    return () => clearInterval(interval);
+  }, [lang]);
 
   // Validate form on change
   useEffect(() => {
@@ -970,3 +977,4 @@ export const FAQ: React.FC<{ language?: "en" | "fr" | "rw" }> = ({
     </div>
   );
 };
+

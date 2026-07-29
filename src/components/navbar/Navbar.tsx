@@ -1,4 +1,4 @@
-
+/* eslint-disable react-refresh/only-export-components */
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 // /* eslint-disable react-hooks/set-state-in-effect */
 // import React, { useState, useEffect, useRef } from "react";
@@ -840,11 +840,11 @@
 //       setUserRole(userData.role || "user");
 //       setUserId(userData.id.toString());
 //       setIsLoginOpen(false);
-      
+
 //       // Store in localStorage
 //       localStorage.setItem("token", token);
 //       localStorage.setItem("user", JSON.stringify(userData));
-      
+
 //       // Clear form
 //       setLoginEmail("");
 //       setLoginPassword("");
@@ -2396,33 +2396,22 @@
 //   );
 // };
 
-
-
-
-
-
-
-
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Cookies from "js-cookie";
 
 // Material-UI Icons
 import PersonIcon from "@mui/icons-material/Person";
 import LanguageIcon from "@mui/icons-material/Language";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import LoginIcon from "@mui/icons-material/Login";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import CloseIcon from "@mui/icons-material/Close";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
-import HomeIcon from "@mui/icons-material/Home";
-import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
-import HelpCenterIcon from "@mui/icons-material/HelpCenter";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -2530,7 +2519,16 @@ const InyumbaLogo = ({ className = "h-12 w-12" }: { className?: string }) => (
       strokeLinecap="round"
     />
     <g transform="translate(250 95)">
-      <text x="0" y="-18" fontSize="34" fontWeight="800" textAnchor="middle" fill="#1B4E91">N</text>
+      <text
+        x="0"
+        y="-18"
+        fontSize="34"
+        fontWeight="800"
+        textAnchor="middle"
+        fill="#1B4E91"
+      >
+        N
+      </text>
       <circle r="58" fill="none" stroke="#1B4E91" strokeWidth="7" />
       <polygon points="0,-58 10,-10 0,-22 -10,-10" fill="#1B4E91" />
       <polygon points="0,58 10,10 0,22 -10,10" fill="#1B4E91" />
@@ -2542,7 +2540,14 @@ const InyumbaLogo = ({ className = "h-12 w-12" }: { className?: string }) => (
       <polygon points="40,40 8,12 12,8" fill="#1B4E91" />
     </g>
     <g>
-      <path d="M150 215 L250 135 L350 215" fill="none" stroke="#36B25A" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M150 215 L250 135 L350 215"
+        fill="none"
+        stroke="#36B25A"
+        strokeWidth="14"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
       <rect x="188" y="215" width="124" height="90" rx="3" fill="#36B25A" />
       <rect x="305" y="175" width="18" height="55" fill="#36B25A" />
     </g>
@@ -2551,36 +2556,106 @@ const InyumbaLogo = ({ className = "h-12 w-12" }: { className?: string }) => (
       transition={{ repeat: Infinity, duration: 2 }}
       transform="translate(250 252)"
     >
-      <path d="M0-32 C-23-32 -38-15 -38 8 C-38 38 0 72 0 72 C0 72 38 38 38 8 C38-15 23-32 0-32" fill="#1B4E91" />
+      <path
+        d="M0-32 C-23-32 -38-15 -38 8 C-38 38 0 72 0 72 C0 72 38 38 38 8 C38-15 23-32 0-32"
+        fill="#1B4E91"
+      />
       <circle r="13" cy="-3" fill="white" />
     </motion.g>
     <g transform="translate(250 320)">
-      <path d="M0 0 C-28 -16 -82 -18 -132 -4 C-120 10 -120 26 -132 40 C-82 20 -30 22 0 42" fill="#1B4E91" />
-      <path d="M0 0 C28 -16 82 -18 132 -4 C120 10 120 26 132 40 C82 20 30 22 0 42" fill="#1B4E91" />
-      <path d="M0 14 C-28 -2 -78 -4 -120 8" stroke="white" strokeWidth="2" fill="none" />
-      <path d="M0 14 C28 -2 78 -4 120 8" stroke="white" strokeWidth="2" fill="none" />
+      <path
+        d="M0 0 C-28 -16 -82 -18 -132 -4 C-120 10 -120 26 -132 40 C-82 20 -30 22 0 42"
+        fill="#1B4E91"
+      />
+      <path
+        d="M0 0 C28 -16 82 -18 132 -4 C120 10 120 26 132 40 C82 20 30 22 0 42"
+        fill="#1B4E91"
+      />
+      <path
+        d="M0 14 C-28 -2 -78 -4 -120 8"
+        stroke="white"
+        strokeWidth="2"
+        fill="none"
+      />
+      <path
+        d="M0 14 C28 -2 78 -4 120 8"
+        stroke="white"
+        strokeWidth="2"
+        fill="none"
+      />
     </g>
-    <text x="250" y="430" textAnchor="middle" fontSize="60" fontWeight="900" fill="#1B4E91" letterSpacing="2" style={{ fontFamily: "Poppins, Montserrat, Arial, sans-serif" }}>INYUMBA</text>
-    <text x="250" y="462" textAnchor="middle" fontSize="20" fontWeight="700" fill="#36B25A" style={{ fontFamily: "Poppins, Arial, sans-serif" }}>STUDENT ACCOMMODATION</text>
-    <text x="250" y="530" textAnchor="middle" fontSize="24" fontWeight="800" letterSpacing="5" fill="#1B4E91" style={{ fontFamily: "Poppins, Arial, sans-serif" }}>RWANDA</text>
+    <text
+      x="250"
+      y="430"
+      textAnchor="middle"
+      fontSize="60"
+      fontWeight="900"
+      fill="#1B4E91"
+      letterSpacing="2"
+      style={{ fontFamily: "Poppins, Montserrat, Arial, sans-serif" }}
+    >
+      INYUMBA
+    </text>
+    <text
+      x="250"
+      y="462"
+      textAnchor="middle"
+      fontSize="20"
+      fontWeight="700"
+      fill="#36B25A"
+      style={{ fontFamily: "Poppins, Arial, sans-serif" }}
+    >
+      STUDENT ACCOMMODATION
+    </text>
+    <text
+      x="250"
+      y="530"
+      textAnchor="middle"
+      fontSize="24"
+      fontWeight="800"
+      letterSpacing="5"
+      fill="#1B4E91"
+      style={{ fontFamily: "Poppins, Arial, sans-serif" }}
+    >
+      RWANDA
+    </text>
   </motion.svg>
 );
 
 // Animated Background SVG
 const AnimatedBackground = () => (
-  <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+  <svg
+    className="absolute inset-0 w-full h-full"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <defs>
       <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" style={{ stopColor: "#FF385C", stopOpacity: 0.1 }} />
-        <stop offset="100%" style={{ stopColor: "#FF385C", stopOpacity: 0.05 }} />
+        <stop
+          offset="100%"
+          style={{ stopColor: "#FF385C", stopOpacity: 0.05 }}
+        />
       </linearGradient>
       <radialGradient id="radial">
         <stop offset="0%" style={{ stopColor: "#FF385C", stopOpacity: 0.15 }} />
         <stop offset="100%" style={{ stopColor: "#FF385C", stopOpacity: 0 }} />
       </radialGradient>
     </defs>
-    <motion.circle cx="50%" cy="50%" r="40%" fill="url(#radial)" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 4, repeat: Infinity }} />
-    <motion.rect width="100%" height="100%" fill="url(#grad)" animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 3, repeat: Infinity }} />
+    <motion.circle
+      cx="50%"
+      cy="50%"
+      r="40%"
+      fill="url(#radial)"
+      animate={{ scale: [1, 1.2, 1] }}
+      transition={{ duration: 4, repeat: Infinity }}
+    />
+    <motion.rect
+      width="100%"
+      height="100%"
+      fill="url(#grad)"
+      animate={{ opacity: [0.5, 1, 0.5] }}
+      transition={{ duration: 3, repeat: Infinity }}
+    />
   </svg>
 );
 
@@ -2630,6 +2705,71 @@ const translations = {
     weak: "Weak",
     moderate: "Moderate",
     strong: "Strong",
+
+    // Hero Section
+    heroTitle: "Find Your Perfect Student Accommodation",
+    heroSubtitle:
+      "Discover safe, affordable, and comfortable housing near your university",
+    heroButton: "Explore Listings",
+    heroStudents: "Happy Students",
+    heroListings: "Available Listings",
+    heroUniversities: "Partner Universities",
+
+    // About Section
+    aboutTitle: "About Inyumba",
+    aboutSubtitle: "Your Trusted Student Housing Platform",
+    aboutDesc1:
+      "Inyumba is Rwanda's premier student accommodation platform, connecting students with quality housing near their universities.",
+    aboutDesc2:
+      "We understand the challenges of finding safe and affordable accommodation as a student. That's why we've created a platform that makes the search easy and reliable.",
+    aboutMission: "Our Mission",
+    aboutMissionText:
+      "To provide every student in Rwanda with access to safe, affordable, and comfortable accommodation that enhances their academic experience.",
+    aboutVision: "Our Vision",
+    aboutVisionText:
+      "To become Africa's leading student housing platform, transforming how students find and secure accommodation.",
+    aboutValues: "Our Values",
+    aboutValue1: "Safety First",
+    aboutValue2: "Affordability",
+    aboutValue3: "Trust & Transparency",
+    aboutValue4: "Student Success",
+
+    // Services Section
+    servicesTitle: "Our Services",
+    servicesSubtitle: "Comprehensive Solutions for Student Housing",
+    service1Title: "Find Accommodation",
+    service1Desc:
+      "Browse through hundreds of verified student housing options near your campus.",
+    service2Title: "List Your Property",
+    service2Desc:
+      "Hosts can list their properties and connect with students looking for accommodation.",
+    service3Title: "Verified Listings",
+    service3Desc:
+      "All properties are verified to ensure safety, quality, and fair pricing.",
+    service4Title: "Support & Guidance",
+    service4Desc:
+      "Our team is here to help you every step of the way, from search to move-in.",
+    service5Title: "Secure Payments",
+    service5Desc: "Safe and secure payment processing with full transparency.",
+    service6Title: "Community Building",
+    service6Desc:
+      "Connect with fellow students and build a community in your new home.",
+
+    // Testimonials Section
+    testimonialsTitle: "What Students Say",
+    testimonialsSubtitle: "Real Stories from Students Who Found Their Home",
+    testimonial1Name: "Marie Uwimana",
+    testimonial1Role: "Student at UR-CAVM",
+    testimonial1Text:
+      "Inyumba made finding accommodation so easy! I found a great place near my university within days.",
+    testimonial2Name: "Jean Pierre Niyonzima",
+    testimonial2Role: "Student at INES-Ruhengeri",
+    testimonial2Text:
+      "The platform is user-friendly and the properties are verified. I felt safe and confident throughout the process.",
+    testimonial3Name: "Clarisse Mukamana",
+    testimonial3Role: "Student at UR-Musanze",
+    testimonial3Text:
+      "I highly recommend Inyumba to any student looking for housing. The service is excellent and the staff are helpful.",
   },
   fr: {
     brand: "airbnb",
@@ -2657,7 +2797,8 @@ const translations = {
     services: "Services",
     about: "À propos",
     helpCenterTitle: "Centre d'aide",
-    becomeHostDesc: "Il est facile de commencer à héberger et de gagner un revenu supplémentaire.",
+    becomeHostDesc:
+      "Il est facile de commencer à héberger et de gagner un revenu supplémentaire.",
     referHost: "Parrainer un hôte",
     findCoHost: "Trouver un co-hôte",
     giftCardsTitle: "Cartes cadeaux",
@@ -2675,6 +2816,73 @@ const translations = {
     weak: "Faible",
     moderate: "Modéré",
     strong: "Fort",
+
+    // Hero Section
+    heroTitle: "Trouvez Votre Logement Étudiant Parfait",
+    heroSubtitle:
+      "Découvrez un logement sûr, abordable et confortable près de votre université",
+    heroButton: "Explorer les annonces",
+    heroStudents: "Étudiants Satisfaits",
+    heroListings: "Annonces Disponibles",
+    heroUniversities: "Universités Partenaires",
+
+    // About Section
+    aboutTitle: "À Propos d'Inyumba",
+    aboutSubtitle: "Votre Plateforme de Logement Étudiant de Confiance",
+    aboutDesc1:
+      "Inyumba est la principale plateforme de logement étudiant au Rwanda, mettant en relation les étudiants avec des logements de qualité près de leurs universités.",
+    aboutDesc2:
+      "Nous comprenons les défis liés à la recherche d'un logement sûr et abordable en tant qu'étudiant. C'est pourquoi nous avons créé une plateforme qui rend la recherche facile et fiable.",
+    aboutMission: "Notre Mission",
+    aboutMissionText:
+      "Offrir à chaque étudiant au Rwanda un accès à un logement sûr, abordable et confortable qui améliore son expérience académique.",
+    aboutVision: "Notre Vision",
+    aboutVisionText:
+      "Devenir la principale plateforme de logement étudiant en Afrique, transformant la façon dont les étudiants trouvent et sécurisent leur logement.",
+    aboutValues: "Nos Valeurs",
+    aboutValue1: "Sécurité d'abord",
+    aboutValue2: "Abordabilité",
+    aboutValue3: "Confiance et Transparence",
+    aboutValue4: "Réussite Étudiante",
+
+    // Services Section
+    servicesTitle: "Nos Services",
+    servicesSubtitle: "Solutions Complètes pour le Logement Étudiant",
+    service1Title: "Trouver un Logement",
+    service1Desc:
+      "Parcourez des centaines d'options de logement étudiant vérifiées près de votre campus.",
+    service2Title: "Listez Votre Propriété",
+    service2Desc:
+      "Les hôtes peuvent lister leurs propriétés et se connecter avec des étudiants à la recherche d'un logement.",
+    service3Title: "Annonces Vérifiées",
+    service3Desc:
+      "Toutes les propriétés sont vérifiées pour garantir sécurité, qualité et prix équitables.",
+    service4Title: "Soutien et Orientation",
+    service4Desc:
+      "Notre équipe est là pour vous aider à chaque étape, de la recherche à l'emménagement.",
+    service5Title: "Paiements Sécurisés",
+    service5Desc:
+      "Traitement des paiements sûr et sécurisé avec une transparence totale.",
+    service6Title: "Construction Communautaire",
+    service6Desc:
+      "Connectez-vous avec d'autres étudiants et construisez une communauté dans votre nouveau foyer.",
+
+    // Testimonials Section
+    testimonialsTitle: "Ce que Disent les Étudiants",
+    testimonialsSubtitle:
+      "Histoires Vraies d'Étudiants Qui Ont Trouvé Leur Logement",
+    testimonial1Name: "Marie Uwimana",
+    testimonial1Role: "Étudiante à UR-CAVM",
+    testimonial1Text:
+      "Inyumba a rendu la recherche de logement si facile ! J'ai trouvé un excellent endroit près de mon université en quelques jours.",
+    testimonial2Name: "Jean Pierre Niyonzima",
+    testimonial2Role: "Étudiant à INES-Ruhengeri",
+    testimonial2Text:
+      "La plateforme est conviviale et les propriétés sont vérifiées. Je me suis senti en sécurité et confiant tout au long du processus.",
+    testimonial3Name: "Clarisse Mukamana",
+    testimonial3Role: "Étudiante à UR-Musanze",
+    testimonial3Text:
+      "Je recommande vivement Inyumba à tout étudiant cherchant un logement. Le service est excellent et le personnel est serviable.",
   },
   rw: {
     brand: "airbnb",
@@ -2720,10 +2928,91 @@ const translations = {
     weak: "Ntacyo",
     moderate: "Rishoboka",
     strong: "Rikomeye",
+
+    // Hero Section
+    heroTitle: "Shakira Aho Uzabera Byiza",
+    heroSubtitle:
+      "Menya amazu meza, ari mu buryo buhoro kandi ari hafi ya kaminuza yawe",
+    heroButton: "Reba Amazu",
+    heroStudents: "Abanyeshuri Bunze",
+    heroListings: "Amazu Aboneka",
+    heroUniversities: "Kaminuza Zifatanya",
+
+    // About Section
+    aboutTitle: "Ibijyanye na Inyumba",
+    aboutSubtitle: "Urubuga Rwizewe rw'Amazu y'Abanyeshuri",
+    aboutDesc1:
+      "Inyumba ni urubuga rwambere mu Rwanda ruhuza abanyeshuri n'amazu meza ari hafi ya kaminuza zabo.",
+    aboutDesc2:
+      "Turumva ibibazo abanyeshuri bahura nabyo mu gushaka amazu meza kandi ari mu buryo buhoro. Ni yo mpamvu twakoze urubuga rworoshye kandi rwizewe.",
+    aboutMission: "Intego Yacu",
+    aboutMissionText:
+      "Kugeza buri mnyeshuri mu Rwanda amazu meza, ari mu buryo buhoro kandi ari ahantu heza yo guturamo agatuma amasomo ye agenda neza.",
+    aboutVision: "Icyifuzo Cyacu",
+    aboutVisionText:
+      "Kuba urubuga rwambere muri Afrika ruhuza abanyeshuri n'amazu, rikavugurura uburyo abanyeshuri babonera no gutura amazu.",
+    aboutValues: "Indangagaciro Zacu",
+    aboutValue1: "Umutekano Mbere ya Byose",
+    aboutValue2: "Ishyushya Ryoheye",
+    aboutValue3: "Ikwizera no Guhishura",
+    aboutValue4: "Intsinzi y'Umnyeshuri",
+
+    // Services Section
+    servicesTitle: "Serivisi Zacu",
+    servicesSubtitle: "Ibikemura Byuzuye ku Mazu y'Abanyeshuri",
+    service1Title: "Shakisha Aho Gutura",
+    service1Desc:
+      "Reba amazu menshi y' abanyeshuri yagenzuwe ari hafi ya kaminuza yawe.",
+    service2Title: "Andika Icyo Utunze",
+    service2Desc:
+      "Abatunze bashobora kwandika amazu yabo no guhuza n'abanyeshuri bashaka aho gutura.",
+    service3Title: "Amazu Yagenzuwe",
+    service3Desc:
+      "Amazu yose aragenzurwa kugira ngo habeho umutekano, ubwiza, n'ibiciro bikwiye.",
+    service4Title: "Ubufasha n'Ubuyobozi",
+    service4Desc:
+      "Itsinda ryacu rihagurukiye gufasha buri ntambwe, kuva mu gushaka no kwinjira mu nzu.",
+    service5Title: "Kwirigira Mu Mutekano",
+    service5Desc: "Kwirigira gukorwa mu mutekano kandi byihishijwe.",
+    service6Title: "Gubaka Umuryango",
+    service6Desc:
+      "Huza n'abandi banyeshuri kandi ubake umuryango mu nzu yawe nshya.",
+
+    // Testimonials Section
+    testimonialsTitle: "Abanyeshuri Bavuga Bati",
+    testimonialsSubtitle: "Inkuru Nyakuri z'Abanyeshuri Babonye Aho Gutura",
+    testimonial1Name: "Marie Uwimana",
+    testimonial1Role: "Umnyeshuri muri UR-CAVM",
+    testimonial1Text:
+      "Inyumba yoroshye cyane gushaka aho gutura! Nabonye ahantu heza hafi ya kaminuza yanjye mu minsi mike.",
+    testimonial2Name: "Jean Pierre Niyonzima",
+    testimonial2Role: "Umnyeshuri muri INES-Ruhengeri",
+    testimonial2Text:
+      "Urubuga rworoshye gukoresha kandi amazu aragenzuwe. Numvise umutekano kandi nizeye mu gihe cyose.",
+    testimonial3Name: "Clarisse Mukamana",
+    testimonial3Role: "Umnyeshuri muri UR-Musanze",
+    testimonial3Text:
+      "Nsaba abanyeshuri bose bashaka aho gutura gukoresha Inyumba. Serivisi nziza kandi abakozi barafasha.",
   },
 };
 
 type Language = "en" | "fr" | "rw";
+
+// Helper function to get language from cookies
+const getLanguageFromCookies = (): Language => {
+  const lang = Cookies.get("language") as Language;
+  return lang || "en";
+};
+
+// Helper function to get translations based on cookie language
+export const getTranslations = () => {
+  const lang = getLanguageFromCookies();
+  return translations[lang];
+};
+
+// Export translations and types for other components
+export type { Language };
+export { translations };
 
 export const Navbar = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -2738,10 +3027,9 @@ export const Navbar = () => {
   const [userRole, setUserRole] = useState("user");
   const [userId, setUserId] = useState("");
 
-  // Initialize language from localStorage or default to 'en'
+  // Initialize language from cookies
   const [language, setLanguage] = useState<Language>(() => {
-    const savedLanguage = localStorage.getItem("language") as Language;
-    return savedLanguage || "en";
+    return getLanguageFromCookies();
   });
 
   // Login form state
@@ -2774,23 +3062,33 @@ export const Navbar = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Email validation state for both forms
-  const [isLoginEmailValid, setIsLoginEmailValid] = useState<boolean | null>(null);
-  const [isRegisterEmailValid, setIsRegisterEmailValid] = useState<boolean | null>(null);
+  const [isLoginEmailValid, setIsLoginEmailValid] = useState<boolean | null>(
+    null,
+  );
+  const [isRegisterEmailValid, setIsRegisterEmailValid] = useState<
+    boolean | null
+  >(null);
   const [isPhoneValid, setIsPhoneValid] = useState<boolean | null>(null);
 
   const userMenuRef = useRef<HTMLDivElement>(null);
   const languageMenuRef = useRef<HTMLDivElement>(null);
 
-  // Get translation
+  // Get translation based on language from cookies
   const t = translations[language];
 
   // Handle click outside menus
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
         setIsUserMenuOpen(false);
       }
-      if (languageMenuRef.current && !languageMenuRef.current.contains(event.target as Node)) {
+      if (
+        languageMenuRef.current &&
+        !languageMenuRef.current.contains(event.target as Node)
+      ) {
         setIsLanguageMenuOpen(false);
       }
     };
@@ -2832,6 +3130,20 @@ export const Navbar = () => {
     }
   }, []);
 
+  // Listen for cookie changes (for other tabs/windows)
+  useEffect(() => {
+    const handleCookieChange = () => {
+      const newLang = getLanguageFromCookies();
+      if (newLang !== language) {
+        setLanguage(newLang);
+      }
+    };
+
+    // Check for cookie changes every second (polling)
+    const interval = setInterval(handleCookieChange, 1000);
+    return () => clearInterval(interval);
+  }, [language]);
+
   // Validate email format
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -2845,7 +3157,9 @@ export const Navbar = () => {
   };
 
   // Check password strength
-  const checkPasswordStrength = (password: string): "weak" | "moderate" | "strong" | null => {
+  const checkPasswordStrength = (
+    password: string,
+  ): "weak" | "moderate" | "strong" | null => {
     if (!password || password.length === 0) return null;
     let score = 0;
     if (password.length >= 8) score++;
@@ -2859,32 +3173,51 @@ export const Navbar = () => {
   };
 
   // Get password strength color
-  const getPasswordStrengthColor = (strength: "weak" | "moderate" | "strong" | null): string => {
+  const getPasswordStrengthColor = (
+    strength: "weak" | "moderate" | "strong" | null,
+  ): string => {
     if (!strength) return "#e5e7eb";
     switch (strength) {
-      case "weak": return "#ef4444";
-      case "moderate": return "#f59e0b";
-      case "strong": return "#22c55e";
+      case "weak":
+        return "#ef4444";
+      case "moderate":
+        return "#f59e0b";
+      case "strong":
+        return "#22c55e";
     }
   };
 
   // Get password strength label
-  const getPasswordStrengthLabel = (strength: "weak" | "moderate" | "strong" | null): string => {
+  const getPasswordStrengthLabel = (
+    strength: "weak" | "moderate" | "strong" | null,
+  ): string => {
     if (!strength) return "";
     switch (strength) {
-      case "weak": return t.weak;
-      case "moderate": return t.moderate;
-      case "strong": return t.strong;
+      case "weak":
+        return t.weak;
+      case "moderate":
+        return t.moderate;
+      case "strong":
+        return t.strong;
     }
   };
 
   // Get password strength icon
-  const getPasswordStrengthIcon = (strength: "weak" | "moderate" | "strong" | null) => {
+  const getPasswordStrengthIcon = (
+    strength: "weak" | "moderate" | "strong" | null,
+  ) => {
     if (!strength) return null;
     switch (strength) {
-      case "weak": return <WarningIcon className="w-4 h-4" style={{ color: "#ef4444" }} />;
-      case "moderate": return <SecurityIcon className="w-4 h-4" style={{ color: "#f59e0b" }} />;
-      case "strong": return <VerifiedIcon className="w-4 h-4" style={{ color: "#22c55e" }} />;
+      case "weak":
+        return <WarningIcon className="w-4 h-4" style={{ color: "#ef4444" }} />;
+      case "moderate":
+        return (
+          <SecurityIcon className="w-4 h-4" style={{ color: "#f59e0b" }} />
+        );
+      case "strong":
+        return (
+          <VerifiedIcon className="w-4 h-4" style={{ color: "#22c55e" }} />
+        );
     }
   };
 
@@ -2907,7 +3240,13 @@ export const Navbar = () => {
 
   // Validate register form
   const validateRegisterForm = (): boolean => {
-    const errors: { name?: string; email?: string; phone?: string; password?: string; confirmPassword?: string } = {};
+    const errors: {
+      name?: string;
+      email?: string;
+      phone?: string;
+      password?: string;
+      confirmPassword?: string;
+    } = {};
     if (!registerName) {
       errors.name = "Full name is required";
     } else if (registerName.length < 2) {
@@ -2921,7 +3260,8 @@ export const Navbar = () => {
     if (!registerPhone) {
       errors.phone = "Phone number is required";
     } else if (!validatePhone(registerPhone)) {
-      errors.phone = "Please enter a valid Rwandan phone number (ex: 0788123456 or +250788123456)";
+      errors.phone =
+        "Please enter a valid Rwandan phone number (ex: 0788123456 or +250788123456)";
     }
     if (!registerPassword) {
       errors.password = "Password is required";
@@ -2955,7 +3295,11 @@ export const Navbar = () => {
 
   // Check if login form is valid
   const isLoginFormValid = (): boolean => {
-    return loginEmail.length > 0 && validateEmail(loginEmail) && loginPassword.length >= 6;
+    return (
+      loginEmail.length > 0 &&
+      validateEmail(loginEmail) &&
+      loginPassword.length >= 6
+    );
   };
 
   // Navigation handler
@@ -2989,16 +3333,40 @@ export const Navbar = () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       let userData: any = null;
       let token: string = "";
-      if (loginEmail === DEMO_USERS.admin.email && loginPassword === DEMO_USERS.admin.password) {
-        userData = { id: DEMO_USERS.admin.id, name: DEMO_USERS.admin.name, email: DEMO_USERS.admin.email, role: DEMO_USERS.admin.role };
+      if (
+        loginEmail === DEMO_USERS.admin.email &&
+        loginPassword === DEMO_USERS.admin.password
+      ) {
+        userData = {
+          id: DEMO_USERS.admin.id,
+          name: DEMO_USERS.admin.name,
+          email: DEMO_USERS.admin.email,
+          role: DEMO_USERS.admin.role,
+        };
         token = DEMO_USERS.admin.token;
         toast.success("🎉 Welcome Admin! Login successful.");
-      } else if (loginEmail === DEMO_USERS.user.email && loginPassword === DEMO_USERS.user.password) {
-        userData = { id: DEMO_USERS.user.id, name: DEMO_USERS.user.name, email: DEMO_USERS.user.email, role: DEMO_USERS.user.role };
+      } else if (
+        loginEmail === DEMO_USERS.user.email &&
+        loginPassword === DEMO_USERS.user.password
+      ) {
+        userData = {
+          id: DEMO_USERS.user.id,
+          name: DEMO_USERS.user.name,
+          email: DEMO_USERS.user.email,
+          role: DEMO_USERS.user.role,
+        };
         token = DEMO_USERS.user.token;
         toast.success("🎉 Welcome User! Login successful.");
-      } else if (loginEmail === DEMO_USERS.host.email && loginPassword === DEMO_USERS.host.password) {
-        userData = { id: DEMO_USERS.host.id, name: DEMO_USERS.host.name, email: DEMO_USERS.host.email, role: DEMO_USERS.host.role };
+      } else if (
+        loginEmail === DEMO_USERS.host.email &&
+        loginPassword === DEMO_USERS.host.password
+      ) {
+        userData = {
+          id: DEMO_USERS.host.id,
+          name: DEMO_USERS.host.name,
+          email: DEMO_USERS.host.email,
+          role: DEMO_USERS.host.role,
+        };
         token = DEMO_USERS.host.token;
         toast.success("🎉 Welcome Host! Login successful.");
       } else {
@@ -3055,7 +3423,8 @@ export const Navbar = () => {
       setPasswordStrength(null);
       setIsLoginOpen(true);
     } catch (error: any) {
-      const errorMessage = error?.message || "Registration failed. Please try again.";
+      const errorMessage =
+        error?.message || "Registration failed. Please try again.";
       toast.error(`❌ ${errorMessage}`);
       console.error("Register error:", error);
     } finally {
@@ -3078,24 +3447,25 @@ export const Navbar = () => {
   };
 
   // ============================================================
-  // LANGUAGE CHANGER FUNCTION - REFRESHES THE ENTIRE WEBSITE
+  // LANGUAGE CHANGER FUNCTION - SAVES TO COOKIES AND REFRESHES
   // ============================================================
   const handleLanguageChange = (lang: Language) => {
-    // Save the selected language to localStorage
-    localStorage.setItem("language", lang);
-    
+    // Save language to cookie (expires in 365 days)
+    Cookies.set("language", lang, { expires: 365, path: "/" });
+
     // Update the language state
     setLanguage(lang);
-    
+
     // Close the language menu
     setIsLanguageMenuOpen(false);
-    
+
     // Show a toast notification
-    const langName = lang === "en" ? "English" : lang === "fr" ? "Français" : "Kinyarwanda";
+    const langName =
+      lang === "en" ? "English" : lang === "fr" ? "Français" : "Kinyarwanda";
     toast.success(`🌍 Language changed to ${langName}`, {
       autoClose: 800,
     });
-    
+
     // REFRESH THE ENTIRE WEBSITE
     // Small delay to let the toast show before refresh
     setTimeout(() => {
@@ -3151,8 +3521,14 @@ export const Navbar = () => {
       setRegisterErrors({ ...registerErrors, password: undefined });
     }
     if (registerConfirmPassword && password !== registerConfirmPassword) {
-      setRegisterErrors({ ...registerErrors, confirmPassword: "Passwords do not match" });
-    } else if (registerConfirmPassword && password === registerConfirmPassword) {
+      setRegisterErrors({
+        ...registerErrors,
+        confirmPassword: "Passwords do not match",
+      });
+    } else if (
+      registerConfirmPassword &&
+      password === registerConfirmPassword
+    ) {
       setRegisterErrors({ ...registerErrors, confirmPassword: undefined });
     }
   };
@@ -3161,7 +3537,10 @@ export const Navbar = () => {
   const handleConfirmPasswordChange = (confirmPassword: string) => {
     setRegisterConfirmPassword(confirmPassword);
     if (registerPassword && registerPassword !== confirmPassword) {
-      setRegisterErrors({ ...registerErrors, confirmPassword: "Passwords do not match" });
+      setRegisterErrors({
+        ...registerErrors,
+        confirmPassword: "Passwords do not match",
+      });
     } else if (registerPassword && registerPassword === confirmPassword) {
       setRegisterErrors({ ...registerErrors, confirmPassword: undefined });
     }
@@ -3169,17 +3548,57 @@ export const Navbar = () => {
 
   // Dashboard data
   const dashboardStats = [
-    { label: t.totalRevenue, value: "RWF 2,450,000", icon: <TrendingUpIcon className="w-5 h-5 text-green-500" />, change: "+23%" },
-    { label: t.activeListings, value: "156", icon: <HotelIcon className="w-5 h-5 text-blue-500" />, change: "+12" },
-    { label: "Total Students", value: "3,847", icon: <PeopleIcon className="w-5 h-5 text-purple-500" />, change: "+18%" },
-    { label: t.bookings, value: "2,134", icon: <CalendarTodayIcon className="w-5 h-5 text-orange-500" />, change: "+31%" },
+    {
+      label: t.totalRevenue,
+      value: "RWF 2,450,000",
+      icon: <TrendingUpIcon className="w-5 h-5 text-green-500" />,
+      change: "+23%",
+    },
+    {
+      label: t.activeListings,
+      value: "156",
+      icon: <HotelIcon className="w-5 h-5 text-blue-500" />,
+      change: "+12",
+    },
+    {
+      label: "Total Students",
+      value: "3,847",
+      icon: <PeopleIcon className="w-5 h-5 text-purple-500" />,
+      change: "+18%",
+    },
+    {
+      label: t.bookings,
+      value: "2,134",
+      icon: <CalendarTodayIcon className="w-5 h-5 text-orange-500" />,
+      change: "+31%",
+    },
   ];
 
   const recentActivities = [
-    { user: "Student from INES-Ruhengeri", action: "Booked a room in Muhoza", time: "5 min ago", icon: <StarIcon className="w-4 h-4 text-yellow-500" /> },
-    { user: "Host in Cyabararika", action: "Listed a new house for students", time: "23 min ago", icon: <HotelIcon className="w-4 h-4 text-blue-500" /> },
-    { user: "Student from UR-CAVM", action: "Left a 5-star review", time: "1 hour ago", icon: <StarIcon className="w-4 h-4 text-yellow-500" /> },
-    { user: "Host in Kigombe", action: "Updated house details and price", time: "3 hours ago", icon: <SettingsIcon className="w-4 h-4 text-gray-500" /> },
+    {
+      user: "Student from INES-Ruhengeri",
+      action: "Booked a room in Muhoza",
+      time: "5 min ago",
+      icon: <StarIcon className="w-4 h-4 text-yellow-500" />,
+    },
+    {
+      user: "Host in Cyabararika",
+      action: "Listed a new house for students",
+      time: "23 min ago",
+      icon: <HotelIcon className="w-4 h-4 text-blue-500" />,
+    },
+    {
+      user: "Student from UR-CAVM",
+      action: "Left a 5-star review",
+      time: "1 hour ago",
+      icon: <StarIcon className="w-4 h-4 text-yellow-500" />,
+    },
+    {
+      user: "Host in Kigombe",
+      action: "Updated house details and price",
+      time: "3 hours ago",
+      icon: <SettingsIcon className="w-4 h-4 text-gray-500" />,
+    },
   ];
 
   // Animation variants
@@ -3216,7 +3635,8 @@ export const Navbar = () => {
 
   // Get dashboard icon based on role
   const getDashboardIcon = () => {
-    if (userRole === "admin") return <AdminPanelSettingsIcon className="w-4 h-4" />;
+    if (userRole === "admin")
+      return <AdminPanelSettingsIcon className="w-4 h-4" />;
     else if (userRole === "host") return <HotelIcon className="w-4 h-4" />;
     else return <DashboardIcon className="w-4 h-4" />;
   };
@@ -3293,8 +3713,18 @@ export const Navbar = () => {
                 }}
                 className="p-2 rounded-lg hover:bg-gray-100 text-gray-700"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 </svg>
               </motion.button>
             </div>
@@ -3335,8 +3765,14 @@ export const Navbar = () => {
                           <span className="text-lg">
                             {lang === "en" ? "🇬🇧" : lang === "fr" ? "🇫🇷" : "🇷🇼"}
                           </span>
-                          {lang === "en" ? "English" : lang === "fr" ? "Français" : "Kinyarwanda"}
-                          {language === lang && <CheckCircleIcon className="w-4 h-4 ml-auto" />}
+                          {lang === "en"
+                            ? "English"
+                            : lang === "fr"
+                              ? "Français"
+                              : "Kinyarwanda"}
+                          {language === lang && (
+                            <CheckCircleIcon className="w-4 h-4 ml-auto" />
+                          )}
                         </button>
                       ))}
                     </motion.div>
@@ -3347,7 +3783,11 @@ export const Navbar = () => {
               {/* Become a Host / Dashboard Button */}
               {isLoggedIn ? (
                 <motion.button
-                  whileHover={{ scale: 1.05, backgroundColor: "#FF385C", color: "white" }}
+                  whileHover={{
+                    scale: 1.05,
+                    backgroundColor: "#FF385C",
+                    color: "white",
+                  }}
                   whileTap={{ scale: 0.95 }}
                   className="hidden sm:block text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all bg-[#FF385C] text-white hover:bg-[#E31C5F] whitespace-nowrap"
                   onClick={handleDashboardNavigation}
@@ -3357,7 +3797,11 @@ export const Navbar = () => {
                 </motion.button>
               ) : (
                 <motion.button
-                  whileHover={{ scale: 1.05, backgroundColor: "#FF385C", color: "white" }}
+                  whileHover={{
+                    scale: 1.05,
+                    backgroundColor: "#FF385C",
+                    color: "white",
+                  }}
                   whileTap={{ scale: 0.95 }}
                   className="hidden sm:block text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all text-gray-700 hover:bg-[#FF385C] hover:text-white border border-gray-200 hover:border-[#FF385C] whitespace-nowrap"
                   onClick={() => setIsLoginOpen(true)}
@@ -3402,16 +3846,22 @@ export const Navbar = () => {
                       {isLoggedIn ? (
                         <>
                           <div className="px-4 py-2 border-b border-gray-100">
-                            <p className="font-semibold text-sm text-gray-900">{userName}</p>
+                            <p className="font-semibold text-sm text-gray-900">
+                              {userName}
+                            </p>
                             <p className="text-xs text-gray-500">{userEmail}</p>
                             <span className="inline-block mt-1 px-2 py-0.5 text-xs rounded-full bg-[#FF385C]/10 text-[#FF385C]">
-                              {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
+                              {userRole.charAt(0).toUpperCase() +
+                                userRole.slice(1)}
                             </span>
                           </div>
                           <motion.button
                             whileHover={{ x: 5 }}
                             className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-gray-700 hover:bg-gray-50"
-                            onClick={() => { setIsUserMenuOpen(false); setIsUserModalOpen(true); }}
+                            onClick={() => {
+                              setIsUserMenuOpen(false);
+                              setIsUserModalOpen(true);
+                            }}
                           >
                             <AccountCircleIcon className="w-4 h-4" />
                             {t.profile}
@@ -3419,61 +3869,28 @@ export const Navbar = () => {
                           <motion.button
                             whileHover={{ x: 5 }}
                             className={`w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 transition-colors ${
-                              userRole === "admin" ? "text-purple-600 hover:bg-purple-50" :
-                              userRole === "host" ? "text-blue-600 hover:bg-blue-50" :
-                              "text-[#FF385C] hover:bg-[#FF385C]/5"
+                              userRole === "admin"
+                                ? "text-purple-600 hover:bg-purple-50"
+                                : userRole === "host"
+                                  ? "text-blue-600 hover:bg-blue-50"
+                                  : "text-[#FF385C] hover:bg-[#FF385C]/5"
                             }`}
                             onClick={handleDashboardNavigation}
                           >
                             {getDashboardIcon()}
                             {getDashboardLabel()}
                             {userRole === "admin" && (
-                              <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-600">Admin</span>
+                              <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-600">
+                                Admin
+                              </span>
                             )}
                             {userRole === "host" && (
-                              <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-600">Host</span>
+                              <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-600">
+                                Host
+                              </span>
                             )}
                           </motion.button>
-                          <motion.button
-                            whileHover={{ x: 5 }}
-                            className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-gray-700 hover:bg-gray-50"
-                            onClick={() => navigateTo("/homes")}
-                          >
-                            <HomeIcon className="w-4 h-4" />
-                            {t.yourHomes}
-                          </motion.button>
-                          <motion.button
-                            whileHover={{ x: 5 }}
-                            className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-gray-700 hover:bg-gray-50"
-                            onClick={() => navigateTo("/wishlists")}
-                          >
-                            <FavoriteIcon className="w-4 h-4" />
-                            {t.wishlists}
-                          </motion.button>
-                          <motion.button
-                            whileHover={{ x: 5 }}
-                            className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-gray-700 hover:bg-gray-50"
-                            onClick={() => navigateTo("/gift-cards")}
-                          >
-                            <CardGiftcardIcon className="w-4 h-4" />
-                            {t.giftCards}
-                          </motion.button>
-                          <motion.button
-                            whileHover={{ x: 5 }}
-                            className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-gray-700 hover:bg-gray-50"
-                            onClick={() => navigateTo("/help")}
-                          >
-                            <HelpCenterIcon className="w-4 h-4" />
-                            {t.helpCenter}
-                          </motion.button>
-                          <motion.button
-                            whileHover={{ x: 5 }}
-                            className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-gray-700 hover:bg-gray-50"
-                            onClick={() => navigateTo("/settings")}
-                          >
-                            <SettingsIcon className="w-4 h-4" />
-                            {t.settings}
-                          </motion.button>
+                         
                           <hr className="my-1 border-gray-200" />
                           <motion.button
                             whileHover={{ x: 5 }}
@@ -3488,7 +3905,10 @@ export const Navbar = () => {
                         <>
                           <motion.button
                             whileHover={{ x: 5 }}
-                            onClick={() => { setIsUserMenuOpen(false); setIsLoginOpen(true); }}
+                            onClick={() => {
+                              setIsUserMenuOpen(false);
+                              setIsLoginOpen(true);
+                            }}
                             className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-gray-700 hover:bg-gray-50"
                           >
                             <LoginIcon className="w-4 h-4" />
@@ -3496,7 +3916,10 @@ export const Navbar = () => {
                           </motion.button>
                           <motion.button
                             whileHover={{ x: 5 }}
-                            onClick={() => { setIsUserMenuOpen(false); setIsRegisterOpen(true); }}
+                            onClick={() => {
+                              setIsUserMenuOpen(false);
+                              setIsRegisterOpen(true);
+                            }}
                             className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-gray-700 hover:bg-gray-50"
                           >
                             <PersonAddIcon className="w-4 h-4" />
@@ -3518,18 +3941,37 @@ export const Navbar = () => {
       </motion.nav>
 
       {/* Mobile Navigation Menu */}
-      <div id="mobile-nav-menu" className="hidden md:hidden bg-white border-b border-gray-200 shadow-lg">
+      <div
+        id="mobile-nav-menu"
+        className="hidden md:hidden bg-white border-b border-gray-200 shadow-lg"
+      >
         <div className="px-4 py-3 space-y-1">
-          <motion.a whileHover={{ x: 5 }} href="/" className="block px-4 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-[#FF385C] transition-colors">
+          <motion.a
+            whileHover={{ x: 5 }}
+            href="/"
+            className="block px-4 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-[#FF385C] transition-colors"
+          >
             {t.home}
           </motion.a>
-          <motion.a whileHover={{ x: 5 }} href="/experience" className="block px-4 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-[#FF385C] transition-colors">
+          <motion.a
+            whileHover={{ x: 5 }}
+            href="/experience"
+            className="block px-4 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-[#FF385C] transition-colors"
+          >
             {t.experience}
           </motion.a>
-          <motion.a whileHover={{ x: 5 }} href="/services" className="block px-4 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-[#FF385C] transition-colors">
+          <motion.a
+            whileHover={{ x: 5 }}
+            href="/services"
+            className="block px-4 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-[#FF385C] transition-colors"
+          >
             {t.services}
           </motion.a>
-          <motion.a whileHover={{ x: 5 }} href="/about" className="block px-4 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-[#FF385C] transition-colors">
+          <motion.a
+            whileHover={{ x: 5 }}
+            href="/about"
+            className="block px-4 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-[#FF385C] transition-colors"
+          >
             {t.about}
           </motion.a>
           <div className="pt-2 border-t border-gray-200">
@@ -3581,7 +4023,9 @@ export const Navbar = () => {
                 <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl relative z-10">
                   <div className="flex items-center gap-2">
                     <AutoAwesomeIcon className="text-[#FF385C] w-5 h-5" />
-                    <h2 className="text-xl font-semibold text-gray-900">{t.welcomeBack}</h2>
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      {t.welcomeBack}
+                    </h2>
                   </div>
                   <motion.button
                     whileHover={{ rotate: 90, scale: 1.1 }}
@@ -3594,9 +4038,15 @@ export const Navbar = () => {
                 </div>
                 <form onSubmit={handleLogin} className="p-6 relative z-10">
                   <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1.5 text-gray-700">{t.email}</label>
-                    <div className={`relative rounded-lg border ${isLoginEmailValid === true ? "border-green-500" : isLoginEmailValid === false ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}>
-                      <EmailIcon className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${isLoginEmailValid === true ? "text-green-500" : isLoginEmailValid === false ? "text-red-500" : "text-gray-400"}`} />
+                    <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                      {t.email}
+                    </label>
+                    <div
+                      className={`relative rounded-lg border ${isLoginEmailValid === true ? "border-green-500" : isLoginEmailValid === false ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+                    >
+                      <EmailIcon
+                        className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${isLoginEmailValid === true ? "text-green-500" : isLoginEmailValid === false ? "text-red-500" : "text-gray-400"}`}
+                      />
                       <input
                         type="email"
                         required
@@ -3605,33 +4055,69 @@ export const Navbar = () => {
                         className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
                         placeholder="you@example.com"
                       />
-                      {isLoginEmailValid === true && <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />}
-                      {isLoginEmailValid === false && <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />}
+                      {isLoginEmailValid === true && (
+                        <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+                      )}
+                      {isLoginEmailValid === false && (
+                        <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+                      )}
                     </div>
-                    {loginErrors.email && <p className="text-xs text-red-500 mt-1">{loginErrors.email}</p>}
-                    {isLoginEmailValid === true && <p className="text-xs text-green-500 mt-1">✓ Valid email address</p>}
+                    {loginErrors.email && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {loginErrors.email}
+                      </p>
+                    )}
+                    {isLoginEmailValid === true && (
+                      <p className="text-xs text-green-500 mt-1">
+                        ✓ Valid email address
+                      </p>
+                    )}
                   </div>
                   <div className="mb-6">
-                    <label className="block text-sm font-medium mb-1.5 text-gray-700">{t.password}</label>
+                    <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                      {t.password}
+                    </label>
                     <div className="relative rounded-lg border border-gray-300 bg-white focus-within:border-[#FF385C] transition-colors duration-300">
                       <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <input
                         type={showPassword ? "text" : "password"}
                         required
                         value={loginPassword}
-                        onChange={(e) => { setLoginPassword(e.target.value); if (loginErrors.password) { setLoginErrors({ ...loginErrors, password: undefined }); } }}
+                        onChange={(e) => {
+                          setLoginPassword(e.target.value);
+                          if (loginErrors.password) {
+                            setLoginErrors({
+                              ...loginErrors,
+                              password: undefined,
+                            });
+                          }
+                        }}
                         className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
                         placeholder="••••••••"
                         minLength={6}
                       />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                        {showPassword ? <VisibilityOffIcon className="w-5 h-5" /> : <VisibilityIcon className="w-5 h-5" />}
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showPassword ? (
+                          <VisibilityOffIcon className="w-5 h-5" />
+                        ) : (
+                          <VisibilityIcon className="w-5 h-5" />
+                        )}
                       </button>
                     </div>
-                    {loginErrors.password && <p className="text-xs text-red-500 mt-1">{loginErrors.password}</p>}
+                    {loginErrors.password && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {loginErrors.password}
+                      </p>
+                    )}
                   </div>
                   <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                    <p className="text-xs text-blue-700 font-medium">Demo Credentials:</p>
+                    <p className="text-xs text-blue-700 font-medium">
+                      Demo Credentials:
+                    </p>
                     <div className="text-xs text-blue-600 mt-1 space-y-0.5">
                       <p>👑 Admin: admin@example.com / admin123</p>
                       <p>👤 User: user@example.com / user123</p>
@@ -3648,9 +4134,25 @@ export const Navbar = () => {
                     <span className="relative z-10 flex items-center justify-center gap-2">
                       {loginLoading ? (
                         <>
-                          <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          <svg
+                            className="animate-spin h-5 w-5 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
                           </svg>
                           Logging in...
                         </>
@@ -3664,7 +4166,14 @@ export const Navbar = () => {
                   </motion.button>
                   <p className="text-center text-sm mt-4 text-gray-500">
                     {t.dontHaveAccount}{" "}
-                    <button type="button" onClick={() => { setIsLoginOpen(false); setIsRegisterOpen(true); }} className="text-[#FF385C] font-medium hover:underline">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsLoginOpen(false);
+                        setIsRegisterOpen(true);
+                      }}
+                      className="text-[#FF385C] font-medium hover:underline"
+                    >
                       {t.signup}
                     </button>
                   </p>
@@ -3707,7 +4216,9 @@ export const Navbar = () => {
                 <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl relative z-10">
                   <div className="flex items-center gap-2">
                     <AutoAwesomeIcon className="text-[#FF385C] w-5 h-5" />
-                    <h2 className="text-xl font-semibold text-gray-900">{t.createAccount}</h2>
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      {t.createAccount}
+                    </h2>
                   </div>
                   <motion.button
                     whileHover={{ rotate: 90, scale: 1.1 }}
@@ -3720,42 +4231,84 @@ export const Navbar = () => {
                 </div>
                 <form onSubmit={handleRegister} className="p-6 relative z-10">
                   <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1.5 text-gray-700">{t.fullName}</label>
-                    <div className={`relative rounded-lg border ${registerErrors.name ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}>
+                    <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                      {t.fullName}
+                    </label>
+                    <div
+                      className={`relative rounded-lg border ${registerErrors.name ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+                    >
                       <PersonIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <input
                         type="text"
                         required
                         value={registerName}
-                        onChange={(e) => { setRegisterName(e.target.value); if (registerErrors.name) { setRegisterErrors({ ...registerErrors, name: undefined }); } }}
+                        onChange={(e) => {
+                          setRegisterName(e.target.value);
+                          if (registerErrors.name) {
+                            setRegisterErrors({
+                              ...registerErrors,
+                              name: undefined,
+                            });
+                          }
+                        }}
                         className="w-full pl-10 pr-3 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
                         placeholder="John Doe"
                       />
                     </div>
-                    {registerErrors.name && <p className="text-xs text-red-500 mt-1">{registerErrors.name}</p>}
+                    {registerErrors.name && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {registerErrors.name}
+                      </p>
+                    )}
                   </div>
                   <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1.5 text-gray-700">{t.email}</label>
-                    <div className={`relative rounded-lg border ${isRegisterEmailValid === true ? "border-green-500" : isRegisterEmailValid === false ? "border-red-500" : registerErrors.email ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}>
-                      <EmailIcon className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${isRegisterEmailValid === true ? "text-green-500" : isRegisterEmailValid === false ? "text-red-500" : "text-gray-400"}`} />
+                    <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                      {t.email}
+                    </label>
+                    <div
+                      className={`relative rounded-lg border ${isRegisterEmailValid === true ? "border-green-500" : isRegisterEmailValid === false ? "border-red-500" : registerErrors.email ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+                    >
+                      <EmailIcon
+                        className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${isRegisterEmailValid === true ? "text-green-500" : isRegisterEmailValid === false ? "text-red-500" : "text-gray-400"}`}
+                      />
                       <input
                         type="email"
                         required
                         value={registerEmail}
-                        onChange={(e) => handleRegisterEmailChange(e.target.value)}
+                        onChange={(e) =>
+                          handleRegisterEmailChange(e.target.value)
+                        }
                         className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
                         placeholder="you@example.com"
                       />
-                      {isRegisterEmailValid === true && <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />}
-                      {isRegisterEmailValid === false && <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />}
+                      {isRegisterEmailValid === true && (
+                        <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+                      )}
+                      {isRegisterEmailValid === false && (
+                        <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+                      )}
                     </div>
-                    {registerErrors.email && <p className="text-xs text-red-500 mt-1">{registerErrors.email}</p>}
-                    {isRegisterEmailValid === true && <p className="text-xs text-green-500 mt-1">✓ Valid email address</p>}
+                    {registerErrors.email && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {registerErrors.email}
+                      </p>
+                    )}
+                    {isRegisterEmailValid === true && (
+                      <p className="text-xs text-green-500 mt-1">
+                        ✓ Valid email address
+                      </p>
+                    )}
                   </div>
                   <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1.5 text-gray-700">{t.phoneNumber}</label>
-                    <div className={`relative rounded-lg border ${isPhoneValid === true ? "border-green-500" : isPhoneValid === false ? "border-red-500" : registerErrors.phone ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}>
-                      <PhoneIcon className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${isPhoneValid === true ? "text-green-500" : isPhoneValid === false ? "text-red-500" : "text-gray-400"}`} />
+                    <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                      {t.phoneNumber}
+                    </label>
+                    <div
+                      className={`relative rounded-lg border ${isPhoneValid === true ? "border-green-500" : isPhoneValid === false ? "border-red-500" : registerErrors.phone ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+                    >
+                      <PhoneIcon
+                        className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${isPhoneValid === true ? "text-green-500" : isPhoneValid === false ? "text-red-500" : "text-gray-400"}`}
+                      />
                       <input
                         type="tel"
                         required
@@ -3764,15 +4317,31 @@ export const Navbar = () => {
                         className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
                         placeholder="0788123456 or +250788123456"
                       />
-                      {isPhoneValid === true && <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />}
-                      {isPhoneValid === false && <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />}
+                      {isPhoneValid === true && (
+                        <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+                      )}
+                      {isPhoneValid === false && (
+                        <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+                      )}
                     </div>
-                    {registerErrors.phone && <p className="text-xs text-red-500 mt-1">{registerErrors.phone}</p>}
-                    {isPhoneValid === true && <p className="text-xs text-green-500 mt-1">✓ Valid phone number</p>}
+                    {registerErrors.phone && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {registerErrors.phone}
+                      </p>
+                    )}
+                    {isPhoneValid === true && (
+                      <p className="text-xs text-green-500 mt-1">
+                        ✓ Valid phone number
+                      </p>
+                    )}
                   </div>
                   <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1.5 text-gray-700">{t.password}</label>
-                    <div className={`relative rounded-lg border ${registerErrors.password ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}>
+                    <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                      {t.password}
+                    </label>
+                    <div
+                      className={`relative rounded-lg border ${registerErrors.password ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+                    >
                       <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <input
                         type={showPassword ? "text" : "password"}
@@ -3783,57 +4352,125 @@ export const Navbar = () => {
                         placeholder="••••••••"
                         minLength={6}
                       />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                        {showPassword ? <VisibilityOffIcon className="w-5 h-5" /> : <VisibilityIcon className="w-5 h-5" />}
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showPassword ? (
+                          <VisibilityOffIcon className="w-5 h-5" />
+                        ) : (
+                          <VisibilityIcon className="w-5 h-5" />
+                        )}
                       </button>
                     </div>
-                    {registerErrors.password && <p className="text-xs text-red-500 mt-1">{registerErrors.password}</p>}
+                    {registerErrors.password && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {registerErrors.password}
+                      </p>
+                    )}
                     {passwordStrength && (
                       <div className="mt-2">
                         <div className="flex items-center gap-2">
                           <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                             <motion.div
                               className="h-full rounded-full transition-all duration-500"
-                              style={{ width: passwordStrength === "weak" ? "33%" : passwordStrength === "moderate" ? "66%" : "100%", backgroundColor: getPasswordStrengthColor(passwordStrength) }}
+                              style={{
+                                width:
+                                  passwordStrength === "weak"
+                                    ? "33%"
+                                    : passwordStrength === "moderate"
+                                      ? "66%"
+                                      : "100%",
+                                backgroundColor:
+                                  getPasswordStrengthColor(passwordStrength),
+                              }}
                               initial={{ width: 0 }}
-                              animate={{ width: passwordStrength === "weak" ? "33%" : passwordStrength === "moderate" ? "66%" : "100%" }}
+                              animate={{
+                                width:
+                                  passwordStrength === "weak"
+                                    ? "33%"
+                                    : passwordStrength === "moderate"
+                                      ? "66%"
+                                      : "100%",
+                              }}
                             />
                           </div>
-                          <div className="flex items-center gap-1 text-xs font-medium" style={{ color: getPasswordStrengthColor(passwordStrength) }}>
+                          <div
+                            className="flex items-center gap-1 text-xs font-medium"
+                            style={{
+                              color: getPasswordStrengthColor(passwordStrength),
+                            }}
+                          >
                             {getPasswordStrengthIcon(passwordStrength)}
-                            <span>{t.passwordStrength}: {getPasswordStrengthLabel(passwordStrength)}</span>
+                            <span>
+                              {t.passwordStrength}:{" "}
+                              {getPasswordStrengthLabel(passwordStrength)}
+                            </span>
                           </div>
                         </div>
                         {passwordStrength === "weak" && (
-                          <p className="text-xs text-red-500 mt-1">⚠️ Password is too weak. Use at least 8 characters with uppercase, lowercase, numbers, and special characters.</p>
+                          <p className="text-xs text-red-500 mt-1">
+                            ⚠️ Password is too weak. Use at least 8 characters
+                            with uppercase, lowercase, numbers, and special
+                            characters.
+                          </p>
                         )}
                       </div>
                     )}
                   </div>
                   <div className="mb-6">
-                    <label className="block text-sm font-medium mb-1.5 text-gray-700">{t.confirmPassword}</label>
-                    <div className={`relative rounded-lg border ${registerErrors.confirmPassword ? "border-red-500" : registerConfirmPassword && registerPassword === registerConfirmPassword && registerConfirmPassword.length > 0 ? "border-green-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}>
-                      <LockIcon className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${registerConfirmPassword && registerPassword === registerConfirmPassword && registerConfirmPassword.length > 0 ? "text-green-500" : "text-gray-400"}`} />
+                    <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                      {t.confirmPassword}
+                    </label>
+                    <div
+                      className={`relative rounded-lg border ${registerErrors.confirmPassword ? "border-red-500" : registerConfirmPassword && registerPassword === registerConfirmPassword && registerConfirmPassword.length > 0 ? "border-green-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+                    >
+                      <LockIcon
+                        className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${registerConfirmPassword && registerPassword === registerConfirmPassword && registerConfirmPassword.length > 0 ? "text-green-500" : "text-gray-400"}`}
+                      />
                       <input
                         type={showConfirmPassword ? "text" : "password"}
                         required
                         value={registerConfirmPassword}
-                        onChange={(e) => handleConfirmPasswordChange(e.target.value)}
+                        onChange={(e) =>
+                          handleConfirmPasswordChange(e.target.value)
+                        }
                         className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
                         placeholder="••••••••"
                         minLength={6}
                       />
-                      <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                        {showConfirmPassword ? <VisibilityOffIcon className="w-5 h-5" /> : <VisibilityIcon className="w-5 h-5" />}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showConfirmPassword ? (
+                          <VisibilityOffIcon className="w-5 h-5" />
+                        ) : (
+                          <VisibilityIcon className="w-5 h-5" />
+                        )}
                       </button>
-                      {registerConfirmPassword && registerPassword === registerConfirmPassword && registerConfirmPassword.length > 0 && (
-                        <CheckCircleIcon className="absolute right-12 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
-                      )}
+                      {registerConfirmPassword &&
+                        registerPassword === registerConfirmPassword &&
+                        registerConfirmPassword.length > 0 && (
+                          <CheckCircleIcon className="absolute right-12 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+                        )}
                     </div>
-                    {registerErrors.confirmPassword && <p className="text-xs text-red-500 mt-1">{registerErrors.confirmPassword}</p>}
-                    {registerConfirmPassword && registerPassword === registerConfirmPassword && registerConfirmPassword.length > 0 && (
-                      <p className="text-xs text-green-500 mt-1">✓ Passwords match</p>
+                    {registerErrors.confirmPassword && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {registerErrors.confirmPassword}
+                      </p>
                     )}
+                    {registerConfirmPassword &&
+                      registerPassword === registerConfirmPassword &&
+                      registerConfirmPassword.length > 0 && (
+                        <p className="text-xs text-green-500 mt-1">
+                          ✓ Passwords match
+                        </p>
+                      )}
                   </div>
                   <motion.button
                     whileHover={{ scale: 1.02 }}
@@ -3845,9 +4482,25 @@ export const Navbar = () => {
                     <span className="relative z-10 flex items-center justify-center gap-2">
                       {registerLoading ? (
                         <>
-                          <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          <svg
+                            className="animate-spin h-5 w-5 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
                           </svg>
                           Creating account...
                         </>
@@ -3859,12 +4512,24 @@ export const Navbar = () => {
                       )}
                     </span>
                   </motion.button>
-                  {!isRegisterFormValid() && registerPassword.length > 0 && passwordStrength === "weak" && (
-                    <p className="text-center text-xs text-red-500 mt-2">⚠️ Please choose a stronger password to enable registration.</p>
-                  )}
+                  {!isRegisterFormValid() &&
+                    registerPassword.length > 0 &&
+                    passwordStrength === "weak" && (
+                      <p className="text-center text-xs text-red-500 mt-2">
+                        ⚠️ Please choose a stronger password to enable
+                        registration.
+                      </p>
+                    )}
                   <p className="text-center text-sm mt-4 text-gray-500">
                     {t.alreadyHaveAccount}{" "}
-                    <button type="button" onClick={() => { setIsRegisterOpen(false); setIsLoginOpen(true); }} className="text-[#FF385C] font-medium hover:underline">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsRegisterOpen(false);
+                        setIsLoginOpen(true);
+                      }}
+                      className="text-[#FF385C] font-medium hover:underline"
+                    >
                       {t.login}
                     </button>
                   </p>
@@ -3907,7 +4572,9 @@ export const Navbar = () => {
                 <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl relative z-10">
                   <div className="flex items-center gap-2">
                     <AccountCircleIcon className="text-[#FF385C] w-5 h-5" />
-                    <h2 className="text-xl font-semibold text-gray-900">{t.profile}</h2>
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      {t.profile}
+                    </h2>
                   </div>
                   <motion.button
                     whileHover={{ rotate: 90, scale: 1.1 }}
@@ -3927,7 +4594,9 @@ export const Navbar = () => {
                     >
                       {userName.charAt(0).toUpperCase()}
                     </motion.div>
-                    <h3 className="text-xl font-semibold text-gray-900">{userName}</h3>
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      {userName}
+                    </h3>
                     <p className="text-sm text-gray-500">{userEmail}</p>
                     <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-[#FF385C]/10 text-[#FF385C] font-medium">
                       {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
@@ -3937,7 +4606,10 @@ export const Navbar = () => {
                     <motion.button
                       whileHover={{ x: 5 }}
                       className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-gray-700 hover:bg-gray-50 rounded-lg"
-                      onClick={() => { setIsUserModalOpen(false); handleDashboardNavigation(); }}
+                      onClick={() => {
+                        setIsUserModalOpen(false);
+                        handleDashboardNavigation();
+                      }}
                     >
                       {getDashboardIcon()}
                       {getDashboardLabel()}
@@ -3945,7 +4617,10 @@ export const Navbar = () => {
                     <motion.button
                       whileHover={{ x: 5 }}
                       className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-gray-700 hover:bg-gray-50 rounded-lg"
-                      onClick={() => { setIsUserModalOpen(false); navigateTo("/settings"); }}
+                      onClick={() => {
+                        setIsUserModalOpen(false);
+                        navigateTo("/settings");
+                      }}
                     >
                       <SettingsIcon className="w-4 h-4" />
                       {t.settings}
@@ -3953,7 +4628,10 @@ export const Navbar = () => {
                     <motion.button
                       whileHover={{ x: 5 }}
                       className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-red-600 hover:bg-red-50 rounded-lg"
-                      onClick={() => { setIsUserModalOpen(false); handleLogout(); }}
+                      onClick={() => {
+                        setIsUserModalOpen(false);
+                        handleLogout();
+                      }}
                     >
                       <LogoutIcon className="w-4 h-4" />
                       {t.logout}
@@ -3992,8 +4670,12 @@ export const Navbar = () => {
                 <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl relative z-10">
                   <div className="flex items-center gap-2">
                     <DashboardIcon className="text-[#FF385C] w-5 h-5" />
-                    <h2 className="text-xl font-semibold text-gray-900">{getDashboardLabel()}</h2>
-                    <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-[#FF385C]/10 text-[#FF385C]">{userRole}</span>
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      {getDashboardLabel()}
+                    </h2>
+                    <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-[#FF385C]/10 text-[#FF385C]">
+                      {userRole}
+                    </span>
                   </div>
                   <motion.button
                     whileHover={{ rotate: 90, scale: 1.1 }}
@@ -4017,16 +4699,24 @@ export const Navbar = () => {
                         className="bg-gray-50 rounded-xl p-4 shadow-sm"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-500">{stat.label}</span>
+                          <span className="text-sm text-gray-500">
+                            {stat.label}
+                          </span>
                           {stat.icon}
                         </div>
-                        <p className="text-2xl font-bold text-gray-900 mt-2">{stat.value}</p>
-                        <p className="text-xs text-green-500 mt-1">{stat.change}</p>
+                        <p className="text-2xl font-bold text-gray-900 mt-2">
+                          {stat.value}
+                        </p>
+                        <p className="text-xs text-green-500 mt-1">
+                          {stat.change}
+                        </p>
                       </motion.div>
                     ))}
                   </div>
                   <div className="bg-gray-50 rounded-xl p-4">
-                    <h3 className="text-sm font-semibold text-gray-700 mb-3">{t.recentActivity}</h3>
+                    <h3 className="text-sm font-semibold text-gray-700 mb-3">
+                      {t.recentActivity}
+                    </h3>
                     <div className="space-y-3">
                       {recentActivities.map((activity, index) => (
                         <motion.div
@@ -4040,10 +4730,16 @@ export const Navbar = () => {
                             {activity.icon}
                           </div>
                           <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-900">{activity.user}</p>
-                            <p className="text-xs text-gray-500">{activity.action}</p>
+                            <p className="text-sm font-medium text-gray-900">
+                              {activity.user}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {activity.action}
+                            </p>
                           </div>
-                          <span className="text-xs text-gray-400">{activity.time}</span>
+                          <span className="text-xs text-gray-400">
+                            {activity.time}
+                          </span>
                         </motion.div>
                       ))}
                     </div>
@@ -4052,7 +4748,10 @@ export const Navbar = () => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     className="w-full mt-4 bg-[#FF385C] text-white py-3 rounded-lg font-medium hover:bg-[#E31C5F] transition-colors"
-                    onClick={() => { setIsDashboardOpen(false); handleDashboardNavigation(); }}
+                    onClick={() => {
+                      setIsDashboardOpen(false);
+                      handleDashboardNavigation();
+                    }}
                   >
                     <DashboardIcon className="w-4 h-4 inline mr-2" />
                     View Full Dashboard
@@ -4066,4 +4765,3 @@ export const Navbar = () => {
     </>
   );
 };
-

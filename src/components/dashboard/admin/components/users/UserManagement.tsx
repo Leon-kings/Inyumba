@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Cookies from 'js-cookie';
 
 // Material-UI Icons
 import PersonIcon from "@mui/icons-material/Person";
@@ -45,6 +46,223 @@ interface UserFormData {
   role: "admin" | "user" | "host";
   status: "active" | "inactive" | "suspended";
 }
+
+// Translations
+const translations = {
+  en: {
+    userManagement: "User Management",
+    manageUsers: "Manage users, roles, and permissions",
+    addUser: "Add User",
+    total: "Total",
+    active: "Active",
+    inactive: "Inactive",
+    suspended: "Suspended",
+    admins: "Admins",
+    hosts: "Hosts",
+    users: "Users",
+    searchUsers: "Search users by name, email or phone...",
+    allRoles: "All Roles",
+    allStatus: "All Status",
+    user: "User",
+    contact: "Contact",
+    role: "Role",
+    status: "Status",
+    joined: "Joined",
+    actions: "Actions",
+    noUsers: "No users found",
+    adjustFilters: "Try adjusting your search or filters",
+    showing: "Showing",
+    of: "of",
+    usersCount: "users",
+    addNewUser: "Add New User",
+    editUser: "Edit User",
+    fullName: "Full Name",
+    email: "Email",
+    phoneNumber: "Phone Number",
+    password: "Password",
+    confirmPassword: "Confirm Password",
+    createUser: "Create User",
+    updateUser: "Update User",
+    deleteUser: "Delete User",
+    deleteConfirmation: "Are you sure you want to delete",
+    actionUndone: "This action cannot be undone.",
+    cancel: "Cancel",
+    delete: "Delete",
+    creating: "Creating...",
+    updating: "Updating...",
+    deleting: "Deleting...",
+    userCreated: "User created successfully!",
+    userUpdated: "User updated successfully!",
+    userDeleted: "User deleted successfully!",
+    usersDeleted: "users deleted successfully!",
+    createFailed: "Failed to create user",
+    updateFailed: "Failed to update user",
+    deleteFailed: "Failed to delete user",
+    nameRequired: "Full name is required",
+    nameMin: "Name must be at least 2 characters",
+    emailRequired: "Email is required",
+    emailInvalid: "Please enter a valid email address",
+    phoneRequired: "Phone number is required",
+    phoneInvalid: "Please enter a valid Rwandan phone number (ex: 0788123456 or +250788123456)",
+    passwordRequired: "Password is required",
+    passwordMin: "Password must be at least 6 characters",
+    confirmPasswordRequired: "Please confirm your password",
+    passwordsDoNotMatch: "Passwords do not match",
+    passwordWeak: "Please choose a stronger password",
+    validEmail: "Valid email address",
+    validPhone: "Valid phone number",
+    passwordsMatch: "Passwords match",
+    strength: "Strength",
+    weak: "Weak",
+    moderate: "Moderate",
+    strong: "Strong",
+    editPasswordNote: "Password fields are optional for editing.",
+  },
+  fr: {
+    userManagement: "Gestion des Utilisateurs",
+    manageUsers: "Gérer les utilisateurs, les rôles et les permissions",
+    addUser: "Ajouter un Utilisateur",
+    total: "Total",
+    active: "Actif",
+    inactive: "Inactif",
+    suspended: "Suspendu",
+    admins: "Administrateurs",
+    hosts: "Hôtes",
+    users: "Utilisateurs",
+    searchUsers: "Rechercher des utilisateurs par nom, email ou téléphone...",
+    allRoles: "Tous les Rôles",
+    allStatus: "Tous les Statuts",
+    user: "Utilisateur",
+    contact: "Contact",
+    role: "Rôle",
+    status: "Statut",
+    joined: "Inscrit",
+    actions: "Actions",
+    noUsers: "Aucun utilisateur trouvé",
+    adjustFilters: "Essayez d'ajuster votre recherche ou vos filtres",
+    showing: "Affichage",
+    of: "de",
+    usersCount: "utilisateurs",
+    addNewUser: "Ajouter un Nouvel Utilisateur",
+    editUser: "Modifier l'Utilisateur",
+    fullName: "Nom Complet",
+    email: "E-mail",
+    phoneNumber: "Numéro de Téléphone",
+    password: "Mot de Passe",
+    confirmPassword: "Confirmer le Mot de Passe",
+    createUser: "Créer l'Utilisateur",
+    updateUser: "Mettre à Jour l'Utilisateur",
+    deleteUser: "Supprimer l'Utilisateur",
+    deleteConfirmation: "Êtes-vous sûr de vouloir supprimer",
+    actionUndone: "Cette action est irréversible.",
+    cancel: "Annuler",
+    delete: "Supprimer",
+    creating: "Création...",
+    updating: "Mise à jour...",
+    deleting: "Suppression...",
+    userCreated: "Utilisateur créé avec succès !",
+    userUpdated: "Utilisateur mis à jour avec succès !",
+    userDeleted: "Utilisateur supprimé avec succès !",
+    usersDeleted: "utilisateurs supprimés avec succès !",
+    createFailed: "Échec de la création de l'utilisateur",
+    updateFailed: "Échec de la mise à jour de l'utilisateur",
+    deleteFailed: "Échec de la suppression de l'utilisateur",
+    nameRequired: "Le nom complet est requis",
+    nameMin: "Le nom doit contenir au moins 2 caractères",
+    emailRequired: "L'e-mail est requis",
+    emailInvalid: "Veuillez entrer une adresse e-mail valide",
+    phoneRequired: "Le numéro de téléphone est requis",
+    phoneInvalid: "Veuillez entrer un numéro de téléphone rwandais valide (ex: 0788123456 ou +250788123456)",
+    passwordRequired: "Le mot de passe est requis",
+    passwordMin: "Le mot de passe doit contenir au moins 6 caractères",
+    confirmPasswordRequired: "Veuillez confirmer votre mot de passe",
+    passwordsDoNotMatch: "Les mots de passe ne correspondent pas",
+    passwordWeak: "Veuillez choisir un mot de passe plus fort",
+    validEmail: "Adresse e-mail valide",
+    validPhone: "Numéro de téléphone valide",
+    passwordsMatch: "Les mots de passe correspondent",
+    strength: "Force",
+    weak: "Faible",
+    moderate: "Modéré",
+    strong: "Fort",
+    editPasswordNote: "Les champs de mot de passe sont facultatifs pour la modification.",
+  },
+  rw: {
+    userManagement: "Gucunga Abakoresha",
+    manageUsers: "Gucunga abakoresha, imirimo n'uburenganzira",
+    addUser: "Ongeraho Umukoresha",
+    total: "Yose",
+    active: "Agikoresha",
+    inactive: "Ntagikoresha",
+    suspended: "Yahagaritswe",
+    admins: "Abayobozi",
+    hosts: "Abatunze Inzu",
+    users: "Abakoresha",
+    searchUsers: "Shakisha abakoresha ukurikije izina, imeri cyangwa telefone...",
+    allRoles: "Imirimo Yose",
+    allStatus: "Ihagaze Ryose",
+    user: "Umukoresha",
+    contact: "Aho Kuvugana",
+    role: "Umurimo",
+    status: "Ihagaze",
+    joined: "Yinjiye",
+    actions: "Ibikorwa",
+    noUsers: "Nta mukoresha wabonetse",
+    adjustFilters: "Gerageza guhindura uburyo ushakisha cyangwa amatungo",
+    showing: "Bereka",
+    of: "muri",
+    usersCount: "abakoresha",
+    addNewUser: "Ongeraho Umukoresha Mushya",
+    editUser: "Hindura Umukoresha",
+    fullName: "Izina Ryose",
+    email: "Imeri",
+    phoneNumber: "Numero ya Telefone",
+    password: "Ijambo ry'Ibanga",
+    confirmPassword: "Emeza Ijambo ry'Ibanga",
+    createUser: "Kora Umukoresha",
+    updateUser: "Vugurura Umukoresha",
+    deleteUser: "Kuraho Umukoresha",
+    deleteConfirmation: "Uri kwizera ko ushaka gukuraho",
+    actionUndone: "Iki gikorwa ntikishobora guhindurwa.",
+    cancel: "Reka",
+    delete: "Kuraho",
+    creating: "Birakorwa...",
+    updating: "Biravugururwa...",
+    deleting: "Birakurwaho...",
+    userCreated: "Umukoresha yakozwe neza!",
+    userUpdated: "Umukoresha yavuguruwe neza!",
+    userDeleted: "Umukoresha yakuweho neza!",
+    usersDeleted: "abakoresha bakuvweho neza!",
+    createFailed: "Kora umukoresha birananiranye",
+    updateFailed: "Vugurura umukoresha birananiranye",
+    deleteFailed: "Kuraho umukoresha birananiranye",
+    nameRequired: "Izina ryose rirasabwa",
+    nameMin: "Izina rigomba kuba nibura inyuguti 2",
+    emailRequired: "Imeri irasabwa",
+    emailInvalid: "Injiza aderesi ya imeri ikwiye",
+    phoneRequired: "Numero ya telefone irasabwa",
+    phoneInvalid: "Injiza numero ya telefone ikwiye (ex: 0788123456 cyangwa +250788123456)",
+    passwordRequired: "Ijambo ry'ibanga rirasabwa",
+    passwordMin: "Ijambo ry'ibanga rigomba kuba nibura inyuguti 6",
+    confirmPasswordRequired: "Emeza ijambo ry'ibanga",
+    passwordsDoNotMatch: "Amagambo y'ibanga ntagahura",
+    passwordWeak: "Hitamo ijambo ry'ibanga rikomeye",
+    validEmail: "Aderesi ya imeri ikwiye",
+    validPhone: "Numero ya telefone ikwiye",
+    passwordsMatch: "Amagambo y'ibanga ahura",
+    strength: "Imbaraga",
+    weak: "Ntacyo",
+    moderate: "Rishoboka",
+    strong: "Rikomeye",
+    editPasswordNote: "Amagambo y'ibanga ntabwo ari ngombwa mugihe uhindura.",
+  }
+};
+
+// Helper function to get language from cookies
+const getLanguageFromCookies = (): 'en' | 'fr' | 'rw' => {
+  const lang = Cookies.get('language') as 'en' | 'fr' | 'rw';
+  return lang || 'en';
+};
 
 // Dummy data
 const INITIAL_USERS: User[] = [
@@ -101,6 +319,8 @@ const INITIAL_USERS: User[] = [
 ];
 
 export const UserManagement: React.FC = () => {
+  // Get language from cookies
+  const [lang, setLang] = useState<'en' | 'fr' | 'rw'>(getLanguageFromCookies());
   const [users, setUsers] = useState<User[]>(INITIAL_USERS);
   const [filteredUsers, setFilteredUsers] = useState<User[]>(INITIAL_USERS);
   const [searchTerm, setSearchTerm] = useState("");
@@ -156,6 +376,22 @@ export const UserManagement: React.FC = () => {
     hosts: 0,
     users: 0,
   });
+
+  const t = translations[lang];
+
+  // Listen for language changes in cookies
+  useEffect(() => {
+    const handleCookieChange = () => {
+      const newLang = getLanguageFromCookies();
+      if (newLang !== lang) {
+        setLang(newLang);
+      }
+    };
+
+    // Check for cookie changes every second (polling)
+    const interval = setInterval(handleCookieChange, 1000);
+    return () => clearInterval(interval);
+  }, [lang]);
 
   // Filter and search users
   useEffect(() => {
@@ -246,11 +482,11 @@ export const UserManagement: React.FC = () => {
     if (!strength) return "";
     switch (strength) {
       case "weak":
-        return "Weak";
+        return t.weak;
       case "moderate":
-        return "Moderate";
+        return t.moderate;
       case "strong":
-        return "Strong";
+        return t.strong;
     }
   };
 
@@ -284,40 +520,39 @@ export const UserManagement: React.FC = () => {
     } = {};
 
     if (!formData.name) {
-      newErrors.name = "Full name is required";
+      newErrors.name = t.nameRequired;
     } else if (formData.name.length < 2) {
-      newErrors.name = "Name must be at least 2 characters";
+      newErrors.name = t.nameMin;
     }
 
     if (!formData.email) {
-      newErrors.email = "Email is required";
+      newErrors.email = t.emailRequired;
     } else if (!validateEmail(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
+      newErrors.email = t.emailInvalid;
     }
 
     if (!formData.phone) {
-      newErrors.phone = "Phone number is required";
+      newErrors.phone = t.phoneRequired;
     } else if (!validatePhone(formData.phone)) {
-      newErrors.phone =
-        "Please enter a valid Rwandan phone number (ex: 0788123456 or +250788123456)";
+      newErrors.phone = t.phoneInvalid;
     }
 
     // Only validate password for create mode
     if (!selectedUser) {
       if (!formData.password) {
-        newErrors.password = "Password is required";
+        newErrors.password = t.passwordRequired;
       } else if (formData.password.length < 6) {
-        newErrors.password = "Password must be at least 6 characters";
+        newErrors.password = t.passwordMin;
       }
 
       if (!formData.confirmPassword) {
-        newErrors.confirmPassword = "Please confirm your password";
+        newErrors.confirmPassword = t.confirmPasswordRequired;
       } else if (formData.password !== formData.confirmPassword) {
-        newErrors.confirmPassword = "Passwords do not match";
+        newErrors.confirmPassword = t.passwordsDoNotMatch;
       }
 
       if (passwordStrength === "weak") {
-        newErrors.password = "Please choose a stronger password";
+        newErrors.password = t.passwordWeak;
       }
     }
 
@@ -380,11 +615,11 @@ export const UserManagement: React.FC = () => {
       };
 
       setUsers([newUser, ...users]);
-      toast.success("✅ User created successfully!");
+      toast.success(`✅ ${t.userCreated}`);
       resetForm();
       setIsCreateModalOpen(false);
     } catch (error) {
-      toast.error("❌ Failed to create user");
+      toast.error(`❌ ${t.createFailed}`);
       console.error("Create user error:", error);
     } finally {
       setIsSubmitting(false);
@@ -416,12 +651,12 @@ export const UserManagement: React.FC = () => {
           user.id === selectedUser.id ? updatedUser : user,
         ),
       );
-      toast.success("✅ User updated successfully!");
+      toast.success(`✅ ${t.userUpdated}`);
       resetForm();
       setIsEditModalOpen(false);
       setSelectedUser(null);
     } catch (error) {
-      toast.error("❌ Failed to update user");
+      toast.error(`❌ ${t.updateFailed}`);
       console.error("Update user error:", error);
     } finally {
       setIsSubmitting(false);
@@ -438,11 +673,11 @@ export const UserManagement: React.FC = () => {
       await new Promise((resolve) => setTimeout(resolve, 800));
 
       setUsers(users.filter((user) => user.id !== selectedUser.id));
-      toast.success("🗑️ User deleted successfully!");
+      toast.success(`🗑️ ${t.userDeleted}`);
       setIsDeleteModalOpen(false);
       setSelectedUser(null);
     } catch (error) {
-      toast.error("❌ Failed to delete user");
+      toast.error(`❌ ${t.deleteFailed}`);
       console.error("Delete user error:", error);
     } finally {
       setIsLoading(false);
@@ -462,10 +697,10 @@ export const UserManagement: React.FC = () => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 800));
       setUsers(users.filter((user) => !selectedUsers.includes(user.id)));
-      toast.success(`🗑️ ${selectedUsers.length} users deleted successfully!`);
+      toast.success(`🗑️ ${selectedUsers.length} ${t.usersDeleted}`);
       setSelectedUsers([]);
     } catch (error) {
-      toast.error("❌ Failed to delete users");
+      toast.error(`❌ ${t.deleteFailed}`);
       console.error("Bulk delete error:", error);
     } finally {
       setIsLoading(false);
@@ -549,7 +784,7 @@ export const UserManagement: React.FC = () => {
       if (formData.confirmPassword && value !== formData.confirmPassword) {
         setErrors((prev) => ({
           ...prev,
-          confirmPassword: "Passwords do not match",
+          confirmPassword: t.passwordsDoNotMatch,
         }));
       } else if (
         formData.confirmPassword &&
@@ -564,7 +799,7 @@ export const UserManagement: React.FC = () => {
       if (formData.password && formData.password !== value) {
         setErrors((prev) => ({
           ...prev,
-          confirmPassword: "Passwords do not match",
+          confirmPassword: t.passwordsDoNotMatch,
         }));
       } else if (formData.password && formData.password === value) {
         setErrors((prev) => ({ ...prev, confirmPassword: undefined }));
@@ -637,10 +872,10 @@ export const UserManagement: React.FC = () => {
           <div>
             <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
               <PersonIcon className="w-7 h-7 text-[#FF385C]" />
-              User Management
+              {t.userManagement}
             </h1>
             <p className="text-sm text-gray-500 mt-1">
-              Manage users, roles, and permissions
+              {t.manageUsers}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -652,7 +887,7 @@ export const UserManagement: React.FC = () => {
                 className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors flex items-center gap-2"
               >
                 <DeleteIcon className="w-4 h-4" />
-                Delete ({selectedUsers.length})
+                {t.delete} ({selectedUsers.length})
               </motion.button>
             )}
             <motion.button
@@ -665,7 +900,7 @@ export const UserManagement: React.FC = () => {
               className="px-4 py-2 bg-[#FF385C] text-white rounded-lg text-sm font-medium hover:bg-[#E31C5F] transition-colors flex items-center gap-2"
             >
               <AddIcon className="w-4 h-4" />
-              Add User
+              {t.addUser}
             </motion.button>
           </div>
         </div>
@@ -677,49 +912,49 @@ export const UserManagement: React.FC = () => {
           whileHover={{ y: -2 }}
           className="bg-white rounded-xl p-4 shadow-sm border border-gray-200"
         >
-          <p className="text-xs text-gray-500">Total</p>
+          <p className="text-xs text-gray-500">{t.total}</p>
           <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
         </motion.div>
         <motion.div
           whileHover={{ y: -2 }}
           className="bg-green-50 rounded-xl p-4 shadow-sm border border-green-200"
         >
-          <p className="text-xs text-green-600">Active</p>
+          <p className="text-xs text-green-600">{t.active}</p>
           <p className="text-2xl font-bold text-green-700">{stats.active}</p>
         </motion.div>
         <motion.div
           whileHover={{ y: -2 }}
           className="bg-yellow-50 rounded-xl p-4 shadow-sm border border-yellow-200"
         >
-          <p className="text-xs text-yellow-600">Inactive</p>
+          <p className="text-xs text-yellow-600">{t.inactive}</p>
           <p className="text-2xl font-bold text-yellow-700">{stats.inactive}</p>
         </motion.div>
         <motion.div
           whileHover={{ y: -2 }}
           className="bg-red-50 rounded-xl p-4 shadow-sm border border-red-200"
         >
-          <p className="text-xs text-red-600">Suspended</p>
+          <p className="text-xs text-red-600">{t.suspended}</p>
           <p className="text-2xl font-bold text-red-700">{stats.suspended}</p>
         </motion.div>
         <motion.div
           whileHover={{ y: -2 }}
           className="bg-purple-50 rounded-xl p-4 shadow-sm border border-purple-200"
         >
-          <p className="text-xs text-purple-600">Admins</p>
+          <p className="text-xs text-purple-600">{t.admins}</p>
           <p className="text-2xl font-bold text-purple-700">{stats.admins}</p>
         </motion.div>
         <motion.div
           whileHover={{ y: -2 }}
           className="bg-blue-50 rounded-xl p-4 shadow-sm border border-blue-200"
         >
-          <p className="text-xs text-blue-600">Hosts</p>
+          <p className="text-xs text-blue-600">{t.hosts}</p>
           <p className="text-2xl font-bold text-blue-700">{stats.hosts}</p>
         </motion.div>
         <motion.div
           whileHover={{ y: -2 }}
           className="bg-gray-50 rounded-xl p-4 shadow-sm border border-gray-200"
         >
-          <p className="text-xs text-gray-500">Users</p>
+          <p className="text-xs text-gray-500">{t.users}</p>
           <p className="text-2xl font-bold text-gray-900">{stats.users}</p>
         </motion.div>
       </div>
@@ -731,7 +966,7 @@ export const UserManagement: React.FC = () => {
             <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search users by name, email or phone..."
+              placeholder={t.searchUsers}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
@@ -743,20 +978,20 @@ export const UserManagement: React.FC = () => {
               onChange={(e) => setFilterRole(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
             >
-              <option value="all">All Roles</option>
-              <option value="admin">Admin</option>
-              <option value="host">Host</option>
-              <option value="user">User</option>
+              <option value="all">{t.allRoles}</option>
+              <option value="admin">{t.admins}</option>
+              <option value="host">{t.hosts}</option>
+              <option value="user">{t.users}</option>
             </select>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
             >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="suspended">Suspended</option>
+              <option value="all">{t.allStatus}</option>
+              <option value="active">{t.active}</option>
+              <option value="inactive">{t.inactive}</option>
+              <option value="suspended">{t.suspended}</option>
             </select>
             <button
               onClick={() => {
@@ -790,22 +1025,22 @@ export const UserManagement: React.FC = () => {
                   />
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  User
+                  {t.user}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                  Contact
+                  {t.contact}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Role
+                  {t.role}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                  {t.status}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                  Joined
+                  {t.joined}
                 </th>
                 <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  {t.actions}
                 </th>
               </tr>
             </thead>
@@ -814,8 +1049,8 @@ export const UserManagement: React.FC = () => {
                 <tr>
                   <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
                     <PersonIcon className="w-12 h-12 mx-auto text-gray-300 mb-2" />
-                    <p>No users found</p>
-                    <p className="text-sm">Try adjusting your search or filters</p>
+                    <p>{t.noUsers}</p>
+                    <p className="text-sm">{t.adjustFilters}</p>
                   </td>
                 </tr>
               ) : (
@@ -887,7 +1122,7 @@ export const UserManagement: React.FC = () => {
                           whileTap={{ scale: 0.9 }}
                           onClick={() => openEditModal(user)}
                           className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="Edit"
+                          title={t.editUser}
                         >
                           <EditIcon className="w-4 h-4" />
                         </motion.button>
@@ -896,7 +1131,7 @@ export const UserManagement: React.FC = () => {
                           whileTap={{ scale: 0.9 }}
                           onClick={() => openDeleteModal(user)}
                           className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Delete"
+                          title={t.deleteUser}
                         >
                           <DeleteIcon className="w-4 h-4" />
                         </motion.button>
@@ -910,12 +1145,12 @@ export const UserManagement: React.FC = () => {
         </div>
         <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
           <p className="text-sm text-gray-500">
-            Showing {filteredUsers.length} of {users.length} users
+            {t.showing} {filteredUsers.length} {t.of} {users.length} {t.usersCount}
           </p>
         </div>
       </div>
 
-      {/* Create User Modal - keep the same as before */}
+      {/* Create User Modal */}
       <AnimatePresence>
         {isCreateModalOpen && (
           <>
@@ -942,7 +1177,7 @@ export const UserManagement: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <PersonAddIcon className="text-[#FF385C] w-5 h-5" />
                     <h2 className="text-xl font-semibold text-gray-900">
-                      Add New User
+                      {t.addNewUser}
                     </h2>
                   </div>
                   <motion.button
@@ -962,7 +1197,7 @@ export const UserManagement: React.FC = () => {
                   {/* Name */}
                   <div className="mb-4">
                     <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      Full Name *
+                      {t.fullName} *
                     </label>
                     <div
                       className={`relative rounded-lg border ${
@@ -988,7 +1223,7 @@ export const UserManagement: React.FC = () => {
                   {/* Email */}
                   <div className="mb-4">
                     <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      Email *
+                      {t.email} *
                     </label>
                     <div
                       className={`relative rounded-lg border ${
@@ -1033,7 +1268,7 @@ export const UserManagement: React.FC = () => {
                     )}
                     {isEmailValid === true && (
                       <p className="text-xs text-green-500 mt-1">
-                        ✓ Valid email address
+                        ✓ {t.validEmail}
                       </p>
                     )}
                   </div>
@@ -1041,7 +1276,7 @@ export const UserManagement: React.FC = () => {
                   {/* Phone */}
                   <div className="mb-4">
                     <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      Phone Number *
+                      {t.phoneNumber} *
                     </label>
                     <div
                       className={`relative rounded-lg border ${
@@ -1086,7 +1321,7 @@ export const UserManagement: React.FC = () => {
                     )}
                     {isPhoneValid === true && (
                       <p className="text-xs text-green-500 mt-1">
-                        ✓ Valid phone number
+                        ✓ {t.validPhone}
                       </p>
                     )}
                   </div>
@@ -1094,7 +1329,7 @@ export const UserManagement: React.FC = () => {
                   {/* Password */}
                   <div className="mb-4">
                     <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      Password *
+                      {t.password} *
                     </label>
                     <div
                       className={`relative rounded-lg border ${
@@ -1165,7 +1400,7 @@ export const UserManagement: React.FC = () => {
                           >
                             {getPasswordStrengthIcon(passwordStrength)}
                             <span>
-                              Strength: {getPasswordStrengthLabel(passwordStrength)}
+                              {t.strength}: {getPasswordStrengthLabel(passwordStrength)}
                             </span>
                           </div>
                         </div>
@@ -1176,7 +1411,7 @@ export const UserManagement: React.FC = () => {
                   {/* Confirm Password */}
                   <div className="mb-4">
                     <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      Confirm Password *
+                      {t.confirmPassword} *
                     </label>
                     <div
                       className={`relative rounded-lg border ${
@@ -1236,7 +1471,7 @@ export const UserManagement: React.FC = () => {
                       formData.password === formData.confirmPassword &&
                       formData.confirmPassword.length > 0 && (
                         <p className="text-xs text-green-500 mt-1">
-                          ✓ Passwords match
+                          ✓ {t.passwordsMatch}
                         </p>
                       )}
                   </div>
@@ -1245,7 +1480,7 @@ export const UserManagement: React.FC = () => {
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
                       <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                        Role *
+                        {t.role} *
                       </label>
                       <select
                         value={formData.role}
@@ -1257,9 +1492,9 @@ export const UserManagement: React.FC = () => {
                         }
                         className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
                       >
-                        <option value="user">User</option>
-                        <option value="host">Host</option>
-                        <option value="admin">Admin</option>
+                        <option value="user">{t.users}</option>
+                        <option value="host">{t.hosts}</option>
+                        <option value="admin">{t.admins}</option>
                       </select>
                       {errors.role && (
                         <p className="text-xs text-red-500 mt-1">
@@ -1269,7 +1504,7 @@ export const UserManagement: React.FC = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                        Status *
+                        {t.status} *
                       </label>
                       <select
                         value={formData.status}
@@ -1281,9 +1516,9 @@ export const UserManagement: React.FC = () => {
                         }
                         className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
                       >
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                        <option value="suspended">Suspended</option>
+                        <option value="active">{t.active}</option>
+                        <option value="inactive">{t.inactive}</option>
+                        <option value="suspended">{t.suspended}</option>
                       </select>
                       {errors.status && (
                         <p className="text-xs text-red-500 mt-1">
@@ -1327,12 +1562,12 @@ export const UserManagement: React.FC = () => {
                               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                             />
                           </svg>
-                          Creating...
+                          {t.creating}
                         </>
                       ) : (
                         <>
                           <PersonAddIcon className="w-5 h-5" />
-                          Create User
+                          {t.createUser}
                         </>
                       )}
                     </span>
@@ -1344,7 +1579,7 @@ export const UserManagement: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Edit User Modal - keep the same as before */}
+      {/* Edit User Modal */}
       <AnimatePresence>
         {isEditModalOpen && (
           <>
@@ -1372,7 +1607,7 @@ export const UserManagement: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <EditIcon className="text-[#FF385C] w-5 h-5" />
                     <h2 className="text-xl font-semibold text-gray-900">
-                      Edit User
+                      {t.editUser}
                     </h2>
                   </div>
                   <motion.button
@@ -1393,7 +1628,7 @@ export const UserManagement: React.FC = () => {
                   {/* Name */}
                   <div className="mb-4">
                     <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      Full Name *
+                      {t.fullName} *
                     </label>
                     <div
                       className={`relative rounded-lg border ${
@@ -1419,7 +1654,7 @@ export const UserManagement: React.FC = () => {
                   {/* Email */}
                   <div className="mb-4">
                     <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      Email *
+                      {t.email} *
                     </label>
                     <div
                       className={`relative rounded-lg border ${
@@ -1467,7 +1702,7 @@ export const UserManagement: React.FC = () => {
                   {/* Phone */}
                   <div className="mb-4">
                     <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      Phone Number *
+                      {t.phoneNumber} *
                     </label>
                     <div
                       className={`relative rounded-lg border ${
@@ -1516,7 +1751,7 @@ export const UserManagement: React.FC = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                        Role *
+                        {t.role} *
                       </label>
                       <select
                         value={formData.role}
@@ -1528,9 +1763,9 @@ export const UserManagement: React.FC = () => {
                         }
                         className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
                       >
-                        <option value="user">User</option>
-                        <option value="host">Host</option>
-                        <option value="admin">Admin</option>
+                        <option value="user">{t.users}</option>
+                        <option value="host">{t.hosts}</option>
+                        <option value="admin">{t.admins}</option>
                       </select>
                       {errors.role && (
                         <p className="text-xs text-red-500 mt-1">
@@ -1540,7 +1775,7 @@ export const UserManagement: React.FC = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                        Status *
+                        {t.status} *
                       </label>
                       <select
                         value={formData.status}
@@ -1552,9 +1787,9 @@ export const UserManagement: React.FC = () => {
                         }
                         className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
                       >
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                        <option value="suspended">Suspended</option>
+                        <option value="active">{t.active}</option>
+                        <option value="inactive">{t.inactive}</option>
+                        <option value="suspended">{t.suspended}</option>
                       </select>
                       {errors.status && (
                         <p className="text-xs text-red-500 mt-1">
@@ -1565,7 +1800,7 @@ export const UserManagement: React.FC = () => {
                   </div>
 
                   <div className="mt-4 text-xs text-gray-500">
-                    <p>Password fields are optional for editing.</p>
+                    <p>{t.editPasswordNote}</p>
                   </div>
 
                   <motion.button
@@ -1602,12 +1837,12 @@ export const UserManagement: React.FC = () => {
                               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                             />
                           </svg>
-                          Updating...
+                          {t.updating}
                         </>
                       ) : (
                         <>
                           <EditIcon className="w-5 h-5" />
-                          Update User
+                          {t.updateUser}
                         </>
                       )}
                     </span>
@@ -1619,7 +1854,7 @@ export const UserManagement: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Delete Confirmation Modal - keep the same as before */}
+      {/* Delete Confirmation Modal */}
       <AnimatePresence>
         {isDeleteModalOpen && (
           <>
@@ -1649,14 +1884,14 @@ export const UserManagement: React.FC = () => {
                     </div>
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">
-                    Delete User
+                    {t.deleteUser}
                   </h3>
                   <p className="text-gray-500 text-center mb-6">
-                    Are you sure you want to delete{" "}
+                    {t.deleteConfirmation}{" "}
                     <span className="font-semibold text-gray-900">
                       {selectedUser?.name}
                     </span>
-                    ? This action cannot be undone.
+                    ? {t.actionUndone}
                   </p>
                   <div className="flex gap-3">
                     <motion.button
@@ -1668,7 +1903,7 @@ export const UserManagement: React.FC = () => {
                       }}
                       className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
                     >
-                      Cancel
+                      {t.cancel}
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.02 }}
@@ -1703,10 +1938,10 @@ export const UserManagement: React.FC = () => {
                               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                             />
                           </svg>
-                          Deleting...
+                          {t.deleting}
                         </span>
                       ) : (
-                        "Delete User"
+                        t.delete
                       )}
                     </motion.button>
                   </div>

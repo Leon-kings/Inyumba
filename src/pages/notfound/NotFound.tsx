@@ -2,10 +2,11 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable react-hooks/immutability */
  
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import Cookies from 'js-cookie';
 
 // Material-UI Icons
 import HomeIcon from "@mui/icons-material/Home";
@@ -21,10 +22,6 @@ import EmailIcon from "@mui/icons-material/Email";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
-
-interface NotFoundProps {
-  language?: "en" | "fr" | "rw";
-}
 
 const translations = {
   en: {
@@ -155,9 +152,16 @@ const translations = {
   },
 };
 
-export const NotFound: React.FC<NotFoundProps> = ({ language = "en" }) => {
+// Helper function to get language from cookies
+const getLanguageFromCookies = (): 'en' | 'fr' | 'rw' => {
+  const lang = Cookies.get('language') as 'en' | 'fr' | 'rw';
+  return lang || 'en';
+};
+
+export const NotFound: React.FC = () => {
   const navigate = useNavigate();
-  const [lang, setLang] = useState(language);
+  // Get language from cookies
+  const [lang, setLang] = useState<'en' | 'fr' | 'rw'>(getLanguageFromCookies());
   const [isAssistanceModalOpen, setIsAssistanceModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -180,21 +184,22 @@ export const NotFound: React.FC<NotFoundProps> = ({ language = "en" }) => {
 
   const t = translations[lang];
 
-  // Listen for language changes
-  React.useEffect(() => {
-    const handleLanguageChange = () => {
-      const savedLang =
-        (localStorage.getItem("language") as "en" | "fr" | "rw") || "en";
-      setLang(savedLang);
+  // Listen for language changes in cookies
+  useEffect(() => {
+    const handleCookieChange = () => {
+      const newLang = getLanguageFromCookies();
+      if (newLang !== lang) {
+        setLang(newLang);
+      }
     };
 
-    window.addEventListener("languageChanged", handleLanguageChange);
-    return () =>
-      window.removeEventListener("languageChanged", handleLanguageChange);
-  }, []);
+    // Check for cookie changes every second (polling)
+    const interval = setInterval(handleCookieChange, 1000);
+    return () => clearInterval(interval);
+  }, [lang]);
 
   // Validate form on change
-  React.useEffect(() => {
+  useEffect(() => {
     const nameValid = formData.name.length >= 2;
     const emailValid = validateEmail(formData.email);
     const messageValid = formData.message.length >= 10;
@@ -215,7 +220,7 @@ export const NotFound: React.FC<NotFoundProps> = ({ language = "en" }) => {
     if (messageValid && errors.message) {
       setErrors((prev) => ({ ...prev, message: undefined }));
     }
-  }, [formData]);
+  }, [formData, errors]);
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
