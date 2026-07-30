@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -325,7 +324,7 @@ export const HostDashboard: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   // Host statistics
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     totalProperties: 5,
     activeProperties: 4,
     totalBookings: 28,
@@ -337,7 +336,7 @@ export const HostDashboard: React.FC = () => {
   });
 
   // Booking data for charts
-  const [bookingData, setBookingData] = useState([
+  const [bookingData] = useState([
     { month: "Jan", bookings: 2, earnings: 250000 },
     { month: "Feb", bookings: 3, earnings: 330000 },
     { month: "Mar", bookings: 4, earnings: 440000 },
