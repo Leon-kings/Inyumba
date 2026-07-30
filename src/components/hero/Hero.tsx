@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 
 // Material-UI Icons
 import SearchIcon from "@mui/icons-material/Search";
@@ -914,9 +914,9 @@ interface HeroProps {
 }
 
 // Helper function to get language from cookies
-const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
-  const lang = Cookies.get('language') as "en" | "fr" | "rw";
-  return lang || 'en';
+const getLanguageFromCookies: () => "en" | "fr" | "rw" = () => {
+  const lang = Cookies.get("language") as "en" | "fr" | "rw";
+  return lang || "en";
 };
 
 const getTranslations = (lang: string) => {
@@ -1554,7 +1554,9 @@ const InyumbaLogo = ({ className = "h-12 w-12" }: { className?: string }) => (
 
 export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
   // Get language from cookies
-  const [language, setLanguage] = useState<"en" | "fr" | "rw">(getLanguageFromCookies());
+  const [language, setLanguage] = useState<"en" | "fr" | "rw">(
+    getLanguageFromCookies(),
+  );
   const t = getTranslations(language);
 
   const categories = [
@@ -1647,7 +1649,8 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
-  const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] = useState(false);
+  const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] =
+    useState(false);
 
   const [selectedHouse, setSelectedHouse] = useState<StudentHouse | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -2355,7 +2358,6 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -3159,9 +3161,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
                     <h4 className="text-xl font-bold text-gray-900 mb-2">
                       {t.loginRequired}
                     </h4>
-                    <p className="text-sm text-gray-600">
-                      {t.loginToOrder}
-                    </p>
+                    <p className="text-sm text-gray-600">{t.loginToOrder}</p>
                     <div className="mt-2 p-3 bg-gray-50 rounded-lg">
                       <p className="text-xs text-gray-500">
                         <strong>{selectedHouse.name}</strong> •{" "}
@@ -3490,4 +3490,3 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
     </div>
   );
 };
-
