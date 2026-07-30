@@ -765,6 +765,7 @@ import { HostRequestManagement } from "./components/dashboard/host/components/re
 import { HostMessageManagement } from "./components/dashboard/host/components/messages/HostMessageManagement";
 import { HostManagement } from "./components/dashboard/host/components/host/HostManagement";
 import { HouseOnRent } from "./pages/houses/HouseOnRent";
+import { Testimonials } from "./pages/testimonials/Testimonials";
 
 // Types
 interface UserData {
@@ -1086,6 +1087,7 @@ export default function App() {
         <Route path="/faq" element={<FAQ />} />
         <Route path="/help" element={<Help />} />
         <Route path="/experience" element={<HouseOnRent />} />
+        <Route path="/testimonials" element={<Testimonials />} />
 
         <Route
           path="/dashboard"
