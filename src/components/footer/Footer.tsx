@@ -19,6 +19,7 @@ import VerifiedIcon from "@mui/icons-material/Verified";
 import PaymentIcon from "@mui/icons-material/Payment";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CodeIcon from "@mui/icons-material/Code";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 
 // Google Maps location - Musanze, INES-Ruhengeri
 const MAP_EMBED_URL =
@@ -56,6 +57,7 @@ const translations = {
     location: "Our Location",
     findUs: "Find Us",
     visitUs: "Visit Us",
+    backToTop: "Back to Top",
   },
   fr: {
     about: "À Propos",
@@ -88,6 +90,7 @@ const translations = {
     location: "Notre Emplacement",
     findUs: "Trouvez-Nous",
     visitUs: "Visitez-Nous",
+    backToTop: "Retour en Haut",
   },
   rw: {
     about: "Ibijyanye Na Twe",
@@ -120,6 +123,7 @@ const translations = {
     location: "Aho Turi",
     findUs: "Turebe",
     visitUs: "Udukerere",
+    backToTop: "Garuka Hejuru",
   },
 };
 
@@ -391,6 +395,7 @@ export const Footer: React.FC = () => {
   const [lang, setLang] = useState<'en' | 'fr' | 'rw'>(getLanguageFromCookies());
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   const t = translations[lang];
 
@@ -408,6 +413,28 @@ export const Footer: React.FC = () => {
     return () => clearInterval(interval);
   }, [lang]);
 
+  // Handle scroll to show/hide back to top button
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 400) {
+        setShowBackToTop(true);
+      } else {
+        setShowBackToTop(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Handle back to top click
+  const handleBackToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+
   const handlePrivacyClick = () => {
     setIsPrivacyOpen(true);
   };
@@ -420,7 +447,26 @@ export const Footer: React.FC = () => {
 
   return (
     <>
-      <footer className="bg-gray-900 text-gray-300">
+      <footer className="bg-gray-900 text-gray-300 relative">
+        {/* Back to Top Button */}
+        <AnimatePresence>
+          {showBackToTop && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 20 }}
+              transition={{ duration: 0.3 }}
+              onClick={handleBackToTop}
+              className="fixed bottom-6 right-6 z-50 bg-[#FF385C] text-white rounded-full p-3 shadow-lg hover:bg-[#E31C5F] transition-all duration-300 hover:scale-110 hover:shadow-2xl"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <ArrowUpwardIcon className="w-6 h-6" />
+              <span className="sr-only">{t.backToTop}</span>
+            </motion.button>
+          )}
+        </AnimatePresence>
+
         {/* Main Footer */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -957,4 +1003,3 @@ export const Footer: React.FC = () => {
     </>
   );
 };
-
