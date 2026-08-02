@@ -1,12 +1,12 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable react-hooks/immutability */
- 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
+import axios from "axios";
 
 // Material-UI Icons
 import HomeIcon from "@mui/icons-material/Home";
@@ -22,6 +22,9 @@ import EmailIcon from "@mui/icons-material/Email";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
+
+// API endpoint - replace with your actual API URL
+const API_URL = "http://localhost:5000/api/contact";
 
 const translations = {
   en: {
@@ -153,15 +156,17 @@ const translations = {
 };
 
 // Helper function to get language from cookies
-const getLanguageFromCookies = (): 'en' | 'fr' | 'rw' => {
-  const lang = Cookies.get('language') as 'en' | 'fr' | 'rw';
-  return lang || 'en';
+const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
+  const lang = Cookies.get("language") as "en" | "fr" | "rw";
+  return lang || "en";
 };
 
 export const NotFound: React.FC = () => {
   const navigate = useNavigate();
   // Get language from cookies
-  const [lang, setLang] = useState<'en' | 'fr' | 'rw'>(getLanguageFromCookies());
+  const [lang, setLang] = useState<"en" | "fr" | "rw">(
+    getLanguageFromCookies(),
+  );
   const [isAssistanceModalOpen, setIsAssistanceModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -285,7 +290,7 @@ export const NotFound: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -295,44 +300,71 @@ export const NotFound: React.FC = () => {
 
     setIsSubmitting(true);
 
-    // Simulate API call with image upload
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast.success(t.success);
+    try {
+      // Prepare form data for API
+      const formDataToSend = new FormData();
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("email", formData.email);
+      formDataToSend.append("message", formData.message);
+      formDataToSend.append("language", lang);
 
-      // Log the submitted data (in production, this would be sent to the admin)
-      console.log("Assistance Request:", {
-        ...formData,
-        image: selectedImage
-          ? {
-              name: selectedImage.name,
-              size: selectedImage.size,
-              type: selectedImage.type,
-            }
-          : null,
+      if (selectedImage) {
+        formDataToSend.append("image", selectedImage);
+      }
+
+      // Send to API
+      const response = await axios.post(API_URL, formDataToSend, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        timeout: 30000,
       });
 
-      // Reset form
-      setFormData({ name: "", email: "", message: "" });
-      setSelectedImage(null);
-      setImagePreview(null);
-      setIsNameValid(null);
-      setIsEmailValid(null);
-      setIsMessageValid(null);
-      setIsFormValid(false);
-      setIsAssistanceModalOpen(false);
+      if (response.status === 200 || response.status === 201) {
+        toast.success(t.success);
 
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+        // Reset form
+        setFormData({ name: "", email: "", message: "" });
+        setSelectedImage(null);
+        setImagePreview(null);
+        setIsNameValid(null);
+        setIsEmailValid(null);
+        setIsMessageValid(null);
+        setIsFormValid(false);
+        setIsAssistanceModalOpen(false);
+
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      } else {
+        throw new Error("Failed to send message");
       }
-    }, 2000);
+    } catch (error: any) {
+      console.error("Error sending contact message:", error);
+
+      if (error.response) {
+        const errorMessage = error.response.data?.message || t.error;
+        toast.error(errorMessage);
+      } else if (error.request) {
+        toast.error("Network error. Please check your internet connection.");
+      } else {
+        toast.error(t.error);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const popularLinks = [
     { label: t.goHome, path: "/", icon: <HomeIcon /> },
     { label: t.searchHouses, path: "/houses", icon: <SearchIcon /> },
     { label: t.helpCenter, path: "/help", icon: <HelpOutlineOutlined /> },
-    { label: t.contactSupport, path: "/contact", icon: <SupportAgentIcon /> },
+    {
+      label: t.contactSupport,
+      path: "#",
+      icon: <SupportAgentIcon />,
+      onClick: () => setIsAssistanceModalOpen(true),
+    },
   ];
 
   return (
@@ -397,7 +429,13 @@ export const NotFound: React.FC = () => {
                 key={index}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => navigate(link.path)}
+                onClick={() => {
+                  if (link.onClick) {
+                    link.onClick();
+                  } else {
+                    navigate(link.path);
+                  }
+                }}
                 className="flex items-center justify-center gap-2 px-4 py-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 text-gray-700 hover:text-[#FF385C] hover:border-[#FF385C]"
               >
                 <span className="text-[#FF385C]">{link.icon}</span>

@@ -1874,7 +1874,7 @@ export const Navbar = () => {
               transition={{ duration: 0.4, type: "spring", stiffness: 300 }}
               className="fixed inset-0 z-[101] flex items-center justify-center p-4"
             >
-              <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white relative">
+              <div className="w-full max-w-md max-h-[90vh] rounded-2xl shadow-2xl bg-white relative overflow-hidden">
                 <AnimatedBackground />
                 <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl relative z-10">
                   <div className="flex items-center gap-2">
@@ -1892,154 +1892,157 @@ export const Navbar = () => {
                     <CloseIcon className="w-5 h-5" />
                   </motion.button>
                 </div>
-                <form onSubmit={handleLogin} className="p-6 relative z-10">
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      {t.email}
-                    </label>
-                    <div
-                      className={`relative rounded-lg border ${isLoginEmailValid === true ? "border-green-500" : isLoginEmailValid === false ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
-                    >
-                      <EmailIcon
-                        className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${isLoginEmailValid === true ? "text-green-500" : isLoginEmailValid === false ? "text-red-500" : "text-gray-400"}`}
-                      />
-                      <input
-                        type="email"
-                        required
-                        value={loginEmail}
-                        onChange={(e) => handleLoginEmailChange(e.target.value)}
-                        className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
-                        placeholder="you@example.com"
-                      />
-                      {isLoginEmailValid === true && (
-                        <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+
+                {/* Slide animation container */}
+                <motion.div
+                  initial={{ y: 50, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: 50, opacity: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                  className="overflow-y-auto max-h-[calc(90vh-80px)]"
+                >
+                  <form onSubmit={handleLogin} className="p-6 relative z-10">
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                        {t.email}
+                      </label>
+                      <div
+                        className={`relative rounded-lg border ${isLoginEmailValid === true ? "border-green-500" : isLoginEmailValid === false ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+                      >
+                        <EmailIcon
+                          className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${isLoginEmailValid === true ? "text-green-500" : isLoginEmailValid === false ? "text-red-500" : "text-gray-400"}`}
+                        />
+                        <input
+                          type="email"
+                          required
+                          value={loginEmail}
+                          onChange={(e) =>
+                            handleLoginEmailChange(e.target.value)
+                          }
+                          className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
+                          placeholder="you@example.com"
+                        />
+                        {isLoginEmailValid === true && (
+                          <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+                        )}
+                        {isLoginEmailValid === false && (
+                          <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+                        )}
+                      </div>
+                      {loginErrors.email && (
+                        <p className="text-xs text-red-500 mt-1">
+                          {loginErrors.email}
+                        </p>
                       )}
-                      {isLoginEmailValid === false && (
-                        <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+                      {isLoginEmailValid === true && (
+                        <p className="text-xs text-green-500 mt-1">
+                          ✓ Valid email address
+                        </p>
                       )}
                     </div>
-                    {loginErrors.email && (
-                      <p className="text-xs text-red-500 mt-1">
-                        {loginErrors.email}
-                      </p>
-                    )}
-                    {isLoginEmailValid === true && (
-                      <p className="text-xs text-green-500 mt-1">
-                        ✓ Valid email address
-                      </p>
-                    )}
-                  </div>
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      {t.password}
-                    </label>
-                    <div className="relative rounded-lg border border-gray-300 bg-white focus-within:border-[#FF385C] transition-colors duration-300">
-                      <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        required
-                        value={loginPassword}
-                        onChange={(e) => {
-                          setLoginPassword(e.target.value);
-                          if (loginErrors.password) {
-                            setLoginErrors({
-                              ...loginErrors,
-                              password: undefined,
-                            });
-                          }
-                        }}
-                        className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
-                        placeholder="••••••••"
-                        minLength={6}
-                      />
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                        {t.password}
+                      </label>
+                      <div className="relative rounded-lg border border-gray-300 bg-white focus-within:border-[#FF385C] transition-colors duration-300">
+                        <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          required
+                          value={loginPassword}
+                          onChange={(e) => {
+                            setLoginPassword(e.target.value);
+                            if (loginErrors.password) {
+                              setLoginErrors({
+                                ...loginErrors,
+                                password: undefined,
+                              });
+                            }
+                          }}
+                          className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
+                          placeholder="••••••••"
+                          minLength={6}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                          {showPassword ? (
+                            <VisibilityOffIcon className="w-5 h-5" />
+                          ) : (
+                            <VisibilityIcon className="w-5 h-5" />
+                          )}
+                        </button>
+                      </div>
+                      {loginErrors.password && (
+                        <p className="text-xs text-red-500 mt-1">
+                          {loginErrors.password}
+                        </p>
+                      )}
+                    </div>
+
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="submit"
+                      disabled={loginLoading || !isLoginFormValid()}
+                      className={`w-full py-3 rounded-lg font-medium relative overflow-hidden group transition-colors ${loginLoading || !isLoginFormValid() ? "bg-gray-400 cursor-not-allowed" : "bg-[#FF385C] hover:bg-[#E31C5F]"} text-white`}
+                    >
+                      <span className="relative z-10 flex items-center justify-center gap-2">
+                        {loginLoading ? (
+                          <>
+                            <svg
+                              className="animate-spin h-5 w-5 text-white"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              ></path>
+                            </svg>
+                            Logging in...
+                          </>
+                        ) : (
+                          <>
+                            <LoginIcon className="w-5 h-5" />
+                            {t.login}
+                          </>
+                        )}
+                      </span>
+                    </motion.button>
+                    <p className="text-center text-sm mt-4 text-gray-500">
+                      {t.dontHaveAccount}{" "}
                       <button
                         type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        onClick={() => {
+                          setIsLoginOpen(false);
+                          setIsRegisterOpen(true);
+                        }}
+                        className="text-[#FF385C] font-medium hover:underline"
                       >
-                        {showPassword ? (
-                          <VisibilityOffIcon className="w-5 h-5" />
-                        ) : (
-                          <VisibilityIcon className="w-5 h-5" />
-                        )}
+                        {t.signup}
                       </button>
-                    </div>
-                    {loginErrors.password && (
-                      <p className="text-xs text-red-500 mt-1">
-                        {loginErrors.password}
-                      </p>
-                    )}
-                  </div>
-                  <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                    <p className="text-xs text-blue-700 font-medium">
-                      Demo Credentials:
                     </p>
-                    <div className="text-xs text-blue-600 mt-1 space-y-0.5">
-                      <p>👑 Admin: admin@example.com / admin123</p>
-                      <p>👤 User: user@example.com / user123</p>
-                      <p>🏠 Host: host@example.com / host123</p>
+                    <div className="mt-6 flex justify-center gap-4">
+                      <FacebookIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-blue-600 text-blue-600" />
+                      <InstagramIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-pink-600 text-pink-600" />
+                      <TwitterIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-blue-600 text-indigo-400" />
+                      <YouTubeIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-red-300 text-red-300" />
                     </div>
-                  </div>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    type="submit"
-                    disabled={loginLoading || !isLoginFormValid()}
-                    className={`w-full py-3 rounded-lg font-medium relative overflow-hidden group transition-colors ${loginLoading || !isLoginFormValid() ? "bg-gray-400 cursor-not-allowed" : "bg-[#FF385C] hover:bg-[#E31C5F]"} text-white`}
-                  >
-                    <span className="relative z-10 flex items-center justify-center gap-2">
-                      {loginLoading ? (
-                        <>
-                          <svg
-                            className="animate-spin h-5 w-5 text-white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                          </svg>
-                          Logging in...
-                        </>
-                      ) : (
-                        <>
-                          <LoginIcon className="w-5 h-5" />
-                          {t.login}
-                        </>
-                      )}
-                    </span>
-                  </motion.button>
-                  <p className="text-center text-sm mt-4 text-gray-500">
-                    {t.dontHaveAccount}{" "}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsLoginOpen(false);
-                        setIsRegisterOpen(true);
-                      }}
-                      className="text-[#FF385C] font-medium hover:underline"
-                    >
-                      {t.signup}
-                    </button>
-                  </p>
-                  <div className="mt-6 flex justify-center gap-4">
-                    <FacebookIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-[#FF385C] text-gray-400" />
-                    <InstagramIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-[#FF385C] text-gray-400" />
-                    <TwitterIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-[#FF385C] text-gray-400" />
-                    <YouTubeIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-[#FF385C] text-gray-400" />
-                  </div>
-                </form>
+                  </form>
+                </motion.div>
               </div>
             </motion.div>
           </>
@@ -2047,6 +2050,7 @@ export const Navbar = () => {
       </AnimatePresence>
 
       {/* Register Modal */}
+
       <AnimatePresence>
         {isRegisterOpen && (
           <>
@@ -2067,7 +2071,7 @@ export const Navbar = () => {
               transition={{ duration: 0.4, type: "spring", stiffness: 300 }}
               className="fixed inset-0 z-[101] flex items-center justify-center p-4"
             >
-              <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white relative">
+              <div className="w-full max-w-md max-h-[90vh] rounded-2xl shadow-2xl bg-white relative overflow-hidden">
                 <AnimatedBackground />
                 <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl relative z-10">
                   <div className="flex items-center gap-2">
@@ -2085,317 +2089,328 @@ export const Navbar = () => {
                     <CloseIcon className="w-5 h-5" />
                   </motion.button>
                 </div>
-                <form onSubmit={handleRegister} className="p-6 relative z-10">
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      {t.fullName}
-                    </label>
-                    <div
-                      className={`relative rounded-lg border ${registerErrors.name ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
-                    >
-                      <PersonIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                      <input
-                        type="text"
-                        required
-                        value={registerName}
-                        onChange={(e) => {
-                          setRegisterName(e.target.value);
-                          if (registerErrors.name) {
-                            setRegisterErrors({
-                              ...registerErrors,
-                              name: undefined,
-                            });
-                          }
-                        }}
-                        className="w-full pl-10 pr-3 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
-                        placeholder="John Doe"
-                      />
-                    </div>
-                    {registerErrors.name && (
-                      <p className="text-xs text-red-500 mt-1">
-                        {registerErrors.name}
-                      </p>
-                    )}
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      {t.email}
-                    </label>
-                    <div
-                      className={`relative rounded-lg border ${isRegisterEmailValid === true ? "border-green-500" : isRegisterEmailValid === false ? "border-red-500" : registerErrors.email ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
-                    >
-                      <EmailIcon
-                        className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${isRegisterEmailValid === true ? "text-green-500" : isRegisterEmailValid === false ? "text-red-500" : "text-gray-400"}`}
-                      />
-                      <input
-                        type="email"
-                        required
-                        value={registerEmail}
-                        onChange={(e) =>
-                          handleRegisterEmailChange(e.target.value)
-                        }
-                        className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
-                        placeholder="you@example.com"
-                      />
-                      {isRegisterEmailValid === true && (
-                        <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
-                      )}
-                      {isRegisterEmailValid === false && (
-                        <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
-                      )}
-                    </div>
-                    {registerErrors.email && (
-                      <p className="text-xs text-red-500 mt-1">
-                        {registerErrors.email}
-                      </p>
-                    )}
-                    {isRegisterEmailValid === true && (
-                      <p className="text-xs text-green-500 mt-1">
-                        ✓ Valid email address
-                      </p>
-                    )}
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      {t.phoneNumber}
-                    </label>
-                    <div
-                      className={`relative rounded-lg border ${isPhoneValid === true ? "border-green-500" : isPhoneValid === false ? "border-red-500" : registerErrors.phone ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
-                    >
-                      <PhoneIcon
-                        className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${isPhoneValid === true ? "text-green-500" : isPhoneValid === false ? "text-red-500" : "text-gray-400"}`}
-                      />
-                      <input
-                        type="tel"
-                        required
-                        value={registerPhone}
-                        onChange={(e) => handlePhoneChange(e.target.value)}
-                        className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
-                        placeholder="0788123456 or +250788123456"
-                      />
-                      {isPhoneValid === true && (
-                        <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
-                      )}
-                      {isPhoneValid === false && (
-                        <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
-                      )}
-                    </div>
-                    {registerErrors.phone && (
-                      <p className="text-xs text-red-500 mt-1">
-                        {registerErrors.phone}
-                      </p>
-                    )}
-                    {isPhoneValid === true && (
-                      <p className="text-xs text-green-500 mt-1">
-                        ✓ Valid phone number
-                      </p>
-                    )}
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      {t.password}
-                    </label>
-                    <div
-                      className={`relative rounded-lg border ${registerErrors.password ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
-                    >
-                      <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        required
-                        value={registerPassword}
-                        onChange={(e) => handlePasswordChange(e.target.value)}
-                        className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
-                        placeholder="••••••••"
-                        minLength={6}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+
+                {/* Slide animation container */}
+                <motion.div
+                  initial={{ y: 50, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: 50, opacity: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                  className="overflow-y-auto max-h-[calc(90vh-80px)]"
+                >
+                  <form onSubmit={handleRegister} className="p-6 relative z-10">
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                        {t.fullName}
+                      </label>
+                      <div
+                        className={`relative rounded-lg border ${registerErrors.name ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
                       >
-                        {showPassword ? (
-                          <VisibilityOffIcon className="w-5 h-5" />
-                        ) : (
-                          <VisibilityIcon className="w-5 h-5" />
-                        )}
-                      </button>
+                        <PersonIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                          type="text"
+                          required
+                          value={registerName}
+                          onChange={(e) => {
+                            setRegisterName(e.target.value);
+                            if (registerErrors.name) {
+                              setRegisterErrors({
+                                ...registerErrors,
+                                name: undefined,
+                              });
+                            }
+                          }}
+                          className="w-full pl-10 pr-3 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
+                          placeholder="John Doe"
+                        />
+                      </div>
+                      {registerErrors.name && (
+                        <p className="text-xs text-red-500 mt-1">
+                          {registerErrors.name}
+                        </p>
+                      )}
                     </div>
-                    {registerErrors.password && (
-                      <p className="text-xs text-red-500 mt-1">
-                        {registerErrors.password}
-                      </p>
-                    )}
-                    {passwordStrength && (
-                      <div className="mt-2">
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                            <motion.div
-                              className="h-full rounded-full transition-all duration-500"
-                              style={{
-                                width:
-                                  passwordStrength === "weak"
-                                    ? "33%"
-                                    : passwordStrength === "moderate"
-                                      ? "66%"
-                                      : "100%",
-                                backgroundColor:
-                                  getPasswordStrengthColor(passwordStrength),
-                              }}
-                              initial={{ width: 0 }}
-                              animate={{
-                                width:
-                                  passwordStrength === "weak"
-                                    ? "33%"
-                                    : passwordStrength === "moderate"
-                                      ? "66%"
-                                      : "100%",
-                              }}
-                            />
-                          </div>
-                          <div
-                            className="flex items-center gap-1 text-xs font-medium"
-                            style={{
-                              color: getPasswordStrengthColor(passwordStrength),
-                            }}
-                          >
-                            {getPasswordStrengthIcon(passwordStrength)}
-                            <span>
-                              {t.passwordStrength}:{" "}
-                              {getPasswordStrengthLabel(passwordStrength)}
-                            </span>
-                          </div>
-                        </div>
-                        {passwordStrength === "weak" && (
-                          <p className="text-xs text-red-500 mt-1">
-                            ⚠️ Password is too weak. Use at least 8 characters
-                            with uppercase, lowercase, numbers, and special
-                            characters.
-                          </p>
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                        {t.email}
+                      </label>
+                      <div
+                        className={`relative rounded-lg border ${isRegisterEmailValid === true ? "border-green-500" : isRegisterEmailValid === false ? "border-red-500" : registerErrors.email ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+                      >
+                        <EmailIcon
+                          className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${isRegisterEmailValid === true ? "text-green-500" : isRegisterEmailValid === false ? "text-red-500" : "text-gray-400"}`}
+                        />
+                        <input
+                          type="email"
+                          required
+                          value={registerEmail}
+                          onChange={(e) =>
+                            handleRegisterEmailChange(e.target.value)
+                          }
+                          className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
+                          placeholder="you@example.com"
+                        />
+                        {isRegisterEmailValid === true && (
+                          <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+                        )}
+                        {isRegisterEmailValid === false && (
+                          <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
                         )}
                       </div>
-                    )}
-                  </div>
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                      {t.confirmPassword}
-                    </label>
-                    <div
-                      className={`relative rounded-lg border ${registerErrors.confirmPassword ? "border-red-500" : registerConfirmPassword && registerPassword === registerConfirmPassword && registerConfirmPassword.length > 0 ? "border-green-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
-                    >
-                      <LockIcon
-                        className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${registerConfirmPassword && registerPassword === registerConfirmPassword && registerConfirmPassword.length > 0 ? "text-green-500" : "text-gray-400"}`}
-                      />
-                      <input
-                        type={showConfirmPassword ? "text" : "password"}
-                        required
-                        value={registerConfirmPassword}
-                        onChange={(e) =>
-                          handleConfirmPasswordChange(e.target.value)
-                        }
-                        className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
-                        placeholder="••••••••"
-                        minLength={6}
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setShowConfirmPassword(!showConfirmPassword)
-                        }
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      {registerErrors.email && (
+                        <p className="text-xs text-red-500 mt-1">
+                          {registerErrors.email}
+                        </p>
+                      )}
+                      {isRegisterEmailValid === true && (
+                        <p className="text-xs text-green-500 mt-1">
+                          ✓ Valid email address
+                        </p>
+                      )}
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                        {t.phoneNumber}
+                      </label>
+                      <div
+                        className={`relative rounded-lg border ${isPhoneValid === true ? "border-green-500" : isPhoneValid === false ? "border-red-500" : registerErrors.phone ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
                       >
-                        {showConfirmPassword ? (
-                          <VisibilityOffIcon className="w-5 h-5" />
-                        ) : (
-                          <VisibilityIcon className="w-5 h-5" />
+                        <PhoneIcon
+                          className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${isPhoneValid === true ? "text-green-500" : isPhoneValid === false ? "text-red-500" : "text-gray-400"}`}
+                        />
+                        <input
+                          type="tel"
+                          required
+                          value={registerPhone}
+                          onChange={(e) => handlePhoneChange(e.target.value)}
+                          className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
+                          placeholder="0788123456 or +250788123456"
+                        />
+                        {isPhoneValid === true && (
+                          <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
                         )}
-                      </button>
+                        {isPhoneValid === false && (
+                          <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+                        )}
+                      </div>
+                      {registerErrors.phone && (
+                        <p className="text-xs text-red-500 mt-1">
+                          {registerErrors.phone}
+                        </p>
+                      )}
+                      {isPhoneValid === true && (
+                        <p className="text-xs text-green-500 mt-1">
+                          ✓ Valid phone number
+                        </p>
+                      )}
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                        {t.password}
+                      </label>
+                      <div
+                        className={`relative rounded-lg border ${registerErrors.password ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+                      >
+                        <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          required
+                          value={registerPassword}
+                          onChange={(e) => handlePasswordChange(e.target.value)}
+                          className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
+                          placeholder="••••••••"
+                          minLength={6}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                          {showPassword ? (
+                            <VisibilityOffIcon className="w-5 h-5" />
+                          ) : (
+                            <VisibilityIcon className="w-5 h-5" />
+                          )}
+                        </button>
+                      </div>
+                      {registerErrors.password && (
+                        <p className="text-xs text-red-500 mt-1">
+                          {registerErrors.password}
+                        </p>
+                      )}
+                      {passwordStrength && (
+                        <div className="mt-2">
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                              <motion.div
+                                className="h-full rounded-full transition-all duration-500"
+                                style={{
+                                  width:
+                                    passwordStrength === "weak"
+                                      ? "33%"
+                                      : passwordStrength === "moderate"
+                                        ? "66%"
+                                        : "100%",
+                                  backgroundColor:
+                                    getPasswordStrengthColor(passwordStrength),
+                                }}
+                                initial={{ width: 0 }}
+                                animate={{
+                                  width:
+                                    passwordStrength === "weak"
+                                      ? "33%"
+                                      : passwordStrength === "moderate"
+                                        ? "66%"
+                                        : "100%",
+                                }}
+                              />
+                            </div>
+                            <div
+                              className="flex items-center gap-1 text-xs font-medium"
+                              style={{
+                                color:
+                                  getPasswordStrengthColor(passwordStrength),
+                              }}
+                            >
+                              {getPasswordStrengthIcon(passwordStrength)}
+                              <span>
+                                {t.passwordStrength}:{" "}
+                                {getPasswordStrengthLabel(passwordStrength)}
+                              </span>
+                            </div>
+                          </div>
+                          {passwordStrength === "weak" && (
+                            <p className="text-xs text-red-500 mt-1">
+                              ⚠️ Password is too weak. Use at least 8 characters
+                              with uppercase, lowercase, numbers, and special
+                              characters.
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                        {t.confirmPassword}
+                      </label>
+                      <div
+                        className={`relative rounded-lg border ${registerErrors.confirmPassword ? "border-red-500" : registerConfirmPassword && registerPassword === registerConfirmPassword && registerConfirmPassword.length > 0 ? "border-green-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+                      >
+                        <LockIcon
+                          className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${registerConfirmPassword && registerPassword === registerConfirmPassword && registerConfirmPassword.length > 0 ? "text-green-500" : "text-gray-400"}`}
+                        />
+                        <input
+                          type={showConfirmPassword ? "text" : "password"}
+                          required
+                          value={registerConfirmPassword}
+                          onChange={(e) =>
+                            handleConfirmPasswordChange(e.target.value)
+                          }
+                          className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
+                          placeholder="••••••••"
+                          minLength={6}
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                          {showConfirmPassword ? (
+                            <VisibilityOffIcon className="w-5 h-5" />
+                          ) : (
+                            <VisibilityIcon className="w-5 h-5" />
+                          )}
+                        </button>
+                        {registerConfirmPassword &&
+                          registerPassword === registerConfirmPassword &&
+                          registerConfirmPassword.length > 0 && (
+                            <CheckCircleIcon className="absolute right-12 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+                          )}
+                      </div>
+                      {registerErrors.confirmPassword && (
+                        <p className="text-xs text-red-500 mt-1">
+                          {registerErrors.confirmPassword}
+                        </p>
+                      )}
                       {registerConfirmPassword &&
                         registerPassword === registerConfirmPassword &&
                         registerConfirmPassword.length > 0 && (
-                          <CheckCircleIcon className="absolute right-12 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+                          <p className="text-xs text-green-500 mt-1">
+                            ✓ Passwords match
+                          </p>
                         )}
                     </div>
-                    {registerErrors.confirmPassword && (
-                      <p className="text-xs text-red-500 mt-1">
-                        {registerErrors.confirmPassword}
-                      </p>
-                    )}
-                    {registerConfirmPassword &&
-                      registerPassword === registerConfirmPassword &&
-                      registerConfirmPassword.length > 0 && (
-                        <p className="text-xs text-green-500 mt-1">
-                          ✓ Passwords match
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="submit"
+                      disabled={registerLoading || !isRegisterFormValid()}
+                      className={`w-full py-3 rounded-lg font-medium relative overflow-hidden group transition-colors ${registerLoading || !isRegisterFormValid() ? "bg-gray-400 cursor-not-allowed" : "bg-[#FF385C] hover:bg-[#E31C5F]"} text-white`}
+                    >
+                      <span className="relative z-10 flex items-center justify-center gap-2">
+                        {registerLoading ? (
+                          <>
+                            <svg
+                              className="animate-spin h-5 w-5 text-white"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              ></path>
+                            </svg>
+                            Creating account...
+                          </>
+                        ) : (
+                          <>
+                            <PersonAddIcon className="w-5 h-5" />
+                            {t.signup}
+                          </>
+                        )}
+                      </span>
+                    </motion.button>
+                    {!isRegisterFormValid() &&
+                      registerPassword.length > 0 &&
+                      passwordStrength === "weak" && (
+                        <p className="text-center text-xs text-red-500 mt-2">
+                          ⚠️ Please choose a stronger password to enable
+                          registration.
                         </p>
                       )}
-                  </div>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    type="submit"
-                    disabled={registerLoading || !isRegisterFormValid()}
-                    className={`w-full py-3 rounded-lg font-medium relative overflow-hidden group transition-colors ${registerLoading || !isRegisterFormValid() ? "bg-gray-400 cursor-not-allowed" : "bg-[#FF385C] hover:bg-[#E31C5F]"} text-white`}
-                  >
-                    <span className="relative z-10 flex items-center justify-center gap-2">
-                      {registerLoading ? (
-                        <>
-                          <svg
-                            className="animate-spin h-5 w-5 text-white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                          </svg>
-                          Creating account...
-                        </>
-                      ) : (
-                        <>
-                          <PersonAddIcon className="w-5 h-5" />
-                          {t.signup}
-                        </>
-                      )}
-                    </span>
-                  </motion.button>
-                  {!isRegisterFormValid() &&
-                    registerPassword.length > 0 &&
-                    passwordStrength === "weak" && (
-                      <p className="text-center text-xs text-red-500 mt-2">
-                        ⚠️ Please choose a stronger password to enable
-                        registration.
-                      </p>
-                    )}
-                  <p className="text-center text-sm mt-4 text-gray-500">
-                    {t.alreadyHaveAccount}{" "}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsRegisterOpen(false);
-                        setIsLoginOpen(true);
-                      }}
-                      className="text-[#FF385C] font-medium hover:underline"
-                    >
-                      {t.login}
-                    </button>
-                  </p>
-                  <div className="mt-6 flex justify-center gap-4">
-                    <FacebookIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-[#FF385C] text-gray-400" />
-                    <InstagramIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-[#FF385C] text-gray-400" />
-                    <TwitterIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-[#FF385C] text-gray-400" />
-                    <YouTubeIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-[#FF385C] text-gray-400" />
-                  </div>
-                </form>
+                    <p className="text-center text-sm mt-4 text-gray-500">
+                      {t.alreadyHaveAccount}{" "}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsRegisterOpen(false);
+                          setIsLoginOpen(true);
+                        }}
+                        className="text-[#FF385C] font-medium hover:underline"
+                      >
+                        {t.login}
+                      </button>
+                    </p>
+                    <div className="mt-6 flex justify-center gap-4">
+                      <FacebookIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-blue-600 text-blue-600" />
+                      <InstagramIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-pink-600 text-pink-600" />
+                      <TwitterIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-blue-600 text-indigo-400" />
+                      <YouTubeIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-red-300 text-red-300" />
+                    </div>
+                  </form>
+                </motion.div>
               </div>
             </motion.div>
           </>
@@ -2470,17 +2485,7 @@ export const Navbar = () => {
                       {getDashboardIcon()}
                       {getDashboardLabel()}
                     </motion.button>
-                    <motion.button
-                      whileHover={{ x: 5 }}
-                      className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-gray-700 hover:bg-gray-50 rounded-lg"
-                      onClick={() => {
-                        setIsUserModalOpen(false);
-                        navigateTo("/settings");
-                      }}
-                    >
-                      <SettingsIcon className="w-4 h-4" />
-                      {t.settings}
-                    </motion.button>
+
                     <motion.button
                       whileHover={{ x: 5 }}
                       className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-red-600 hover:bg-red-50 rounded-lg"

@@ -5,7 +5,6 @@ export const Home = () => {
     <>
       <div className="w-full">
         <Hero />
-
       </div>
     </>
   );
