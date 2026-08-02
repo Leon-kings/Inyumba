@@ -38,7 +38,10 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import WarningIcon from "@mui/icons-material/Warning";
 import SecurityIcon from "@mui/icons-material/Security";
 import VerifiedIcon from "@mui/icons-material/Verified";
-import {CheckCircleOutlineRounded, ErrorOutlineOutlined} from "@mui/icons-material";
+import {
+  CheckCircleOutlineRounded,
+  ErrorOutlineOutlined,
+} from "@mui/icons-material";
 import InfoIcon from "@mui/icons-material/Info";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -652,7 +655,9 @@ const StatusModal: React.FC<StatusModalProps> = ({
   const getIcon = () => {
     switch (type) {
       case "success":
-        return <CheckCircleOutlineRounded className="w-16 h-16 text-green-500" />;
+        return (
+          <CheckCircleOutlineRounded className="w-16 h-16 text-green-500" />
+        );
       case "error":
         return <ErrorOutlineOutlined className="w-16 h-16 text-red-500" />;
       case "info":
@@ -1123,7 +1128,7 @@ export const Navbar = () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       let userData: any = null;
       let token: string = "";
-   
+
       if (
         loginEmail === DEMO_USERS.admin.email &&
         loginPassword === DEMO_USERS.admin.password
@@ -1135,7 +1140,7 @@ export const Navbar = () => {
           role: DEMO_USERS.admin.role,
         };
         token = DEMO_USERS.admin.token;
-       
+
         // Show success modal
         setStatusModal({
           isOpen: true,
@@ -1155,7 +1160,7 @@ export const Navbar = () => {
           role: DEMO_USERS.user.role,
         };
         token = DEMO_USERS.user.token;
-       
+
         setStatusModal({
           isOpen: true,
           type: "success",
@@ -1174,7 +1179,7 @@ export const Navbar = () => {
           role: DEMO_USERS.host.role,
         };
         token = DEMO_USERS.host.token;
-        
+
         setStatusModal({
           isOpen: true,
           type: "success",
@@ -1532,7 +1537,7 @@ export const Navbar = () => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
-            {/* Logo - Left */}
+            {/* Logo - Left - Updated with INYUMBA text */}
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -1540,8 +1545,16 @@ export const Navbar = () => {
               onClick={() => navigateTo("/")}
             >
               <div className="text-[#FF385C]">
-                <InyumbaLogo className="h-12 w-12 sm:h-12 sm:w-12" />
+                <InyumbaLogo className="h-10 w-10 sm:h-12 sm:w-12" />
               </div>
+              {/* INYUMBA text - visible on all screen sizes with responsive font sizes */}
+              <span className="font-bold text-[#1B4E91] tracking-tight hidden sm:inline text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl">
+                INYUMBA
+              </span>
+              {/* For very small screens, show abbreviated version */}
+              <span className="font-bold text-[#1B4E91] tracking-tight sm:hidden text-sm">
+                INYUMBA
+              </span>
             </motion.div>
 
             {/* Main Navigation - Using Link from react-router-dom */}
