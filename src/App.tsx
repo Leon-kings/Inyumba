@@ -1274,7 +1274,7 @@ export default function App() {
         />
 
         <Route path="/404" element={<NotFound />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       {!isDashboardRoute && <Footer />}
     </div>

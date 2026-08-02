@@ -6,6 +6,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import Cookies from 'js-cookie';
+import axios from 'axios';
 
 // Material-UI Icons
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -27,6 +28,9 @@ import SendIcon from "@mui/icons-material/Send";
 import EmailIcon from "@mui/icons-material/Email";
 import PersonIcon from "@mui/icons-material/Person";
 import ChatIcon from "@mui/icons-material/Chat";
+
+// API endpoint - replace with your actual API URL
+const API_URL = 'http://localhost:5000/api/contact';
 
 // Translations
 const translations = {
@@ -66,6 +70,18 @@ const translations = {
     relatedQuestions: "Related Questions",
     showAnswer: "Show Answer",
     hideAnswer: "Hide Answer",
+    contactTitle: "Contact Us",
+    contactDesc: "Fill out the form below and we'll get back to you within 24 hours.",
+    subject: "Subject",
+    yourMessage: "Your Message",
+    sendMessage: "Send Message",
+    sending: "Sending...",
+    messageRequired: "Message is required",
+    messageMin: "Message must be at least 10 characters",
+    subjectRequired: "Subject is required",
+    subjectMin: "Subject must be at least 3 characters",
+    successContact: "Message sent successfully! We'll respond within 24 hours.",
+    errorContact: "Failed to send message. Please try again.",
   },
   fr: {
     faq: "Foire Aux Questions",
@@ -105,6 +121,18 @@ const translations = {
     relatedQuestions: "Questions Similaires",
     showAnswer: "Voir la Réponse",
     hideAnswer: "Cacher la Réponse",
+    contactTitle: "Contactez-Nous",
+    contactDesc: "Remplissez le formulaire ci-dessous et nous vous répondrons dans les 24 heures.",
+    subject: "Sujet",
+    yourMessage: "Votre Message",
+    sendMessage: "Envoyer le Message",
+    sending: "Envoi en cours...",
+    messageRequired: "Le message est requis",
+    messageMin: "Le message doit contenir au moins 10 caractères",
+    subjectRequired: "Le sujet est requis",
+    subjectMin: "Le sujet doit contenir au moins 3 caractères",
+    successContact: "Message envoyé avec succès ! Nous répondrons dans les 24 heures.",
+    errorContact: "Échec de l'envoi du message. Veuillez réessayer.",
   },
   rw: {
     faq: "Ibibazo Bikunze Kubazwa",
@@ -140,6 +168,18 @@ const translations = {
     relatedQuestions: "Ibibazo Bisa",
     showAnswer: "Reba Igisubizo",
     hideAnswer: "Hisha Igisubizo",
+    contactTitle: "Twandikire",
+    contactDesc: "Uzura uru rupapuro maze tuzagusubiza mu masaha 24.",
+    subject: "Ikibazo",
+    yourMessage: "Ubutumwa Bwawe",
+    sendMessage: "Ohereza Ubutumwa",
+    sending: "Biremereza...",
+    messageRequired: "Ubutumwa burasabwa",
+    messageMin: "Ubutumwa bugomba kuba nibura inyuguti 10",
+    subjectRequired: "Ikibazo girasabwa",
+    subjectMin: "Ikibazo kigomba kuba nibura inyuguti 3",
+    successContact: "Ubutumwa bwoherejwe neza! Tuzagusubiza mu masaha 24.",
+    errorContact: "Ubutumwa ntabwo bwoherejwe. Ongera ugerageze.",
   },
 };
 
@@ -166,8 +206,9 @@ export const FAQ: React.FC = () => {
   >("all");
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [isAskModalOpen, setIsAskModalOpen] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
-  // Form state
+  // Form state for Ask Question
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -184,6 +225,26 @@ export const FAQ: React.FC = () => {
     question?: string;
   }>({});
 
+  // Form state for Contact
+  const [contactFormData, setContactFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+  const [isContactSubmitting, setIsContactSubmitting] = useState(false);
+  const [isContactFormValid, setIsContactFormValid] = useState(false);
+  const [isContactNameValid, setIsContactNameValid] = useState<boolean | null>(null);
+  const [isContactEmailValid, setIsContactEmailValid] = useState<boolean | null>(null);
+  const [isSubjectValid, setIsSubjectValid] = useState<boolean | null>(null);
+  const [isMessageValid, setIsMessageValid] = useState<boolean | null>(null);
+  const [contactErrors, setContactErrors] = useState<{
+    name?: string;
+    email?: string;
+    subject?: string;
+    message?: string;
+  }>({});
+
   const t = translations[lang];
 
   // Listen for language changes in cookies
@@ -195,12 +256,11 @@ export const FAQ: React.FC = () => {
       }
     };
 
-    // Check for cookie changes every second (polling)
     const interval = setInterval(handleCookieChange, 1000);
     return () => clearInterval(interval);
   }, [lang]);
 
-  // Validate form on change
+  // Validate Ask Question form on change
   useEffect(() => {
     const nameValid = formData.name.length >= 2;
     const emailValid = validateEmail(formData.email);
@@ -224,6 +284,35 @@ export const FAQ: React.FC = () => {
     }
   }, [formData.name, formData.email, formData.question]);
 
+  // Validate Contact form on change
+  useEffect(() => {
+    const nameValid = contactFormData.name.length >= 2;
+    const emailValid = validateEmail(contactFormData.email);
+    const subjectValid = contactFormData.subject.length >= 3;
+    const messageValid = contactFormData.message.length >= 10;
+
+    setIsContactNameValid(contactFormData.name.length > 0 ? nameValid : null);
+    setIsContactEmailValid(contactFormData.email.length > 0 ? emailValid : null);
+    setIsSubjectValid(contactFormData.subject.length > 0 ? subjectValid : null);
+    setIsMessageValid(contactFormData.message.length > 0 ? messageValid : null);
+
+    const valid = nameValid && emailValid && subjectValid && messageValid;
+    setIsContactFormValid(valid);
+
+    if (nameValid && contactErrors.name) {
+      setContactErrors((prev) => ({ ...prev, name: undefined }));
+    }
+    if (emailValid && contactErrors.email) {
+      setContactErrors((prev) => ({ ...prev, email: undefined }));
+    }
+    if (subjectValid && contactErrors.subject) {
+      setContactErrors((prev) => ({ ...prev, subject: undefined }));
+    }
+    if (messageValid && contactErrors.message) {
+      setContactErrors((prev) => ({ ...prev, message: undefined }));
+    }
+  }, [contactFormData]);
+
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -234,6 +323,13 @@ export const FAQ: React.FC = () => {
   ) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleContactInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setContactFormData({ ...contactFormData, [name]: value });
   };
 
   const validateForm = (): boolean => {
@@ -257,6 +353,31 @@ export const FAQ: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const validateContactForm = (): boolean => {
+    const newErrors: { name?: string; email?: string; subject?: string; message?: string } = {};
+
+    if (!contactFormData.name || contactFormData.name.length < 2) {
+      newErrors.name = t.nameMin;
+    }
+
+    if (!contactFormData.email) {
+      newErrors.email = t.emailRequired;
+    } else if (!validateEmail(contactFormData.email)) {
+      newErrors.email = t.emailInvalid;
+    }
+
+    if (!contactFormData.subject || contactFormData.subject.length < 3) {
+      newErrors.subject = t.subjectMin;
+    }
+
+    if (!contactFormData.message || contactFormData.message.length < 10) {
+      newErrors.message = t.messageMin;
+    }
+
+    setContactErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -277,6 +398,60 @@ export const FAQ: React.FC = () => {
       setIsFormValid(false);
       setIsAskModalOpen(false);
     }, 1500);
+  };
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateContactForm()) {
+      toast.error("Please fix the errors before submitting.");
+      return;
+    }
+
+    setIsContactSubmitting(true);
+
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', contactFormData.name);
+      formDataToSend.append('email', contactFormData.email);
+      formDataToSend.append('subject', contactFormData.subject);
+      formDataToSend.append('message', contactFormData.message);
+      formDataToSend.append('language', lang);
+
+      const response = await axios.post(API_URL, formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        timeout: 30000,
+      });
+
+      if (response.status === 200 || response.status === 201) {
+        toast.success(t.successContact);
+        
+        setContactFormData({ name: "", email: "", subject: "", message: "" });
+        setIsContactNameValid(null);
+        setIsContactEmailValid(null);
+        setIsSubjectValid(null);
+        setIsMessageValid(null);
+        setIsContactFormValid(false);
+        setIsContactModalOpen(false);
+      } else {
+        throw new Error('Failed to send message');
+      }
+    } catch (error: any) {
+      console.error('Error sending contact message:', error);
+      
+      if (error.response) {
+        const errorMessage = error.response.data?.message || t.errorContact;
+        toast.error(errorMessage);
+      } else if (error.request) {
+        toast.error('Network error. Please check your internet connection.');
+      } else {
+        toast.error(t.errorContact);
+      }
+    } finally {
+      setIsContactSubmitting(false);
+    }
   };
 
   const faqData: FAQItem[] = [
@@ -750,6 +925,7 @@ export const FAQ: React.FC = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => setIsContactModalOpen(true)}
                 className="px-6 py-3 border-2 border-[#FF385C] text-[#FF385C] rounded-xl font-medium hover:bg-[#FF385C] hover:text-white transition-colors flex items-center gap-2"
               >
                 <EmailIcon className="w-5 h-5" />
@@ -974,7 +1150,230 @@ export const FAQ: React.FC = () => {
           </>
         )}
       </AnimatePresence>
+
+      {/* Contact Modal - Without Image Upload */}
+      <AnimatePresence>
+        {isContactModalOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[600]"
+              onClick={() => setIsContactModalOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="fixed inset-2 xs:inset-4 z-[601] flex items-center justify-center"
+            >
+              <div className="bg-white rounded-xl xs:rounded-2xl w-full max-w-2xl max-h-[95vh] xs:max-h-[90vh] overflow-hidden shadow-2xl">
+                {/* Modal Header */}
+                <div className="sticky top-0 bg-white border-b border-gray-200 p-4 xs:p-6 flex items-center justify-between z-10">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-[#FF385C]/10 rounded-full flex items-center justify-center text-[#FF385C]">
+                      <EmailIcon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg xs:text-xl font-bold text-gray-900">
+                        {t.contactTitle}
+                      </h3>
+                      <p className="text-xs text-gray-500">
+                        {t.contactDesc}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setIsContactModalOpen(false)}
+                    className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  >
+                    <CloseIcon className="w-5 h-5 text-gray-600" />
+                  </button>
+                </div>
+
+                {/* Modal Content */}
+                <div className="p-4 xs:p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+                  <form onSubmit={handleContactSubmit} className="space-y-4" noValidate>
+                    {/* Name Field */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        {t.yourName} <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                          <PersonIcon className="w-5 h-5" />
+                        </div>
+                        <input
+                          type="text"
+                          name="name"
+                          value={contactFormData.name}
+                          onChange={handleContactInputChange}
+                          className={`w-full pl-10 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-1 transition-colors text-sm ${
+                            isContactNameValid === true
+                              ? "border-green-500 focus:border-green-500 focus:ring-green-500"
+                              : isContactNameValid === false
+                                ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                                : "border-gray-300 focus:border-[#FF385C] focus:ring-[#FF385C]"
+                          }`}
+                          placeholder="John Doe"
+                        />
+                        {isContactNameValid === true && (
+                          <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+                        )}
+                        {isContactNameValid === false && (
+                          <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+                        )}
+                      </div>
+                      {contactErrors.name && (
+                        <p className="text-xs text-red-500 mt-1">{contactErrors.name}</p>
+                      )}
+                    </div>
+
+                    {/* Email Field */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        {t.yourEmail} <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                          <EmailIcon className="w-5 h-5" />
+                        </div>
+                        <input
+                          type="email"
+                          name="email"
+                          value={contactFormData.email}
+                          onChange={handleContactInputChange}
+                          className={`w-full pl-10 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-1 transition-colors text-sm ${
+                            isContactEmailValid === true
+                              ? "border-green-500 focus:border-green-500 focus:ring-green-500"
+                              : isContactEmailValid === false
+                                ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                                : "border-gray-300 focus:border-[#FF385C] focus:ring-[#FF385C]"
+                          }`}
+                          placeholder="you@example.com"
+                        />
+                        {isContactEmailValid === true && (
+                          <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+                        )}
+                        {isContactEmailValid === false && (
+                          <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+                        )}
+                      </div>
+                      {contactErrors.email && (
+                        <p className="text-xs text-red-500 mt-1">{contactErrors.email}</p>
+                      )}
+                    </div>
+
+                    {/* Subject Field */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        {t.subject} <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          name="subject"
+                          value={contactFormData.subject}
+                          onChange={handleContactInputChange}
+                          className={`w-full pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-1 transition-colors text-sm px-4 ${
+                            isSubjectValid === true
+                              ? "border-green-500 focus:border-green-500 focus:ring-green-500"
+                              : isSubjectValid === false
+                                ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                                : "border-gray-300 focus:border-[#FF385C] focus:ring-[#FF385C]"
+                          }`}
+                          placeholder="Subject of your message"
+                        />
+                        {isSubjectValid === true && (
+                          <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+                        )}
+                        {isSubjectValid === false && (
+                          <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+                        )}
+                      </div>
+                      {contactErrors.subject && (
+                        <p className="text-xs text-red-500 mt-1">{contactErrors.subject}</p>
+                      )}
+                    </div>
+
+                    {/* Message Field */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        {t.yourMessage} <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <textarea
+                          name="message"
+                          value={contactFormData.message}
+                          onChange={handleContactInputChange}
+                          rows={4}
+                          className={`w-full pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-1 transition-colors text-sm resize-none px-4 ${
+                            isMessageValid === true
+                              ? "border-green-500 focus:border-green-500 focus:ring-green-500"
+                              : isMessageValid === false
+                                ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                                : "border-gray-300 focus:border-[#FF385C] focus:ring-[#FF385C]"
+                          }`}
+                          placeholder="Describe your inquiry or request in detail..."
+                        />
+                        <div className="absolute right-3 top-3">
+                          {isMessageValid === true && (
+                            <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                          )}
+                          {isMessageValid === false && (
+                            <CancelIcon className="w-5 h-5 text-red-500" />
+                          )}
+                        </div>
+                      </div>
+                      {contactErrors.message && (
+                        <p className="text-xs text-red-500 mt-1">{contactErrors.message}</p>
+                      )}
+                      <p className="text-xs text-gray-400 mt-1">
+                        {contactFormData.message.length}/10 characters minimum
+                      </p>
+                    </div>
+
+                    {/* Submit Button */}
+                    <motion.button
+                      whileHover={{ scale: isContactFormValid ? 1.02 : 1 }}
+                      whileTap={{ scale: isContactFormValid ? 0.98 : 1 }}
+                      type="submit"
+                      disabled={!isContactFormValid || isContactSubmitting}
+                      className={`w-full py-3 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+                        isContactFormValid && !isContactSubmitting
+                          ? "bg-[#FF385C] text-white hover:bg-[#E31C5F] shadow-lg shadow-[#FF385C]/30 cursor-pointer"
+                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      }`}
+                    >
+                      {isContactSubmitting ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          {t.sending}
+                        </>
+                      ) : (
+                        <>
+                          <SendIcon className="w-5 h-5" />
+                          {t.sendMessage}
+                        </>
+                      )}
+                    </motion.button>
+
+                    {!isContactFormValid &&
+                      Object.keys(contactFormData).some(
+                        (key) => contactFormData[key as keyof typeof contactFormData].length > 0,
+                      ) && (
+                        <p className="text-center text-xs text-amber-500">
+                          Please fill in all fields correctly to enable submit
+                        </p>
+                      )}
+                  </form>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
-
