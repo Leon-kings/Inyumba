@@ -1,28 +1,28 @@
 /* eslint-disable react-hooks/immutability */
 /* eslint-disable react-hooks/set-state-in-effect */
- 
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { toast } from 'react-toastify';
-import Cookies from 'js-cookie';
+
+import React, { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 
 // Material-UI Icons
-import StarIcon from '@mui/icons-material/Star';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
-import StarHalfIcon from '@mui/icons-material/StarHalf';
-import SchoolIcon from '@mui/icons-material/School';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import VerifiedIcon from '@mui/icons-material/Verified';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import HomeIcon from '@mui/icons-material/Home';
-import RateReviewIcon from '@mui/icons-material/RateReview';
-import CloseIcon from '@mui/icons-material/Close';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import PauseIcon from '@mui/icons-material/Pause';
+import StarIcon from "@mui/icons-material/Star";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
+import StarHalfIcon from "@mui/icons-material/StarHalf";
+import SchoolIcon from "@mui/icons-material/School";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import VerifiedIcon from "@mui/icons-material/Verified";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import HomeIcon from "@mui/icons-material/Home";
+import RateReviewIcon from "@mui/icons-material/RateReview";
+import CloseIcon from "@mui/icons-material/Close";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
+import ThumbDownIcon from "@mui/icons-material/ThumbDown";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import PauseIcon from "@mui/icons-material/Pause";
 
 interface Testimonial {
   id: number;
@@ -42,101 +42,108 @@ interface Testimonial {
 
 const translations = {
   en: {
-    title: 'Student Testimonials',
-    subtitle: 'Real Stories from Students Who Found Their Perfect Home',
-    description: 'Hear from students across Rwanda who found safe, affordable, and comfortable housing through INYUMBA PROJECT.',
-    verified: 'Verified Student',
-    rating: 'Rating',
-    helpful: 'Helpful',
-    notHelpful: 'Not Helpful',
-    readMore: 'Read Full Review',
-    showLess: 'Show Less',
-    from: 'Student at',
-    stayed: 'Stayed at',
-    months: 'months',
-    shareExperience: 'Share Your Experience',
-    shareDesc: 'Have you found your home through INYUMBA PROJECT? Share your story and help other students!',
-    writeReview: 'Write a Review',
-    noTestimonials: 'No testimonials found',
-    filterBy: 'Filter by University',
-    allUniversities: 'All Universities',
-    sortBy: 'Sort by',
-    newest: 'Newest First',
-    oldest: 'Oldest First',
-    highestRated: 'Highest Rated',
-    lowestRated: 'Lowest Rated',
-    averageRating: 'Average Rating',
-    totalReviews: 'Total Reviews',
-    verifiedReview: 'Verified Review',
-    studentReview: 'Student Review',
-    featured: 'Featured Review',
-    pause: 'Pause',
-    play: 'Play',
+    title: "Student Testimonials",
+    subtitle: "Real Stories from Students Who Found Their Perfect Home",
+    description:
+      "Hear from students across Rwanda who found safe, affordable, and comfortable housing through INYUMBA PROJECT.",
+    verified: "Verified Student",
+    rating: "Rating",
+    helpful: "Helpful",
+    notHelpful: "Not Helpful",
+    readMore: "Read Full Review",
+    showLess: "Show Less",
+    from: "Student at",
+    stayed: "Stayed at",
+    months: "months",
+    shareExperience: "Share Your Experience",
+    shareDesc:
+      "Have you found your home through INYUMBA PROJECT? Share your story and help other students!",
+    writeReview: "Write a Review",
+    noTestimonials: "No testimonials found",
+    filterBy: "Filter by University",
+    allUniversities: "All Universities",
+    sortBy: "Sort by",
+    newest: "Newest First",
+    oldest: "Oldest First",
+    highestRated: "Highest Rated",
+    lowestRated: "Lowest Rated",
+    averageRating: "Average Rating",
+    totalReviews: "Total Reviews",
+    verifiedReview: "Verified Review",
+    studentReview: "Student Review",
+    featured: "Featured Review",
+    pause: "Pause",
+    play: "Play",
   },
   fr: {
-    title: 'Témoignages d\'Étudiants',
-    subtitle: 'Des Histoires Vraies d\'Étudiants Qui Ont Trouvé Leur Logement Parfait',
-    description: 'Écoutez les étudiants à travers le Rwanda qui ont trouvé un logement sûr, abordable et confortable grâce à INYUMBA PROJECT.',
-    verified: 'Étudiant Vérifié',
-    rating: 'Évaluation',
-    helpful: 'Utile',
-    notHelpful: 'Pas Utile',
-    readMore: 'Lire l\'Avis Complet',
-    showLess: 'Voir Moins',
-    from: 'Étudiant à',
-    stayed: 'A séjourné à',
-    months: 'mois',
-    shareExperience: 'Partagez Votre Expérience',
-    shareDesc: 'Avez-vous trouvé votre logement via INYUMBA PROJECT ? Partagez votre histoire et aidez d\'autres étudiants !',
-    writeReview: 'Écrire un Avis',
-    noTestimonials: 'Aucun témoignage trouvé',
-    filterBy: 'Filtrer par Université',
-    allUniversities: 'Toutes les Universités',
-    sortBy: 'Trier par',
-    newest: 'Plus Récents',
-    oldest: 'Plus Anciens',
-    highestRated: 'Mieux Notés',
-    lowestRated: 'Moins Bien Notés',
-    averageRating: 'Évaluation Moyenne',
-    totalReviews: 'Avis Totaux',
-    verifiedReview: 'Avis Vérifié',
-    studentReview: 'Avis d\'Étudiant',
-    featured: 'Avis en Vedette',
-    pause: 'Pause',
-    play: 'Lecture',
+    title: "Témoignages d'Étudiants",
+    subtitle:
+      "Des Histoires Vraies d'Étudiants Qui Ont Trouvé Leur Logement Parfait",
+    description:
+      "Écoutez les étudiants à travers le Rwanda qui ont trouvé un logement sûr, abordable et confortable grâce à INYUMBA PROJECT.",
+    verified: "Étudiant Vérifié",
+    rating: "Évaluation",
+    helpful: "Utile",
+    notHelpful: "Pas Utile",
+    readMore: "Lire l'Avis Complet",
+    showLess: "Voir Moins",
+    from: "Étudiant à",
+    stayed: "A séjourné à",
+    months: "mois",
+    shareExperience: "Partagez Votre Expérience",
+    shareDesc:
+      "Avez-vous trouvé votre logement via INYUMBA PROJECT ? Partagez votre histoire et aidez d'autres étudiants !",
+    writeReview: "Écrire un Avis",
+    noTestimonials: "Aucun témoignage trouvé",
+    filterBy: "Filtrer par Université",
+    allUniversities: "Toutes les Universités",
+    sortBy: "Trier par",
+    newest: "Plus Récents",
+    oldest: "Plus Anciens",
+    highestRated: "Mieux Notés",
+    lowestRated: "Moins Bien Notés",
+    averageRating: "Évaluation Moyenne",
+    totalReviews: "Avis Totaux",
+    verifiedReview: "Avis Vérifié",
+    studentReview: "Avis d'Étudiant",
+    featured: "Avis en Vedette",
+    pause: "Pause",
+    play: "Lecture",
   },
   rw: {
-    title: 'Ibyo Abanyeshuri Bavuga',
-    subtitle: 'Inkuru Nyabyo Z\'abanyeshuri Babonye Inzu Nziza',
-    description: 'Umu abanyeshuri bo mu Rwanda babonye amazu meza, afite umutekano, kandi ari buhendutse binyuze muri INYUMBA PROJECT.',
-    verified: 'Umunyeshuri Umejwe',
-    rating: 'Igipimo',
-    helpful: 'Byagufashije',
-    notHelpful: 'Ntabwo byagufashije',
-    readMore: 'Soma Byinshi',
-    showLess: 'Garagaza Bike',
-    from: 'Umunyeshuri i',
-    stayed: 'Yabaye i',
-    months: 'amezi',
-    shareExperience: 'Tanga Ubuhamya Bwawe',
-    shareDesc: 'Wabonye inzu yawe binyuze muri INYUMBA PROJECT? Tanga ubuhamya bwawe ugafasha abandi banyeshuri!',
-    writeReview: 'Andika Ubuhamya',
-    noTestimonials: 'Nta buhamya buboneka',
-    filterBy: 'Hitamo Kaminuza',
-    allUniversities: 'Kaminuza Zose',
-    sortBy: 'Hitamo Uburyo',
-    newest: 'Zishya',
-    oldest: 'Zishaje',
-    highestRated: 'Zifite Igipimo Cyinshi',
-    lowestRated: 'Zifite Igipimo Gito',
-    averageRating: 'Igipimo Rusange',
-    totalReviews: 'Ubuso Bw\'ubuhamya',
-    verifiedReview: 'Ubuhamya Bwemejwe',
-    studentReview: 'Ubuhamya Bw\'umunyeshuri',
-    featured: 'Ubuhamya Bw\'umwimerere',
-    pause: 'Hagarika',
-    play: 'Kora',
-  }
+    title: "Ibyo Abanyeshuri Bavuga",
+    subtitle: "Inkuru Nyabyo Z'abanyeshuri Babonye Inzu Nziza",
+    description:
+      "Umu abanyeshuri bo mu Rwanda babonye amazu meza, afite umutekano, kandi ari buhendutse binyuze muri INYUMBA PROJECT.",
+    verified: "Umunyeshuri Umejwe",
+    rating: "Igipimo",
+    helpful: "Byagufashije",
+    notHelpful: "Ntabwo byagufashije",
+    readMore: "Soma Byinshi",
+    showLess: "Garagaza Bike",
+    from: "Umunyeshuri i",
+    stayed: "Yabaye i",
+    months: "amezi",
+    shareExperience: "Tanga Ubuhamya Bwawe",
+    shareDesc:
+      "Wabonye inzu yawe binyuze muri INYUMBA PROJECT? Tanga ubuhamya bwawe ugafasha abandi banyeshuri!",
+    writeReview: "Andika Ubuhamya",
+    noTestimonials: "Nta buhamya buboneka",
+    filterBy: "Hitamo Kaminuza",
+    allUniversities: "Kaminuza Zose",
+    sortBy: "Hitamo Uburyo",
+    newest: "Zishya",
+    oldest: "Zishaje",
+    highestRated: "Zifite Igipimo Cyinshi",
+    lowestRated: "Zifite Igipimo Gito",
+    averageRating: "Igipimo Rusange",
+    totalReviews: "Ubuso Bw'ubuhamya",
+    verifiedReview: "Ubuhamya Bwemejwe",
+    studentReview: "Ubuhamya Bw'umunyeshuri",
+    featured: "Ubuhamya Bw'umwimerere",
+    pause: "Hagarika",
+    play: "Kora",
+  },
 };
 
 // Sample testimonials data
@@ -149,12 +156,14 @@ const testimonialsData: Testimonial[] = [
     rating: 5,
     date: "2024-01-15",
     title: "Perfect Location Near Campus",
-    content: "I found an amazing house just 5 minutes walk from INES-Ruhengeri. The landlord was very welcoming and the price was affordable. The house has everything I need - WiFi, kitchen, and a comfortable study area. I'm really grateful to INYUMBA PROJECT for making this possible.",
-    image: "https://ui-avatars.com/api/?name=Jean+Paul+Mugisha&size=100&background=FF385C&color=fff&font-size=0.5",
+    content:
+      "I found an amazing house just 5 minutes walk from INES-Ruhengeri. The landlord was very welcoming and the price was affordable. The house has everything I need - WiFi, kitchen, and a comfortable study area. I'm really grateful to INYUMBA PROJECT for making this possible.",
+    image:
+      "https://ui-avatars.com/api/?name=Jean+Paul+Mugisha&size=100&background=FF385C&color=fff&font-size=0.5",
     verified: true,
     helpful: 45,
     notHelpful: 2,
-    houseName: "INES Ruhengeri Student Lodge"
+    houseName: "INES Ruhengeri Student Lodge",
   },
   {
     id: 2,
@@ -164,12 +173,14 @@ const testimonialsData: Testimonial[] = [
     rating: 5,
     date: "2024-01-10",
     title: "Safe and Comfortable Living",
-    content: "Finding accommodation near UR-CAVM was a challenge until I discovered INYUMBA PROJECT. I found a beautiful apartment with security, parking, and a garden. The booking process was simple and the landlord is very responsive. I highly recommend this platform to all students.",
-    image: "https://ui-avatars.com/api/?name=Marie+Claire+Uwimana&size=100&background=FF6B6B&color=fff&font-size=0.5",
+    content:
+      "Finding accommodation near UR-CAVM was a challenge until I discovered INYUMBA PROJECT. I found a beautiful apartment with security, parking, and a garden. The booking process was simple and the landlord is very responsive. I highly recommend this platform to all students.",
+    image:
+      "https://ui-avatars.com/api/?name=Marie+Claire+Uwimana&size=100&background=FF6B6B&color=fff&font-size=0.5",
     verified: true,
     helpful: 38,
     notHelpful: 1,
-    houseName: "UR-CAVM Student Village"
+    houseName: "UR-CAVM Student Village",
   },
   {
     id: 3,
@@ -179,12 +190,14 @@ const testimonialsData: Testimonial[] = [
     rating: 4,
     date: "2023-12-20",
     title: "Great Value for Money",
-    content: "I was looking for affordable housing near UR-Huye and INYUMBA PROJECT delivered. The house is spacious, clean, and close to campus. The MOMO payment system is very convenient. I've been living here for 6 months and I'm very satisfied.",
-    image: "https://ui-avatars.com/api/?name=David+Niyonzima&size=100&background=4ECDC4&color=fff&font-size=0.5",
+    content:
+      "I was looking for affordable housing near UR-Huye and INYUMBA PROJECT delivered. The house is spacious, clean, and close to campus. The MOMO payment system is very convenient. I've been living here for 6 months and I'm very satisfied.",
+    image:
+      "https://ui-avatars.com/api/?name=David+Niyonzima&size=100&background=4ECDC4&color=fff&font-size=0.5",
     verified: true,
     helpful: 32,
     notHelpful: 3,
-    houseName: "UR Huye Student Flats"
+    houseName: "UR Huye Student Flats",
   },
   {
     id: 4,
@@ -194,12 +207,14 @@ const testimonialsData: Testimonial[] = [
     rating: 5,
     date: "2023-12-05",
     title: "Best Decision I Made",
-    content: "Moving to Kigali for university was stressful, but INYUMBA PROJECT made finding a house easy. I found a modern apartment with all amenities near campus. The support team was very helpful throughout the process. I couldn't be happier!",
-    image: "https://ui-avatars.com/api/?name=Grace+Uwase&size=100&background=FFB347&color=fff&font-size=0.5",
+    content:
+      "Moving to Kigali for university was stressful, but INYUMBA PROJECT made finding a house easy. I found a modern apartment with all amenities near campus. The support team was very helpful throughout the process. I couldn't be happier!",
+    image:
+      "https://ui-avatars.com/api/?name=Grace+Uwase&size=100&background=FFB347&color=fff&font-size=0.5",
     verified: true,
     helpful: 56,
     notHelpful: 4,
-    houseName: "Gasabo Student Apartments"
+    houseName: "Gasabo Student Apartments",
   },
   {
     id: 5,
@@ -209,12 +224,14 @@ const testimonialsData: Testimonial[] = [
     rating: 4,
     date: "2023-11-28",
     title: "Excellent Service",
-    content: "The platform is very user-friendly and the houses are exactly as described. I found a great room near IPRC Musanze with all the amenities I needed. The landlord is friendly and the rent is reasonable. I recommend INYUMBA PROJECT to all students.",
-    image: "https://ui-avatars.com/api/?name=Eric+Kamanzi&size=100&background=FF6B6B&color=fff&font-size=0.5",
+    content:
+      "The platform is very user-friendly and the houses are exactly as described. I found a great room near IPRC Musanze with all the amenities I needed. The landlord is friendly and the rent is reasonable. I recommend INYUMBA PROJECT to all students.",
+    image:
+      "https://ui-avatars.com/api/?name=Eric+Kamanzi&size=100&background=FF6B6B&color=fff&font-size=0.5",
     verified: true,
     helpful: 28,
     notHelpful: 2,
-    houseName: "IPRC Musanze Hostel"
+    houseName: "IPRC Musanze Hostel",
   },
   {
     id: 6,
@@ -224,12 +241,14 @@ const testimonialsData: Testimonial[] = [
     rating: 5,
     date: "2023-11-15",
     title: "Amazing Experience",
-    content: "I was worried about finding accommodation in Kigali, but INYUMBA PROJECT connected me with a wonderful landlord. The house is comfortable, secure, and close to university. The payment process was smooth and the support team was always available.",
-    image: "https://ui-avatars.com/api/?name=Aline+Mukamana&size=100&background=4ECDC4&color=fff&font-size=0.5",
+    content:
+      "I was worried about finding accommodation in Kigali, but INYUMBA PROJECT connected me with a wonderful landlord. The house is comfortable, secure, and close to university. The payment process was smooth and the support team was always available.",
+    image:
+      "https://ui-avatars.com/api/?name=Aline+Mukamana&size=100&background=4ECDC4&color=fff&font-size=0.5",
     verified: true,
     helpful: 42,
     notHelpful: 1,
-    houseName: "Gisozi Student Lodge"
+    houseName: "Gisozi Student Lodge",
   },
   {
     id: 7,
@@ -239,12 +258,14 @@ const testimonialsData: Testimonial[] = [
     rating: 3,
     date: "2023-10-30",
     title: "Good Platform with Room for Improvement",
-    content: "Overall, INYUMBA PROJECT is a helpful platform. I found a house near UR-CST, but the communication with the landlord could be improved. The house itself is good and the price is fair. I hope the platform continues to grow and improve.",
-    image: "https://ui-avatars.com/api/?name=Pascal+Nzabonimpa&size=100&background=FFB347&color=fff&font-size=0.5",
+    content:
+      "Overall, INYUMBA PROJECT is a helpful platform. I found a house near UR-CST, but the communication with the landlord could be improved. The house itself is good and the price is fair. I hope the platform continues to grow and improve.",
+    image:
+      "https://ui-avatars.com/api/?name=Pascal+Nzabonimpa&size=100&background=FFB347&color=fff&font-size=0.5",
     verified: true,
     helpful: 15,
     notHelpful: 8,
-    houseName: "Nyarugenge Student Apartments"
+    houseName: "Nyarugenge Student Apartments",
   },
   {
     id: 8,
@@ -254,12 +275,14 @@ const testimonialsData: Testimonial[] = [
     rating: 5,
     date: "2023-10-20",
     title: "Godsend for Students",
-    content: "INYUMBA PROJECT is a godsend for students looking for housing. I found a beautiful apartment near AUCA with all the amenities I needed. The landlord is kind and the environment is safe. I'm so grateful for this platform.",
-    image: "https://ui-avatars.com/api/?name=Jeanne+d%27Arc+Uwimana&size=100&background=FF385C&color=fff&font-size=0.5",
+    content:
+      "INYUMBA PROJECT is a godsend for students looking for housing. I found a beautiful apartment near AUCA with all the amenities I needed. The landlord is kind and the environment is safe. I'm so grateful for this platform.",
+    image:
+      "https://ui-avatars.com/api/?name=Jeanne+d%27Arc+Uwimana&size=100&background=FF385C&color=fff&font-size=0.5",
     verified: true,
     helpful: 51,
     notHelpful: 2,
-    houseName: "Ndera Student Village"
+    houseName: "Ndera Student Village",
   },
   {
     id: 9,
@@ -269,31 +292,37 @@ const testimonialsData: Testimonial[] = [
     rating: 4,
     date: "2023-10-10",
     title: "Great Location near Lake Kivu",
-    content: "I found a wonderful house near Lake Kivu through INYUMBA PROJECT. The view is amazing and the house is well-maintained. The platform made it easy to connect with the landlord and the booking process was smooth. Highly recommended!",
-    image: "https://ui-avatars.com/api/?name=Olivier+Niyitanga&size=100&background=4ECDC4&color=fff&font-size=0.5",
+    content:
+      "I found a wonderful house near Lake Kivu through INYUMBA PROJECT. The view is amazing and the house is well-maintained. The platform made it easy to connect with the landlord and the booking process was smooth. Highly recommended!",
+    image:
+      "https://ui-avatars.com/api/?name=Olivier+Niyitanga&size=100&background=4ECDC4&color=fff&font-size=0.5",
     verified: true,
     helpful: 27,
     notHelpful: 3,
-    houseName: "Gisenyi Student House"
-  }
+    houseName: "Gisenyi Student House",
+  },
 ];
 
 // Helper function to get language from cookies
-const getLanguageFromCookies = (): 'en' | 'fr' | 'rw' => {
-  const lang = Cookies.get('language') as 'en' | 'fr' | 'rw';
-  return lang || 'en';
+const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
+  const lang = Cookies.get("language") as "en" | "fr" | "rw";
+  return lang || "en";
 };
 
 export const Testimonials: React.FC = () => {
   // Get language from cookies
-  const [lang, setLang] = useState<'en' | 'fr' | 'rw'>(getLanguageFromCookies());
-  const [filteredTestimonials, setFilteredTestimonials] = useState<Testimonial[]>(testimonialsData);
-  const [selectedUniversity, setSelectedUniversity] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<string>('newest');
- 
-  const [selectedTestimonial, setSelectedTestimonial] = useState<Testimonial | null>(null);
+  const [lang, setLang] = useState<"en" | "fr" | "rw">(
+    getLanguageFromCookies(),
+  );
+  const [filteredTestimonials, setFilteredTestimonials] =
+    useState<Testimonial[]>(testimonialsData);
+  const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("newest");
+
+  const [selectedTestimonial, setSelectedTestimonial] =
+    useState<Testimonial | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   // Auto-slide states
   const [slideIndex, setSlideIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -303,7 +332,10 @@ export const Testimonials: React.FC = () => {
   const t = translations[lang];
 
   // Get unique universities
-  const universities = ['all', ...new Set(testimonialsData.map(t => t.university))];
+  const universities = [
+    "all",
+    ...new Set(testimonialsData.map((t) => t.university)),
+  ];
 
   // Listen for language changes in cookies
   useEffect(() => {
@@ -330,10 +362,10 @@ export const Testimonials: React.FC = () => {
         setItemsPerSlide(3);
       }
     };
-    
+
     handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Auto-slide effect
@@ -369,21 +401,25 @@ export const Testimonials: React.FC = () => {
   useEffect(() => {
     let filtered = [...testimonialsData];
 
-    if (selectedUniversity !== 'all') {
-      filtered = filtered.filter(t => t.university === selectedUniversity);
+    if (selectedUniversity !== "all") {
+      filtered = filtered.filter((t) => t.university === selectedUniversity);
     }
 
     switch (sortBy) {
-      case 'newest':
-        filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      case "newest":
+        filtered.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+        );
         break;
-      case 'oldest':
-        filtered.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      case "oldest":
+        filtered.sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+        );
         break;
-      case 'highest':
+      case "highest":
         filtered.sort((a, b) => b.rating - a.rating);
         break;
-      case 'lowest':
+      case "lowest":
         filtered.sort((a, b) => a.rating - b.rating);
         break;
       default:
@@ -395,8 +431,10 @@ export const Testimonials: React.FC = () => {
 
   // Calculate statistics
   const totalReviews = testimonialsData.length;
-  const averageRating = (testimonialsData.reduce((sum, t) => sum + t.rating, 0) / totalReviews).toFixed(1);
-  const fiveStarCount = testimonialsData.filter(t => t.rating === 5).length;
+  const averageRating = (
+    testimonialsData.reduce((sum, t) => sum + t.rating, 0) / totalReviews
+  ).toFixed(1);
+  const fiveStarCount = testimonialsData.filter((t) => t.rating === 5).length;
 
   const renderStars = (rating: number) => {
     const stars = [];
@@ -404,43 +442,54 @@ export const Testimonials: React.FC = () => {
     const hasHalfStar = rating % 1 !== 0;
 
     for (let i = 0; i < fullStars; i++) {
-      stars.push(<StarIcon key={`full-${i}`} className="w-4 h-4 text-yellow-400 fill-current" />);
+      stars.push(
+        <StarIcon
+          key={`full-${i}`}
+          className="w-4 h-4 text-yellow-400 fill-current"
+        />,
+      );
     }
 
     if (hasHalfStar) {
-      stars.push(<StarHalfIcon key="half" className="w-4 h-4 text-yellow-400 fill-current" />);
+      stars.push(
+        <StarHalfIcon
+          key="half"
+          className="w-4 h-4 text-yellow-400 fill-current"
+        />,
+      );
     }
 
     const remainingStars = 5 - stars.length;
     for (let i = 0; i < remainingStars; i++) {
-      stars.push(<StarBorderIcon key={`empty-${i}`} className="w-4 h-4 text-gray-300" />);
+      stars.push(
+        <StarBorderIcon key={`empty-${i}`} className="w-4 h-4 text-gray-300" />,
+      );
     }
 
     return stars;
   };
 
-
   const openModal = (testimonial: Testimonial) => {
     setSelectedTestimonial(testimonial);
     setIsModalOpen(true);
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
     setIsPlaying(false);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedTestimonial(null);
-    document.body.style.overflow = 'auto';
+    document.body.style.overflow = "auto";
     setIsPlaying(true);
   };
 
-  const handleHelpful = (id: number, type: 'helpful' | 'notHelpful') => {
-    const testimonial = testimonialsData.find(t => t.id === id);
+  const handleHelpful = (id: number, type: "helpful" | "notHelpful") => {
+    const testimonial = testimonialsData.find((t) => t.id === id);
     if (testimonial) {
-      if (type === 'helpful') {
-        toast.success('Thank you for your feedback! 👍');
+      if (type === "helpful") {
+        toast.success("Thank you for your feedback! 👍");
       } else {
-        toast.info('We appreciate your feedback');
+        toast.info("We appreciate your feedback");
       }
     }
   };
@@ -473,7 +522,7 @@ export const Testimonials: React.FC = () => {
   // Get current visible testimonials for auto-slide
   const visibleTestimonials = filteredTestimonials.slice(
     slideIndex,
-    slideIndex + itemsPerSlide
+    slideIndex + itemsPerSlide,
   );
 
   const totalSlides = Math.ceil(filteredTestimonials.length / itemsPerSlide);
@@ -496,7 +545,7 @@ export const Testimonials: React.FC = () => {
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
               className="inline-block bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 mb-6"
             >
               <span className="text-sm font-medium flex items-center gap-2">
@@ -513,8 +562,15 @@ export const Testimonials: React.FC = () => {
           </motion.div>
         </div>
         <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H0Z" fill="#F9FAFB" />
+          <svg
+            viewBox="0 0 1440 120"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H0Z"
+              fill="#F9FAFB"
+            />
           </svg>
         </div>
       </section>
@@ -524,19 +580,27 @@ export const Testimonials: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">
-              <p className="text-3xl font-bold text-[#FF385C]">{averageRating}</p>
+              <p className="text-3xl font-bold text-[#FF385C]">
+                {averageRating}
+              </p>
               <p className="text-sm text-gray-600">{t.averageRating}</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-[#FF385C]">{totalReviews}</p>
+              <p className="text-3xl font-bold text-[#FF385C]">
+                {totalReviews}
+              </p>
               <p className="text-sm text-gray-600">{t.totalReviews}</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-[#FF385C]">{fiveStarCount}</p>
+              <p className="text-3xl font-bold text-[#FF385C]">
+                {fiveStarCount}
+              </p>
               <p className="text-sm text-gray-600">5 {t.rating}</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-[#FF385C]">{Math.round((fiveStarCount / totalReviews) * 100)}%</p>
+              <p className="text-3xl font-bold text-[#FF385C]">
+                {Math.round((fiveStarCount / totalReviews) * 100)}%
+              </p>
               <p className="text-sm text-gray-600">Satisfaction</p>
             </div>
           </div>
@@ -569,7 +633,9 @@ export const Testimonials: React.FC = () => {
                     className="w-12 h-12 rounded-full border-2 border-[#FF385C]"
                   />
                   <div>
-                    <p className="font-semibold text-gray-900 text-sm">{testimonial.name}</p>
+                    <p className="font-semibold text-gray-900 text-sm">
+                      {testimonial.name}
+                    </p>
                     <div className="flex items-center gap-1 text-xs text-gray-500">
                       <SchoolIcon className="w-3 h-3" />
                       {testimonial.university}
@@ -582,7 +648,9 @@ export const Testimonials: React.FC = () => {
                 <div className="flex items-center gap-1 mb-2">
                   {renderStars(testimonial.rating)}
                 </div>
-                <p className="text-sm text-gray-600 line-clamp-3">{testimonial.content}</p>
+                <p className="text-sm text-gray-600 line-clamp-3">
+                  {testimonial.content}
+                </p>
                 <button
                   onClick={() => openModal(testimonial)}
                   className="mt-3 text-xs text-[#FF385C] font-medium hover:underline"
@@ -600,7 +668,9 @@ export const Testimonials: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
             <div className="flex flex-wrap gap-3 items-center">
-              <span className="text-sm font-medium text-gray-700">{t.filterBy}:</span>
+              <span className="text-sm font-medium text-gray-700">
+                {t.filterBy}:
+              </span>
               <select
                 value={selectedUniversity}
                 onChange={(e) => setSelectedUniversity(e.target.value)}
@@ -608,13 +678,15 @@ export const Testimonials: React.FC = () => {
               >
                 {universities.map((uni) => (
                   <option key={uni} value={uni}>
-                    {uni === 'all' ? t.allUniversities : uni}
+                    {uni === "all" ? t.allUniversities : uni}
                   </option>
                 ))}
               </select>
             </div>
             <div className="flex flex-wrap gap-3 items-center">
-              <span className="text-sm font-medium text-gray-700">{t.sortBy}:</span>
+              <span className="text-sm font-medium text-gray-700">
+                {t.sortBy}:
+              </span>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
@@ -686,8 +758,8 @@ export const Testimonials: React.FC = () => {
                       onClick={() => goToSlide(i * itemsPerSlide)}
                       className={`h-1.5 rounded-full transition-all duration-300 ${
                         isActive
-                          ? 'w-8 bg-[#FF385C]'
-                          : 'w-4 bg-gray-300 hover:bg-gray-400'
+                          ? "w-8 bg-[#FF385C]"
+                          : "w-4 bg-gray-300 hover:bg-gray-400"
                       }`}
                     />
                   );
@@ -705,10 +777,10 @@ export const Testimonials: React.FC = () => {
                     transition={{ duration: 0.5 }}
                     className={`grid gap-6 ${
                       itemsPerSlide === 1
-                        ? 'grid-cols-1'
+                        ? "grid-cols-1"
                         : itemsPerSlide === 2
-                        ? 'grid-cols-1 sm:grid-cols-2'
-                        : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+                          ? "grid-cols-1 sm:grid-cols-2"
+                          : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
                     }`}
                   >
                     {visibleTestimonials.map((testimonial, index) => (
@@ -729,7 +801,9 @@ export const Testimonials: React.FC = () => {
                               className="w-12 h-12 rounded-full border-2 border-gray-200"
                             />
                             <div>
-                              <p className="font-semibold text-gray-900 text-sm">{testimonial.name}</p>
+                              <p className="font-semibold text-gray-900 text-sm">
+                                {testimonial.name}
+                              </p>
                               <div className="flex items-center gap-1 text-xs text-gray-500">
                                 <SchoolIcon className="w-3 h-3" />
                                 {testimonial.university}
@@ -745,7 +819,9 @@ export const Testimonials: React.FC = () => {
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-1">
                             {renderStars(testimonial.rating)}
-                            <span className="text-xs text-gray-500 ml-1">({testimonial.rating})</span>
+                            <span className="text-xs text-gray-500 ml-1">
+                              ({testimonial.rating})
+                            </span>
                           </div>
                           <span className="text-xs text-gray-400">
                             <CalendarTodayIcon className="w-3 h-3 inline mr-1" />
@@ -757,7 +833,9 @@ export const Testimonials: React.FC = () => {
                         {testimonial.houseName && (
                           <div className="flex items-center gap-1 text-xs text-gray-500 mb-2">
                             <HomeIcon className="w-3 h-3" />
-                            <span>{t.stayed} {testimonial.houseName}</span>
+                            <span>
+                              {t.stayed} {testimonial.houseName}
+                            </span>
                           </div>
                         )}
 
@@ -777,14 +855,18 @@ export const Testimonials: React.FC = () => {
                         {/* Helpful buttons */}
                         <div className="flex items-center gap-4 pt-3 mt-3 border-t border-gray-100">
                           <button
-                            onClick={() => handleHelpful(testimonial.id, 'helpful')}
+                            onClick={() =>
+                              handleHelpful(testimonial.id, "helpful")
+                            }
                             className="flex items-center gap-1 text-xs text-gray-500 hover:text-green-500 transition-colors"
                           >
                             <ThumbUpIcon className="w-3.5 h-3.5" />
                             {testimonial.helpful}
                           </button>
                           <button
-                            onClick={() => handleHelpful(testimonial.id, 'notHelpful')}
+                            onClick={() =>
+                              handleHelpful(testimonial.id, "notHelpful")
+                            }
                             className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-500 transition-colors"
                           >
                             <ThumbDownIcon className="w-3.5 h-3.5" />
@@ -856,7 +938,9 @@ export const Testimonials: React.FC = () => {
                     />
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-bold text-gray-900">{selectedTestimonial.name}</h3>
+                        <h3 className="text-lg font-bold text-gray-900">
+                          {selectedTestimonial.name}
+                        </h3>
                         {selectedTestimonial.verified && (
                           <VerifiedIcon className="text-[#FF385C] w-4 h-4" />
                         )}
@@ -889,11 +973,14 @@ export const Testimonials: React.FC = () => {
                     </span>
                     <span className="text-xs text-gray-400 ml-auto">
                       <CalendarTodayIcon className="w-3 h-3 inline mr-1" />
-                      {new Date(selectedTestimonial.date).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
+                      {new Date(selectedTestimonial.date).toLocaleDateString(
+                        "en-US",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        },
+                      )}
                     </span>
                   </div>
 
@@ -909,14 +996,18 @@ export const Testimonials: React.FC = () => {
                   <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-200">
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => handleHelpful(selectedTestimonial.id, 'helpful')}
+                        onClick={() =>
+                          handleHelpful(selectedTestimonial.id, "helpful")
+                        }
                         className="flex items-center gap-1 px-3 py-1.5 bg-green-50 text-green-600 rounded-lg text-sm hover:bg-green-100 transition-colors"
                       >
                         <ThumbUpIcon className="w-4 h-4" />
                         {t.helpful} ({selectedTestimonial.helpful})
                       </button>
                       <button
-                        onClick={() => handleHelpful(selectedTestimonial.id, 'notHelpful')}
+                        onClick={() =>
+                          handleHelpful(selectedTestimonial.id, "notHelpful")
+                        }
                         className="flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-sm hover:bg-red-100 transition-colors"
                       >
                         <ThumbDownIcon className="w-4 h-4" />
@@ -936,4 +1027,3 @@ export const Testimonials: React.FC = () => {
     </div>
   );
 };
-
