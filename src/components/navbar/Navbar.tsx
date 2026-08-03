@@ -1,3 +1,4 @@
+
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
@@ -5,6 +6,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
+import axios from "axios";
 
 // Material-UI Icons
 import PersonIcon from "@mui/icons-material/Person";
@@ -45,33 +47,23 @@ import {
 import InfoIcon from "@mui/icons-material/Info";
 import { useNavigate, Link } from "react-router-dom";
 
-// Dummy user data for login
-const DEMO_USERS = {
-  admin: {
-    email: "admin@example.com",
-    password: "admin123",
-    name: "Admin User",
-    role: "admin",
-    id: 1,
-    token: "demo-admin-token-12345",
+// API Configuration
+const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
+const API = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
   },
-  user: {
-    email: "user@example.com",
-    password: "user123",
-    name: "Regular User",
-    role: "user",
-    id: 2,
-    token: "demo-user-token-67890",
-  },
-  host: {
-    email: "host@example.com",
-    password: "host123",
-    name: "Host User",
-    role: "host",
-    id: 3,
-    token: "demo-host-token-11111",
-  },
-};
+});
+
+// Add token interceptor
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 // INYUMBA SVG Logo Component with Animation
 const InyumbaLogo = ({ className = "h-12 w-12" }: { className?: string }) => (
@@ -314,6 +306,15 @@ const translations = {
     weak: "Weak",
     moderate: "Moderate",
     strong: "Strong",
+    forgotPassword: "Forgot password?",
+    resetPassword: "Reset Password",
+    sendResetLink: "Send Reset Link",
+    checkEmail: "Check your email",
+    resetLinkSent: "We've sent a password reset link to your email.",
+    enterEmail:
+      "Enter your email address and we'll send you a link to reset your password.",
+    backToLogin: "Back to login",
+    resetPasswordTitle: "Reset Your Password",
 
     // Hero Section
     heroTitle: "Find Your Perfect Student Accommodation",
@@ -426,6 +427,16 @@ const translations = {
     weak: "Faible",
     moderate: "Modéré",
     strong: "Fort",
+    forgotPassword: "Mot de passe oublié ?",
+    resetPassword: "Réinitialiser le mot de passe",
+    sendResetLink: "Envoyer le lien",
+    checkEmail: "Vérifiez votre email",
+    resetLinkSent:
+      "Nous vous avons envoyé un lien pour réinitialiser votre mot de passe.",
+    enterEmail:
+      "Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+    backToLogin: "Retour à la connexion",
+    resetPasswordTitle: "Réinitialiser votre mot de passe",
 
     // Hero Section
     heroTitle: "Trouvez Votre Logement Étudiant Parfait",
@@ -539,6 +550,16 @@ const translations = {
     weak: "Ntacyo",
     moderate: "Rishoboka",
     strong: "Rikomeye",
+    forgotPassword: "Wibagiwe ijambo ry'ibanga?",
+    resetPassword: "Hindura ijambo ry'ibanga",
+    sendResetLink: "Ohereza umurongo",
+    checkEmail: "Reba imeri yawe",
+    resetLinkSent:
+      "Twohereje umurongo wo guhindura ijambo ry'ibanga kuri imeri yawe.",
+    enterEmail:
+      "Andika aderesi ya imeri yawe kandi tuzohereza umurongo wo guhindura ijambo ry'ibanga.",
+    backToLogin: "Garuka kwinjira",
+    resetPasswordTitle: "Hindura ijambo ry'ibanga",
 
     // Hero Section
     heroTitle: "Shakira Aho Uzabera Byiza",
@@ -628,10 +649,11 @@ export { translations };
 // Navigation links object
 const navLinks = [
   { id: "home", path: "/", label: "home" },
+  { id: "about", path: "/about", label: "about" },
   { id: "experience", path: "/experience", label: "experience" },
   { id: "services", path: "/services", label: "services" },
   { id: "testimonials", path: "/testimonials", label: "testimonials" },
-  { id: "about", path: "/about", label: "about" },
+  
 ];
 
 // Success/Fail Modal Component
@@ -796,6 +818,276 @@ const StatusModal: React.FC<StatusModalProps> = ({
   );
 };
 
+// Forget Password Modal Component
+interface ForgetPasswordModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onBackToLogin: () => void;
+}
+
+const ForgetPasswordModal: React.FC<ForgetPasswordModalProps> = ({
+  isOpen,
+  onClose,
+  onBackToLogin,
+}) => {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isEmailValid, setIsEmailValid] = useState<boolean | null>(null);
+  const t = getTranslations();
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    if (value.length > 0) {
+      setIsEmailValid(validateEmail(value));
+    } else {
+      setIsEmailValid(null);
+    }
+    setError(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email || !validateEmail(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await API.post("/auth/forgot-password", { email });
+
+      if (response.data.success) {
+        setEmailSent(true);
+        setError(null);
+      } else {
+        setError(response.data.message || "Failed to send reset link");
+      }
+    } catch (err: any) {
+      setError(
+        err.response?.data?.message || "An error occurred. Please try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    setEmail("");
+    setEmailSent(false);
+    setError(null);
+    setIsEmailValid(null);
+    onClose();
+  };
+
+  const handleBackToLogin = () => {
+    setEmail("");
+    setEmailSent(false);
+    setError(null);
+    setIsEmailValid(null);
+    onBackToLogin();
+  };
+
+  const modalVariants = {
+    hidden: { opacity: 0, scale: 0.8, y: 30 },
+    visible: { opacity: 1, scale: 1, y: 0 },
+    exit: { opacity: 0, scale: 0.8, y: 30 },
+  };
+
+  const overlayVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+    exit: { opacity: 0 },
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            variants={overlayVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150]"
+            onClick={handleClose}
+          />
+          <motion.div
+            variants={modalVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ duration: 0.4, type: "spring", stiffness: 300 }}
+            className="fixed inset-0 z-[151] flex items-center justify-center p-4"
+          >
+            <div className="w-full max-w-md max-h-[90vh] rounded-2xl shadow-2xl bg-white relative overflow-hidden">
+              <AnimatedBackground />
+              <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl relative z-10">
+                <div className="flex items-center gap-2">
+                  <LockIcon className="text-[#FF385C] w-5 h-5" />
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    {t.resetPasswordTitle}
+                  </h2>
+                </div>
+                <motion.button
+                  whileHover={{ rotate: 90, scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleClose}
+                  className="p-1 rounded-full transition-colors hover:bg-gray-100 text-gray-500"
+                >
+                  <CloseIcon className="w-5 h-5" />
+                </motion.button>
+              </div>
+
+              <div className="p-6 relative z-10">
+                {!emailSent ? (
+                  <form onSubmit={handleSubmit}>
+                    <p className="text-sm text-gray-600 mb-4">{t.enterEmail}</p>
+
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                        {t.email}
+                      </label>
+                      <div
+                        className={`relative rounded-lg border ${
+                          isEmailValid === true
+                            ? "border-green-500"
+                            : isEmailValid === false
+                              ? "border-red-500"
+                              : "border-gray-300"
+                        } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+                      >
+                        <EmailIcon
+                          className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+                            isEmailValid === true
+                              ? "text-green-500"
+                              : isEmailValid === false
+                                ? "text-red-500"
+                                : "text-gray-400"
+                          }`}
+                        />
+                        <input
+                          type="email"
+                          required
+                          value={email}
+                          onChange={(e) => handleEmailChange(e.target.value)}
+                          className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
+                          placeholder="you@example.com"
+                          disabled={loading}
+                        />
+                        {isEmailValid === true && (
+                          <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+                        )}
+                        {isEmailValid === false && (
+                          <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+                        )}
+                      </div>
+                      {error && (
+                        <p className="text-xs text-red-500 mt-1">{error}</p>
+                      )}
+                      {isEmailValid === true && (
+                        <p className="text-xs text-green-500 mt-1">
+                          ✓ Valid email address
+                        </p>
+                      )}
+                    </div>
+
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="submit"
+                      disabled={loading || !isEmailValid}
+                      className={`w-full py-3 rounded-lg font-medium relative overflow-hidden transition-colors ${
+                        loading || !isEmailValid
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-[#FF385C] hover:bg-[#E31C5F]"
+                      } text-white`}
+                    >
+                      <span className="relative z-10 flex items-center justify-center gap-2">
+                        {loading ? (
+                          <>
+                            <svg
+                              className="animate-spin h-5 w-5 text-white"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              ></path>
+                            </svg>
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            <EmailIcon className="w-5 h-5" />
+                            {t.sendResetLink}
+                          </>
+                        )}
+                      </span>
+                    </motion.button>
+
+                    <button
+                      type="button"
+                      onClick={handleBackToLogin}
+                      className="w-full text-center text-sm mt-4 text-gray-500 hover:text-[#FF385C] transition-colors"
+                    >
+                      ← {t.backToLogin}
+                    </button>
+                  </form>
+                ) : (
+                  <div className="text-center py-4">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.5, type: "spring" }}
+                    >
+                      <CheckCircleOutlineRounded className="w-20 h-20 text-green-500 mx-auto mb-4" />
+                    </motion.div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      {t.checkEmail}
+                    </h3>
+                    <p className="text-gray-600 mb-6">{t.resetLinkSent}</p>
+                    <p className="text-sm text-gray-500 mb-6">{email}</p>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleBackToLogin}
+                      className="px-6 py-2.5 rounded-lg bg-[#FF385C] text-white font-medium hover:bg-[#E31C5F] transition-colors"
+                    >
+                      {t.backToLogin}
+                    </motion.button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
+
 export const Navbar = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
@@ -803,6 +1095,7 @@ export const Navbar = () => {
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [isForgetPasswordOpen, setIsForgetPasswordOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("Guest");
   const [userEmail, setUserEmail] = useState("");
@@ -905,6 +1198,7 @@ export const Navbar = () => {
         setIsLanguageMenuOpen(false);
         setIsDashboardOpen(false);
         setIsUserModalOpen(false);
+        setIsForgetPasswordOpen(false);
         setStatusModal((prev) => ({ ...prev, isOpen: false }));
       }
     };
@@ -1102,12 +1396,12 @@ export const Navbar = () => {
     );
   };
 
-  // Navigation handler - FIXED: Using navigate instead of window.location
+  // Navigation handler
   const navigateTo = (path: string) => {
     navigate(path);
   };
 
-  // Handle Dashboard navigation based on role - FIXED: Removed :id from path
+  // Handle Dashboard navigation based on role
   const handleDashboardNavigation = () => {
     setIsUserMenuOpen(false);
     if (userRole === "admin") {
@@ -1119,111 +1413,64 @@ export const Navbar = () => {
     }
   };
 
-  // Handle Login with dummy data - FIXED: Using navigate instead of window.location.href
+  // Handle Login with API
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateLoginForm()) return;
     setLoginLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      let userData: any = null;
-      let token: string = "";
+      const response = await API.post("/auth/login", {
+        email: loginEmail,
+        password: loginPassword,
+      });
 
-      if (
-        loginEmail === DEMO_USERS.admin.email &&
-        loginPassword === DEMO_USERS.admin.password
-      ) {
-        userData = {
-          id: DEMO_USERS.admin.id,
-          name: DEMO_USERS.admin.name,
-          email: DEMO_USERS.admin.email,
-          role: DEMO_USERS.admin.role,
-        };
-        token = DEMO_USERS.admin.token;
+      if (response.data.success) {
+        const { user, token } = response.data;
 
-        // Show success modal
-        setStatusModal({
-          isOpen: true,
-          type: "success",
-          title: "🎉 Welcome Admin!",
-          message: "You have successfully logged in as an administrator.",
-          details: `Email: ${DEMO_USERS.admin.email}`,
-        });
-      } else if (
-        loginEmail === DEMO_USERS.user.email &&
-        loginPassword === DEMO_USERS.user.password
-      ) {
-        userData = {
-          id: DEMO_USERS.user.id,
-          name: DEMO_USERS.user.name,
-          email: DEMO_USERS.user.email,
-          role: DEMO_USERS.user.role,
-        };
-        token = DEMO_USERS.user.token;
+        setIsLoggedIn(true);
+        setUserName(user.name || "User");
+        setUserEmail(user.email || "");
+        setUserRole(user.role || "user");
+        setUserId(user.id || user._id || "");
+        setIsLoginOpen(false);
+
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+
+        setLoginEmail("");
+        setLoginPassword("");
+        setLoginErrors({});
 
         setStatusModal({
           isOpen: true,
           type: "success",
-          title: "🎉 Welcome User!",
-          message: "You have successfully logged in as a regular user.",
-          details: `Email: ${DEMO_USERS.user.email}`,
+          title: `🎉 Welcome ${user.name}!`,
+          message: "You have successfully logged in.",
+          details: `Email: ${user.email}`,
         });
-      } else if (
-        loginEmail === DEMO_USERS.host.email &&
-        loginPassword === DEMO_USERS.host.password
-      ) {
-        userData = {
-          id: DEMO_USERS.host.id,
-          name: DEMO_USERS.host.name,
-          email: DEMO_USERS.host.email,
-          role: DEMO_USERS.host.role,
-        };
-        token = DEMO_USERS.host.token;
 
-        setStatusModal({
-          isOpen: true,
-          type: "success",
-          title: "🎉 Welcome Host!",
-          message: "You have successfully logged in as a host.",
-          details: `Email: ${DEMO_USERS.host.email}`,
-        });
+        // Navigate based on role
+        setTimeout(() => {
+          if (user.role === "admin") {
+            navigate("/dashboard", { replace: true });
+          } else if (user.role === "host") {
+            navigate("/host/dashboard", { replace: true });
+          } else {
+            navigate("/user/dashboard", { replace: true });
+          }
+        }, 100);
       } else {
         setStatusModal({
           isOpen: true,
           type: "error",
           title: "❌ Login Failed",
-          message: "Invalid email or password. Please try again.",
+          message: response.data.message || "Invalid email or password",
           details: "Please check your credentials and try again.",
         });
-        setLoginLoading(false);
-        return;
       }
-
-      setIsLoggedIn(true);
-      setUserName(userData.name || "User");
-      setUserEmail(userData.email || "");
-      setUserRole(userData.role || "user");
-      setUserId(userData.id.toString());
-      setIsLoginOpen(false);
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(userData));
-      setLoginEmail("");
-      setLoginPassword("");
-      setLoginErrors({});
-
-      // Use navigate instead of window.location.href
-      // Adding a small delay to ensure state updates are processed
-      setTimeout(() => {
-        if (userData.role === "admin") {
-          navigate("/dashboard", { replace: true });
-        } else if (userData.role === "host") {
-          navigate("/host/dashboard", { replace: true });
-        } else {
-          navigate("/user/dashboard", { replace: true });
-        }
-      }, 100);
     } catch (error: any) {
-      const errorMessage = error?.message || "Login failed. Please try again.";
+      const errorMessage =
+        error.response?.data?.message || "Login failed. Please try again.";
       setStatusModal({
         isOpen: true,
         type: "error",
@@ -1237,7 +1484,7 @@ export const Navbar = () => {
     }
   };
 
-  // Handle Register
+  // Handle Register with API
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateRegisterForm()) return;
@@ -1254,32 +1501,48 @@ export const Navbar = () => {
     }
     setRegisterLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      setStatusModal({
-        isOpen: true,
-        type: "success",
-        title: "🎊 Account Created!",
-        message: "Your account has been created successfully.",
-        details: `Welcome, ${registerName}! Please login to continue.`,
+      const response = await API.post("/auth/register", {
+        name: registerName,
+        email: registerEmail,
+        phone: registerPhone,
+        password: registerPassword,
       });
 
-      setIsRegisterOpen(false);
-      setRegisterName("");
-      setRegisterEmail("");
-      setRegisterPhone("");
-      setRegisterPassword("");
-      setRegisterConfirmPassword("");
-      setRegisterErrors({});
-      setPasswordStrength(null);
+      if (response.data.success) {
+        setStatusModal({
+          isOpen: true,
+          type: "success",
+          title: "🎊 Account Created!",
+          message: "Your account has been created successfully.",
+          details: `Welcome, ${registerName}! Please login to continue.`,
+        });
 
-      // Open login modal after a short delay
-      setTimeout(() => {
-        setIsLoginOpen(true);
-      }, 500);
+        setIsRegisterOpen(false);
+        setRegisterName("");
+        setRegisterEmail("");
+        setRegisterPhone("");
+        setRegisterPassword("");
+        setRegisterConfirmPassword("");
+        setRegisterErrors({});
+        setPasswordStrength(null);
+
+        // Open login modal after a short delay
+        setTimeout(() => {
+          setIsLoginOpen(true);
+        }, 500);
+      } else {
+        setStatusModal({
+          isOpen: true,
+          type: "error",
+          title: "❌ Registration Failed",
+          message: response.data.message || "Registration failed",
+          details: "Please check your information and try again.",
+        });
+      }
     } catch (error: any) {
       const errorMessage =
-        error?.message || "Registration failed. Please try again.";
+        error.response?.data?.message ||
+        "Registration failed. Please try again.";
       setStatusModal({
         isOpen: true,
         type: "error",
@@ -1316,20 +1579,12 @@ export const Navbar = () => {
     navigate("/");
   };
 
-  // ============================================================
-  // LANGUAGE CHANGER FUNCTION - SAVES TO COOKIES AND REFRESHES
-  // ============================================================
+  // Language changer function
   const handleLanguageChange = (lang: Language) => {
-    // Save language to cookie (expires in 365 days)
     Cookies.set("language", lang, { expires: 365, path: "/" });
-
-    // Update the language state
     setLanguage(lang);
-
-    // Close the language menu
     setIsLanguageMenuOpen(false);
 
-    // Show a toast notification
     const langName =
       lang === "en" ? "English" : lang === "fr" ? "Français" : "Kinyarwanda";
 
@@ -1341,8 +1596,6 @@ export const Navbar = () => {
       details: "The page will refresh to apply the new language.",
     });
 
-    // REFRESH THE ENTIRE WEBSITE
-    // Small delay to let the modal show before refresh
     setTimeout(() => {
       window.location.reload();
     }, 1500);
@@ -1421,7 +1674,7 @@ export const Navbar = () => {
     }
   };
 
-  // Dashboard data
+  // Dashboard data (static for UI, can be replaced with API data)
   const dashboardStats = [
     {
       label: t.totalRevenue,
@@ -1528,6 +1781,16 @@ export const Navbar = () => {
         details={statusModal.details}
       />
 
+      {/* Forget Password Modal */}
+      <ForgetPasswordModal
+        isOpen={isForgetPasswordOpen}
+        onClose={() => setIsForgetPasswordOpen(false)}
+        onBackToLogin={() => {
+          setIsForgetPasswordOpen(false);
+          setIsLoginOpen(true);
+        }}
+      />
+
       {/* Navbar */}
       <motion.nav
         initial={{ y: -100 }}
@@ -1537,7 +1800,7 @@ export const Navbar = () => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
-            {/* Logo - Left - Updated with INYUMBA text */}
+            {/* Logo - Left */}
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -1547,17 +1810,15 @@ export const Navbar = () => {
               <div className="text-[#FF385C]">
                 <InyumbaLogo className="h-10 w-10 sm:h-12 sm:w-12" />
               </div>
-              {/* INYUMBA text - visible on all screen sizes with responsive font sizes */}
               <span className="font-bold text-[#1B4E91] tracking-tight hidden sm:inline text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl">
                 INYUMBA
               </span>
-              {/* For very small screens, show abbreviated version */}
               <span className="font-bold text-[#1B4E91] tracking-tight sm:hidden text-sm">
                 INYUMBA
               </span>
             </motion.div>
 
-            {/* Main Navigation - Using Link from react-router-dom */}
+            {/* Main Navigation */}
             <div className="hidden md:flex items-center gap-1 lg:gap-2">
               {navLinks.map((link) => (
                 <motion.div
@@ -1814,7 +2075,7 @@ export const Navbar = () => {
         </div>
       </motion.nav>
 
-      {/* Mobile Navigation Menu - Using Link */}
+      {/* Mobile Navigation Menu */}
       <div
         id="mobile-nav-menu"
         className="hidden md:hidden bg-white border-b border-gray-200 shadow-lg"
@@ -1893,7 +2154,6 @@ export const Navbar = () => {
                   </motion.button>
                 </div>
 
-                {/* Slide animation container */}
                 <motion.div
                   initial={{ y: 50, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
@@ -1940,7 +2200,7 @@ export const Navbar = () => {
                         </p>
                       )}
                     </div>
-                    <div className="mb-6">
+                    <div className="mb-4">
                       <label className="block text-sm font-medium mb-1.5 text-gray-700">
                         {t.password}
                       </label>
@@ -1980,6 +2240,20 @@ export const Navbar = () => {
                           {loginErrors.password}
                         </p>
                       )}
+                    </div>
+
+                    {/* Forgot Password Link */}
+                    <div className="text-right mb-4">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsLoginOpen(false);
+                          setIsForgetPasswordOpen(true);
+                        }}
+                        className="text-sm text-[#FF385C] hover:underline font-medium"
+                      >
+                        {t.forgotPassword}
+                      </button>
                     </div>
 
                     <motion.button
@@ -2050,7 +2324,6 @@ export const Navbar = () => {
       </AnimatePresence>
 
       {/* Register Modal */}
-
       <AnimatePresence>
         {isRegisterOpen && (
           <>
@@ -2090,7 +2363,6 @@ export const Navbar = () => {
                   </motion.button>
                 </div>
 
-                {/* Slide animation container */}
                 <motion.div
                   initial={{ y: 50, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}

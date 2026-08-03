@@ -3,9 +3,9 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { toast } from "react-toastify";
+import { motion, AnimatePresence } from "framer-motion";
 import Cookies from "js-cookie";
+import axios from "axios";
 
 // Material-UI Icons - Only imported ones that are used
 import HomeIcon from "@mui/icons-material/Home";
@@ -28,6 +28,22 @@ import WifiIcon from "@mui/icons-material/Wifi";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import CancelIcon from "@mui/icons-material/Cancel";
 import SendIcon from "@mui/icons-material/Send";
+import CloseIcon from "@mui/icons-material/Close";
+import {
+  CheckCircleOutlineRounded,
+  ErrorOutlineOutlined,
+} from "@mui/icons-material";
+import InfoIcon from "@mui/icons-material/Info";
+
+// API Configuration
+const CONTACT_API_URL = "https://rene-inyumba-nodejs.onrender.com/contact";
+
+const CONTACT_API = axios.create({
+  baseURL: CONTACT_API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 // Translations
 const translations = {
@@ -75,6 +91,9 @@ const translations = {
     submit: "Send Message",
     sending: "Sending...",
     success: "Message sent successfully! We'll get back to you soon.",
+    successTitle: "🎉 Message Sent!",
+    errorTitle: "❌ Failed to Send",
+    errorMessage: "Please try again later.",
     address: "Musanze, Northern Province, Rwanda",
     phone: "+250 780 414 088",
     emailAddress: "inyumba@yahoo.fr",
@@ -164,6 +183,9 @@ const translations = {
     submit: "Envoyer",
     sending: "Envoi en cours...",
     success: "Message envoyé avec succès ! Nous vous répondrons bientôt.",
+    successTitle: "🎉 Message Envoyé!",
+    errorTitle: "❌ Échec de l'envoi",
+    errorMessage: "Veuillez réessayer plus tard.",
     address: "Musanze, Province du Nord, Rwanda",
     phone: "+250 780 414 088",
     emailAddress: "inyumba@yahoo.fr",
@@ -253,6 +275,9 @@ const translations = {
     submit: "Ohereza",
     sending: "Biremereza...",
     success: "Ubutumwa bwoherejwe neza! Tuzagusubiza vuba.",
+    successTitle: "🎉 Ubutumwa Bwoherejwe!",
+    errorTitle: "❌ Ntabwo Bwoherejwe",
+    errorMessage: "Ongera ugerageze nyuma.",
     address: "Musanze, Intara y'Amajyaruguru, Rwanda",
     phone: "+250 780 414 088",
     emailAddress: "inyumba@yahoo.fr",
@@ -306,6 +331,205 @@ interface Service {
   features?: string[];
 }
 
+// Status Modal Component
+interface StatusModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  type: "success" | "error" | "info";
+  title: string;
+  message: string;
+  details?: string;
+}
+
+const StatusModal: React.FC<StatusModalProps> = ({
+  isOpen,
+  onClose,
+  type,
+  title,
+  message,
+  details,
+}) => {
+  const getIcon = () => {
+    switch (type) {
+      case "success":
+        return (
+          <CheckCircleOutlineRounded className="w-16 h-16 text-green-500" />
+        );
+      case "error":
+        return <ErrorOutlineOutlined className="w-16 h-16 text-red-500" />;
+      case "info":
+        return <InfoIcon className="w-16 h-16 text-blue-500" />;
+    }
+  };
+
+  const getColors = () => {
+    switch (type) {
+      case "success":
+        return {
+          bg: "bg-green-50",
+          border: "border-green-200",
+          text: "text-green-800",
+          button: "bg-green-500 hover:bg-green-600",
+        };
+      case "error":
+        return {
+          bg: "bg-red-50",
+          border: "border-red-200",
+          text: "text-red-800",
+          button: "bg-red-500 hover:bg-red-600",
+        };
+      case "info":
+        return {
+          bg: "bg-blue-50",
+          border: "border-blue-200",
+          text: "text-blue-800",
+          button: "bg-blue-500 hover:bg-blue-600",
+        };
+    }
+  };
+
+  const colors = getColors();
+
+  const modalVariants = {
+    hidden: { opacity: 0, scale: 0.8, y: 30 },
+    visible: { opacity: 1, scale: 1, y: 0 },
+    exit: { opacity: 0, scale: 0.8, y: 30 },
+  };
+
+  const overlayVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+    exit: { opacity: 0 },
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            variants={overlayVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200]"
+            onClick={onClose}
+          />
+          <motion.div
+            variants={modalVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ duration: 0.4, type: "spring", stiffness: 300 }}
+            className="fixed inset-0 z-[201] flex items-center justify-center p-4"
+          >
+            <div
+              className={`w-full max-w-md rounded-2xl shadow-2xl border ${colors.border} ${colors.bg} relative overflow-hidden`}
+            >
+              {/* Animated Background */}
+              <svg
+                className="absolute inset-0 w-full h-full"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <defs>
+                  <radialGradient id="modalRadial">
+                    <stop
+                      offset="0%"
+                      style={{
+                        stopColor:
+                          type === "success"
+                            ? "#22c55e"
+                            : type === "error"
+                              ? "#ef4444"
+                              : "#3b82f6",
+                        stopOpacity: 0.1,
+                      }}
+                    />
+                    <stop offset="100%" style={{ stopOpacity: 0 }} />
+                  </radialGradient>
+                </defs>
+                <motion.circle
+                  cx="50%"
+                  cy="50%"
+                  r="40%"
+                  fill="url(#modalRadial)"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                />
+              </svg>
+              <div className="relative z-10 p-6">
+                <div className="flex flex-col items-center text-center">
+                  {/* Close Button */}
+                  <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-200/50 transition-colors"
+                  >
+                    <CloseIcon className="w-5 h-5 text-gray-500" />
+                  </button>
+
+                  {/* Icon */}
+                  <motion.div
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ duration: 0.5, type: "spring" }}
+                    className="mb-4"
+                  >
+                    {getIcon()}
+                  </motion.div>
+
+                  {/* Title */}
+                  <motion.h3
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className={`text-2xl font-bold ${colors.text} mb-2`}
+                  >
+                    {title}
+                  </motion.h3>
+
+                  {/* Message */}
+                  <motion.p
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="text-gray-700 mb-4"
+                  >
+                    {message}
+                  </motion.p>
+
+                  {/* Details */}
+                  {details && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="bg-white/50 rounded-lg p-3 mb-4 w-full text-sm text-gray-600"
+                    >
+                      {details}
+                    </motion.div>
+                  )}
+
+                  {/* Button */}
+                  <motion.button
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={onClose}
+                    className={`px-6 py-2.5 rounded-lg text-white font-medium transition-all ${colors.button} shadow-lg`}
+                  >
+                    Got it
+                  </motion.button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
 // Helper function to get language from cookies
 const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
   const lang = Cookies.get("language") as "en" | "fr" | "rw";
@@ -335,6 +559,21 @@ export const Services: React.FC = () => {
     email?: string;
     message?: string;
   }>({});
+
+  // Status Modal state
+  const [statusModal, setStatusModal] = useState<{
+    isOpen: boolean;
+    type: "success" | "error" | "info";
+    title: string;
+    message: string;
+    details?: string;
+  }>({
+    isOpen: false,
+    type: "success",
+    title: "",
+    message: "",
+    details: "",
+  });
 
   const t = translations[lang];
 
@@ -410,25 +649,78 @@ export const Services: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
-      toast.error("Please fix the errors before submitting.");
+      setStatusModal({
+        isOpen: true,
+        type: "error",
+        title: "⚠️ Invalid Form",
+        message: "Please fix the errors before submitting.",
+        details: "Check all fields and try again.",
+      });
       return;
     }
 
     setIsSubmitting(true);
 
-    setTimeout(() => {
+    try {
+      const response = await CONTACT_API.post("/", {
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+      });
+
+      if (response.status === 200 || response.status === 201) {
+        setStatusModal({
+          isOpen: true,
+          type: "success",
+          title: t.successTitle,
+          message: t.success,
+          details: `Thank you, ${formData.name}! We'll get back to you soon.`,
+        });
+
+        // Reset form
+        setFormData({ name: "", email: "", message: "" });
+        setIsNameValid(null);
+        setIsEmailValid(null);
+        setIsMessageValid(null);
+        setIsFormValid(false);
+      } else {
+        setStatusModal({
+          isOpen: true,
+          type: "error",
+          title: t.errorTitle,
+          message: "Something went wrong. Please try again.",
+          details: "Our team has been notified of this issue.",
+        });
+      }
+    } catch (error: any) {
+      console.error("Contact form error:", error);
+
+      const errorMessage = error.response
+        ? error.response.data?.message || "Server error occurred."
+        : error.request
+          ? "No response from server."
+          : error.message || "An unexpected error occurred.";
+
+      const errorDetails = error.response
+        ? `Status: ${error.response.status}. Please try again later.`
+        : error.request
+          ? "Please check your internet connection."
+          : "Please try again or contact support.";
+
+      setStatusModal({
+        isOpen: true,
+        type: "error",
+        title: t.errorTitle,
+        message: errorMessage,
+        details: errorDetails,
+      });
+    } finally {
       setIsSubmitting(false);
-      toast.success(t.success);
-      setFormData({ name: "", email: "", message: "" });
-      setIsNameValid(null);
-      setIsEmailValid(null);
-      setIsMessageValid(null);
-      setIsFormValid(false);
-    }, 1500);
+    }
   };
 
   const services: Service[] = [
@@ -618,577 +910,589 @@ export const Services: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-[#FF385C] to-[#E31C5F] py-16 sm:py-20 md:py-28 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-72 h-72 bg-white rounded-full -mt-20 -mr-20"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full -mb-40 -ml-40"></div>
-        </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center text-white"
-          >
+    <>
+      {/* Status Modal */}
+      <StatusModal
+        isOpen={statusModal.isOpen}
+        onClose={() => setStatusModal((prev) => ({ ...prev, isOpen: false }))}
+        type={statusModal.type}
+        title={statusModal.title}
+        message={statusModal.message}
+        details={statusModal.details}
+      />
+
+      <div className="min-h-screen bg-gray-50">
+        {/* Hero Section */}
+        <section className="relative bg-gradient-to-r from-[#FF385C] to-[#E31C5F] py-16 sm:py-20 md:py-28 overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-72 h-72 bg-white rounded-full -mt-20 -mr-20"></div>
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full -mb-40 -ml-40"></div>
+          </div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-              className="inline-block bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 mb-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center text-white"
             >
-              <span className="text-sm font-medium flex items-center gap-2">
-                <AutoAwesomeIcon className="w-4 h-4" />
-                {t.services}
-              </span>
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                className="inline-block bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 mb-6"
+              >
+                <span className="text-sm font-medium flex items-center gap-2">
+                  <AutoAwesomeIcon className="w-4 h-4" />
+                  {t.services}
+                </span>
+              </motion.div>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+                {t.tagline}
+              </h1>
+              <p className="text-lg sm:text-xl md:text-2xl text-white/90 max-w-3xl mx-auto font-light">
+                {t.description}
+              </p>
             </motion.div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-              {t.tagline}
-            </h1>
-            <p className="text-lg sm:text-xl md:text-2xl text-white/90 max-w-3xl mx-auto font-light">
-              {t.description}
-            </p>
-          </motion.div>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg
-            viewBox="0 0 1440 120"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H0Z"
-              fill="#F9FAFB"
-            />
-          </svg>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-12 bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 sm:gap-6">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                viewport={{ once: true }}
-                className="text-center"
-              >
-                <div className="w-12 h-12 bg-[#FF385C]/10 rounded-full flex items-center justify-center mx-auto mb-3 text-[#FF385C]">
-                  {stat.icon}
-                </div>
-                <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                <p className="text-xs text-gray-500 mt-1">{stat.label}</p>
-              </motion.div>
-            ))}
           </div>
-        </div>
-      </section>
-
-      {/* Category Filter */}
-      <section className="py-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap gap-3 justify-center">
-            {categoryButtons.map((category) => (
-              <motion.button
-                key={category.id}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() =>
-                  setSelectedCategory(
-                    category.id as
-                      | "all"
-                      | "student"
-                      | "landlord"
-                      | "university",
-                  )
-                }
-                className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-full font-medium text-sm transition-all duration-300 flex items-center gap-2 ${
-                  selectedCategory === category.id
-                    ? "bg-[#FF385C] text-white shadow-lg shadow-[#FF385C]/30"
-                    : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
-                }`}
-              >
-                {category.icon}
-                {category.label}
-              </motion.button>
-            ))}
+          <div className="absolute bottom-0 left-0 right-0">
+            <svg
+              viewBox="0 0 1440 120"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H0Z"
+                fill="#F9FAFB"
+              />
+            </svg>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Services Grid */}
-      <section className="py-12 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-              {t.serviceList}
-            </h2>
-            <div className="w-20 h-1 bg-[#FF385C] rounded-full mx-auto mt-4"></div>
-            <p className="text-gray-600 max-w-2xl mx-auto mt-4">
-              {selectedCategory === "all"
-                ? "Explore all our services"
-                : selectedCategory === "student"
-                  ? t.studentServices
-                  : selectedCategory === "landlord"
-                    ? t.landlordServices
-                    : t.universityServices}
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredServices.map((service, index) => (
-              <motion.div
-                key={service.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -4 }}
-                className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100"
-              >
-                <div
-                  className={`w-14 h-14 ${service.bgColor} rounded-xl flex items-center justify-center mb-4 ${service.color}`}
+        {/* Stats Section - Kept as is */}
+        <section className="py-12 bg-white border-b border-gray-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 sm:gap-6">
+              {stats.map((stat, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                  viewport={{ once: true }}
+                  className="text-center"
                 >
-                  {React.cloneElement(service.icon as React.ReactElement<any>, {
-                    className: "w-7 h-7",
-                  })}
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {service.title}
-                </h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  {service.description}
-                </p>
-                {service.features && (
-                  <div className="mt-4 flex flex-wrap gap-1.5">
-                    {service.features.map((feature, i) => (
-                      <span
-                        key={i}
-                        className="px-2 py-0.5 bg-gray-100 rounded-full text-xs text-gray-600"
-                      >
-                        {feature}
-                      </span>
-                    ))}
+                  <div className="w-12 h-12 bg-[#FF385C]/10 rounded-full flex items-center justify-center mx-auto mb-3 text-[#FF385C]">
+                    {stat.icon}
                   </div>
-                )}
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <span className="inline-block px-3 py-1 bg-[#FF385C]/10 text-[#FF385C] rounded-full text-xs font-medium">
-                    {service.category === "student"
-                      ? t.forStudents
-                      : service.category === "landlord"
-                        ? t.forLandlords
-                        : t.forUniversities}
-                  </span>
-                </div>
-              </motion.div>
-            ))}
+                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                  <p className="text-xs text-gray-500 mt-1">{stat.label}</p>
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* How It Works */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-              {t.process}
-            </h2>
-            <div className="w-20 h-1 bg-[#FF385C] rounded-full mx-auto mt-4"></div>
-          </motion.div>
+        {/* Category Filter */}
+        <section className="py-8 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-wrap gap-3 justify-center">
+              {categoryButtons.map((category) => (
+                <motion.button
+                  key={category.id}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() =>
+                    setSelectedCategory(
+                      category.id as
+                        | "all"
+                        | "student"
+                        | "landlord"
+                        | "university",
+                    )
+                  }
+                  className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-full font-medium text-sm transition-all duration-300 flex items-center gap-2 ${
+                    selectedCategory === category.id
+                      ? "bg-[#FF385C] text-white shadow-lg shadow-[#FF385C]/30"
+                      : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+                  }`}
+                >
+                  {category.icon}
+                  {category.label}
+                </motion.button>
+              ))}
+            </div>
+          </div>
+        </section>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {steps.map((step, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.15, duration: 0.5 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -4 }}
-                className="relative"
-              >
-                <div className="bg-gray-50 rounded-2xl p-6 text-center border border-gray-100 hover:shadow-xl transition-all duration-300">
+        {/* Services Grid */}
+        <section className="py-12 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
+                {t.serviceList}
+              </h2>
+              <div className="w-20 h-1 bg-[#FF385C] rounded-full mx-auto mt-4"></div>
+              <p className="text-gray-600 max-w-2xl mx-auto mt-4">
+                {selectedCategory === "all"
+                  ? "Explore all our services"
+                  : selectedCategory === "student"
+                    ? t.studentServices
+                    : selectedCategory === "landlord"
+                      ? t.landlordServices
+                      : t.universityServices}
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredServices.map((service, index) => (
+                <motion.div
+                  key={service.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -4 }}
+                  className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100"
+                >
                   <div
-                    className={`w-16 h-16 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4`}
+                    className={`w-14 h-14 ${service.bgColor} rounded-xl flex items-center justify-center mb-4 ${service.color}`}
                   >
-                    {index + 1}
+                    {React.cloneElement(service.icon as React.ReactElement<any>, {
+                      className: "w-7 h-7",
+                    })}
                   </div>
-                  <div className="text-4xl mb-3">{step.icon}</div>
-                  <h3 className="font-semibold text-gray-900 mb-2">
-                    {step.title}
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    {service.title}
                   </h3>
                   <p className="text-sm text-gray-600 leading-relaxed">
-                    {step.desc}
+                    {service.description}
                   </p>
-                </div>
-                {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-1/2 -right-3 transform -translate-y-1/2 text-gray-300">
-                    <svg
-                      className="w-6 h-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
+                  {service.features && (
+                    <div className="mt-4 flex flex-wrap gap-1.5">
+                      {service.features.map((feature, i) => (
+                        <span
+                          key={i}
+                          className="px-2 py-0.5 bg-gray-100 rounded-full text-xs text-gray-600"
+                        >
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <span className="inline-block px-3 py-1 bg-[#FF385C]/10 text-[#FF385C] rounded-full text-xs font-medium">
+                      {service.category === "student"
+                        ? t.forStudents
+                        : service.category === "landlord"
+                          ? t.forLandlords
+                          : t.forUniversities}
+                    </span>
                   </div>
-                )}
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Why Choose Us */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-              {t.whyChoose}
-            </h2>
-            <div className="w-20 h-1 bg-[#FF385C] rounded-full mx-auto mt-4"></div>
-          </motion.div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                icon: <VerifiedIcon />,
-                title: "Verified Properties",
-                desc: "Every property is verified for quality and safety",
-                color: "bg-green-500",
-              },
-              {
-                icon: <SecurityIcon />,
-                title: "Secure Payments",
-                desc: "Protected transactions with MOMO integration",
-                color: "bg-blue-500",
-              },
-              {
-                icon: <SupportAgentIcon />,
-                title: "24/7 Support",
-                desc: "Dedicated team always ready to help",
-                color: "bg-purple-500",
-              },
-              {
-                icon: <LocationCityIcon />,
-                title: "Near Campus",
-                desc: "Properties located close to universities",
-                color: "bg-orange-500",
-              },
-              {
-                icon: <PaymentsIcon />,
-                title: "Student Budgets",
-                desc: "Affordable rates for students",
-                color: "bg-red-500",
-              },
-              {
-                icon: <HandshakeIcon />,
-                title: "Trusted Platform",
-                desc: "Building trust through transparency",
-                color: "bg-indigo-500",
-              },
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -4 }}
-                className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex items-start gap-4"
-              >
-                <div
-                  className={`w-12 h-12 ${item.color} rounded-xl flex items-center justify-center flex-shrink-0 text-white`}
-                >
-                  {item.icon}
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-900">{item.title}</h4>
-                  <p className="text-sm text-gray-600 mt-1">{item.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Section with Form */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-              {t.contact}
-            </h2>
-            <div className="w-20 h-1 bg-[#FF385C] rounded-full mx-auto mt-4"></div>
-            <p className="text-gray-600 max-w-2xl mx-auto mt-4">
-              {t.contactDesc}
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Contact Info */}
+        {/* How It Works */}
+        <section className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
-              className="space-y-6"
+              className="text-center mb-12"
             >
-              <div className="bg-gray-50 rounded-2xl p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
-                  Get in Touch
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#FF385C]/10 rounded-full flex items-center justify-center text-[#FF385C]">
-                      <EmailIcon className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Email</p>
-                      <p className="text-sm text-gray-900">{t.emailAddress}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#FF385C]/10 rounded-full flex items-center justify-center text-[#FF385C]">
-                      <PhoneIcon className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Phone</p>
-                      <p className="text-sm text-gray-900">{t.phone}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#FF385C]/10 rounded-full flex items-center justify-center text-[#FF385C]">
-                      <LocationOnIcon className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Location</p>
-                      <p className="text-sm text-gray-900">{t.address}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gray-50 rounded-2xl p-6">
-                <h4 className="font-semibold text-gray-900 mb-3">
-                  Quick Actions
-                </h4>
-                <div className="flex flex-wrap gap-3">
-                  <button className="px-4 py-2 bg-[#FF385C] text-white rounded-full font-medium hover:bg-[#E31C5F] transition-colors text-sm">
-                    {t.bookNow}
-                  </button>
-                  <button className="px-4 py-2 border border-[#FF385C] text-[#FF385C] rounded-full font-medium hover:bg-[#FF385C] hover:text-white transition-colors text-sm">
-                    {t.becomeHost}
-                  </button>
-                  <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-full font-medium hover:bg-gray-300 transition-colors text-sm">
-                    {t.partnerWithUs}
-                  </button>
-                </div>
-              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
+                {t.process}
+              </h2>
+              <div className="w-20 h-1 bg-[#FF385C] rounded-full mx-auto mt-4"></div>
             </motion.div>
 
-            {/* Contact Form */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              <div className="bg-gray-50 rounded-2xl p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
-                  Send a Message
-                </h3>
-                <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      {t.name}
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        className={`w-full px-4 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-1 transition-colors text-sm ${
-                          isNameValid === true
-                            ? "border-green-500 focus:border-green-500 focus:ring-green-500"
-                            : isNameValid === false
-                              ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:border-[#FF385C] focus:ring-[#FF385C]"
-                        }`}
-                        placeholder="John Doe"
-                      />
-                      {isNameValid === true && (
-                        <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
-                      )}
-                      {isNameValid === false && (
-                        <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
-                      )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {steps.map((step, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.15, duration: 0.5 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -4 }}
+                  className="relative"
+                >
+                  <div className="bg-gray-50 rounded-2xl p-6 text-center border border-gray-100 hover:shadow-xl transition-all duration-300">
+                    <div
+                      className={`w-16 h-16 bg-gradient-to-br ${step.color} rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4`}
+                    >
+                      {index + 1}
                     </div>
-                    {errors.name && (
-                      <p className="text-xs text-red-500 mt-1">{errors.name}</p>
-                    )}
-                    {isNameValid === true && (
-                      <p className="text-xs text-green-500 mt-1">
-                        ✓ Valid name
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      {t.email}
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        className={`w-full px-4 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-1 transition-colors text-sm ${
-                          isEmailValid === true
-                            ? "border-green-500 focus:border-green-500 focus:ring-green-500"
-                            : isEmailValid === false
-                              ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:border-[#FF385C] focus:ring-[#FF385C]"
-                        }`}
-                        placeholder="you@example.com"
-                      />
-                      {isEmailValid === true && (
-                        <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
-                      )}
-                      {isEmailValid === false && (
-                        <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
-                      )}
-                    </div>
-                    {errors.email && (
-                      <p className="text-xs text-red-500 mt-1">
-                        {errors.email}
-                      </p>
-                    )}
-                    {isEmailValid === true && (
-                      <p className="text-xs text-green-500 mt-1">
-                        ✓ Valid email
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      {t.message}
-                    </label>
-                    <div className="relative">
-                      <textarea
-                        name="message"
-                        value={formData.message}
-                        onChange={handleInputChange}
-                        rows={4}
-                        className={`w-full px-4 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-1 transition-colors text-sm resize-none ${
-                          isMessageValid === true
-                            ? "border-green-500 focus:border-green-500 focus:ring-green-500"
-                            : isMessageValid === false
-                              ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:border-[#FF385C] focus:ring-[#FF385C]"
-                        }`}
-                        placeholder="Your message here..."
-                      />
-                      <div className="absolute right-3 top-3">
-                        {isMessageValid === true && (
-                          <CheckCircleIcon className="w-5 h-5 text-green-500" />
-                        )}
-                        {isMessageValid === false && (
-                          <CancelIcon className="w-5 h-5 text-red-500" />
-                        )}
-                      </div>
-                    </div>
-                    {errors.message && (
-                      <p className="text-xs text-red-500 mt-1">
-                        {errors.message}
-                      </p>
-                    )}
-                    {isMessageValid === true && (
-                      <p className="text-xs text-green-500 mt-1">
-                        ✓ Valid message
-                      </p>
-                    )}
-                    <p className="text-xs text-gray-400 mt-1">
-                      {formData.message.length}/10 characters minimum
+                    <div className="text-4xl mb-3">{step.icon}</div>
+                    <h3 className="font-semibold text-gray-900 mb-2">
+                      {step.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {step.desc}
                     </p>
                   </div>
-
-                  <motion.button
-                    whileHover={{ scale: isFormValid ? 1.02 : 1 }}
-                    whileTap={{ scale: isFormValid ? 0.98 : 1 }}
-                    type="submit"
-                    disabled={!isFormValid || isSubmitting}
-                    className={`w-full py-3 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
-                      isFormValid && !isSubmitting
-                        ? "bg-[#FF385C] text-white hover:bg-[#E31C5F] shadow-lg shadow-[#FF385C]/30 cursor-pointer"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        {t.sending}
-                      </>
-                    ) : (
-                      <>
-                        <SendIcon className="w-5 h-5" />
-                        {t.submit}
-                      </>
-                    )}
-                  </motion.button>
-
-                  {!isFormValid &&
-                    Object.keys(formData).some(
-                      (key) =>
-                        formData[key as keyof typeof formData].length > 0,
-                    ) && (
-                      <p className="text-center text-xs text-amber-500 mt-2">
-                        Please fill in all fields correctly to enable submit
-                      </p>
-                    )}
-                </form>
-              </div>
-            </motion.div>
+                  {index < steps.length - 1 && (
+                    <div className="hidden lg:block absolute top-1/2 -right-3 transform -translate-y-1/2 text-gray-300">
+                      <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
-    </div>
+        </section>
+
+        {/* Why Choose Us */}
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
+                {t.whyChoose}
+              </h2>
+              <div className="w-20 h-1 bg-[#FF385C] rounded-full mx-auto mt-4"></div>
+            </motion.div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                {
+                  icon: <VerifiedIcon />,
+                  title: "Verified Properties",
+                  desc: "Every property is verified for quality and safety",
+                  color: "bg-green-500",
+                },
+                {
+                  icon: <SecurityIcon />,
+                  title: "Secure Payments",
+                  desc: "Protected transactions with MOMO integration",
+                  color: "bg-blue-500",
+                },
+                {
+                  icon: <SupportAgentIcon />,
+                  title: "24/7 Support",
+                  desc: "Dedicated team always ready to help",
+                  color: "bg-purple-500",
+                },
+                {
+                  icon: <LocationCityIcon />,
+                  title: "Near Campus",
+                  desc: "Properties located close to universities",
+                  color: "bg-orange-500",
+                },
+                {
+                  icon: <PaymentsIcon />,
+                  title: "Student Budgets",
+                  desc: "Affordable rates for students",
+                  color: "bg-red-500",
+                },
+                {
+                  icon: <HandshakeIcon />,
+                  title: "Trusted Platform",
+                  desc: "Building trust through transparency",
+                  color: "bg-indigo-500",
+                },
+              ].map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -4 }}
+                  className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex items-start gap-4"
+                >
+                  <div
+                    className={`w-12 h-12 ${item.color} rounded-xl flex items-center justify-center flex-shrink-0 text-white`}
+                  >
+                    {item.icon}
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900">{item.title}</h4>
+                    <p className="text-sm text-gray-600 mt-1">{item.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Contact Section with Form */}
+        <section className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
+                {t.contact}
+              </h2>
+              <div className="w-20 h-1 bg-[#FF385C] rounded-full mx-auto mt-4"></div>
+              <p className="text-gray-600 max-w-2xl mx-auto mt-4">
+                {t.contactDesc}
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Contact Info */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+                className="space-y-6"
+              >
+                <div className="bg-gray-50 rounded-2xl p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">
+                    Get in Touch
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[#FF385C]/10 rounded-full flex items-center justify-center text-[#FF385C]">
+                        <EmailIcon className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Email</p>
+                        <p className="text-sm text-gray-900">{t.emailAddress}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[#FF385C]/10 rounded-full flex items-center justify-center text-[#FF385C]">
+                        <PhoneIcon className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Phone</p>
+                        <p className="text-sm text-gray-900">{t.phone}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[#FF385C]/10 rounded-full flex items-center justify-center text-[#FF385C]">
+                        <LocationOnIcon className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Location</p>
+                        <p className="text-sm text-gray-900">{t.address}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 rounded-2xl p-6">
+                  <h4 className="font-semibold text-gray-900 mb-3">
+                    Quick Actions
+                  </h4>
+                  <div className="flex flex-wrap gap-3">
+                    <button className="px-4 py-2 bg-[#FF385C] text-white rounded-full font-medium hover:bg-[#E31C5F] transition-colors text-sm">
+                      {t.bookNow}
+                    </button>
+                    <button className="px-4 py-2 border border-[#FF385C] text-[#FF385C] rounded-full font-medium hover:bg-[#FF385C] hover:text-white transition-colors text-sm">
+                      {t.becomeHost}
+                    </button>
+                    <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-full font-medium hover:bg-gray-300 transition-colors text-sm">
+                      {t.partnerWithUs}
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Contact Form */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+              >
+                <div className="bg-gray-50 rounded-2xl p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">
+                    Send a Message
+                  </h3>
+                  <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        {t.name}
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleInputChange}
+                          className={`w-full px-4 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-1 transition-colors text-sm ${
+                            isNameValid === true
+                              ? "border-green-500 focus:border-green-500 focus:ring-green-500"
+                              : isNameValid === false
+                                ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                                : "border-gray-300 focus:border-[#FF385C] focus:ring-[#FF385C]"
+                          }`}
+                          placeholder="John Doe"
+                        />
+                        {isNameValid === true && (
+                          <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+                        )}
+                        {isNameValid === false && (
+                          <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+                        )}
+                      </div>
+                      {errors.name && (
+                        <p className="text-xs text-red-500 mt-1">{errors.name}</p>
+                      )}
+                      {isNameValid === true && (
+                        <p className="text-xs text-green-500 mt-1">
+                          ✓ Valid name
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        {t.email}
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          className={`w-full px-4 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-1 transition-colors text-sm ${
+                            isEmailValid === true
+                              ? "border-green-500 focus:border-green-500 focus:ring-green-500"
+                              : isEmailValid === false
+                                ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                                : "border-gray-300 focus:border-[#FF385C] focus:ring-[#FF385C]"
+                          }`}
+                          placeholder="you@example.com"
+                        />
+                        {isEmailValid === true && (
+                          <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+                        )}
+                        {isEmailValid === false && (
+                          <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+                        )}
+                      </div>
+                      {errors.email && (
+                        <p className="text-xs text-red-500 mt-1">
+                          {errors.email}
+                        </p>
+                      )}
+                      {isEmailValid === true && (
+                        <p className="text-xs text-green-500 mt-1">
+                          ✓ Valid email
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        {t.message}
+                      </label>
+                      <div className="relative">
+                        <textarea
+                          name="message"
+                          value={formData.message}
+                          onChange={handleInputChange}
+                          rows={4}
+                          className={`w-full px-4 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-1 transition-colors text-sm resize-none ${
+                            isMessageValid === true
+                              ? "border-green-500 focus:border-green-500 focus:ring-green-500"
+                              : isMessageValid === false
+                                ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                                : "border-gray-300 focus:border-[#FF385C] focus:ring-[#FF385C]"
+                          }`}
+                          placeholder="Your message here..."
+                        />
+                        <div className="absolute right-3 top-3">
+                          {isMessageValid === true && (
+                            <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                          )}
+                          {isMessageValid === false && (
+                            <CancelIcon className="w-5 h-5 text-red-500" />
+                          )}
+                        </div>
+                      </div>
+                      {errors.message && (
+                        <p className="text-xs text-red-500 mt-1">
+                          {errors.message}
+                        </p>
+                      )}
+                      {isMessageValid === true && (
+                        <p className="text-xs text-green-500 mt-1">
+                          ✓ Valid message
+                        </p>
+                      )}
+                      <p className="text-xs text-gray-400 mt-1">
+                        {formData.message.length}/10 characters minimum
+                      </p>
+                    </div>
+
+                    <motion.button
+                      whileHover={{ scale: isFormValid ? 1.02 : 1 }}
+                      whileTap={{ scale: isFormValid ? 0.98 : 1 }}
+                      type="submit"
+                      disabled={!isFormValid || isSubmitting}
+                      className={`w-full py-3 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+                        isFormValid && !isSubmitting
+                          ? "bg-[#FF385C] text-white hover:bg-[#E31C5F] shadow-lg shadow-[#FF385C]/30 cursor-pointer"
+                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      }`}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          {t.sending}
+                        </>
+                      ) : (
+                        <>
+                          <SendIcon className="w-5 h-5" />
+                          {t.submit}
+                        </>
+                      )}
+                    </motion.button>
+
+                    {!isFormValid &&
+                      Object.keys(formData).some(
+                        (key) =>
+                          formData[key as keyof typeof formData].length > 0,
+                      ) && (
+                        <p className="text-center text-xs text-amber-500 mt-2">
+                          Please fill in all fields correctly to enable submit
+                        </p>
+                      )}
+                  </form>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </>
   );
 };
