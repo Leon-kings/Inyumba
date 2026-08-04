@@ -1,3 +1,4 @@
+
 // /* eslint-disable react-refresh/only-export-components */
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 // /* eslint-disable react-hooks/set-state-in-effect */
@@ -44,7 +45,7 @@
 //   ErrorOutlineOutlined,
 // } from "@mui/icons-material";
 // import InfoIcon from "@mui/icons-material/Info";
-// import { useNavigate, Link } from "react-router-dom";
+// import { useLocation } from "react-router-dom";
 
 // // API Configuration
 // const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
@@ -648,11 +649,10 @@
 // // Navigation links object
 // const navLinks = [
 //   { id: "home", path: "/", label: "home" },
-//   { id: "about", path: "/about", label: "about" },
-//   { id: "experience", path: "/experience", label: "experience" },
+//   { id: "experience", path: "/house/rent", label: "experience" },
 //   { id: "services", path: "/services", label: "services" },
 //   { id: "testimonials", path: "/testimonials", label: "testimonials" },
-
+//   { id: "about", path: "/about", label: "about" },
 // ];
 
 // // Success/Fail Modal Component
@@ -1165,7 +1165,14 @@
 //   // Get translation based on language from cookies
 //   const t = translations[language];
 
-//   const navigate = useNavigate();
+//   const location = useLocation();
+
+//   // Navigation handler - forces full page refresh
+//   const navigateTo = (path: string) => {
+//     if (location.pathname !== path) {
+//       window.location.href = path;
+//     }
+//   };
 
 //   // Handle click outside menus
 //   useEffect(() => {
@@ -1395,11 +1402,6 @@
 //     );
 //   };
 
-//   // Navigation handler
-//   const navigateTo = (path: string) => {
-//     navigate(path);
-//   };
-
 //   // Handle Dashboard navigation based on role
 //   const handleDashboardNavigation = () => {
 //     setIsUserMenuOpen(false);
@@ -1448,14 +1450,14 @@
 //           details: `Email: ${user.email}`,
 //         });
 
-//         // Navigate based on role
+//         // Navigate based on role with full refresh
 //         setTimeout(() => {
 //           if (user.role === "admin") {
-//             navigate("/dashboard", { replace: true });
+//             window.location.href = "/dashboard";
 //           } else if (user.role === "host") {
-//             navigate("/host/dashboard", { replace: true });
+//             window.location.href = "/host/dashboard";
 //           } else {
-//             navigate("/user/dashboard", { replace: true });
+//             window.location.href = "/user/dashboard";
 //           }
 //         }, 100);
 //       } else {
@@ -1575,7 +1577,7 @@
 //       details: "See you again soon!",
 //     });
 
-//     navigate("/");
+//     window.location.href = "/";
 //   };
 
 //   // Language changer function
@@ -1817,7 +1819,7 @@
 //               </span>
 //             </motion.div>
 
-//             {/* Main Navigation */}
+//             {/* Main Navigation - Desktop */}
 //             <div className="hidden md:flex items-center gap-1 lg:gap-2">
 //               {navLinks.map((link) => (
 //                 <motion.div
@@ -1825,17 +1827,17 @@
 //                   whileHover={{ y: -2 }}
 //                   whileTap={{ scale: 0.95 }}
 //                 >
-//                   <Link
-//                     to={link.path}
+//                   <button
+//                     onClick={() => navigateTo(link.path)}
 //                     className="px-3 lg:px-4 py-2 rounded-full text-sm font-medium transition-colors text-gray-700 hover:bg-gray-100 hover:text-[#FF385C]"
 //                   >
 //                     {t[link.label as keyof typeof t]}
-//                   </Link>
+//                   </button>
 //                 </motion.div>
 //               ))}
 //             </div>
 
-//             {/* Mobile Navigation */}
+//             {/* Mobile Navigation Menu Toggle */}
 //             <div className="flex md:hidden items-center">
 //               <motion.button
 //                 whileHover={{ scale: 1.05 }}
@@ -2010,7 +2012,10 @@
 //                                   ? "text-blue-600 hover:bg-blue-50"
 //                                   : "text-[#FF385C] hover:bg-[#FF385C]/5"
 //                             }`}
-//                             onClick={handleDashboardNavigation}
+//                             onClick={() => {
+//                               setIsUserMenuOpen(false);
+//                               handleDashboardNavigation();
+//                             }}
 //                           >
 //                             {getDashboardIcon()}
 //                             {getDashboardLabel()}
@@ -2082,12 +2087,12 @@
 //         <div className="px-4 py-3 space-y-1">
 //           {navLinks.map((link) => (
 //             <motion.div key={link.id} whileHover={{ x: 5 }}>
-//               <Link
-//                 to={link.path}
-//                 className="block px-4 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-[#FF385C] transition-colors"
+//               <button
+//                 onClick={() => navigateTo(link.path)}
+//                 className="block w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-[#FF385C] transition-colors"
 //               >
 //                 {t[link.label as keyof typeof t]}
-//               </Link>
+//               </button>
 //             </motion.div>
 //           ))}
 //           <div className="pt-2 border-t border-gray-200">
@@ -2166,10 +2171,22 @@
 //                         {t.email}
 //                       </label>
 //                       <div
-//                         className={`relative rounded-lg border ${isLoginEmailValid === true ? "border-green-500" : isLoginEmailValid === false ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+//                         className={`relative rounded-lg border ${
+//                           isLoginEmailValid === true
+//                             ? "border-green-500"
+//                             : isLoginEmailValid === false
+//                               ? "border-red-500"
+//                               : "border-gray-300"
+//                         } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
 //                       >
 //                         <EmailIcon
-//                           className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${isLoginEmailValid === true ? "text-green-500" : isLoginEmailValid === false ? "text-red-500" : "text-gray-400"}`}
+//                           className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+//                             isLoginEmailValid === true
+//                               ? "text-green-500"
+//                               : isLoginEmailValid === false
+//                                 ? "text-red-500"
+//                                 : "text-gray-400"
+//                           }`}
 //                         />
 //                         <input
 //                           type="email"
@@ -2260,7 +2277,11 @@
 //                       whileTap={{ scale: 0.98 }}
 //                       type="submit"
 //                       disabled={loginLoading || !isLoginFormValid()}
-//                       className={`w-full py-3 rounded-lg font-medium relative overflow-hidden group transition-colors ${loginLoading || !isLoginFormValid() ? "bg-gray-400 cursor-not-allowed" : "bg-[#FF385C] hover:bg-[#E31C5F]"} text-white`}
+//                       className={`w-full py-3 rounded-lg font-medium relative overflow-hidden group transition-colors ${
+//                         loginLoading || !isLoginFormValid()
+//                           ? "bg-gray-400 cursor-not-allowed"
+//                           : "bg-[#FF385C] hover:bg-[#E31C5F]"
+//                       } text-white`}
 //                     >
 //                       <span className="relative z-10 flex items-center justify-center gap-2">
 //                         {loginLoading ? (
@@ -2375,7 +2396,11 @@
 //                         {t.fullName}
 //                       </label>
 //                       <div
-//                         className={`relative rounded-lg border ${registerErrors.name ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+//                         className={`relative rounded-lg border ${
+//                           registerErrors.name
+//                             ? "border-red-500"
+//                             : "border-gray-300"
+//                         } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
 //                       >
 //                         <PersonIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
 //                         <input
@@ -2406,10 +2431,24 @@
 //                         {t.email}
 //                       </label>
 //                       <div
-//                         className={`relative rounded-lg border ${isRegisterEmailValid === true ? "border-green-500" : isRegisterEmailValid === false ? "border-red-500" : registerErrors.email ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+//                         className={`relative rounded-lg border ${
+//                           isRegisterEmailValid === true
+//                             ? "border-green-500"
+//                             : isRegisterEmailValid === false
+//                               ? "border-red-500"
+//                               : registerErrors.email
+//                                 ? "border-red-500"
+//                                 : "border-gray-300"
+//                         } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
 //                       >
 //                         <EmailIcon
-//                           className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${isRegisterEmailValid === true ? "text-green-500" : isRegisterEmailValid === false ? "text-red-500" : "text-gray-400"}`}
+//                           className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+//                             isRegisterEmailValid === true
+//                               ? "text-green-500"
+//                               : isRegisterEmailValid === false
+//                                 ? "text-red-500"
+//                                 : "text-gray-400"
+//                           }`}
 //                         />
 //                         <input
 //                           type="email"
@@ -2444,10 +2483,24 @@
 //                         {t.phoneNumber}
 //                       </label>
 //                       <div
-//                         className={`relative rounded-lg border ${isPhoneValid === true ? "border-green-500" : isPhoneValid === false ? "border-red-500" : registerErrors.phone ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+//                         className={`relative rounded-lg border ${
+//                           isPhoneValid === true
+//                             ? "border-green-500"
+//                             : isPhoneValid === false
+//                               ? "border-red-500"
+//                               : registerErrors.phone
+//                                 ? "border-red-500"
+//                                 : "border-gray-300"
+//                         } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
 //                       >
 //                         <PhoneIcon
-//                           className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${isPhoneValid === true ? "text-green-500" : isPhoneValid === false ? "text-red-500" : "text-gray-400"}`}
+//                           className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+//                             isPhoneValid === true
+//                               ? "text-green-500"
+//                               : isPhoneValid === false
+//                                 ? "text-red-500"
+//                                 : "text-gray-400"
+//                           }`}
 //                         />
 //                         <input
 //                           type="tel"
@@ -2480,7 +2533,11 @@
 //                         {t.password}
 //                       </label>
 //                       <div
-//                         className={`relative rounded-lg border ${registerErrors.password ? "border-red-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+//                         className={`relative rounded-lg border ${
+//                           registerErrors.password
+//                             ? "border-red-500"
+//                             : "border-gray-300"
+//                         } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
 //                       >
 //                         <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
 //                         <input
@@ -2565,10 +2622,24 @@
 //                         {t.confirmPassword}
 //                       </label>
 //                       <div
-//                         className={`relative rounded-lg border ${registerErrors.confirmPassword ? "border-red-500" : registerConfirmPassword && registerPassword === registerConfirmPassword && registerConfirmPassword.length > 0 ? "border-green-500" : "border-gray-300"} bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+//                         className={`relative rounded-lg border ${
+//                           registerErrors.confirmPassword
+//                             ? "border-red-500"
+//                             : registerConfirmPassword &&
+//                                 registerPassword === registerConfirmPassword &&
+//                                 registerConfirmPassword.length > 0
+//                               ? "border-green-500"
+//                               : "border-gray-300"
+//                         } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
 //                       >
 //                         <LockIcon
-//                           className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${registerConfirmPassword && registerPassword === registerConfirmPassword && registerConfirmPassword.length > 0 ? "text-green-500" : "text-gray-400"}`}
+//                           className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+//                             registerConfirmPassword &&
+//                             registerPassword === registerConfirmPassword &&
+//                             registerConfirmPassword.length > 0
+//                               ? "text-green-500"
+//                               : "text-gray-400"
+//                           }`}
 //                         />
 //                         <input
 //                           type={showConfirmPassword ? "text" : "password"}
@@ -2618,7 +2689,11 @@
 //                       whileTap={{ scale: 0.98 }}
 //                       type="submit"
 //                       disabled={registerLoading || !isRegisterFormValid()}
-//                       className={`w-full py-3 rounded-lg font-medium relative overflow-hidden group transition-colors ${registerLoading || !isRegisterFormValid() ? "bg-gray-400 cursor-not-allowed" : "bg-[#FF385C] hover:bg-[#E31C5F]"} text-white`}
+//                       className={`w-full py-3 rounded-lg font-medium relative overflow-hidden group transition-colors ${
+//                         registerLoading || !isRegisterFormValid()
+//                           ? "bg-gray-400 cursor-not-allowed"
+//                           : "bg-[#FF385C] hover:bg-[#E31C5F]"
+//                       } text-white`}
 //                     >
 //                       <span className="relative z-10 flex items-center justify-center gap-2">
 //                         {registerLoading ? (
@@ -2898,6 +2973,29 @@
 //   );
 // };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
@@ -2917,7 +3015,6 @@ import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import YouTubeIcon from "@mui/icons-material/YouTube";
@@ -3989,7 +4086,6 @@ const ForgetPasswordModal: React.FC<ForgetPasswordModalProps> = ({
 export const Navbar = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
@@ -4058,7 +4154,6 @@ export const Navbar = () => {
   >(null);
   const [isPhoneValid, setIsPhoneValid] = useState<boolean | null>(null);
 
-  const userMenuRef = useRef<HTMLDivElement>(null);
   const languageMenuRef = useRef<HTMLDivElement>(null);
 
   // Get translation based on language from cookies
@@ -4077,12 +4172,6 @@ export const Navbar = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        userMenuRef.current &&
-        !userMenuRef.current.contains(event.target as Node)
-      ) {
-        setIsUserMenuOpen(false);
-      }
-      if (
         languageMenuRef.current &&
         !languageMenuRef.current.contains(event.target as Node)
       ) {
@@ -4099,7 +4188,6 @@ export const Navbar = () => {
       if (event.key === "Escape") {
         setIsLoginOpen(false);
         setIsRegisterOpen(false);
-        setIsUserMenuOpen(false);
         setIsLanguageMenuOpen(false);
         setIsDashboardOpen(false);
         setIsUserModalOpen(false);
@@ -4303,7 +4391,6 @@ export const Navbar = () => {
 
   // Handle Dashboard navigation based on role
   const handleDashboardNavigation = () => {
-    setIsUserMenuOpen(false);
     if (userRole === "admin") {
       navigateTo("/dashboard");
     } else if (userRole === "host") {
@@ -4465,8 +4552,6 @@ export const Navbar = () => {
     setUserEmail("");
     setUserRole("user");
     setUserId("");
-    setIsUserMenuOpen(false);
-    setIsDashboardOpen(false);
 
     setStatusModal({
       isOpen: true,
@@ -4816,163 +4901,66 @@ export const Navbar = () => {
                 </AnimatePresence>
               </div>
 
-              {/* Become a Host / Dashboard Button */}
+              {/* Login / Register / Dashboard Buttons */}
               {isLoggedIn ? (
-                <motion.button
-                  whileHover={{
-                    scale: 1.05,
-                    backgroundColor: "#FF385C",
-                    color: "white",
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                  className="hidden sm:block text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all bg-[#FF385C] text-white hover:bg-[#E31C5F] whitespace-nowrap"
-                  onClick={handleDashboardNavigation}
-                >
-                  <DashboardIcon className="w-4 h-4 inline mr-1" />
-                  {getDashboardLabel()}
-                </motion.button>
+                <>
+                  <motion.button
+                    whileHover={{
+                      scale: 1.05,
+                      backgroundColor: "#FF385C",
+                      color: "white",
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                    className="hidden sm:block text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all bg-[#FF385C] text-white hover:bg-[#E31C5F] whitespace-nowrap"
+                    onClick={handleDashboardNavigation}
+                  >
+                    <DashboardIcon className="w-4 h-4 inline mr-1" />
+                    {getDashboardLabel()}
+                  </motion.button>
+                  <motion.button
+                    whileHover={{
+                      scale: 1.05,
+                      backgroundColor: "#dc2626",
+                      color: "white",
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                    className="hidden sm:block text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all text-gray-700 hover:bg-red-600 hover:text-white border border-gray-200 hover:border-red-600 whitespace-nowrap"
+                    onClick={handleLogout}
+                  >
+                    <LogoutIcon className="w-3 h-3 inline mr-1" />
+                    {t.logout}
+                  </motion.button>
+                </>
               ) : (
-                <motion.button
-                  whileHover={{
-                    scale: 1.05,
-                    backgroundColor: "#FF385C",
-                    color: "white",
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                  className="hidden sm:block text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all text-gray-700 hover:bg-[#FF385C] hover:text-white border border-gray-200 hover:border-[#FF385C] whitespace-nowrap"
-                  onClick={() => setIsLoginOpen(true)}
-                >
-                  {t.becomeHost}
-                </motion.button>
+                <>
+                  <motion.button
+                    whileHover={{
+                      scale: 1.05,
+                      backgroundColor: "#FF385C",
+                      color: "white",
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                    className="hidden sm:block text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all text-gray-700 hover:bg-[#FF385C] hover:text-white border border-gray-200 hover:border-[#FF385C] whitespace-nowrap"
+                    onClick={() => setIsLoginOpen(true)}
+                  >
+                    <LoginIcon className="w-3 h-3 inline mr-1" />
+                    {t.login}
+                  </motion.button>
+                  <motion.button
+                    whileHover={{
+                      scale: 1.05,
+                      backgroundColor: "#1B4E91",
+                      color: "white",
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                    className="hidden sm:block text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all text-gray-700 hover:bg-[#1B4E91] hover:text-white border border-gray-200 hover:border-[#1B4E91] whitespace-nowrap"
+                    onClick={() => setIsRegisterOpen(true)}
+                  >
+                    <PersonAddIcon className="w-3 h-3 inline mr-1" />
+                    {t.signup}
+                  </motion.button>
+                </>
               )}
-
-              {/* User Menu */}
-              <div className="relative" ref={userMenuRef}>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center gap-2 border border-gray-200 rounded-full px-2 sm:px-3 py-1.5 transition-all duration-300 bg-white hover:shadow-md"
-                >
-                  {isLoggedIn ? (
-                    <motion.div
-                      className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold bg-[#FF385C] text-white"
-                      whileHover={{ rotate: 360 }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      {userName.charAt(0).toUpperCase()}
-                    </motion.div>
-                  ) : (
-                    <PersonIcon className="w-4 h-4 text-gray-700" />
-                  )}
-                  <ExpandMoreIcon className="w-4 h-4 hidden sm:block text-gray-700" />
-                </motion.button>
-
-                {/* Dropdown Menu */}
-                <AnimatePresence>
-                  {isUserMenuOpen && (
-                    <motion.div
-                      variants={menuVariants}
-                      initial="hidden"
-                      animate="visible"
-                      exit="exit"
-                      transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-64 rounded-xl shadow-lg border bg-white border-gray-100 py-2"
-                    >
-                      {isLoggedIn ? (
-                        <>
-                          <div className="px-4 py-2 border-b border-gray-100">
-                            <p className="font-semibold text-sm text-gray-900">
-                              {userName}
-                            </p>
-                            <p className="text-xs text-gray-500">{userEmail}</p>
-                            <span className="inline-block mt-1 px-2 py-0.5 text-xs rounded-full bg-[#FF385C]/10 text-[#FF385C]">
-                              {userRole.charAt(0).toUpperCase() +
-                                userRole.slice(1)}
-                            </span>
-                          </div>
-                          <motion.button
-                            whileHover={{ x: 5 }}
-                            className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-gray-700 hover:bg-gray-50"
-                            onClick={() => {
-                              setIsUserMenuOpen(false);
-                              setIsUserModalOpen(true);
-                            }}
-                          >
-                            <AccountCircleIcon className="w-4 h-4" />
-                            {t.profile}
-                          </motion.button>
-                          <motion.button
-                            whileHover={{ x: 5 }}
-                            className={`w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 transition-colors ${
-                              userRole === "admin"
-                                ? "text-purple-600 hover:bg-purple-50"
-                                : userRole === "host"
-                                  ? "text-blue-600 hover:bg-blue-50"
-                                  : "text-[#FF385C] hover:bg-[#FF385C]/5"
-                            }`}
-                            onClick={() => {
-                              setIsUserMenuOpen(false);
-                              handleDashboardNavigation();
-                            }}
-                          >
-                            {getDashboardIcon()}
-                            {getDashboardLabel()}
-                            {userRole === "admin" && (
-                              <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-600">
-                                Admin
-                              </span>
-                            )}
-                            {userRole === "host" && (
-                              <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-600">
-                                Host
-                              </span>
-                            )}
-                          </motion.button>
-                          <hr className="my-1 border-gray-200" />
-                          <motion.button
-                            whileHover={{ x: 5 }}
-                            onClick={handleLogout}
-                            className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-red-600 hover:bg-red-50"
-                          >
-                            <LogoutIcon className="w-4 h-4" />
-                            {t.logout}
-                          </motion.button>
-                        </>
-                      ) : (
-                        <>
-                          <motion.button
-                            whileHover={{ x: 5 }}
-                            onClick={() => {
-                              setIsUserMenuOpen(false);
-                              setIsLoginOpen(true);
-                            }}
-                            className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-gray-700 hover:bg-gray-50"
-                          >
-                            <LoginIcon className="w-4 h-4" />
-                            {t.login}
-                          </motion.button>
-                          <motion.button
-                            whileHover={{ x: 5 }}
-                            onClick={() => {
-                              setIsUserMenuOpen(false);
-                              setIsRegisterOpen(true);
-                            }}
-                            className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-gray-700 hover:bg-gray-50"
-                          >
-                            <PersonAddIcon className="w-4 h-4" />
-                            {t.signup}
-                          </motion.button>
-                          <hr className="my-1 border-gray-200" />
-                          <div className="px-4 py-2 text-gray-500">
-                            <p className="text-xs">{t.becomeHostDesc}</p>
-                          </div>
-                        </>
-                      )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
             </div>
           </div>
         </div>
@@ -4994,24 +4982,45 @@ export const Navbar = () => {
               </button>
             </motion.div>
           ))}
-          <div className="pt-2 border-t border-gray-200">
+          <div className="pt-2 border-t border-gray-200 space-y-1">
             {isLoggedIn ? (
-              <motion.button
-                whileHover={{ x: 5 }}
-                onClick={handleDashboardNavigation}
-                className="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-[#FF385C] hover:bg-[#FF385C]/5 transition-colors"
-              >
-                <DashboardIcon className="w-4 h-4 inline mr-2" />
-                {getDashboardLabel()}
-              </motion.button>
+              <>
+                <motion.button
+                  whileHover={{ x: 5 }}
+                  onClick={handleDashboardNavigation}
+                  className="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-[#FF385C] hover:bg-[#FF385C]/5 transition-colors"
+                >
+                  <DashboardIcon className="w-4 h-4 inline mr-2" />
+                  {getDashboardLabel()}
+                </motion.button>
+                <motion.button
+                  whileHover={{ x: 5 }}
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  <LogoutIcon className="w-4 h-4 inline mr-2" />
+                  {t.logout}
+                </motion.button>
+              </>
             ) : (
-              <motion.button
-                whileHover={{ x: 5 }}
-                onClick={() => setIsLoginOpen(true)}
-                className="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-[#FF385C] hover:bg-[#FF385C]/5 transition-colors"
-              >
-                {t.becomeHost}
-              </motion.button>
+              <>
+                <motion.button
+                  whileHover={{ x: 5 }}
+                  onClick={() => setIsLoginOpen(true)}
+                  className="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-[#FF385C] hover:bg-[#FF385C]/5 transition-colors"
+                >
+                  <LoginIcon className="w-4 h-4 inline mr-2" />
+                  {t.login}
+                </motion.button>
+                <motion.button
+                  whileHover={{ x: 5 }}
+                  onClick={() => setIsRegisterOpen(true)}
+                  className="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-[#1B4E91] hover:bg-[#1B4E91]/5 transition-colors"
+                >
+                  <PersonAddIcon className="w-4 h-4 inline mr-2" />
+                  {t.signup}
+                </motion.button>
+              </>
             )}
           </div>
         </div>
