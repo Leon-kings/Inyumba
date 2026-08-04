@@ -1,4 +1,3 @@
-
 // /* eslint-disable react-refresh/only-export-components */
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 // /* eslint-disable react-hooks/set-state-in-effect */
@@ -653,7 +652,7 @@
 //   { id: "experience", path: "/experience", label: "experience" },
 //   { id: "services", path: "/services", label: "services" },
 //   { id: "testimonials", path: "/testimonials", label: "testimonials" },
-  
+
 // ];
 
 // // Success/Fail Modal Component
@@ -3549,10 +3548,10 @@ export { translations };
 // Navigation links object
 const navLinks = [
   { id: "home", path: "/", label: "home" },
-  { id: "about", path: "/about", label: "about" },
-  { id: "experience", path: "/experience", label: "experience" },
+  { id: "experience", path: "/house/rent", label: "experience" },
   { id: "services", path: "/services", label: "services" },
   { id: "testimonials", path: "/testimonials", label: "testimonials" },
+  { id: "about", path: "/about", label: "about" },
 ];
 
 // Success/Fail Modal Component
@@ -3862,8 +3861,8 @@ const ForgetPasswordModal: React.FC<ForgetPasswordModalProps> = ({
                           isEmailValid === true
                             ? "border-green-500"
                             : isEmailValid === false
-                            ? "border-red-500"
-                            : "border-gray-300"
+                              ? "border-red-500"
+                              : "border-gray-300"
                         } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
                       >
                         <EmailIcon
@@ -3871,8 +3870,8 @@ const ForgetPasswordModal: React.FC<ForgetPasswordModalProps> = ({
                             isEmailValid === true
                               ? "text-green-500"
                               : isEmailValid === false
-                              ? "text-red-500"
-                              : "text-gray-400"
+                                ? "text-red-500"
+                                : "text-gray-400"
                           }`}
                         />
                         <input
@@ -4743,9 +4742,7 @@ export const Navbar = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
-                  const mobileMenu = document.getElementById(
-                    "mobile-nav-menu",
-                  );
+                  const mobileMenu = document.getElementById("mobile-nav-menu");
                   if (mobileMenu) {
                     mobileMenu.classList.toggle("hidden");
                   }
@@ -4775,9 +4772,7 @@ export const Navbar = () => {
                 <motion.button
                   whileHover={{ scale: 1.1, rotate: 10 }}
                   whileTap={{ scale: 0.9 }}
-                  onClick={() =>
-                    setIsLanguageMenuOpen(!isLanguageMenuOpen)
-                  }
+                  onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
                   className="p-2 rounded-full transition-colors hover:bg-gray-100 text-gray-700"
                 >
                   <LanguageIcon className="w-5 h-5" />
@@ -4796,9 +4791,7 @@ export const Navbar = () => {
                       {["en", "fr", "rw"].map((lang) => (
                         <button
                           key={lang}
-                          onClick={() =>
-                            handleLanguageChange(lang as Language)
-                          }
+                          onClick={() => handleLanguageChange(lang as Language)}
                           className={`w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 transition-colors ${
                             language === lang
                               ? "text-[#FF385C] font-semibold"
@@ -4806,17 +4799,13 @@ export const Navbar = () => {
                           }`}
                         >
                           <span className="text-lg">
-                            {lang === "en"
-                              ? "🇬🇧"
-                              : lang === "fr"
-                              ? "🇫🇷"
-                              : "🇷🇼"}
+                            {lang === "en" ? "🇬🇧" : lang === "fr" ? "🇫🇷" : "🇷🇼"}
                           </span>
                           {lang === "en"
                             ? "English"
                             : lang === "fr"
-                            ? "Français"
-                            : "Kinyarwanda"}
+                              ? "Français"
+                              : "Kinyarwanda"}
                           {language === lang && (
                             <CheckCircleIcon className="w-4 h-4 ml-auto" />
                           )}
@@ -4919,8 +4908,8 @@ export const Navbar = () => {
                               userRole === "admin"
                                 ? "text-purple-600 hover:bg-purple-50"
                                 : userRole === "host"
-                                ? "text-blue-600 hover:bg-blue-50"
-                                : "text-[#FF385C] hover:bg-[#FF385C]/5"
+                                  ? "text-blue-600 hover:bg-blue-50"
+                                  : "text-[#FF385C] hover:bg-[#FF385C]/5"
                             }`}
                             onClick={() => {
                               setIsUserMenuOpen(false);
@@ -5085,8 +5074,8 @@ export const Navbar = () => {
                           isLoginEmailValid === true
                             ? "border-green-500"
                             : isLoginEmailValid === false
-                            ? "border-red-500"
-                            : "border-gray-300"
+                              ? "border-red-500"
+                              : "border-gray-300"
                         } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
                       >
                         <EmailIcon
@@ -5094,8 +5083,8 @@ export const Navbar = () => {
                             isLoginEmailValid === true
                               ? "text-green-500"
                               : isLoginEmailValid === false
-                              ? "text-red-500"
-                              : "text-gray-400"
+                                ? "text-red-500"
+                                : "text-gray-400"
                           }`}
                         />
                         <input
@@ -5345,10 +5334,10 @@ export const Navbar = () => {
                           isRegisterEmailValid === true
                             ? "border-green-500"
                             : isRegisterEmailValid === false
-                            ? "border-red-500"
-                            : registerErrors.email
-                            ? "border-red-500"
-                            : "border-gray-300"
+                              ? "border-red-500"
+                              : registerErrors.email
+                                ? "border-red-500"
+                                : "border-gray-300"
                         } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
                       >
                         <EmailIcon
@@ -5356,8 +5345,8 @@ export const Navbar = () => {
                             isRegisterEmailValid === true
                               ? "text-green-500"
                               : isRegisterEmailValid === false
-                              ? "text-red-500"
-                              : "text-gray-400"
+                                ? "text-red-500"
+                                : "text-gray-400"
                           }`}
                         />
                         <input
@@ -5397,10 +5386,10 @@ export const Navbar = () => {
                           isPhoneValid === true
                             ? "border-green-500"
                             : isPhoneValid === false
-                            ? "border-red-500"
-                            : registerErrors.phone
-                            ? "border-red-500"
-                            : "border-gray-300"
+                              ? "border-red-500"
+                              : registerErrors.phone
+                                ? "border-red-500"
+                                : "border-gray-300"
                         } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
                       >
                         <PhoneIcon
@@ -5408,8 +5397,8 @@ export const Navbar = () => {
                             isPhoneValid === true
                               ? "text-green-500"
                               : isPhoneValid === false
-                              ? "text-red-500"
-                              : "text-gray-400"
+                                ? "text-red-500"
+                                : "text-gray-400"
                           }`}
                         />
                         <input
@@ -5487,8 +5476,8 @@ export const Navbar = () => {
                                     passwordStrength === "weak"
                                       ? "33%"
                                       : passwordStrength === "moderate"
-                                      ? "66%"
-                                      : "100%",
+                                        ? "66%"
+                                        : "100%",
                                   backgroundColor:
                                     getPasswordStrengthColor(passwordStrength),
                                 }}
@@ -5498,8 +5487,8 @@ export const Navbar = () => {
                                     passwordStrength === "weak"
                                       ? "33%"
                                       : passwordStrength === "moderate"
-                                      ? "66%"
-                                      : "100%",
+                                        ? "66%"
+                                        : "100%",
                                 }}
                               />
                             </div>
@@ -5519,9 +5508,9 @@ export const Navbar = () => {
                           </div>
                           {passwordStrength === "weak" && (
                             <p className="text-xs text-red-500 mt-1">
-                              ⚠️ Password is too weak. Use at least 8
-                              characters with uppercase, lowercase, numbers, and
-                              special characters.
+                              ⚠️ Password is too weak. Use at least 8 characters
+                              with uppercase, lowercase, numbers, and special
+                              characters.
                             </p>
                           )}
                         </div>
@@ -5536,10 +5525,10 @@ export const Navbar = () => {
                           registerErrors.confirmPassword
                             ? "border-red-500"
                             : registerConfirmPassword &&
-                              registerPassword === registerConfirmPassword &&
-                              registerConfirmPassword.length > 0
-                            ? "border-green-500"
-                            : "border-gray-300"
+                                registerPassword === registerConfirmPassword &&
+                                registerConfirmPassword.length > 0
+                              ? "border-green-500"
+                              : "border-gray-300"
                         } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
                       >
                         <LockIcon
