@@ -1,3 +1,5 @@
+/* eslint-disable no-useless-assignment */
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable react-hooks/immutability */
@@ -11,7 +13,6 @@ import axios from "axios";
 // Material-UI Icons
 import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
-
 import CloseIcon from "@mui/icons-material/Close";
 import SendIcon from "@mui/icons-material/Send";
 import { ErrorOutlineRounded, HelpOutlineOutlined } from "@mui/icons-material";
@@ -23,8 +24,8 @@ import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-// API endpoint - replace with your actual API URL
-const API_URL = "http://localhost:5000/api/contact";
+// API endpoint - YOUR ORIGINAL API URL
+const API_URL = "https://rene-inyumba-nodejs.onrender.com/requests";
 
 const translations = {
   en: {
@@ -163,7 +164,6 @@ const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
 
 export const NotFound: React.FC = () => {
   const navigate = useNavigate();
-  // Get language from cookies
   const [lang, setLang] = useState<"en" | "fr" | "rw">(
     getLanguageFromCookies(),
   );
@@ -187,6 +187,12 @@ export const NotFound: React.FC = () => {
   }>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Success/Fail Modal States
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showFailModal, setShowFailModal] = useState(false);
+  const [failMessage, setFailMessage] = useState("");
+  const [successData, setSuccessData] = useState<any>(null);
+
   const t = translations[lang];
 
   // Listen for language changes in cookies
@@ -198,7 +204,6 @@ export const NotFound: React.FC = () => {
       }
     };
 
-    // Check for cookie changes every second (polling)
     const interval = setInterval(handleCookieChange, 1000);
     return () => clearInterval(interval);
   }, [lang]);
@@ -301,7 +306,7 @@ export const NotFound: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      // Prepare form data for API
+      // Create FormData to match your controller
       const formDataToSend = new FormData();
       formDataToSend.append("name", formData.name);
       formDataToSend.append("email", formData.email);
@@ -312,16 +317,34 @@ export const NotFound: React.FC = () => {
         formDataToSend.append("image", selectedImage);
       }
 
-      // Send to API
-      const response = await axios.post(API_URL, formDataToSend, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        timeout: 30000,
+      // Log what we're sending
+      console.log("Sending request to:", API_URL);
+      console.log("With data:", {
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+        language: lang,
+        hasImage: !!selectedImage,
       });
 
+      // Send to API - DO NOT set Content-Type header for FormData
+      const response = await axios.post(API_URL, formDataToSend);
+
+      console.log("Response received:", response);
+
       if (response.status === 200 || response.status === 201) {
-        toast.success(t.success);
+        // Store success data
+        setSuccessData({
+          name: formData.name,
+          email: formData.email,
+          status: response.data?.data?.status || "Pending",
+          language: lang,
+          requestId: response.data?.data?._id || response.data?.data?.id,
+          ...response.data?.data,
+        });
+
+        // Show success modal
+        setShowSuccessModal(true);
 
         // Reset form
         setFormData({ name: "", email: "", message: "" });
@@ -342,14 +365,28 @@ export const NotFound: React.FC = () => {
     } catch (error: any) {
       console.error("Error sending contact message:", error);
 
-      if (error.response) {
-        const errorMessage = error.response.data?.message || t.error;
-        toast.error(errorMessage);
+      let errorMessage = t.error;
+
+      if (error.code === "ECONNABORTED") {
+        errorMessage = "Request timeout. Please try again.";
+      } else if (error.response) {
+        // Server responded with error
+        console.error("Response error data:", error.response.data);
+        console.error("Response status:", error.response.status);
+        errorMessage =
+          error.response.data?.message || error.response.data?.error || t.error;
       } else if (error.request) {
-        toast.error("Network error. Please check your internet connection.");
+        // No response received
+        console.error("No response received:", error.request);
+        errorMessage =
+          "Cannot connect to server. Please check if the server is running.";
       } else {
-        toast.error(t.error);
+        // Other errors
+        errorMessage = error.message || t.error;
       }
+
+      setFailMessage(errorMessage);
+      setShowFailModal(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -768,6 +805,209 @@ export const NotFound: React.FC = () => {
                         </p>
                       )}
                   </form>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Success Modal */}
+      <AnimatePresence>
+        {showSuccessModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[700]"
+              onClick={() => setShowSuccessModal(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="fixed inset-4 z-[701] flex items-center justify-center"
+            >
+              <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl">
+                <div className="text-center">
+                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CheckCircleIcon className="w-12 h-12 text-green-600" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    {lang === "en"
+                      ? "Request Sent Successfully!"
+                      : lang === "fr"
+                        ? "Demande Envoyée avec Succès!"
+                        : "Ubutumwa Bwoherejwe Neza!"}
+                  </h3>
+                  <p className="text-gray-600 mb-2">
+                    {lang === "en"
+                      ? "Your request has been received. Our support team will review it and get back to you within 24 hours."
+                      : lang === "fr"
+                        ? "Votre demande a été reçue. Notre équipe de support l'examinera et vous répondra dans les 24 heures."
+                        : "Ubutumwa bwawe bwakiriwe. Itsinda ryacu ry'ubufasha rizabisuzuma kandi rikagusubiza mu masaha 24."}
+                  </p>
+                  <div className="bg-gray-50 rounded-lg p-3 text-left text-sm mb-4">
+                    <div className="flex justify-between py-1 border-b border-gray-200">
+                      <span className="text-gray-500">
+                        {lang === "en"
+                          ? "Name"
+                          : lang === "fr"
+                            ? "Nom"
+                            : "Izina"}
+                      </span>
+                      <span className="font-medium text-gray-800">
+                        {successData?.name || formData.name}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-gray-200">
+                      <span className="text-gray-500">
+                        {lang === "en"
+                          ? "Email"
+                          : lang === "fr"
+                            ? "Email"
+                            : "Imeri"}
+                      </span>
+                      <span className="font-medium text-gray-800">
+                        {successData?.email || formData.email}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-gray-200">
+                      <span className="text-gray-500">
+                        {lang === "en"
+                          ? "Status"
+                          : lang === "fr"
+                            ? "Statut"
+                            : "Imiterere"}
+                      </span>
+                      <span className="font-medium text-amber-600">
+                        {successData?.status || "Pending"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-gray-200">
+                      <span className="text-gray-500">
+                        {lang === "en"
+                          ? "Language"
+                          : lang === "fr"
+                            ? "Langue"
+                            : "Ururimi"}
+                      </span>
+                      <span className="font-medium text-gray-800 uppercase">
+                        {successData?.language || lang}
+                      </span>
+                    </div>
+                    {successData?.requestId && (
+                      <div className="flex justify-between py-1 border-t border-gray-200 mt-1 pt-1">
+                        <span className="text-gray-500">Request ID</span>
+                        <span className="font-mono text-xs text-gray-600 truncate max-w-[150px]">
+                          {successData.requestId}
+                        </span>
+                      </div>
+                    )}
+                    {successData?.image?.url && (
+                      <div className="flex justify-between py-1 border-t border-gray-200 mt-1 pt-1">
+                        <span className="text-gray-500">Image</span>
+                        <span className="text-xs text-green-600">Uploaded</span>
+                      </div>
+                    )}
+                  </div>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setShowSuccessModal(false);
+                      setSuccessData(null);
+                    }}
+                    className="w-full py-3 bg-[#FF385C] text-white rounded-lg font-medium hover:bg-[#E31C5F] transition-colors"
+                  >
+                    {lang === "en"
+                      ? "Close"
+                      : lang === "fr"
+                        ? "Fermer"
+                        : "Funga"}
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Fail Modal */}
+      <AnimatePresence>
+        {showFailModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[700]"
+              onClick={() => setShowFailModal(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="fixed inset-4 z-[701] flex items-center justify-center"
+            >
+              <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl">
+                <div className="text-center">
+                  <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CancelIcon className="w-12 h-12 text-red-600" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    {lang === "en"
+                      ? "Request Failed"
+                      : lang === "fr"
+                        ? "Échec de la Demande"
+                        : "Ubutumwa Ntabwo Bwoherejwe"}
+                  </h3>
+                  <p className="text-gray-600 mb-4">{failMessage}</p>
+                  <div className="bg-red-50 rounded-lg p-3 text-left text-sm mb-4">
+                    <p className="text-red-600 flex items-start gap-2">
+                      <ErrorOutlineRounded className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                      <span>
+                        {lang === "en"
+                          ? "There was an error submitting your request. Please try again or contact support directly."
+                          : lang === "fr"
+                            ? "Une erreur s'est produite lors de l'envoi de votre demande. Veuillez réessayer ou contacter le support directement."
+                            : "Habaye ikosa ryatumye ubutumwa butawoherezwa. Ongera ugerageze cyangwa wandikire ubufasha."}
+                      </span>
+                    </p>
+                  </div>
+                  <div className="flex gap-3">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setShowFailModal(false);
+                        setIsAssistanceModalOpen(true);
+                      }}
+                      className="flex-1 py-3 bg-[#FF385C] text-white rounded-lg font-medium hover:bg-[#E31C5F] transition-colors"
+                    >
+                      {lang === "en"
+                        ? "Try Again"
+                        : lang === "fr"
+                          ? "Réessayer"
+                          : "Ongera Ugerageze"}
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setShowFailModal(false);
+                        setFailMessage("");
+                      }}
+                      className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                    >
+                      {lang === "en"
+                        ? "Close"
+                        : lang === "fr"
+                          ? "Fermer"
+                          : "Funga"}
+                    </motion.button>
+                  </div>
                 </div>
               </div>
             </motion.div>

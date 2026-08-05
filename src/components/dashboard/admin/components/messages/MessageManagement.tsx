@@ -30,7 +30,7 @@ import ErrorIcon from "@mui/icons-material/Error";
 
 // Types - Updated to match the contact model
 interface Contact {
-  id?: string;  // Made optional to handle MongoDB _id
+  id?: string; // Made optional to handle MongoDB _id
   _id: string;
   name: string;
   email: string;
@@ -517,7 +517,7 @@ const transformContactToMessage = (contact: Contact): Message => {
     replyMessage: contact.replyMessage || null,
     createdAt: contact.createdAt,
     updatedAt: contact.updatedAt,
-    
+
     // UI fields
     senderName: contact.name,
     senderEmail: contact.email,

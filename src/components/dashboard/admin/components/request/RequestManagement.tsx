@@ -1,20 +1,5 @@
 // /* eslint-disable no-useless-escape */
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // /* eslint-disable react-hooks/set-state-in-effect */
 // import React, { useState, useEffect } from "react";
 // import { motion, AnimatePresence } from "framer-motion";
@@ -34,7 +19,6 @@
 // import AssignmentIcon from "@mui/icons-material/Assignment";
 // import ChatIcon from "@mui/icons-material/Chat";
 // import { Close, Send } from "@mui/icons-material";
-
 
 // // Types - Updated to match the request model
 // interface RequestImage {
@@ -466,7 +450,7 @@
 //         throw new Error(`HTTP error! status: ${response.status}`);
 //       }
 //       const data = await response.json();
-      
+
 //       // Handle both array and single object responses
 //       let requestsData: Request[] = [];
 //       if (Array.isArray(data)) {
@@ -485,7 +469,7 @@
 //           }
 //         }
 //       }
-      
+
 //       const transformedRequests = requestsData.map((req: Request) => transformRequestToUI(req));
 //       setRequests(transformedRequests);
 //     } catch (error) {
@@ -1386,17 +1370,6 @@
 //   );
 // };
 
-
-
-
-
-
-
-
-
-
-
-
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -1416,7 +1389,6 @@ import ClearIcon from "@mui/icons-material/Clear";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import ChatIcon from "@mui/icons-material/Chat";
 import { Close, Send } from "@mui/icons-material";
-
 
 // Types - Updated to match the request model
 interface RequestImage {
@@ -1555,7 +1527,8 @@ const translations = {
   },
   fr: {
     requestManagement: "Gestion des Demandes",
-    manageRequests: "Gérer les demandes de support et les demandes d'assistance",
+    manageRequests:
+      "Gérer les demandes de support et les demandes d'assistance",
     total: "Total",
     pending: "En Attente",
     approved: "Approuvé",
@@ -1775,7 +1748,9 @@ export const RequestManagement: React.FC = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isRespondModalOpen, setIsRespondModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<RequestUI | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<RequestUI | null>(
+    null,
+  );
   const [responseText, setResponseText] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
@@ -1805,12 +1780,12 @@ export const RequestManagement: React.FC = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      
+
       // Handle both array and single object responses
       let requestsData: Request[] = [];
       if (Array.isArray(data)) {
         requestsData = data;
-      } else if (data && typeof data === 'object') {
+      } else if (data && typeof data === "object") {
         if (data._id) {
           requestsData = [data];
         } else if (data.data && Array.isArray(data.data)) {
@@ -1818,14 +1793,18 @@ export const RequestManagement: React.FC = () => {
         } else if (data.requests && Array.isArray(data.requests)) {
           requestsData = data.requests;
         } else {
-          const possibleArrays = Object.values(data).filter(val => Array.isArray(val));
+          const possibleArrays = Object.values(data).filter((val) =>
+            Array.isArray(val),
+          );
           if (possibleArrays.length > 0) {
             requestsData = possibleArrays[0];
           }
         }
       }
-      
-      const transformedRequests = requestsData.map((req: Request) => transformRequestToUI(req));
+
+      const transformedRequests = requestsData.map((req: Request) =>
+        transformRequestToUI(req),
+      );
       setRequests(transformedRequests);
     } catch (error) {
       console.error("Error fetching requests:", error);
@@ -1957,7 +1936,7 @@ export const RequestManagement: React.FC = () => {
       const transformedRequest = transformRequestToUI(updatedRequest);
 
       const updatedRequests = requests.map((r) =>
-        r._id === selectedRequest._id ? transformedRequest : r
+        r._id === selectedRequest._id ? transformedRequest : r,
       );
       setRequests(updatedRequests);
 
@@ -2374,7 +2353,9 @@ export const RequestManagement: React.FC = () => {
                         >
                           <img
                             src={selectedRequest.image.url}
-                            alt={selectedRequest.image.public_id || "Request image"}
+                            alt={
+                              selectedRequest.image.public_id || "Request image"
+                            }
                             className="max-h-48 object-contain cursor-pointer"
                           />
                           <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
@@ -2681,7 +2662,8 @@ export const RequestManagement: React.FC = () => {
                 />
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white text-sm px-4 py-2 rounded-lg">
                   {selectedRequest.image.public_id || "Image"}
-                  {selectedRequest.image.format && ` (${selectedRequest.image.format})`}
+                  {selectedRequest.image.format &&
+                    ` (${selectedRequest.image.format})`}
                 </div>
               </div>
             </motion.div>

@@ -984,7 +984,9 @@ export const Services: React.FC = () => {
                   <div className="w-12 h-12 bg-[#FF385C]/10 rounded-full flex items-center justify-center mx-auto mb-3 text-[#FF385C]">
                     {stat.icon}
                   </div>
-                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stat.value}
+                  </p>
                   <p className="text-xs text-gray-500 mt-1">{stat.label}</p>
                 </motion.div>
               ))}
@@ -1063,9 +1065,12 @@ export const Services: React.FC = () => {
                   <div
                     className={`w-14 h-14 ${service.bgColor} rounded-xl flex items-center justify-center mb-4 ${service.color}`}
                   >
-                    {React.cloneElement(service.icon as React.ReactElement<any>, {
-                      className: "w-7 h-7",
-                    })}
+                    {React.cloneElement(
+                      service.icon as React.ReactElement<any>,
+                      {
+                        className: "w-7 h-7",
+                      },
+                    )}
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
                     {service.title}
@@ -1234,7 +1239,9 @@ export const Services: React.FC = () => {
                     {item.icon}
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900">{item.title}</h4>
+                    <h4 className="font-semibold text-gray-900">
+                      {item.title}
+                    </h4>
                     <p className="text-sm text-gray-600 mt-1">{item.desc}</p>
                   </div>
                 </motion.div>
@@ -1282,7 +1289,9 @@ export const Services: React.FC = () => {
                       </div>
                       <div>
                         <p className="text-xs text-gray-500">Email</p>
-                        <p className="text-sm text-gray-900">{t.emailAddress}</p>
+                        <p className="text-sm text-gray-900">
+                          {t.emailAddress}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -1335,7 +1344,11 @@ export const Services: React.FC = () => {
                   <h3 className="text-xl font-bold text-gray-900 mb-4">
                     Send a Message
                   </h3>
-                  <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+                  <form
+                    onSubmit={handleSubmit}
+                    className="space-y-4"
+                    noValidate
+                  >
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1.5">
                         {t.name}
@@ -1363,7 +1376,9 @@ export const Services: React.FC = () => {
                         )}
                       </div>
                       {errors.name && (
-                        <p className="text-xs text-red-500 mt-1">{errors.name}</p>
+                        <p className="text-xs text-red-500 mt-1">
+                          {errors.name}
+                        </p>
                       )}
                       {isNameValid === true && (
                         <p className="text-xs text-green-500 mt-1">
