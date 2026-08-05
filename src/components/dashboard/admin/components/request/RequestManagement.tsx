@@ -1,6 +1,20 @@
-/* eslint-disable no-useless-escape */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// /* eslint-disable no-useless-escape */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // /* eslint-disable react-hooks/set-state-in-effect */
 // import React, { useState, useEffect } from "react";
 // import { motion, AnimatePresence } from "framer-motion";
@@ -16,29 +30,79 @@
 // import DeleteIcon from "@mui/icons-material/Delete";
 // import VisibilityIcon from "@mui/icons-material/Visibility";
 // import ImageIcon from "@mui/icons-material/Image";
-
 // import ClearIcon from "@mui/icons-material/Clear";
 // import AssignmentIcon from "@mui/icons-material/Assignment";
 // import ChatIcon from "@mui/icons-material/Chat";
 // import { Close, Send } from "@mui/icons-material";
 
-// // Types
+
+// // Types - Updated to match the request model
+// interface RequestImage {
+//   public_id: string | null;
+//   url: string | null;
+//   format: string | null;
+// }
+
+// interface RequestNotification {
+//   notificationId: string;
+//   type: string | null;
+//   message: string | null;
+//   targetRoles: ("admin" | "user" | "host")[];
+//   createdAt: string;
+// }
+
 // interface Request {
-//   id: string;
+//   _id: string;
 //   name: string;
 //   email: string;
 //   message: string;
-//   image?: {
+//   language: string;
+//   image: RequestImage;
+//   status: "Pending" | "Approved" | "Rejected" | "Completed";
+//   adminReply: string;
+//   userId: string | null;
+//   notificationId: string | null;
+//   notifications: RequestNotification[];
+//   lastNotification: {
+//     type: string | null;
+//     message: string | null;
+//     status: "new" | "read" | "archived";
+//     createdAt: string | null;
+//   } | null;
+//   createdAt: string;
+//   updatedAt: string;
+//   hasNotification?: boolean;
+// }
+
+// // Extended type for UI purposes
+// interface RequestUI extends Request {
+//   // UI-specific fields
+//   response: string;
+//   respondedBy: string;
+//   statusLabel: string;
+//   statusColor: string;
+//   displayImage?: {
 //     name: string;
 //     size: number;
 //     type: string;
 //     dataUrl: string;
 //   };
-//   status: "pending" | "reviewing" | "resolved" | "rejected";
-//   createdAt: string;
-//   updatedAt: string;
-//   response?: string;
-//   respondedBy?: string;
+// }
+
+// interface RequestFormData {
+//   name: string;
+//   email: string;
+//   message: string;
+//   language: string;
+//   status: "Pending" | "Approved" | "Rejected" | "Completed";
+//   adminReply?: string;
+// }
+
+// // Form validation errors
+// interface FormErrors {
+//   name?: string;
+//   email?: string;
+//   message?: string;
 // }
 
 // // Translations
@@ -48,9 +112,9 @@
 //     manageRequests: "Manage support requests and assistance inquiries",
 //     total: "Total",
 //     pending: "Pending",
-//     reviewing: "Reviewing",
-//     resolved: "Resolved",
+//     approved: "Approved",
 //     rejected: "Rejected",
+//     completed: "Completed",
 //     searchRequests: "Search by name, email, or message...",
 //     allStatus: "All Status",
 //     request: "Request",
@@ -93,29 +157,44 @@
 //     close: "Close",
 //     send: "Send",
 //     sending: "Sending...",
+//     loading: "Loading...",
+//     fetchError: "Failed to load requests",
+//     nameRequired: "Name is required",
+//     nameMinLength: "Name must be at least 2 characters",
+//     emailRequired: "Email is required",
+//     emailInvalid: "Please enter a valid email",
+//     messageRequired: "Message is required",
+//     messageMinLength: "Message must be at least 10 characters",
+//     messageMaxLength: "Message cannot exceed 1000 characters",
+//     allFieldsValid: "All fields are valid!",
+//     pleaseFixErrors: "Please fix the errors above",
+//     replyTo: "Reply to",
+//     createdAt: "Created At",
+//     updatedAt: "Updated At",
+//     language: "Language",
+//     adminReply: "Admin Reply",
 //     statuses: {
-//       pending: "Pending",
-//       reviewing: "Reviewing",
-//       resolved: "Resolved",
-//       rejected: "Rejected",
+//       Pending: "Pending",
+//       Approved: "Approved",
+//       Rejected: "Rejected",
+//       Completed: "Completed",
 //     },
 //     filters: {
 //       all: "All Status",
-//       pending: "Pending",
-//       reviewing: "Reviewing",
-//       resolved: "Resolved",
-//       rejected: "Rejected",
+//       Pending: "Pending",
+//       Approved: "Approved",
+//       Rejected: "Rejected",
+//       Completed: "Completed",
 //     },
 //   },
 //   fr: {
 //     requestManagement: "Gestion des Demandes",
-//     manageRequests:
-//       "Gérer les demandes de support et les demandes d'assistance",
+//     manageRequests: "Gérer les demandes de support et les demandes d'assistance",
 //     total: "Total",
 //     pending: "En Attente",
-//     reviewing: "En Révision",
-//     resolved: "Résolu",
+//     approved: "Approuvé",
 //     rejected: "Rejeté",
+//     completed: "Terminé",
 //     searchRequests: "Rechercher par nom, email ou message...",
 //     allStatus: "Tous les Statuts",
 //     request: "Demande",
@@ -158,18 +237,34 @@
 //     close: "Fermer",
 //     send: "Envoyer",
 //     sending: "Envoi en cours...",
+//     loading: "Chargement...",
+//     fetchError: "Échec du chargement des demandes",
+//     nameRequired: "Le nom est requis",
+//     nameMinLength: "Le nom doit contenir au moins 2 caractères",
+//     emailRequired: "L'email est requis",
+//     emailInvalid: "Veuillez entrer un email valide",
+//     messageRequired: "Le message est requis",
+//     messageMinLength: "Le message doit contenir au moins 10 caractères",
+//     messageMaxLength: "Le message ne peut pas dépasser 1000 caractères",
+//     allFieldsValid: "Tous les champs sont valides !",
+//     pleaseFixErrors: "Veuillez corriger les erreurs ci-dessus",
+//     replyTo: "Répondre à",
+//     createdAt: "Créé le",
+//     updatedAt: "Mis à jour le",
+//     language: "Langue",
+//     adminReply: "Réponse Admin",
 //     statuses: {
-//       pending: "En Attente",
-//       reviewing: "En Révision",
-//       resolved: "Résolu",
-//       rejected: "Rejeté",
+//       Pending: "En Attente",
+//       Approved: "Approuvé",
+//       Rejected: "Rejeté",
+//       Completed: "Terminé",
 //     },
 //     filters: {
 //       all: "Tous les Statuts",
-//       pending: "En Attente",
-//       reviewing: "En Révision",
-//       resolved: "Résolu",
-//       rejected: "Rejeté",
+//       Pending: "En Attente",
+//       Approved: "Approuvé",
+//       Rejected: "Rejeté",
+//       Completed: "Terminé",
 //     },
 //   },
 //   rw: {
@@ -177,9 +272,9 @@
 //     manageRequests: "Gucunga ibyifuzo by'ubufasha n'ibibazo",
 //     total: "Yose",
 //     pending: "Bitegereje",
-//     reviewing: "Birisuzumwa",
-//     resolved: "Byakemutse",
+//     approved: "Byemewe",
 //     rejected: "Byangijwe",
+//     completed: "Byarangiye",
 //     searchRequests: "Shakisha ukurikije izina, imeri cyangwa ubutumwa...",
 //     allStatus: "Ihagaze Ryose",
 //     request: "Icyifuzo",
@@ -222,18 +317,34 @@
 //     close: "Funga",
 //     send: "Ohereza",
 //     sending: "Biremereza...",
+//     loading: "Birakoreshwa...",
+//     fetchError: "Kubura ibyifuzo birananiranye",
+//     nameRequired: "Izina rirasabwa",
+//     nameMinLength: "Izina rigomba kuba ibinyuguti 2 byibuze",
+//     emailRequired: "Imeri irasabwa",
+//     emailInvalid: "Andika imeri ikwiye",
+//     messageRequired: "Ubutumwa burasabwa",
+//     messageMinLength: "Ubutumwa bugomba kuba ibinyuguti 10 byibuze",
+//     messageMaxLength: "Ubutumwa ntibugomba kurenga ibinyuguti 1000",
+//     allFieldsValid: "Ibice byose birimo amakuru akwiye!",
+//     pleaseFixErrors: "Kosora amakosa hejuru",
+//     replyTo: "Subiza kuri",
+//     createdAt: "Byakozwe",
+//     updatedAt: "Byavuguruwe",
+//     language: "Ururimi",
+//     adminReply: "Igisubizo cy'Admin",
 //     statuses: {
-//       pending: "Bitegereje",
-//       reviewing: "Birisuzumwa",
-//       resolved: "Byakemutse",
-//       rejected: "Byangijwe",
+//       Pending: "Bitegereje",
+//       Approved: "Byemewe",
+//       Rejected: "Byangijwe",
+//       Completed: "Byarangiye",
 //     },
 //     filters: {
 //       all: "Ihagaze Ryose",
-//       pending: "Bitegereje",
-//       reviewing: "Birisuzumwa",
-//       resolved: "Byakemutse",
-//       rejected: "Byangijwe",
+//       Pending: "Bitegereje",
+//       Approved: "Byemewe",
+//       Rejected: "Byangijwe",
+//       Completed: "Byarangiye",
 //     },
 //   },
 // };
@@ -244,84 +355,65 @@
 //   return lang || "en";
 // };
 
-// // Initial requests (populated from NotFound.tsx submissions)
-// const INITIAL_REQUESTS: Request[] = [
-//   {
-//     id: "1",
-//     name: "Jean Paul Mugisha",
-//     email: "jean@example.com",
-//     message:
-//       "I'm having trouble finding houses near INES-Ruhengeri. Can you help me find accommodation?",
-//     status: "pending",
-//     createdAt: "2024-01-20T10:00:00Z",
-//     updatedAt: "2024-01-20T10:00:00Z",
-//   },
-//   {
-//     id: "2",
-//     name: "Marie Claire Uwimana",
-//     email: "marie@example.com",
-//     message:
-//       "I need assistance with the booking process. I found a house but I'm not sure how to complete the payment.",
-//     status: "reviewing",
-//     createdAt: "2024-01-19T14:30:00Z",
-//     updatedAt: "2024-01-20T09:00:00Z",
-//     response:
-//       "Hi Marie, we've received your request. Our team will guide you through the booking process. Please check your email for detailed instructions.",
-//     respondedBy: "Admin User",
-//   },
-//   {
-//     id: "3",
-//     name: "David Niyonzima",
-//     email: "david@example.com",
-//     message:
-//       "I'm a landlord and I want to list my property on the platform. What are the requirements?",
-//     status: "resolved",
-//     createdAt: "2024-01-18T16:00:00Z",
-//     updatedAt: "2024-01-19T11:00:00Z",
-//     response:
-//       "Hi David, thank you for your interest in becoming a host. You can list your property by clicking 'Become a Host' in the navigation. Our team will review and verify your property within 24 hours. Please ensure you have clear photos and accurate property details.",
-//     respondedBy: "Admin User",
-//   },
-//   {
-//     id: "4",
-//     name: "Grace Uwase",
-//     email: "grace@example.com",
-//     message:
-//       "I want to report an issue with my booking. The landlord is not responding to my messages.",
-//     status: "rejected",
-//     createdAt: "2024-01-17T09:00:00Z",
-//     updatedAt: "2024-01-18T08:00:00Z",
-//     response:
-//       "Hi Grace, we've reviewed your case and have contacted the landlord. They should respond within 24 hours. If not, please let us know and we'll escalate the matter.",
-//     respondedBy: "Admin User",
-//   },
-//   {
-//     id: "5",
-//     name: "Eric Kamanzi",
-//     email: "eric@example.com",
-//     message:
-//       "Can you help me find accommodation near UR-Huye campus? I need a 2-bedroom apartment for the upcoming semester.",
-//     status: "pending",
-//     createdAt: "2024-01-21T08:30:00Z",
-//     updatedAt: "2024-01-21T08:30:00Z",
-//     image: {
-//       name: "room-requirements.jpg",
-//       size: 245000,
-//       type: "image/jpeg",
-//       dataUrl:
-//         "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop",
-//     },
-//   },
-// ];
+// // API Base URL
+// const API_URL = "https://rene-inyumba-nodejs.onrender.com/requests";
+
+// // Helper function to transform request to UI format
+// const transformRequestToUI = (request: Request): RequestUI => {
+//   const statusColors: Record<string, string> = {
+//     Pending: "bg-yellow-100 text-yellow-800",
+//     Approved: "bg-green-100 text-green-800",
+//     Rejected: "bg-red-100 text-red-800",
+//     Completed: "bg-blue-100 text-blue-800",
+//   };
+
+//   const statusLabels: Record<string, string> = {
+//     Pending: "Pending",
+//     Approved: "Approved",
+//     Rejected: "Rejected",
+//     Completed: "Completed",
+//   };
+
+//   // Check if there's an image URL
+//   let displayImage = undefined;
+//   if (request.image && request.image.url) {
+//     displayImage = {
+//       name: request.image.public_id || "image",
+//       size: 0,
+//       type: request.image.format || "image/jpeg",
+//       dataUrl: request.image.url,
+//     };
+//   }
+
+//   return {
+//     ...request,
+//     response: request.adminReply || "",
+//     respondedBy: "Admin",
+//     statusLabel: statusLabels[request.status] || request.status,
+//     statusColor: statusColors[request.status] || "bg-gray-100 text-gray-800",
+//     displayImage,
+//   };
+// };
+
+// // Helper function to transform form data to API format
+// const transformFormToRequest = (data: RequestFormData): any => {
+//   return {
+//     name: data.name,
+//     email: data.email,
+//     message: data.message,
+//     language: data.language || "en",
+//     status: data.status || "Pending",
+//     adminReply: data.adminReply || "",
+//   };
+// };
 
 // export const RequestManagement: React.FC = () => {
 //   // Get language from cookies
 //   const [lang, setLang] = useState<"en" | "fr" | "rw">(
 //     getLanguageFromCookies(),
 //   );
-//   const [requests, setRequests] = useState<Request[]>(INITIAL_REQUESTS);
-//   const [filteredRequests, setFilteredRequests] =
-//     useState<Request[]>(INITIAL_REQUESTS);
+//   const [requests, setRequests] = useState<RequestUI[]>([]);
+//   const [filteredRequests, setFilteredRequests] = useState<RequestUI[]>([]);
 //   const [searchTerm, setSearchTerm] = useState("");
 //   const [filterStatus, setFilterStatus] = useState<string>("all");
 
@@ -329,25 +421,80 @@
 //   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 //   const [isRespondModalOpen, setIsRespondModalOpen] = useState(false);
 //   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-//   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
+//   const [selectedRequest, setSelectedRequest] = useState<RequestUI | null>(null);
 //   const [responseText, setResponseText] = useState("");
 //   const [selectedStatus, setSelectedStatus] = useState<string>("");
 //   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
+//   // Form state for compose
+//   const [formData] = useState<RequestFormData>({
+//     name: "",
+//     email: "",
+//     message: "",
+//     language: "en",
+//     status: "Pending",
+//     adminReply: "",
+//   });
+
 //   // Loading states
 //   const [isLoading, setIsLoading] = useState(false);
 //   const [isSubmitting, setIsSubmitting] = useState(false);
+//   const [isFetching, setIsFetching] = useState(true);
 
 //   // Statistics
 //   const [stats, setStats] = useState({
 //     total: 0,
-//     pending: 0,
-//     reviewing: 0,
-//     resolved: 0,
-//     rejected: 0,
+//     Pending: 0,
+//     Approved: 0,
+//     Rejected: 0,
+//     Completed: 0,
 //   });
 
 //   const t = translations[lang];
+
+//   // Reset form
+//   const resetForm = () => {
+//     // Form reset functionality removed since formData is not used
+//   };
+
+//   // Fetch requests from API
+//   const fetchRequests = async () => {
+//     setIsFetching(true);
+//     try {
+//       const response = await fetch(API_URL);
+//       if (!response.ok) {
+//         throw new Error(`HTTP error! status: ${response.status}`);
+//       }
+//       const data = await response.json();
+      
+//       // Handle both array and single object responses
+//       let requestsData: Request[] = [];
+//       if (Array.isArray(data)) {
+//         requestsData = data;
+//       } else if (data && typeof data === 'object') {
+//         if (data._id) {
+//           requestsData = [data];
+//         } else if (data.data && Array.isArray(data.data)) {
+//           requestsData = data.data;
+//         } else if (data.requests && Array.isArray(data.requests)) {
+//           requestsData = data.requests;
+//         } else {
+//           const possibleArrays = Object.values(data).filter(val => Array.isArray(val));
+//           if (possibleArrays.length > 0) {
+//             requestsData = possibleArrays[0];
+//           }
+//         }
+//       }
+      
+//       const transformedRequests = requestsData.map((req: Request) => transformRequestToUI(req));
+//       setRequests(transformedRequests);
+//     } catch (error) {
+//       console.error("Error fetching requests:", error);
+//       toast.error(`❌ ${t.fetchError}`);
+//     } finally {
+//       setIsFetching(false);
+//     }
+//   };
 
 //   // Listen for language changes in cookies
 //   useEffect(() => {
@@ -358,16 +505,19 @@
 //       }
 //     };
 
-//     // Check for cookie changes every second (polling)
 //     const interval = setInterval(handleCookieChange, 1000);
 //     return () => clearInterval(interval);
 //   }, [lang]);
+
+//   // Initial fetch
+//   useEffect(() => {
+//     fetchRequests();
+//   }, []);
 
 //   // Filter requests
 //   useEffect(() => {
 //     let filtered = [...requests];
 
-//     // Search filter
 //     if (searchTerm) {
 //       const term = searchTerm.toLowerCase();
 //       filtered = filtered.filter(
@@ -378,7 +528,6 @@
 //       );
 //     }
 
-//     // Status filter
 //     if (filterStatus !== "all") {
 //       filtered = filtered.filter((req) => req.status === filterStatus);
 //     }
@@ -389,25 +538,25 @@
 //   // Update statistics
 //   useEffect(() => {
 //     const total = requests.length;
-//     const pending = requests.filter((r) => r.status === "pending").length;
-//     const reviewing = requests.filter((r) => r.status === "reviewing").length;
-//     const resolved = requests.filter((r) => r.status === "resolved").length;
-//     const rejected = requests.filter((r) => r.status === "rejected").length;
+//     const Pending = requests.filter((r) => r.status === "Pending").length;
+//     const Approved = requests.filter((r) => r.status === "Approved").length;
+//     const Rejected = requests.filter((r) => r.status === "Rejected").length;
+//     const Completed = requests.filter((r) => r.status === "Completed").length;
 
-//     setStats({ total, pending, reviewing, resolved, rejected });
+//     setStats({ total, Pending, Approved, Rejected, Completed });
 //   }, [requests]);
 
 //   // Get status badge color
 //   const getStatusColor = (status: string): string => {
 //     switch (status) {
-//       case "pending":
+//       case "Pending":
 //         return "bg-yellow-100 text-yellow-800";
-//       case "reviewing":
-//         return "bg-blue-100 text-blue-800";
-//       case "resolved":
+//       case "Approved":
 //         return "bg-green-100 text-green-800";
-//       case "rejected":
+//       case "Rejected":
 //         return "bg-red-100 text-red-800";
+//       case "Completed":
+//         return "bg-blue-100 text-blue-800";
 //       default:
 //         return "bg-gray-100 text-gray-800";
 //     }
@@ -416,14 +565,14 @@
 //   // Get status label
 //   const getStatusLabel = (status: string): string => {
 //     switch (status) {
-//       case "pending":
-//         return t.statuses.pending;
-//       case "reviewing":
-//         return t.statuses.reviewing;
-//       case "resolved":
-//         return t.statuses.resolved;
-//       case "rejected":
-//         return t.statuses.rejected;
+//       case "Pending":
+//         return t.statuses.Pending;
+//       case "Approved":
+//         return t.statuses.Approved;
+//       case "Rejected":
+//         return t.statuses.Rejected;
+//       case "Completed":
+//         return t.statuses.Completed;
 //       default:
 //         return status;
 //     }
@@ -440,55 +589,42 @@
 //     });
 //   };
 
-//   // Open view modal
-//   const openViewModal = (request: Request) => {
-//     setSelectedRequest(request);
-//     setIsViewModalOpen(true);
+//   // CRUD Operations
+//   const handleCreateRequest = async () => {
+//     // Create request functionality removed since formData is not used
 //   };
 
-//   // Open respond modal
-//   const openRespondModal = (request: Request) => {
-//     setSelectedRequest(request);
-//     setResponseText(request.response || "");
-//     setSelectedStatus(request.status);
-//     setIsRespondModalOpen(true);
-//   };
-
-//   // Open delete modal
-//   const openDeleteModal = (request: Request) => {
-//     setSelectedRequest(request);
-//     setIsDeleteModalOpen(true);
-//   };
-
-//   // Handle status update
-
-//   // Handle send response
 //   const handleSendResponse = async () => {
 //     if (!selectedRequest || !responseText.trim()) {
-//       toast.warning("Please enter a response");
+//       toast.warning("⚠️ Please enter a response");
 //       return;
 //     }
 
 //     setIsSubmitting(true);
 
 //     try {
-//       // Simulate API call
-//       await new Promise((resolve) => setTimeout(resolve, 1000));
+//       const response = await fetch(`${API_URL}/${selectedRequest._id}`, {
+//         method: "PUT",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({
+//           adminReply: responseText,
+//           status: selectedStatus || selectedRequest.status,
+//         }),
+//       });
 
-//       const updatedRequest: Request = {
-//         ...selectedRequest,
-//         response: responseText,
-//         status:
-//           selectedStatus === "pending"
-//             ? "reviewing"
-//             : (selectedStatus as Request["status"]),
-//         updatedAt: new Date().toISOString(),
-//         respondedBy: "Admin User",
-//       };
+//       if (!response.ok) {
+//         throw new Error(`HTTP error! status: ${response.status}`);
+//       }
 
-//       setRequests(
-//         requests.map((r) => (r.id === selectedRequest.id ? updatedRequest : r)),
+//       const updatedRequest = await response.json();
+//       const transformedRequest = transformRequestToUI(updatedRequest);
+
+//       const updatedRequests = requests.map((r) =>
+//         r._id === selectedRequest._id ? transformedRequest : r
 //       );
+//       setRequests(updatedRequests);
 
 //       toast.success(`✅ ${t.responseSent}`);
 //       setIsRespondModalOpen(false);
@@ -503,17 +639,21 @@
 //     }
 //   };
 
-//   // Handle delete request
 //   const handleDeleteRequest = async () => {
 //     if (!selectedRequest) return;
 
 //     setIsLoading(true);
 
 //     try {
-//       // Simulate API call
-//       await new Promise((resolve) => setTimeout(resolve, 800));
+//       const response = await fetch(`${API_URL}/${selectedRequest._id}`, {
+//         method: "DELETE",
+//       });
 
-//       setRequests(requests.filter((r) => r.id !== selectedRequest.id));
+//       if (!response.ok) {
+//         throw new Error(`HTTP error! status: ${response.status}`);
+//       }
+
+//       setRequests(requests.filter((r) => r._id !== selectedRequest._id));
 //       toast.success(`🗑️ ${t.requestDeleted}`);
 //       setIsDeleteModalOpen(false);
 //       setSelectedRequest(null);
@@ -525,14 +665,51 @@
 //     }
 //   };
 
-//   // Handle refresh
-//   const handleRefresh = () => {
-//     setIsLoading(true);
-//     toast.info("Refreshing requests...");
-//     setTimeout(() => {
-//       setIsLoading(false);
-//       toast.success("Requests refreshed!");
-//     }, 800);
+//   const handleUpdateStatus = async (requestId: string, newStatus: string) => {
+//     try {
+//       const response = await fetch(`${API_URL}/${requestId}`, {
+//         method: "PUT",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({ status: newStatus }),
+//       });
+
+//       if (!response.ok) {
+//         throw new Error(`HTTP error! status: ${response.status}`);
+//       }
+
+//       const updatedRequest = await response.json();
+//       const transformedRequest = transformRequestToUI(updatedRequest);
+
+//       const updatedRequests = requests.map((r) =>
+//         r._id === requestId ? transformedRequest : r
+//       );
+//       setRequests(updatedRequests);
+
+//       toast.success(`✅ ${t.statusUpdated}`);
+//     } catch (error) {
+//       toast.error(`❌ ${t.statusUpdateFailed}`);
+//       console.error("Status update error:", error);
+//     }
+//   };
+
+//   // Open modals
+//   const openViewModal = (request: RequestUI) => {
+//     setSelectedRequest(request);
+//     setIsViewModalOpen(true);
+//   };
+
+//   const openRespondModal = (request: RequestUI) => {
+//     setSelectedRequest(request);
+//     setResponseText(request.adminReply || "");
+//     setSelectedStatus(request.status);
+//     setIsRespondModalOpen(true);
+//   };
+
+//   const openDeleteModal = (request: RequestUI) => {
+//     setSelectedRequest(request);
+//     setIsDeleteModalOpen(true);
 //   };
 
 //   // Modal variants
@@ -548,6 +725,17 @@
 //     exit: { opacity: 0 },
 //   };
 
+//   if (isFetching) {
+//     return (
+//       <div className="p-6 bg-gray-50 min-h-screen flex items-center justify-center">
+//         <div className="text-center">
+//           <div className="w-12 h-12 border-4 border-[#FF385C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+//           <p className="text-gray-500">{t.loading}</p>
+//         </div>
+//       </div>
+//     );
+//   }
+
 //   return (
 //     <div className="p-6 bg-gray-50 min-h-screen">
 //       {/* Header */}
@@ -562,7 +750,7 @@
 //           </div>
 //           <div className="flex items-center gap-2">
 //             <button
-//               onClick={handleRefresh}
+//               onClick={fetchRequests}
 //               className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
 //               disabled={isLoading}
 //             >
@@ -588,28 +776,28 @@
 //           className="bg-yellow-50 rounded-xl p-4 shadow-sm border border-yellow-200"
 //         >
 //           <p className="text-xs text-yellow-600">{t.pending}</p>
-//           <p className="text-2xl font-bold text-yellow-700">{stats.pending}</p>
-//         </motion.div>
-//         <motion.div
-//           whileHover={{ y: -2 }}
-//           className="bg-blue-50 rounded-xl p-4 shadow-sm border border-blue-200"
-//         >
-//           <p className="text-xs text-blue-600">{t.reviewing}</p>
-//           <p className="text-2xl font-bold text-blue-700">{stats.reviewing}</p>
+//           <p className="text-2xl font-bold text-yellow-700">{stats.Pending}</p>
 //         </motion.div>
 //         <motion.div
 //           whileHover={{ y: -2 }}
 //           className="bg-green-50 rounded-xl p-4 shadow-sm border border-green-200"
 //         >
-//           <p className="text-xs text-green-600">{t.resolved}</p>
-//           <p className="text-2xl font-bold text-green-700">{stats.resolved}</p>
+//           <p className="text-xs text-green-600">{t.approved}</p>
+//           <p className="text-2xl font-bold text-green-700">{stats.Approved}</p>
 //         </motion.div>
 //         <motion.div
 //           whileHover={{ y: -2 }}
 //           className="bg-red-50 rounded-xl p-4 shadow-sm border border-red-200"
 //         >
 //           <p className="text-xs text-red-600">{t.rejected}</p>
-//           <p className="text-2xl font-bold text-red-700">{stats.rejected}</p>
+//           <p className="text-2xl font-bold text-red-700">{stats.Rejected}</p>
+//         </motion.div>
+//         <motion.div
+//           whileHover={{ y: -2 }}
+//           className="bg-blue-50 rounded-xl p-4 shadow-sm border border-blue-200"
+//         >
+//           <p className="text-xs text-blue-600">{t.completed}</p>
+//           <p className="text-2xl font-bold text-blue-700">{stats.Completed}</p>
 //         </motion.div>
 //       </div>
 
@@ -633,10 +821,10 @@
 //               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
 //             >
 //               <option value="all">{t.filters.all}</option>
-//               <option value="pending">{t.filters.pending}</option>
-//               <option value="reviewing">{t.filters.reviewing}</option>
-//               <option value="resolved">{t.filters.resolved}</option>
-//               <option value="rejected">{t.filters.rejected}</option>
+//               <option value="Pending">{t.filters.Pending}</option>
+//               <option value="Approved">{t.filters.Approved}</option>
+//               <option value="Rejected">{t.filters.Rejected}</option>
+//               <option value="Completed">{t.filters.Completed}</option>
 //             </select>
 //             <button
 //               onClick={() => {
@@ -689,7 +877,7 @@
 //               ) : (
 //                 filteredRequests.map((request) => (
 //                   <motion.tr
-//                     key={request.id}
+//                     key={request._id}
 //                     initial={{ opacity: 0 }}
 //                     animate={{ opacity: 1 }}
 //                     className="hover:bg-gray-50 transition-colors"
@@ -713,11 +901,11 @@
 //                       <p className="text-sm text-gray-600 line-clamp-1">
 //                         {request.message}
 //                       </p>
-//                       {request.image && (
+//                       {request.image && request.image.url && (
 //                         <div className="flex items-center gap-1 mt-1">
 //                           <ImageIcon className="w-3 h-3 text-gray-400" />
 //                           <span className="text-xs text-gray-400">
-//                             {request.image.name}
+//                             {request.image.public_id || "Image"}
 //                           </span>
 //                         </div>
 //                       )}
@@ -868,7 +1056,7 @@
 //                   </div>
 
 //                   {/* Image */}
-//                   {selectedRequest.image && (
+//                   {selectedRequest.image && selectedRequest.image.url && (
 //                     <div>
 //                       <label className="text-xs font-medium text-gray-500">
 //                         {t.attachedImage}
@@ -879,33 +1067,28 @@
 //                           className="relative rounded-lg overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow"
 //                         >
 //                           <img
-//                             src={selectedRequest.image.dataUrl}
-//                             alt={selectedRequest.image.name}
+//                             src={selectedRequest.image.url}
+//                             alt={selectedRequest.image.public_id || "Request image"}
 //                             className="max-h-48 object-contain cursor-pointer"
 //                           />
 //                           <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-//                             {selectedRequest.image.name}
+//                             {selectedRequest.image.public_id || "Image"}
 //                           </div>
 //                         </button>
 //                       </div>
 //                     </div>
 //                   )}
 
-//                   {/* Response */}
-//                   {selectedRequest.response && (
+//                   {/* Admin Reply */}
+//                   {selectedRequest.adminReply && (
 //                     <div>
 //                       <label className="text-xs font-medium text-gray-500">
-//                         {t.responseLabel}
+//                         {t.adminReply}
 //                       </label>
 //                       <div className="mt-1 p-3 bg-green-50 rounded-lg border border-green-200">
 //                         <p className="text-sm text-gray-700 whitespace-pre-wrap">
-//                           {selectedRequest.response}
+//                           {selectedRequest.adminReply}
 //                         </p>
-//                         {selectedRequest.respondedBy && (
-//                           <p className="text-xs text-gray-500 mt-2">
-//                             Responded by: {selectedRequest.respondedBy}
-//                           </p>
-//                         )}
 //                       </div>
 //                     </div>
 //                   )}
@@ -914,7 +1097,7 @@
 //                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
 //                     <div>
 //                       <label className="text-xs font-medium text-gray-500">
-//                         {t.submitted}
+//                         {t.createdAt}
 //                       </label>
 //                       <p className="text-sm text-gray-900 mt-1">
 //                         {formatDate(selectedRequest.createdAt)}
@@ -922,7 +1105,7 @@
 //                     </div>
 //                     <div>
 //                       <label className="text-xs font-medium text-gray-500">
-//                         Updated
+//                         {t.updatedAt}
 //                       </label>
 //                       <p className="text-sm text-gray-900 mt-1">
 //                         {formatDate(selectedRequest.updatedAt)}
@@ -983,7 +1166,7 @@
 //                   <div className="flex items-center gap-2">
 //                     <ChatIcon className="text-[#FF385C] w-5 h-5" />
 //                     <h2 className="text-xl font-semibold text-gray-900">
-//                       {t.respond}
+//                       {t.replyTo} {selectedRequest.name}
 //                     </h2>
 //                   </div>
 //                   <motion.button
@@ -1021,11 +1204,10 @@
 //                       onChange={(e) => setSelectedStatus(e.target.value)}
 //                       className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
 //                     >
-//                       <option value="">{t.selectStatus}</option>
-//                       <option value="pending">{t.statuses.pending}</option>
-//                       <option value="reviewing">{t.statuses.reviewing}</option>
-//                       <option value="resolved">{t.statuses.resolved}</option>
-//                       <option value="rejected">{t.statuses.rejected}</option>
+//                       <option value="Pending">{t.statuses.Pending}</option>
+//                       <option value="Approved">{t.statuses.Approved}</option>
+//                       <option value="Rejected">{t.statuses.Rejected}</option>
+//                       <option value="Completed">{t.statuses.Completed}</option>
 //                     </select>
 //                   </div>
 
@@ -1164,7 +1346,7 @@
 
 //       {/* Image Preview Modal */}
 //       <AnimatePresence>
-//         {isImageModalOpen && selectedRequest?.image && (
+//         {isImageModalOpen && selectedRequest?.image?.url && (
 //           <>
 //             <motion.div
 //               initial={{ opacity: 0 }}
@@ -1187,13 +1369,13 @@
 //                   <Close className="w-8 h-8" />
 //                 </button>
 //                 <img
-//                   src={selectedRequest.image.dataUrl}
-//                   alt={selectedRequest.image.name}
+//                   src={selectedRequest.image.url}
+//                   alt={selectedRequest.image.public_id || "Request image"}
 //                   className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
 //                 />
 //                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white text-sm px-4 py-2 rounded-lg">
-//                   {selectedRequest.image.name} (
-//                   {(selectedRequest.image.size / 1024).toFixed(1)} KB)
+//                   {selectedRequest.image.public_id || "Image"}
+//                   {selectedRequest.image.format && ` (${selectedRequest.image.format})`}
 //                 </div>
 //               </div>
 //             </motion.div>
@@ -1203,11 +1385,6 @@
 //     </div>
 //   );
 // };
-
-
-
-
-
 
 
 
@@ -1292,22 +1469,6 @@ interface RequestUI extends Request {
     type: string;
     dataUrl: string;
   };
-}
-
-interface RequestFormData {
-  name: string;
-  email: string;
-  message: string;
-  language: string;
-  status: "Pending" | "Approved" | "Rejected" | "Completed";
-  adminReply?: string;
-}
-
-// Form validation errors
-interface FormErrors {
-  name?: string;
-  email?: string;
-  message?: string;
 }
 
 // Translations
@@ -1600,18 +1761,6 @@ const transformRequestToUI = (request: Request): RequestUI => {
   };
 };
 
-// Helper function to transform form data to API format
-const transformFormToRequest = (data: RequestFormData): any => {
-  return {
-    name: data.name,
-    email: data.email,
-    message: data.message,
-    language: data.language || "en",
-    status: data.status || "Pending",
-    adminReply: data.adminReply || "",
-  };
-};
-
 export const RequestManagement: React.FC = () => {
   // Get language from cookies
   const [lang, setLang] = useState<"en" | "fr" | "rw">(
@@ -1631,25 +1780,6 @@ export const RequestManagement: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
-  // Form state for compose
-  const [formData, setFormData] = useState<RequestFormData>({
-    name: "",
-    email: "",
-    message: "",
-    language: "en",
-    status: "Pending",
-    adminReply: "",
-  });
-
-  // Form validation
-  const [formErrors, setFormErrors] = useState<FormErrors>({});
-  const [touchedFields, setTouchedFields] = useState<{ name: boolean; email: boolean; message: boolean }>({
-    name: false,
-    email: false,
-    message: false,
-  });
-  const [isFormValid, setIsFormValid] = useState(false);
-
   // Loading states
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -1665,102 +1795,6 @@ export const RequestManagement: React.FC = () => {
   });
 
   const t = translations[lang];
-
-  // Validation functions
-  const validateName = (name: string): string | undefined => {
-    if (!name || name.trim() === '') {
-      return t.nameRequired;
-    }
-    if (name.trim().length < 2) {
-      return t.nameMinLength;
-    }
-    return undefined;
-  };
-
-  const validateEmail = (email: string): string | undefined => {
-    if (!email || email.trim() === '') {
-      return t.emailRequired;
-    }
-    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    if (!emailRegex.test(email.trim())) {
-      return t.emailInvalid;
-    }
-    return undefined;
-  };
-
-  const validateMessage = (message: string): string | undefined => {
-    if (!message || message.trim() === '') {
-      return t.messageRequired;
-    }
-    if (message.trim().length < 10) {
-      return t.messageMinLength;
-    }
-    if (message.trim().length > 1000) {
-      return t.messageMaxLength;
-    }
-    return undefined;
-  };
-
-  // Validate all form fields
-  const validateForm = () => {
-    const errors: FormErrors = {};
-    const nameError = validateName(formData.name);
-    const emailError = validateEmail(formData.email);
-    const messageError = validateMessage(formData.message);
-
-    if (nameError) errors.name = nameError;
-    if (emailError) errors.email = emailError;
-    if (messageError) errors.message = messageError;
-
-    setFormErrors(errors);
-    const valid = Object.keys(errors).length === 0;
-    setIsFormValid(valid);
-    return valid;
-  };
-
-  // Handle field blur (mark as touched)
-  const handleFieldBlur = (field: 'name' | 'email' | 'message') => {
-    setTouchedFields(prev => ({ ...prev, [field]: true }));
-    validateForm();
-  };
-
-  // Handle field change with validation
-  const handleFieldChange = (field: keyof RequestFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
-    let error: string | undefined;
-    if (field === 'name') error = validateName(value);
-    else if (field === 'email') error = validateEmail(value);
-    else if (field === 'message') error = validateMessage(value);
-    
-    setFormErrors(prev => ({ ...prev, [field]: error }));
-    
-    const nameError = field === 'name' ? error : validateName(formData.name);
-    const emailError = field === 'email' ? error : validateEmail(formData.email);
-    const messageError = field === 'message' ? error : validateMessage(formData.message);
-    
-    const valid = !nameError && !emailError && !messageError;
-    setIsFormValid(valid);
-  };
-
-  // Reset form
-  const resetForm = () => {
-    setFormData({
-      name: "",
-      email: "",
-      message: "",
-      language: "en",
-      status: "Pending",
-      adminReply: "",
-    });
-    setFormErrors({});
-    setTouchedFields({
-      name: false,
-      email: false,
-      message: false,
-    });
-    setIsFormValid(false);
-  };
 
   // Fetch requests from API
   const fetchRequests = async () => {
@@ -1817,6 +1851,7 @@ export const RequestManagement: React.FC = () => {
   // Initial fetch
   useEffect(() => {
     fetchRequests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Filter requests
@@ -1894,50 +1929,6 @@ export const RequestManagement: React.FC = () => {
     });
   };
 
-  // CRUD Operations
-  const handleCreateRequest = async () => {
-    const isValid = validateForm();
-    if (!isValid) {
-      toast.warning(`⚠️ ${t.pleaseFixErrors}`);
-      setTouchedFields({
-        name: true,
-        email: true,
-        message: true,
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const requestData = transformFormToRequest(formData);
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-      }
-
-      const newRequest = await response.json();
-      const transformedRequest = transformRequestToUI(newRequest);
-      
-      setRequests([transformedRequest, ...requests]);
-      toast.success(`✅ Request created successfully!`);
-      resetForm();
-    } catch (error: any) {
-      toast.error(`❌ Failed to create request: ${error.message}`);
-      console.error("Create request error:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const handleSendResponse = async () => {
     if (!selectedRequest || !responseText.trim()) {
       toast.warning("⚠️ Please enter a response");
@@ -2006,35 +1997,6 @@ export const RequestManagement: React.FC = () => {
       console.error("Delete request error:", error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleUpdateStatus = async (requestId: string, newStatus: string) => {
-    try {
-      const response = await fetch(`${API_URL}/${requestId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const updatedRequest = await response.json();
-      const transformedRequest = transformRequestToUI(updatedRequest);
-
-      const updatedRequests = requests.map((r) =>
-        r._id === requestId ? transformedRequest : r
-      );
-      setRequests(updatedRequests);
-
-      toast.success(`✅ ${t.statusUpdated}`);
-    } catch (error) {
-      toast.error(`❌ ${t.statusUpdateFailed}`);
-      console.error("Status update error:", error);
     }
   };
 
