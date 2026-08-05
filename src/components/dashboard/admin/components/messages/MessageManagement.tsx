@@ -1,20 +1,21 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-useless-escape */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 
 // Material-UI Icons
 import MessageIcon from "@mui/icons-material/Message";
 import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
-
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import ClearIcon from "@mui/icons-material/Clear";
-import CloseIconMui from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
@@ -24,63 +25,73 @@ import ReplyIcon from "@mui/icons-material/Reply";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import UnarchiveIcon from "@mui/icons-material/Unarchive";
 import SendIcon from "@mui/icons-material/Send";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorIcon from "@mui/icons-material/Error";
 
-// Types
-interface MessageAttachment {
+// Types - Updated to match the contact model
+interface Contact {
+  id?: string;  // Made optional to handle MongoDB _id
+  _id: string;
   name: string;
-  size: number;
-  type: string;
-  dataUrl: string;
+  email: string;
+  message: string;
+  status: "pending" | "read" | "replied" | "archived";
+  ipAddress: string | null;
+  userAgent: string | null;
+  repliedAt: string | null;
+  readAt: string | null;
+  replyMessage: string | null;
+  createdAt: string;
+  updatedAt: string;
+  contactWithStatus?: string;
+  notificationMessage?: string;
+  messagePreview?: string;
+  responseTime?: string | null;
 }
 
-interface Message {
-  id: string;
-  senderId: string;
+// Extended type for UI purposes
+interface Message extends Contact {
   senderName: string;
   senderEmail: string;
-  recipientId?: string;
-  recipientEmail?: string;
-  subject: string;
   content: string;
-  attachments?: MessageAttachment[];
-  category: "general" | "support" | "booking" | "payment" | "complaint" | "feedback" | "other";
-  priority: "low" | "medium" | "high" | "urgent";
-  status: "pending" | "read" | "replied" | "resolved" | "archived";
+  subject: string;
   isRead: boolean;
   isFlagged: boolean;
   isStarred: boolean;
+  category:
+    | "general"
+    | "support"
+    | "booking"
+    | "payment"
+    | "complaint"
+    | "feedback"
+    | "other";
+  priority: "low" | "medium" | "high" | "urgent";
   labels: string[];
-  createdAt: string;
-  updatedAt: string;
-  repliedAt?: string;
-  repliedBy?: string;
-  replyContent?: string;
-  assignedTo?: string;
   tags: string[];
-  metadata: {
-    ipAddress?: string;
-    userAgent?: string;
-    pageUrl?: string;
-    browser?: string;
-    os?: string;
-  };
+  repliedBy?: string;
+  attachments?: any[];
+  recipientEmail?: string;
+  recipientId?: string;
+  senderId?: string;
 }
 
 interface MessageFormData {
-  senderName: string;
-  senderEmail: string;
-  recipientEmail: string;
-  subject: string;
-  content: string;
-  category: Message["category"];
-  priority: Message["priority"];
-  status: Message["status"];
-  labels: string[];
-  tags: string[];
+  name: string;
+  email: string;
+  message: string;
+  status: "pending" | "read" | "replied" | "archived";
+  replyMessage?: string;
+}
+
+// Form validation errors
+interface FormErrors {
+  name?: string;
+  email?: string;
+  message?: string;
 }
 
 // Translations
-// Translations - DUPLICATES REMOVED
 const translations = {
   en: {
     messageManagement: "Message Management",
@@ -93,7 +104,7 @@ const translations = {
     archived: "Archived",
     flagged: "Flagged",
     starred: "Starred",
-    searchMessages: "Search by subject, sender, or content...",
+    searchMessages: "Search by name, email, or message...",
     allStatus: "All Status",
     allCategories: "All Categories",
     allPriorities: "All Priorities",
@@ -168,12 +179,23 @@ const translations = {
     all: "All",
     selectCategory: "Select Category",
     selectPriority: "Select Priority",
-    
     recipient: "Recipient",
     content: "Content",
     attachmentsLabel: "Attachments",
     noImage: "No image attached",
     viewImage: "View Image",
+    loading: "Loading...",
+    fetchError: "Failed to load messages",
+    replyTo: "Reply to",
+    nameRequired: "Name is required",
+    nameMinLength: "Name must be at least 2 characters",
+    emailRequired: "Email is required",
+    emailInvalid: "Please enter a valid email",
+    messageRequired: "Message is required",
+    messageMinLength: "Message must be at least 10 characters",
+    messageMaxLength: "Message cannot exceed 1000 characters",
+    allFieldsValid: "All fields are valid!",
+    pleaseFixErrors: "Please fix the errors above",
   },
   fr: {
     messageManagement: "Gestion des Messages",
@@ -186,7 +208,7 @@ const translations = {
     archived: "Archivé",
     flagged: "Signalé",
     starred: "Favori",
-    searchMessages: "Rechercher par sujet, expéditeur ou contenu...",
+    searchMessages: "Rechercher par nom, email ou contenu...",
     allStatus: "Tous les Statuts",
     allCategories: "Toutes les Catégories",
     allPriorities: "Toutes les Priorités",
@@ -261,12 +283,23 @@ const translations = {
     all: "Tous",
     selectCategory: "Sélectionner une Catégorie",
     selectPriority: "Sélectionner une Priorité",
-   
     recipient: "Destinataire",
     content: "Contenu",
     attachmentsLabel: "Pièces Jointes",
     noImage: "Aucune image jointe",
     viewImage: "Voir l'Image",
+    loading: "Chargement...",
+    fetchError: "Échec du chargement des messages",
+    replyTo: "Répondre à",
+    nameRequired: "Le nom est requis",
+    nameMinLength: "Le nom doit contenir au moins 2 caractères",
+    emailRequired: "L'email est requis",
+    emailInvalid: "Veuillez entrer un email valide",
+    messageRequired: "Le message est requis",
+    messageMinLength: "Le message doit contenir au moins 10 caractères",
+    messageMaxLength: "Le message ne peut pas dépasser 1000 caractères",
+    allFieldsValid: "Tous les champs sont valides !",
+    pleaseFixErrors: "Veuillez corriger les erreurs ci-dessus",
   },
   rw: {
     messageManagement: "Gucunga Ubutumwa",
@@ -279,7 +312,8 @@ const translations = {
     archived: "Byabitswe",
     flagged: "Byashyizwe ikimenyetso",
     starred: "Byakunzwe",
-    searchMessages: "Shakisha ukurikije ikiganiro, uwohereje cyangwa ibiri mu butumwa...",
+    searchMessages:
+      "Shakisha ukurikije izina, imeri cyangwa ibiri mu butumwa...",
     allStatus: "Ihagaze Ryose",
     allCategories: "Ibyiciro Byose",
     allPriorities: "Iby'ibanze Byose",
@@ -354,162 +388,168 @@ const translations = {
     all: "Byose",
     selectCategory: "Hitamo Icyiciro",
     selectPriority: "Hitamo Iby'ibanze",
-
     recipient: "Uwakiriye",
     content: "Ibirimo",
     attachmentsLabel: "Ibishushanyo",
     noImage: "Nta shusho yashyizweho",
     viewImage: "Reba Ishusho",
-  }
+    loading: "Birakoreshwa...",
+    fetchError: "Kubura ubutumwa birananiranye",
+    replyTo: "Subiza kuri",
+    nameRequired: "Izina rirasabwa",
+    nameMinLength: "Izina rigomba kuba ibinyuguti 2 byibuze",
+    emailRequired: "Imeri irasabwa",
+    emailInvalid: "Andika imeri ikwiye",
+    messageRequired: "Ubutumwa burasabwa",
+    messageMinLength: "Ubutumwa bugomba kuba ibinyuguti 10 byibuze",
+    messageMaxLength: "Ubutumwa ntibugomba kurenga ibinyuguti 1000",
+    allFieldsValid: "Ibice byose birimo amakuru akwiye!",
+    pleaseFixErrors: "Kosora amakosa hejuru",
+  },
 };
 
 // Helper function to get language from cookies
-const getLanguageFromCookies = (): 'en' | 'fr' | 'rw' => {
-  const lang = Cookies.get('language') as 'en' | 'fr' | 'rw';
-  return lang || 'en';
+const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
+  const lang = Cookies.get("language") as "en" | "fr" | "rw";
+  return lang || "en";
 };
 
-// Storage keys
-const STORAGE_KEY = "messages";
+// API Base URL
+const API_URL = "https://rene-inyumba-nodejs.onrender.com/contact";
 
-// Generate unique ID
-const generateId = (): string => {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
-};
+// Helper function to transform contact to message
+const transformContactToMessage = (contact: Contact): Message => {
+  const messageText = contact.message || "";
 
-// Initial messages
-const INITIAL_MESSAGES: Message[] = [
-  {
-    id: "1",
-    senderId: "user1",
-    senderName: "Jean Paul Mugisha",
-    senderEmail: "jean@example.com",
-    recipientEmail: "admin@inyumba.com",
-    subject: "Question about housing near INES-Ruhengeri",
-    content: "I'm having trouble finding houses near INES-Ruhengeri. Can you help me find accommodation? I need a 2-bedroom apartment for the upcoming semester.",
-    category: "support",
-    priority: "high",
-    status: "pending",
-    isRead: false,
-    isFlagged: true,
-    isStarred: false,
-    labels: ["housing", "urgent"],
-    createdAt: "2024-01-20T10:00:00Z",
-    updatedAt: "2024-01-20T10:00:00Z",
-    tags: ["student", "INES-Ruhengeri"],
-    metadata: {},
-  },
-  {
-    id: "2",
-    senderId: "user2",
-    senderName: "Marie Claire Uwimana",
-    senderEmail: "marie@example.com",
-    recipientEmail: "admin@inyumba.com",
-    subject: "Booking payment issue",
-    content: "I need assistance with the booking process. I found a house but I'm not sure how to complete the payment using MOMO.",
-    category: "payment",
-    priority: "urgent",
-    status: "replied",
-    isRead: true,
-    isFlagged: false,
-    isStarred: true,
-    labels: ["payment", "momo"],
-    createdAt: "2024-01-19T14:30:00Z",
-    updatedAt: "2024-01-20T09:00:00Z",
-    repliedAt: "2024-01-20T09:00:00Z",
-    repliedBy: "Admin User",
-    replyContent: "Hi Marie, we've received your request. Our team will guide you through the booking process. Please check your email for detailed instructions.",
-    tags: ["booking", "payment"],
-    metadata: {},
-  },
-  {
-    id: "3",
-    senderId: "user3",
-    senderName: "David Niyonzima",
-    senderEmail: "david@example.com",
-    recipientEmail: "admin@inyumba.com",
-    subject: "Becoming a host - requirements",
-    content: "I'm a landlord and I want to list my property on the platform. What are the requirements? I have a 3-bedroom house near UR-Huye.",
-    category: "general",
-    priority: "medium",
-    status: "resolved",
-    isRead: true,
-    isFlagged: false,
-    isStarred: false,
-    labels: ["host", "listing"],
-    createdAt: "2024-01-18T16:00:00Z",
-    updatedAt: "2024-01-19T11:00:00Z",
-    repliedAt: "2024-01-19T11:00:00Z",
-    repliedBy: "Admin User",
-    replyContent: "Hi David, thank you for your interest in becoming a host. You can list your property by clicking 'Become a Host' in the navigation. Our team will review and verify your property within 24 hours.",
-    tags: ["landlord", "property"],
-    metadata: {},
-  },
-  {
-    id: "4",
-    senderId: "user4",
-    senderName: "Grace Uwase",
-    senderEmail: "grace@example.com",
-    recipientEmail: "admin@inyumba.com",
-    subject: "Landlord not responding",
-    content: "I want to report an issue with my booking. The landlord is not responding to my messages and I need to move in next week.",
-    category: "complaint",
-    priority: "high",
-    status: "archived",
-    isRead: true,
-    isFlagged: false,
-    isStarred: false,
-    labels: ["complaint", "landlord"],
-    createdAt: "2024-01-17T09:00:00Z",
-    updatedAt: "2024-01-18T08:00:00Z",
-    repliedAt: "2024-01-18T08:00:00Z",
-    repliedBy: "Admin User",
-    replyContent: "Hi Grace, we've reviewed your case and have contacted the landlord. They should respond within 24 hours.",
-    tags: ["issue", "urgent"],
-    metadata: {},
-  },
-  {
-    id: "5",
-    senderId: "user5",
-    senderName: "Eric Kamanzi",
-    senderEmail: "eric@example.com",
-    recipientEmail: "admin@inyumba.com",
-    subject: "Feedback about the platform",
-    content: "I just wanted to share that I had a great experience using INYUMBA PROJECT to find my accommodation. The platform is very user-friendly and the support team was helpful.",
-    category: "feedback",
-    priority: "low",
-    status: "read",
-    isRead: true,
-    isFlagged: true,
-    isStarred: false,
-    labels: ["feedback", "positive"],
-    createdAt: "2024-01-21T08:30:00Z",
-    updatedAt: "2024-01-21T08:30:00Z",
-    tags: ["experience", "recommendation"],
-    metadata: {},
-  },
-];
+  const msgLower = messageText.toLowerCase();
 
-// Helper functions
-const getMessages = (): Message[] => {
-  const data = localStorage.getItem(STORAGE_KEY);
-  if (data) {
-    return JSON.parse(data);
+  // Determine category
+  let category: Message["category"] = "general";
+
+  if (
+    msgLower.includes("support") ||
+    msgLower.includes("help") ||
+    msgLower.includes("assist")
+  ) {
+    category = "support";
+  } else if (
+    msgLower.includes("book") ||
+    msgLower.includes("reserv") ||
+    msgLower.includes("housing") ||
+    msgLower.includes("house")
+  ) {
+    category = "booking";
+  } else if (
+    msgLower.includes("pay") ||
+    msgLower.includes("momo") ||
+    msgLower.includes("money")
+  ) {
+    category = "payment";
+  } else if (
+    msgLower.includes("complaint") ||
+    msgLower.includes("issue") ||
+    msgLower.includes("problem") ||
+    msgLower.includes("report")
+  ) {
+    category = "complaint";
+  } else if (
+    msgLower.includes("feedback") ||
+    msgLower.includes("suggest") ||
+    msgLower.includes("great") ||
+    msgLower.includes("good")
+  ) {
+    category = "feedback";
   }
-  // Initialize with initial data if empty
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_MESSAGES));
-  return INITIAL_MESSAGES;
+
+  // Determine priority
+  let priority: Message["priority"] = "medium";
+
+  if (contact.status === "pending") {
+    priority = "high";
+  }
+
+  if (
+    msgLower.includes("urgent") ||
+    msgLower.includes("emergency") ||
+    msgLower.includes("immediate")
+  ) {
+    priority = "urgent";
+  }
+
+  // Labels and tags
+  const labels: string[] = [];
+  const tags: string[] = [];
+
+  if (
+    msgLower.includes("housing") ||
+    msgLower.includes("house") ||
+    msgLower.includes("apartment")
+  ) {
+    labels.push("housing");
+    tags.push("accommodation");
+  }
+
+  if (msgLower.includes("student")) {
+    tags.push("student");
+  }
+
+  if (msgLower.includes("landlord") || msgLower.includes("host")) {
+    tags.push("landlord");
+  }
+
+  if (msgLower.includes("payment") || msgLower.includes("momo")) {
+    labels.push("payment");
+    tags.push("payment");
+  }
+
+  return {
+    // Use _id as the primary identifier
+    id: contact._id,
+    _id: contact._id,
+    name: contact.name,
+    email: contact.email,
+    message: messageText,
+    status: contact.status || "pending",
+    ipAddress: contact.ipAddress || null,
+    userAgent: contact.userAgent || null,
+    repliedAt: contact.repliedAt || null,
+    readAt: contact.readAt || null,
+    replyMessage: contact.replyMessage || null,
+    createdAt: contact.createdAt,
+    updatedAt: contact.updatedAt,
+    
+    // UI fields
+    senderName: contact.name,
+    senderEmail: contact.email,
+    content: messageText,
+    subject: `Message from ${contact.name}`,
+    isRead: contact.status !== "pending",
+    isFlagged: false,
+    isStarred: false,
+    category,
+    priority,
+    labels,
+    tags,
+    repliedBy: contact.repliedAt ? "Admin" : undefined,
+  };
 };
 
-const saveMessages = (messages: Message[]): void => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+// Helper function to transform message to contact for API
+const transformMessageToContact = (message: MessageFormData): any => {
+  return {
+    name: message.name,
+    email: message.email,
+    message: message.message,
+  };
 };
 
 export const MessageManagement: React.FC = () => {
   // Get language from cookies
-  const [lang, setLang] = useState<'en' | 'fr' | 'rw'>(getLanguageFromCookies());
-  const [messages, setMessages] = useState<Message[]>(getMessages());
-  const [filteredMessages, setFilteredMessages] = useState<Message[]>(getMessages());
+  const [lang, setLang] = useState<"en" | "fr" | "rw">(
+    getLanguageFromCookies(),
+  );
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [filteredMessages, setFilteredMessages] = useState<Message[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterCategory, setFilterCategory] = useState<string>("all");
@@ -526,23 +566,29 @@ export const MessageManagement: React.FC = () => {
 
   // Compose form state
   const [formData, setFormData] = useState<MessageFormData>({
-    senderName: "",
-    senderEmail: "",
-    recipientEmail: "",
-    subject: "",
-    content: "",
-    category: "general",
-    priority: "medium",
+    name: "",
+    email: "",
+    message: "",
     status: "pending",
-    labels: [],
-    tags: [],
   });
-  const [labelInput, setLabelInput] = useState("");
-  const [tagInput, setTagInput] = useState("");
+
+  // Form validation
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
+  const [touchedFields, setTouchedFields] = useState<{
+    name: boolean;
+    email: boolean;
+    message: boolean;
+  }>({
+    name: false,
+    email: false,
+    message: false,
+  });
+  const [isFormValid, setIsFormValid] = useState(false);
 
   // Loading states
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
 
   // Statistics
   const [stats, setStats] = useState({
@@ -550,13 +596,140 @@ export const MessageManagement: React.FC = () => {
     pending: 0,
     read: 0,
     replied: 0,
-    resolved: 0,
     archived: 0,
     flagged: 0,
     starred: 0,
   });
 
   const t = translations[lang];
+
+  // Validation functions
+  const validateName = (name: string): string | undefined => {
+    if (!name || name.trim() === "") {
+      return t.nameRequired;
+    }
+    if (name.trim().length < 2) {
+      return t.nameMinLength;
+    }
+    return undefined;
+  };
+
+  const validateEmail = (email: string): string | undefined => {
+    if (!email || email.trim() === "") {
+      return t.emailRequired;
+    }
+    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(email.trim())) {
+      return t.emailInvalid;
+    }
+    return undefined;
+  };
+
+  const validateMessage = (message: string): string | undefined => {
+    if (!message || message.trim() === "") {
+      return t.messageRequired;
+    }
+    if (message.trim().length < 10) {
+      return t.messageMinLength;
+    }
+    if (message.trim().length > 1000) {
+      return t.messageMaxLength;
+    }
+    return undefined;
+  };
+
+  // Validate all form fields
+  const validateForm = () => {
+    const errors: FormErrors = {};
+    const nameError = validateName(formData.name);
+    const emailError = validateEmail(formData.email);
+    const messageError = validateMessage(formData.message);
+
+    if (nameError) errors.name = nameError;
+    if (emailError) errors.email = emailError;
+    if (messageError) errors.message = messageError;
+
+    setFormErrors(errors);
+    const valid = Object.keys(errors).length === 0;
+    setIsFormValid(valid);
+    return valid;
+  };
+
+  // Handle field blur (mark as touched)
+  const handleFieldBlur = (field: "name" | "email" | "message") => {
+    setTouchedFields((prev) => ({ ...prev, [field]: true }));
+    validateForm();
+  };
+
+  // Handle field change with validation
+  const handleFieldChange = (field: keyof MessageFormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+
+    // Validate the specific field
+    let error: string | undefined;
+    if (field === "name") error = validateName(value);
+    else if (field === "email") error = validateEmail(value);
+    else if (field === "message") error = validateMessage(value);
+
+    setFormErrors((prev) => ({ ...prev, [field]: error }));
+
+    // Update form validity
+    const nameError = field === "name" ? error : validateName(formData.name);
+    const emailError =
+      field === "email" ? error : validateEmail(formData.email);
+    const messageError =
+      field === "message" ? error : validateMessage(formData.message);
+
+    const valid = !nameError && !emailError && !messageError;
+    setIsFormValid(valid);
+  };
+
+  // Fetch messages from API
+  const fetchMessages = async () => {
+    setIsFetching(true);
+    try {
+      const response = await fetch(API_URL);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+
+      // Handle both array and single object responses
+      let contacts: Contact[] = [];
+      if (Array.isArray(data)) {
+        contacts = data;
+      } else if (data && typeof data === "object") {
+        // If it's a single object, wrap it in an array
+        if (data._id) {
+          contacts = [data];
+        } else if (data.data && Array.isArray(data.data)) {
+          // If the response has a data property that's an array
+          contacts = data.data;
+        } else if (data.contacts && Array.isArray(data.contacts)) {
+          contacts = data.contacts;
+        } else {
+          // Try to extract any array from the response
+          const possibleArrays = Object.values(data).filter((val) =>
+            Array.isArray(val),
+          );
+          if (possibleArrays.length > 0) {
+            contacts = possibleArrays[0];
+          }
+        }
+      }
+
+      // Transform API data to Message format
+      const transformedMessages = contacts.map((contact: Contact) =>
+        transformContactToMessage(contact),
+      );
+      setMessages(transformedMessages);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      toast.error(`❌ ${t.fetchError}`);
+    } finally {
+      setIsFetching(false);
+    }
+  };
 
   // Listen for language changes in cookies
   useEffect(() => {
@@ -571,6 +744,11 @@ export const MessageManagement: React.FC = () => {
     return () => clearInterval(interval);
   }, [lang]);
 
+  // Initial fetch
+  useEffect(() => {
+    fetchMessages();
+  }, []);
+
   // Filter messages
   useEffect(() => {
     let filtered = [...messages];
@@ -580,10 +758,10 @@ export const MessageManagement: React.FC = () => {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(
         (msg) =>
-          msg.subject.toLowerCase().includes(term) ||
-          msg.senderName.toLowerCase().includes(term) ||
-          msg.content.toLowerCase().includes(term) ||
-          msg.senderEmail.toLowerCase().includes(term)
+          msg.name.toLowerCase().includes(term) ||
+          msg.email.toLowerCase().includes(term) ||
+          msg.message.toLowerCase().includes(term) ||
+          msg.subject.toLowerCase().includes(term),
       );
     }
 
@@ -611,12 +789,11 @@ export const MessageManagement: React.FC = () => {
     const pending = messages.filter((m) => m.status === "pending").length;
     const read = messages.filter((m) => m.status === "read").length;
     const replied = messages.filter((m) => m.status === "replied").length;
-    const resolved = messages.filter((m) => m.status === "resolved").length;
     const archived = messages.filter((m) => m.status === "archived").length;
     const flagged = messages.filter((m) => m.isFlagged).length;
     const starred = messages.filter((m) => m.isStarred).length;
 
-    setStats({ total, pending, read, replied, resolved, archived, flagged, starred });
+    setStats({ total, pending, read, replied, archived, flagged, starred });
   }, [messages]);
 
   // Get status badge color
@@ -628,8 +805,6 @@ export const MessageManagement: React.FC = () => {
         return "bg-blue-100 text-blue-800";
       case "replied":
         return "bg-green-100 text-green-800";
-      case "resolved":
-        return "bg-emerald-100 text-emerald-800";
       case "archived":
         return "bg-gray-100 text-gray-800";
       default:
@@ -646,8 +821,6 @@ export const MessageManagement: React.FC = () => {
         return t.read;
       case "replied":
         return t.replied;
-      case "resolved":
-        return t.resolved;
       case "archived":
         return t.archived;
       default:
@@ -706,47 +879,78 @@ export const MessageManagement: React.FC = () => {
 
   // CRUD Operations
   const handleCreateMessage = async () => {
-    if (!formData.senderName || !formData.senderEmail || !formData.subject || !formData.content) {
-      toast.warning("Please fill in all required fields");
+    const isValid = validateForm();
+
+    if (!isValid) {
+      toast.warning(`⚠️ ${t.pleaseFixErrors}`);
+
+      setTouchedFields({
+        name: true,
+        email: true,
+        message: true,
+      });
+
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Prepare data matching backend Contact schema
+      const contactData = transformMessageToContact(formData);
 
-      const newMessage: Message = {
-        id: generateId(),
-        senderId: "admin",
-        senderName: formData.senderName,
-        senderEmail: formData.senderEmail,
-        recipientEmail: formData.recipientEmail || "admin@inyumba.com",
-        subject: formData.subject,
-        content: formData.content,
-        category: formData.category,
-        priority: formData.priority,
-        status: formData.status,
-        isRead: false,
-        isFlagged: false,
-        isStarred: false,
-        labels: formData.labels,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        tags: formData.tags,
-        metadata: {},
-      };
+      console.log("📤 Sending contact data:", contactData);
 
-      const updatedMessages = [newMessage, ...messages];
-      setMessages(updatedMessages);
-      saveMessages(updatedMessages);
-      
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(contactData),
+      });
+
+      console.log("📡 Response status:", response.status);
+
+      // Convert response to JSON
+      const result = await response.json();
+
+      console.log("📥 Backend response:", result);
+
+      // Handle backend errors
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Failed to submit contact form");
+      }
+
+      // Make sure data exists
+      if (!result.data) {
+        throw new Error("Invalid response from server");
+      }
+
+      // Convert backend data to frontend message format
+      const newMessage = transformContactToMessage(result.data);
+
+      console.log("✅ New message created:", newMessage);
+
+      // Update messages list
+      setMessages((prev) => [newMessage, ...prev]);
+
       toast.success(`✅ ${t.messageCreated}`);
+
+      // Reset form
       resetForm();
+
+      // Close modal
       setIsComposeModalOpen(false);
     } catch (error) {
-      toast.error(`❌ ${t.createFailed}`);
-      console.error("Create message error:", error);
+      console.error("❌ Create message error:", error);
+
+      if (error instanceof Error) {
+        console.error("Error message:", error.message);
+
+        toast.error(`❌ ${error.message}`);
+      } else {
+        toast.error("❌ An unexpected error occurred!");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -758,13 +962,20 @@ export const MessageManagement: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      const response = await fetch(`${API_URL}/${selectedMessage._id}`, {
+        method: "DELETE",
+      });
 
-      const updatedMessages = messages.filter((m) => m.id !== selectedMessage.id);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const updatedMessages = messages.filter(
+        (m) => m._id !== selectedMessage._id,
+      );
       setMessages(updatedMessages);
-      saveMessages(updatedMessages);
-      
-      toast.success(`🗑️ ${t.messageDeleted}`);
+
+      toast.success(`✅ ${t.messageDeleted}`);
       setIsDeleteModalOpen(false);
       setSelectedMessage(null);
     } catch (error) {
@@ -777,29 +988,35 @@ export const MessageManagement: React.FC = () => {
 
   const handleSendReply = async () => {
     if (!selectedMessage || !replyContent.trim()) {
-      toast.warning("Please enter a reply");
+      toast.warning("⚠️ Please enter a reply");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await fetch(`${API_URL}/${selectedMessage._id}/reply`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          replyMessage: replyContent,
+          status: selectedStatus || "replied",
+        }),
+      });
 
-      const updatedMessage: Message = {
-        ...selectedMessage,
-        status: "replied",
-        replyContent: replyContent,
-        repliedBy: "Admin User",
-        repliedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const updatedContact = await response.json();
+      const updatedMessage = transformContactToMessage(updatedContact);
 
       const updatedMessages = messages.map((m) =>
-        m.id === selectedMessage.id ? updatedMessage : m
+        m._id === selectedMessage._id ? updatedMessage : m,
       );
       setMessages(updatedMessages);
-      saveMessages(updatedMessages);
 
       toast.success(`✅ ${t.replySent}`);
       setIsReplyModalOpen(false);
@@ -813,17 +1030,30 @@ export const MessageManagement: React.FC = () => {
     }
   };
 
-  const handleUpdateStatus = async (messageId: string, newStatus: Message["status"]) => {
+  const handleUpdateStatus = async (
+    messageId: string,
+    newStatus: Message["status"],
+  ) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const response = await fetch(`${API_URL}/${messageId}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const updatedContact = await response.json();
+      const updatedMessage = transformContactToMessage(updatedContact);
 
       const updatedMessages = messages.map((m) =>
-        m.id === messageId
-          ? { ...m, status: newStatus, updatedAt: new Date().toISOString() }
-          : m
+        m._id === messageId ? updatedMessage : m,
       );
       setMessages(updatedMessages);
-      saveMessages(updatedMessages);
 
       toast.success(`✅ ${t.statusUpdated}`);
     } catch (error) {
@@ -833,109 +1063,65 @@ export const MessageManagement: React.FC = () => {
   };
 
   const handleToggleStar = async (messageId: string) => {
-    const message = messages.find((m) => m.id === messageId);
+    const message = messages.find((m) => m._id === messageId);
     if (!message) return;
 
-    try {
-      const updatedMessages = messages.map((m) =>
-        m.id === messageId
-          ? { ...m, isStarred: !m.isStarred, updatedAt: new Date().toISOString() }
-          : m
-      );
-      setMessages(updatedMessages);
-      saveMessages(updatedMessages);
-    } catch (error) {
-      console.error("Toggle star error:", error);
-    }
+    // This is a UI-only feature since the API doesn't support star
+    const updatedMessages = messages.map((m) =>
+      m._id === messageId ? { ...m, isStarred: !m.isStarred } : m,
+    );
+    setMessages(updatedMessages);
   };
 
   const handleToggleFlag = async (messageId: string) => {
-    const message = messages.find((m) => m.id === messageId);
+    const message = messages.find((m) => m._id === messageId);
     if (!message) return;
 
-    try {
-      const updatedMessages = messages.map((m) =>
-        m.id === messageId
-          ? { ...m, isFlagged: !m.isFlagged, updatedAt: new Date().toISOString() }
-          : m
-      );
-      setMessages(updatedMessages);
-      saveMessages(updatedMessages);
-    } catch (error) {
-      console.error("Toggle flag error:", error);
-    }
+    // This is a UI-only feature since the API doesn't support flag
+    const updatedMessages = messages.map((m) =>
+      m._id === messageId ? { ...m, isFlagged: !m.isFlagged } : m,
+    );
+    setMessages(updatedMessages);
   };
 
   const handleMarkAsRead = async (messageId: string) => {
     try {
+      const response = await fetch(`${API_URL}/${messageId}/read`, {
+        method: "PUT",
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const updatedContact = await response.json();
+      const updatedMessage = transformContactToMessage(updatedContact);
+
       const updatedMessages = messages.map((m) =>
-        m.id === messageId
-          ? { ...m, isRead: true, status: m.status === "pending" ? "read" : m.status, updatedAt: new Date().toISOString() }
-          : m
+        m._id === messageId ? updatedMessage : m,
       );
       setMessages(updatedMessages);
-      saveMessages(updatedMessages);
     } catch (error) {
       console.error("Mark as read error:", error);
     }
   };
 
-
-
   // Reset form
   const resetForm = () => {
     setFormData({
-      senderName: "",
-      senderEmail: "",
-      recipientEmail: "",   
-      subject: "",
-      content: "",
-      category: "general",
-      priority: "medium",
+      name: "",
+      email: "",
+      message: "",
       status: "pending",
-      labels: [],
-      tags: [],
+      replyMessage: "",
     });
-    setLabelInput("");
-    setTagInput("");
-  };
-
-  // Add label
-  const addLabel = () => {
-    if (labelInput.trim() && !formData.labels.includes(labelInput.trim())) {
-      setFormData({
-        ...formData,
-        labels: [...formData.labels, labelInput.trim()],
-      });
-      setLabelInput("");
-    }
-  };
-
-  // Remove label
-  const removeLabel = (label: string) => {
-    setFormData({
-      ...formData,
-      labels: formData.labels.filter((l) => l !== label),
+    setFormErrors({});
+    setTouchedFields({
+      name: false,
+      email: false,
+      message: false,
     });
-  };
-
-  // Add tag
-  const addTag = () => {
-    if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
-      setFormData({
-        ...formData,
-        tags: [...formData.tags, tagInput.trim()],
-      });
-      setTagInput("");
-    }
-  };
-
-  // Remove tag
-  const removeTag = (tag: string) => {
-    setFormData({
-      ...formData,
-      tags: formData.tags.filter((t) => t !== tag),
-    });
+    setIsFormValid(false);
   };
 
   // Open modals
@@ -943,13 +1129,13 @@ export const MessageManagement: React.FC = () => {
     setSelectedMessage(message);
     setIsViewModalOpen(true);
     if (!message.isRead) {
-      handleMarkAsRead(message.id);
+      handleMarkAsRead(message._id);
     }
   };
 
   const openReplyModal = (message: Message) => {
     setSelectedMessage(message);
-    setReplyContent("");
+    setReplyContent(message.replyMessage || "");
     setSelectedStatus(message.status);
     setIsReplyModalOpen(true);
   };
@@ -977,6 +1163,17 @@ export const MessageManagement: React.FC = () => {
     exit: { opacity: 0 },
   };
 
+  if (isFetching) {
+    return (
+      <div className="p-6 bg-gray-50 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-[#FF385C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-500">{t.loading}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Header */}
@@ -987,9 +1184,7 @@ export const MessageManagement: React.FC = () => {
               <MessageIcon className="w-7 h-7 text-[#FF385C]" />
               {t.messageManagement}
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              {t.manageMessages}
-            </p>
+            <p className="text-sm text-gray-500 mt-1">{t.manageMessages}</p>
           </div>
           <div className="flex items-center gap-2">
             <motion.button
@@ -1002,11 +1197,7 @@ export const MessageManagement: React.FC = () => {
               {t.composeMessage}
             </motion.button>
             <button
-              onClick={() => {
-                const refreshed = getMessages();
-                setMessages(refreshed);
-                toast.success("Messages refreshed!");
-              }}
+              onClick={fetchMessages}
               className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <RefreshIcon className="w-5 h-5" />
@@ -1016,36 +1207,53 @@ export const MessageManagement: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 mb-6">
-        <motion.div whileHover={{ y: -2 }} className="bg-white rounded-xl p-3 shadow-sm border border-gray-200">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
+        <motion.div
+          whileHover={{ y: -2 }}
+          className="bg-white rounded-xl p-3 shadow-sm border border-gray-200"
+        >
           <p className="text-xs text-gray-500">{t.total}</p>
           <p className="text-xl font-bold text-gray-900">{stats.total}</p>
         </motion.div>
-        <motion.div whileHover={{ y: -2 }} className="bg-yellow-50 rounded-xl p-3 shadow-sm border border-yellow-200">
+        <motion.div
+          whileHover={{ y: -2 }}
+          className="bg-yellow-50 rounded-xl p-3 shadow-sm border border-yellow-200"
+        >
           <p className="text-xs text-yellow-600">{t.pending}</p>
           <p className="text-xl font-bold text-yellow-700">{stats.pending}</p>
         </motion.div>
-        <motion.div whileHover={{ y: -2 }} className="bg-blue-50 rounded-xl p-3 shadow-sm border border-blue-200">
+        <motion.div
+          whileHover={{ y: -2 }}
+          className="bg-blue-50 rounded-xl p-3 shadow-sm border border-blue-200"
+        >
           <p className="text-xs text-blue-600">{t.read}</p>
           <p className="text-xl font-bold text-blue-700">{stats.read}</p>
         </motion.div>
-        <motion.div whileHover={{ y: -2 }} className="bg-green-50 rounded-xl p-3 shadow-sm border border-green-200">
+        <motion.div
+          whileHover={{ y: -2 }}
+          className="bg-green-50 rounded-xl p-3 shadow-sm border border-green-200"
+        >
           <p className="text-xs text-green-600">{t.replied}</p>
           <p className="text-xl font-bold text-green-700">{stats.replied}</p>
         </motion.div>
-        <motion.div whileHover={{ y: -2 }} className="bg-emerald-50 rounded-xl p-3 shadow-sm border border-emerald-200">
-          <p className="text-xs text-emerald-600">{t.resolved}</p>
-          <p className="text-xl font-bold text-emerald-700">{stats.resolved}</p>
-        </motion.div>
-        <motion.div whileHover={{ y: -2 }} className="bg-gray-50 rounded-xl p-3 shadow-sm border border-gray-200">
+        <motion.div
+          whileHover={{ y: -2 }}
+          className="bg-gray-50 rounded-xl p-3 shadow-sm border border-gray-200"
+        >
           <p className="text-xs text-gray-500">{t.archived}</p>
           <p className="text-xl font-bold text-gray-900">{stats.archived}</p>
         </motion.div>
-        <motion.div whileHover={{ y: -2 }} className="bg-red-50 rounded-xl p-3 shadow-sm border border-red-200">
+        <motion.div
+          whileHover={{ y: -2 }}
+          className="bg-red-50 rounded-xl p-3 shadow-sm border border-red-200"
+        >
           <p className="text-xs text-red-600">{t.flagged}</p>
           <p className="text-xl font-bold text-red-700">{stats.flagged}</p>
         </motion.div>
-        <motion.div whileHover={{ y: -2 }} className="bg-purple-50 rounded-xl p-3 shadow-sm border border-purple-200">
+        <motion.div
+          whileHover={{ y: -2 }}
+          className="bg-purple-50 rounded-xl p-3 shadow-sm border border-purple-200"
+        >
           <p className="text-xs text-purple-600">{t.starred}</p>
           <p className="text-xl font-bold text-purple-700">{stats.starred}</p>
         </motion.div>
@@ -1074,7 +1282,6 @@ export const MessageManagement: React.FC = () => {
               <option value="pending">{t.pending}</option>
               <option value="read">{t.read}</option>
               <option value="replied">{t.replied}</option>
-              <option value="resolved">{t.resolved}</option>
               <option value="archived">{t.archived}</option>
             </select>
             <select
@@ -1151,7 +1358,10 @@ export const MessageManagement: React.FC = () => {
             <tbody className="divide-y divide-gray-200">
               {filteredMessages.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                  <td
+                    colSpan={7}
+                    className="px-4 py-8 text-center text-gray-500"
+                  >
                     <MessageIcon className="w-12 h-12 mx-auto text-gray-300 mb-2" />
                     <p>{t.noMessages}</p>
                     <p className="text-sm">{t.adjustFilters}</p>
@@ -1160,7 +1370,7 @@ export const MessageManagement: React.FC = () => {
               ) : (
                 filteredMessages.map((message) => (
                   <motion.tr
-                    key={message.id}
+                    key={message._id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className={`hover:bg-gray-50 transition-colors cursor-pointer ${!message.isRead ? "bg-blue-50/50" : ""}`}
@@ -1177,7 +1387,9 @@ export const MessageManagement: React.FC = () => {
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className={`text-sm ${!message.isRead ? "font-semibold text-gray-900" : "text-gray-900"}`}>
+                          <p
+                            className={`text-sm ${!message.isRead ? "font-semibold text-gray-900" : "text-gray-900"}`}
+                          >
                             {message.subject}
                           </p>
                           <p className="text-xs text-gray-500 truncate md:hidden">
@@ -1187,21 +1399,31 @@ export const MessageManagement: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-4 py-3 hidden md:table-cell">
-                      <p className="text-sm text-gray-600">{message.senderName}</p>
-                      <p className="text-xs text-gray-400">{message.senderEmail}</p>
+                      <p className="text-sm text-gray-600">
+                        {message.senderName}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {message.senderEmail}
+                      </p>
                     </td>
                     <td className="px-4 py-3 hidden lg:table-cell">
-                      <span className={`px-2 py-0.5 text-xs rounded-full ${getCategoryColor(message.category)}`}>
+                      <span
+                        className={`px-2 py-0.5 text-xs rounded-full ${getCategoryColor(message.category)}`}
+                      >
                         {message.category}
                       </span>
                     </td>
                     <td className="px-4 py-3 hidden lg:table-cell">
-                      <span className={`px-2 py-0.5 text-xs rounded-full ${getPriorityColor(message.priority)}`}>
+                      <span
+                        className={`px-2 py-0.5 text-xs rounded-full ${getPriorityColor(message.priority)}`}
+                      >
                         {message.priority}
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`px-2 py-0.5 text-xs rounded-full ${getStatusColor(message.status)}`}>
+                      <span
+                        className={`px-2 py-0.5 text-xs rounded-full ${getStatusColor(message.status)}`}
+                      >
                         {getStatusLabel(message.status)}
                       </span>
                       {!message.isRead && (
@@ -1209,7 +1431,9 @@ export const MessageManagement: React.FC = () => {
                       )}
                     </td>
                     <td className="px-4 py-3 hidden lg:table-cell">
-                      <p className="text-sm text-gray-600">{formatDate(message.createdAt)}</p>
+                      <p className="text-sm text-gray-600">
+                        {formatDate(message.createdAt)}
+                      </p>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-1">
@@ -1242,7 +1466,7 @@ export const MessageManagement: React.FC = () => {
                           whileTap={{ scale: 0.9 }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleToggleStar(message.id);
+                            handleToggleStar(message._id);
                           }}
                           className="p-1.5 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
                           title={t.toggleStar}
@@ -1258,7 +1482,7 @@ export const MessageManagement: React.FC = () => {
                           whileTap={{ scale: 0.9 }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleToggleFlag(message.id);
+                            handleToggleFlag(message._id);
                           }}
                           className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           title={t.toggleFlag}
@@ -1291,7 +1515,8 @@ export const MessageManagement: React.FC = () => {
         </div>
         <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
           <p className="text-sm text-gray-500">
-            {t.showing} {filteredMessages.length} {t.of} {messages.length} {t.messages}
+            {t.showing} {filteredMessages.length} {t.of} {messages.length}{" "}
+            {t.messages}
           </p>
         </div>
       </div>
@@ -1327,7 +1552,7 @@ export const MessageManagement: React.FC = () => {
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      onClick={() => handleToggleStar(selectedMessage.id)}
+                      onClick={() => handleToggleStar(selectedMessage._id)}
                       className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
                     >
                       {selectedMessage.isStarred ? (
@@ -1339,7 +1564,7 @@ export const MessageManagement: React.FC = () => {
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      onClick={() => handleToggleFlag(selectedMessage.id)}
+                      onClick={() => handleToggleFlag(selectedMessage._id)}
                       className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
                     >
                       {selectedMessage.isFlagged ? (
@@ -1363,32 +1588,63 @@ export const MessageManagement: React.FC = () => {
                   {/* Message Header */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.senderName}</label>
-                      <p className="text-sm font-medium text-gray-900 mt-1">{selectedMessage.senderName}</p>
+                      <label className="text-xs font-medium text-gray-500">
+                        {t.senderName}
+                      </label>
+                      <p className="text-sm font-medium text-gray-900 mt-1">
+                        {selectedMessage.senderName}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.senderEmail}</label>
-                      <p className="text-sm font-medium text-gray-900 mt-1">{selectedMessage.senderEmail}</p>
+                      <label className="text-xs font-medium text-gray-500">
+                        {t.senderEmail}
+                      </label>
+                      <p className="text-sm font-medium text-gray-900 mt-1">
+                        {selectedMessage.senderEmail}
+                      </p>
                     </div>
                   </div>
 
+                  {selectedMessage.ipAddress && (
+                    <div>
+                      <label className="text-xs font-medium text-gray-500">
+                        IP Address
+                      </label>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {selectedMessage.ipAddress}
+                      </p>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.subject}</label>
-                      <p className="text-sm font-medium text-gray-900 mt-1">{selectedMessage.subject}</p>
+                      <label className="text-xs font-medium text-gray-500">
+                        {t.subject}
+                      </label>
+                      <p className="text-sm font-medium text-gray-900 mt-1">
+                        {selectedMessage.subject}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.category}</label>
+                      <label className="text-xs font-medium text-gray-500">
+                        {t.category}
+                      </label>
                       <p className="mt-1">
-                        <span className={`px-2 py-0.5 text-xs rounded-full ${getCategoryColor(selectedMessage.category)}`}>
+                        <span
+                          className={`px-2 py-0.5 text-xs rounded-full ${getCategoryColor(selectedMessage.category)}`}
+                        >
                           {selectedMessage.category}
                         </span>
                       </p>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.priority}</label>
+                      <label className="text-xs font-medium text-gray-500">
+                        {t.priority}
+                      </label>
                       <p className="mt-1">
-                        <span className={`px-2 py-0.5 text-xs rounded-full ${getPriorityColor(selectedMessage.priority)}`}>
+                        <span
+                          className={`px-2 py-0.5 text-xs rounded-full ${getPriorityColor(selectedMessage.priority)}`}
+                        >
                           {selectedMessage.priority}
                         </span>
                       </p>
@@ -1397,32 +1653,47 @@ export const MessageManagement: React.FC = () => {
 
                   {/* Message Content */}
                   <div>
-                    <label className="text-xs font-medium text-gray-500">{t.messageContent}</label>
+                    <label className="text-xs font-medium text-gray-500">
+                      {t.messageContent}
+                    </label>
                     <div className="mt-1 p-4 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedMessage.content}</p>
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                        {selectedMessage.message}
+                      </p>
                     </div>
                   </div>
 
                   {/* Labels & Tags */}
-                  {selectedMessage.labels.length > 0 && (
-                    <div>
-                      <label className="text-xs font-medium text-gray-500">{t.labels}</label>
-                      <div className="mt-1 flex flex-wrap gap-1">
-                        {selectedMessage.labels.map((label) => (
-                          <span key={label} className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs">
-                            {label}
-                          </span>
-                        ))}
+                  {selectedMessage.labels &&
+                    selectedMessage.labels.length > 0 && (
+                      <div>
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.labels}
+                        </label>
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {selectedMessage.labels.map((label) => (
+                            <span
+                              key={label}
+                              className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs"
+                            >
+                              {label}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  {selectedMessage.tags.length > 0 && (
+                  {selectedMessage.tags && selectedMessage.tags.length > 0 && (
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.tags}</label>
+                      <label className="text-xs font-medium text-gray-500">
+                        {t.tags}
+                      </label>
                       <div className="mt-1 flex flex-wrap gap-1">
                         {selectedMessage.tags.map((tag) => (
-                          <span key={tag} className="px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full text-xs">
+                          <span
+                            key={tag}
+                            className="px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full text-xs"
+                          >
                             #{tag}
                           </span>
                         ))}
@@ -1431,14 +1702,19 @@ export const MessageManagement: React.FC = () => {
                   )}
 
                   {/* Reply Section */}
-                  {selectedMessage.replyContent && (
+                  {selectedMessage.replyMessage && (
                     <div className="border-t border-gray-200 pt-4 mt-4">
-                      <label className="text-xs font-medium text-gray-500">{t.replyLabel}</label>
+                      <label className="text-xs font-medium text-gray-500">
+                        {t.replyLabel}
+                      </label>
                       <div className="mt-1 p-3 bg-green-50 rounded-lg border border-green-200">
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedMessage.replyContent}</p>
+                        <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                          {selectedMessage.replyMessage}
+                        </p>
                         {selectedMessage.repliedBy && (
                           <p className="text-xs text-gray-500 mt-2">
-                            Replied by: {selectedMessage.repliedBy} on {formatDate(selectedMessage.repliedAt || "")}
+                            Replied by: {selectedMessage.repliedBy} on{" "}
+                            {formatDate(selectedMessage.repliedAt || "")}
                           </p>
                         )}
                       </div>
@@ -1462,8 +1738,14 @@ export const MessageManagement: React.FC = () => {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => {
-                        const newStatus = selectedMessage.status === "archived" ? "read" : "archived";
-                        handleUpdateStatus(selectedMessage.id, newStatus as Message["status"]);
+                        const newStatus =
+                          selectedMessage.status === "archived"
+                            ? "read"
+                            : "archived";
+                        handleUpdateStatus(
+                          selectedMessage._id,
+                          newStatus as Message["status"],
+                        );
                         setIsViewModalOpen(false);
                       }}
                       className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
@@ -1473,7 +1755,9 @@ export const MessageManagement: React.FC = () => {
                       ) : (
                         <ArchiveIcon className="w-4 h-4" />
                       )}
-                      {selectedMessage.status === "archived" ? t.unarchive : t.archive}
+                      {selectedMessage.status === "archived"
+                        ? t.unarchive
+                        : t.archive}
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.02 }}
@@ -1527,7 +1811,7 @@ export const MessageManagement: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <ReplyIcon className="text-[#FF385C] w-5 h-5" />
                     <h2 className="text-xl font-semibold text-gray-900">
-                      {t.reply} - {selectedMessage.subject}
+                      {t.replyTo} {selectedMessage.senderName}
                     </h2>
                   </div>
                   <motion.button
@@ -1548,14 +1832,11 @@ export const MessageManagement: React.FC = () => {
                   <div className="p-3 bg-gray-50 rounded-lg">
                     <p className="text-sm text-gray-500">
                       <span className="font-medium text-gray-700">From:</span>{" "}
-                      {selectedMessage.senderName} ({selectedMessage.senderEmail})
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      <span className="font-medium text-gray-700">Subject:</span>{" "}
-                      {selectedMessage.subject}
+                      {selectedMessage.senderName} (
+                      {selectedMessage.senderEmail})
                     </p>
                     <p className="text-sm text-gray-700 mt-1 line-clamp-2">
-                      {selectedMessage.content}
+                      {selectedMessage.message}
                     </p>
                   </div>
 
@@ -1572,7 +1853,6 @@ export const MessageManagement: React.FC = () => {
                       <option value="pending">{t.pending}</option>
                       <option value="read">{t.read}</option>
                       <option value="replied">{t.replied}</option>
-                      <option value="resolved">{t.resolved}</option>
                       <option value="archived">{t.archived}</option>
                     </select>
                   </div>
@@ -1669,7 +1949,9 @@ export const MessageManagement: React.FC = () => {
                   <p className="text-gray-500 text-center mb-6">
                     {t.deleteConfirmation}
                     <br />
-                    <span className="text-sm text-gray-400">{t.actionUndone}</span>
+                    <span className="text-sm text-gray-400">
+                      {t.actionUndone}
+                    </span>
                   </p>
                   <div className="flex gap-3">
                     <motion.button
@@ -1755,188 +2037,198 @@ export const MessageManagement: React.FC = () => {
                 </div>
 
                 <div className="p-6 space-y-4">
+                  {/* Form Validation Status */}
+                  {isFormValid &&
+                    touchedFields.name &&
+                    touchedFields.email &&
+                    touchedFields.message && (
+                      <div className="p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2">
+                        <CheckCircleIcon className="w-5 h-5 text-green-600" />
+                        <span className="text-sm text-green-700 font-medium">
+                          {t.allFieldsValid}
+                        </span>
+                      </div>
+                    )}
+
+                  {!isFormValid &&
+                    (touchedFields.name ||
+                      touchedFields.email ||
+                      touchedFields.message) && (
+                      <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
+                        <ErrorIcon className="w-5 h-5 text-red-600" />
+                        <span className="text-sm text-red-700 font-medium">
+                          {t.pleaseFixErrors}
+                        </span>
+                      </div>
+                    )}
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1.5">
                         {t.senderName} *
                       </label>
-                      <input
-                        type="text"
-                        value={formData.senderName}
-                        onChange={(e) => setFormData({ ...formData, senderName: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                        placeholder="John Doe"
-                      />
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={formData.name}
+                          onChange={(e) =>
+                            handleFieldChange("name", e.target.value)
+                          }
+                          onBlur={() => handleFieldBlur("name")}
+                          className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-colors ${
+                            touchedFields.name && formErrors.name
+                              ? "border-red-500 bg-red-50"
+                              : touchedFields.name &&
+                                  !formErrors.name &&
+                                  formData.name
+                                ? "border-green-500 bg-green-50"
+                                : "border-gray-300"
+                          }`}
+                          placeholder="John Doe"
+                        />
+                        {touchedFields.name &&
+                          !formErrors.name &&
+                          formData.name && (
+                            <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+                          )}
+                        {touchedFields.name && formErrors.name && (
+                          <ErrorIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+                        )}
+                      </div>
+                      {touchedFields.name && formErrors.name && (
+                        <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+                          <ErrorIcon className="w-3 h-3" />
+                          {formErrors.name}
+                        </p>
+                      )}
+                      {touchedFields.name &&
+                        !formErrors.name &&
+                        formData.name && (
+                          <p className="mt-1 text-xs text-green-600 flex items-center gap-1">
+                            <CheckCircleIcon className="w-3 h-3" />
+                            Valid
+                          </p>
+                        )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1.5">
                         {t.senderEmail} *
                       </label>
-                      <input
-                        type="email"
-                        value={formData.senderEmail}
-                        onChange={(e) => setFormData({ ...formData, senderEmail: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                        placeholder="you@example.com"
-                      />
+                      <div className="relative">
+                        <input
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) =>
+                            handleFieldChange("email", e.target.value)
+                          }
+                          onBlur={() => handleFieldBlur("email")}
+                          className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-colors ${
+                            touchedFields.email && formErrors.email
+                              ? "border-red-500 bg-red-50"
+                              : touchedFields.email &&
+                                  !formErrors.email &&
+                                  formData.email
+                                ? "border-green-500 bg-green-50"
+                                : "border-gray-300"
+                          }`}
+                          placeholder="you@example.com"
+                        />
+                        {touchedFields.email &&
+                          !formErrors.email &&
+                          formData.email && (
+                            <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+                          )}
+                        {touchedFields.email && formErrors.email && (
+                          <ErrorIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+                        )}
+                      </div>
+                      {touchedFields.email && formErrors.email && (
+                        <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+                          <ErrorIcon className="w-3 h-3" />
+                          {formErrors.email}
+                        </p>
+                      )}
+                      {touchedFields.email &&
+                        !formErrors.email &&
+                        formData.email && (
+                          <p className="mt-1 text-xs text-green-600 flex items-center gap-1">
+                            <CheckCircleIcon className="w-3 h-3" />
+                            Valid
+                          </p>
+                        )}
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      {t.recipient}
-                    </label>
-                    <input
-                      type="email"
-                      value={formData.recipientEmail}
-                      onChange={(e) => setFormData({ ...formData, recipientEmail: e.target.value })}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      placeholder="recipient@example.com"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      {t.subject} *
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.subject}
-                      onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      placeholder="Message subject"
-                    />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       {t.content} *
                     </label>
-                    <textarea
-                      value={formData.content}
-                      onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                      rows={5}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm resize-none"
-                      placeholder="Type your message here..."
-                    />
+                    <div className="relative">
+                      <textarea
+                        value={formData.message}
+                        onChange={(e) =>
+                          handleFieldChange("message", e.target.value)
+                        }
+                        onBlur={() => handleFieldBlur("message")}
+                        rows={5}
+                        className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm resize-none transition-colors ${
+                          touchedFields.message && formErrors.message
+                            ? "border-red-500 bg-red-50"
+                            : touchedFields.message &&
+                                !formErrors.message &&
+                                formData.message
+                              ? "border-green-500 bg-green-50"
+                              : "border-gray-300"
+                        }`}
+                        placeholder="Type your message here..."
+                      />
+                      {touchedFields.message &&
+                        !formErrors.message &&
+                        formData.message && (
+                          <CheckCircleIcon className="absolute right-3 top-3 w-5 h-5 text-green-500" />
+                        )}
+                      {touchedFields.message && formErrors.message && (
+                        <ErrorIcon className="absolute right-3 top-3 w-5 h-5 text-red-500" />
+                      )}
+                    </div>
+                    {touchedFields.message && formErrors.message && (
+                      <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+                        <ErrorIcon className="w-3 h-3" />
+                        {formErrors.message}
+                      </p>
+                    )}
+                    {touchedFields.message &&
+                      !formErrors.message &&
+                      formData.message && (
+                        <p className="mt-1 text-xs text-green-600 flex items-center gap-1">
+                          <CheckCircleIcon className="w-3 h-3" />
+                          Valid ({formData.message.length}/1000 characters)
+                        </p>
+                      )}
+                    <p className="mt-1 text-xs text-gray-400 text-right">
+                      {formData.message.length}/1000 characters
+                    </p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        {t.category}
-                      </label>
-                      <select
-                        value={formData.category}
-                        onChange={(e) => setFormData({ ...formData, category: e.target.value as Message["category"] })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
-                      >
-                        <option value="general">{t.general}</option>
-                        <option value="support">{t.support}</option>
-                        <option value="booking">{t.booking}</option>
-                        <option value="payment">{t.payment}</option>
-                        <option value="complaint">{t.complaint}</option>
-                        <option value="feedback">{t.feedback}</option>
-                        <option value="other">{t.other}</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        {t.priority}
-                      </label>
-                      <select
-                        value={formData.priority}
-                        onChange={(e) => setFormData({ ...formData, priority: e.target.value as Message["priority"] })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
-                      >
-                        <option value="low">{t.low}</option>
-                        <option value="medium">{t.medium}</option>
-                        <option value="high">{t.high}</option>
-                        <option value="urgent">{t.urgent}</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        {t.status}
-                      </label>
-                      <select
-                        value={formData.status}
-                        onChange={(e) => setFormData({ ...formData, status: e.target.value as Message["status"] })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
-                      >
-                        <option value="pending">{t.pending}</option>
-                        <option value="read">{t.read}</option>
-                        <option value="replied">{t.replied}</option>
-                        <option value="resolved">{t.resolved}</option>
-                        <option value="archived">{t.archived}</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Labels */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      {t.labels}
+                      {t.status}
                     </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={labelInput}
-                        onChange={(e) => setLabelInput(e.target.value)}
-                        onKeyPress={(e) => e.key === "Enter" && addLabel()}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                        placeholder="Add a label..."
-                      />
-                      <button
-                        onClick={addLabel}
-                        className="px-3 py-2 bg-[#FF385C] text-white rounded-lg hover:bg-[#E31C5F] transition-colors"
-                      >
-                        <AddIcon className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {formData.labels.map((label) => (
-                        <span key={label} className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs flex items-center gap-1">
-                          {label}
-                          <button onClick={() => removeLabel(label)} className="hover:text-red-500">
-                            <CloseIconMui className="w-3 h-3" />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Tags */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      {t.tags}
-                    </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={tagInput}
-                        onChange={(e) => setTagInput(e.target.value)}
-                        onKeyPress={(e) => e.key === "Enter" && addTag()}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                        placeholder="Add a tag..."
-                      />
-                      <button
-                        onClick={addTag}
-                        className="px-3 py-2 bg-[#FF385C] text-white rounded-lg hover:bg-[#E31C5F] transition-colors"
-                      >
-                        <AddIcon className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {formData.tags.map((tag) => (
-                        <span key={tag} className="px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full text-xs flex items-center gap-1">
-                          #{tag}
-                          <button onClick={() => removeTag(tag)} className="hover:text-red-500">
-                            <CloseIconMui className="w-3 h-3" />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
+                    <select
+                      value={formData.status}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          status: e.target.value as Message["status"],
+                        })
+                      }
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
+                    >
+                      <option value="pending">{t.pending}</option>
+                      <option value="read">{t.read}</option>
+                      <option value="replied">{t.replied}</option>
+                      <option value="archived">{t.archived}</option>
+                    </select>
                   </div>
 
                   <div className="flex gap-3 pt-4 border-t border-gray-200">
@@ -1944,9 +2236,9 @@ export const MessageManagement: React.FC = () => {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={handleCreateMessage}
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || !isFormValid}
                       className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors flex items-center justify-center gap-2 ${
-                        isSubmitting
+                        isSubmitting || !isFormValid
                           ? "bg-gray-400 cursor-not-allowed"
                           : "bg-[#FF385C] hover:bg-[#E31C5F]"
                       }`}
@@ -1984,4 +2276,3 @@ export const MessageManagement: React.FC = () => {
     </div>
   );
 };
-
