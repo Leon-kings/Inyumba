@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/set-state-in-effect */
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import axios from 'axios';
-import { 
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import axios from "axios";
+import {
   People as PeopleIcon,
   Add as AddIcon,
   Edit as EditIcon,
@@ -18,7 +18,10 @@ import {
   Description as DescriptionIcon,
   Save as SaveIcon,
   Refresh as RefreshIcon,
-} from '@mui/icons-material';
+  Visibility as VisibilityIcon,
+  Email as EmailIcon,
+  CalendarToday as CalendarTodayIcon,
+} from "@mui/icons-material";
 
 // ============================================
 // TYPES
@@ -63,12 +66,12 @@ interface TeamMemberResponse {
 // ============================================
 // API CONFIGURATION
 // ============================================
-const API_BASE_URL = 'https://rene-inyumba-nodejs.onrender.com';
+const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'multipart/form-data',
+    "Content-Type": "multipart/form-data",
   },
 });
 
@@ -78,20 +81,23 @@ const axiosInstance = axios.create({
 class TeamMemberModel {
   private handleError(error: unknown): never {
     if (axios.isAxiosError(error)) {
-      const message = error.response?.data?.message || error.response?.data?.error || error.message;
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message;
       throw new Error(message);
     }
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error('An unknown error occurred');
+    throw new Error("An unknown error occurred");
   }
 
   async getAll(): Promise<TeamMember[]> {
     try {
-      const response = await axiosInstance.get('/team');
+      const response = await axiosInstance.get("/team");
       const result = response.data as TeamMemberResponse;
-      
+
       if (result.success && result.data) {
         return Array.isArray(result.data) ? result.data : [result.data];
       }
@@ -105,7 +111,7 @@ class TeamMemberModel {
     try {
       const response = await axiosInstance.get(`/team/${id}`);
       const result = response.data as TeamMemberResponse;
-      
+
       if (result.success && result.data) {
         return Array.isArray(result.data) ? result.data[0] : result.data;
       }
@@ -118,28 +124,28 @@ class TeamMemberModel {
   async create(data: TeamMemberFormData): Promise<TeamMember> {
     try {
       const formData = new FormData();
-      formData.append('name', data.name);
-      formData.append('role', data.role);
-      formData.append('bio', data.bio);
-      formData.append('social[linkedin]', data.social.linkedin || '');
-      formData.append('social[twitter]', data.social.twitter || '');
-      
+      formData.append("name", data.name);
+      formData.append("role", data.role);
+      formData.append("bio", data.bio);
+      formData.append("social[linkedin]", data.social.linkedin || "");
+      formData.append("social[twitter]", data.social.twitter || "");
+
       if (data.image) {
-        formData.append('image', data.image);
+        formData.append("image", data.image);
       }
 
-      const response = await axiosInstance.post('/team', formData, {
+      const response = await axiosInstance.post("/team", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
-      
+
       const result = response.data as TeamMemberResponse;
-      
+
       if (!result.success || !result.data) {
-        throw new Error(result.message || 'Failed to create team member');
+        throw new Error(result.message || "Failed to create team member");
       }
-      
+
       return Array.isArray(result.data) ? result.data[0] : result.data;
     } catch (error) {
       this.handleError(error);
@@ -149,28 +155,28 @@ class TeamMemberModel {
   async update(id: string, data: TeamMemberFormData): Promise<TeamMember> {
     try {
       const formData = new FormData();
-      formData.append('name', data.name);
-      formData.append('role', data.role);
-      formData.append('bio', data.bio);
-      formData.append('social[linkedin]', data.social.linkedin || '');
-      formData.append('social[twitter]', data.social.twitter || '');
-      
+      formData.append("name", data.name);
+      formData.append("role", data.role);
+      formData.append("bio", data.bio);
+      formData.append("social[linkedin]", data.social.linkedin || "");
+      formData.append("social[twitter]", data.social.twitter || "");
+
       if (data.image) {
-        formData.append('image', data.image);
+        formData.append("image", data.image);
       }
 
       const response = await axiosInstance.put(`/team/${id}`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
-      
+
       const result = response.data as TeamMemberResponse;
-      
+
       if (!result.success || !result.data) {
-        throw new Error(result.message || 'Failed to update team member');
+        throw new Error(result.message || "Failed to update team member");
       }
-      
+
       return Array.isArray(result.data) ? result.data[0] : result.data;
     } catch (error) {
       this.handleError(error);
@@ -181,47 +187,56 @@ class TeamMemberModel {
     try {
       const response = await axiosInstance.delete(`/team/${id}`);
       const result = response.data as TeamMemberResponse;
-      
+
       if (!result.success) {
-        throw new Error(result.message || 'Failed to delete team member');
+        throw new Error(result.message || "Failed to delete team member");
       }
     } catch (error) {
       this.handleError(error);
     }
   }
 
-  validateForm(data: TeamMemberFormData, editingMember: TeamMember | null = null): Record<string, string> {
+  validateForm(
+    data: TeamMemberFormData,
+    editingMember: TeamMember | null = null,
+  ): Record<string, string> {
     const errors: Record<string, string> = {};
-    
+
     if (!data.name.trim()) {
-      errors.name = 'Name is required';
+      errors.name = "Name is required";
     } else if (data.name.trim().length < 2) {
-      errors.name = 'Name must be at least 2 characters';
+      errors.name = "Name must be at least 2 characters";
     }
-    
+
     if (!data.role.trim()) {
-      errors.role = 'Role is required';
+      errors.role = "Role is required";
     }
-    
+
     if (!data.bio.trim()) {
-      errors.bio = 'Bio is required';
+      errors.bio = "Bio is required";
     } else if (data.bio.trim().length < 10) {
-      errors.bio = 'Bio must be at least 10 characters';
+      errors.bio = "Bio must be at least 10 characters";
     }
-    
+
     // Image validation - only required if not editing or if editing and no existing image
     if (!editingMember && !data.image) {
-      errors.image = 'Profile image is required';
+      errors.image = "Profile image is required";
     }
-    
-    if (data.social.linkedin && !data.social.linkedin.match(/^https?:\/\/[^\s]+$/)) {
-      errors.linkedin = 'Invalid LinkedIn URL';
+
+    if (
+      data.social.linkedin &&
+      !data.social.linkedin.match(/^https?:\/\/[^\s]+$/)
+    ) {
+      errors.linkedin = "Invalid LinkedIn URL";
     }
-    
-    if (data.social.twitter && !data.social.twitter.match(/^https?:\/\/[^\s]+$/)) {
-      errors.twitter = 'Invalid Twitter URL';
+
+    if (
+      data.social.twitter &&
+      !data.social.twitter.match(/^https?:\/\/[^\s]+$/)
+    ) {
+      errors.twitter = "Invalid Twitter URL";
     }
-    
+
     return errors;
   }
 }
@@ -244,7 +259,8 @@ const useTeamMember = () => {
       const data = await model.getAll();
       setMembers(data);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load team members';
+      const message =
+        err instanceof Error ? err.message : "Failed to load team members";
       setError(message);
       throw err;
     } finally {
@@ -252,46 +268,57 @@ const useTeamMember = () => {
     }
   }, []);
 
-  const createMember = useCallback(async (data: TeamMemberFormData): Promise<TeamMember> => {
-    try {
-      setIsSubmitting(true);
-      setError(null);
-      const newMember = await model.create(data);
-      setMembers(prev => [...prev, newMember]);
-      return newMember;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to create team member';
-      setError(message);
-      throw err;
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, []);
+  const createMember = useCallback(
+    async (data: TeamMemberFormData): Promise<TeamMember> => {
+      try {
+        setIsSubmitting(true);
+        setError(null);
+        const newMember = await model.create(data);
+        setMembers((prev) => [...prev, newMember]);
+        return newMember;
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Failed to create team member";
+        setError(message);
+        throw err;
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [],
+  );
 
-  const updateMember = useCallback(async (id: string, data: TeamMemberFormData): Promise<TeamMember> => {
-    try {
-      setIsSubmitting(true);
-      setError(null);
-      const updatedMember = await model.update(id, data);
-      setMembers(prev => prev.map(m => m._id === updatedMember._id ? updatedMember : m));
-      return updatedMember;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to update team member';
-      setError(message);
-      throw err;
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, []);
+  const updateMember = useCallback(
+    async (id: string, data: TeamMemberFormData): Promise<TeamMember> => {
+      try {
+        setIsSubmitting(true);
+        setError(null);
+        const updatedMember = await model.update(id, data);
+        setMembers((prev) =>
+          prev.map((m) => (m._id === updatedMember._id ? updatedMember : m)),
+        );
+        return updatedMember;
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Failed to update team member";
+        setError(message);
+        throw err;
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [],
+  );
 
   const deleteMember = useCallback(async (id: string): Promise<void> => {
     try {
       setIsSubmitting(true);
       setError(null);
       await model.delete(id);
-      setMembers(prev => prev.filter(m => m._id !== id));
+      setMembers((prev) => prev.filter((m) => m._id !== id));
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to delete team member';
+      const message =
+        err instanceof Error ? err.message : "Failed to delete team member";
       setError(message);
       throw err;
     } finally {
@@ -299,9 +326,15 @@ const useTeamMember = () => {
     }
   }, []);
 
-  const validateForm = useCallback((data: TeamMemberFormData, editingMember: TeamMember | null = null): Record<string, string> => {
-    return model.validateForm(data, editingMember);
-  }, []);
+  const validateForm = useCallback(
+    (
+      data: TeamMemberFormData,
+      editingMember: TeamMember | null = null,
+    ): Record<string, string> => {
+      return model.validateForm(data, editingMember);
+    },
+    [],
+  );
 
   useEffect(() => {
     loadMembers();
@@ -345,15 +378,15 @@ interface ValidationIndicatorProps {
   editingMember: TeamMember | null;
 }
 
-const ValidationIndicator: React.FC<ValidationIndicatorProps> = ({ 
-  field, 
-  formErrors, 
+const ValidationIndicator: React.FC<ValidationIndicatorProps> = ({
+  field,
+  formErrors,
   formData,
-  editingMember 
+  editingMember,
 }) => {
   const error = formErrors[field];
-  
-  if (field === 'image') {
+
+  if (field === "image") {
     if (!formData.imagePreview && !editingMember) return null;
     return (
       <div className="flex items-center mt-1 text-sm">
@@ -373,13 +406,16 @@ const ValidationIndicator: React.FC<ValidationIndicatorProps> = ({
   }
 
   // For social fields, only show if there's a value
-  if ((field === 'linkedin' || field === 'twitter') && !formData.social[field as keyof typeof formData.social]) {
+  if (
+    (field === "linkedin" || field === "twitter") &&
+    !formData.social[field as keyof typeof formData.social]
+  ) {
     return null;
   }
 
   const value = formData[field as keyof TeamMemberFormData];
-  if (!value && field !== 'linkedin' && field !== 'twitter') return null;
-  
+  if (!value && field !== "linkedin" && field !== "twitter") return null;
+
   return (
     <div className="flex items-center mt-1 text-sm">
       {error ? (
@@ -398,45 +434,216 @@ const ValidationIndicator: React.FC<ValidationIndicatorProps> = ({
 };
 
 // ============================================
+// VIEW MODAL COMPONENT
+// ============================================
+interface ViewModalProps {
+  member: TeamMember | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}
+
+const ViewModal: React.FC<ViewModalProps> = ({
+  member,
+  isOpen,
+  onClose,
+  onEdit,
+  onDelete,
+}) => {
+  if (!isOpen || !member) return null;
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="p-6 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-white z-10 rounded-t-xl">
+          <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <VisibilityIcon className="w-6 h-6 text-indigo-600" />
+            Team Member Details
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <CloseIcon className="w-6 h-6 text-gray-500" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          {/* Profile Image */}
+          <div className="flex justify-center mb-6">
+            <div className="relative">
+              <img
+                src={member.image?.url || member.image?.secure_url}
+                alt={member.name}
+                className="w-32 h-32 rounded-full object-cover border-4 border-indigo-100 shadow-lg"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src =
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      member.name,
+                    )}&size=150&background=indigo&color=fff&font-size=0.5`;
+                }}
+              />
+              <div className="absolute -bottom-2 -right-2 bg-indigo-100 rounded-full p-2 border-4 border-white">
+                <PersonIcon className="w-4 h-4 text-indigo-600" />
+              </div>
+            </div>
+          </div>
+
+          {/* Name & Role */}
+          <div className="text-center mb-6">
+            <h3 className="text-2xl font-bold text-gray-800">{member.name}</h3>
+            <span className="inline-block px-4 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium mt-2">
+              {member.role}
+            </span>
+          </div>
+
+          {/* Bio */}
+          <div className="mb-6">
+            <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
+              Bio
+            </h4>
+            <div className="bg-gray-50 rounded-lg p-4">
+              <p className="text-gray-700 leading-relaxed">{member.bio}</p>
+            </div>
+          </div>
+
+          {/* Social Links */}
+          {(member.social?.linkedin || member.social?.twitter) && (
+            <div className="mb-6">
+              <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                Social Links
+              </h4>
+              <div className="flex gap-4">
+                {member.social?.linkedin && member.social.linkedin !== "#" && (
+                  <a
+                    href={member.social.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                  >
+                    <LinkedInIcon className="w-5 h-5" />
+                    LinkedIn
+                  </a>
+                )}
+                {member.social?.twitter && member.social.twitter !== "#" && (
+                  <a
+                    href={member.social.twitter}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 bg-sky-50 text-sky-600 rounded-lg hover:bg-sky-100 transition-colors"
+                  >
+                    <TwitterIcon className="w-5 h-5" />
+                    Twitter
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Meta Info */}
+          <div className="border-t border-gray-100 pt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+              <div className="flex items-center gap-2 text-gray-500">
+                <CalendarTodayIcon className="w-4 h-4" />
+                <span>Created: {formatDate(member.createdAt)}</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-500">
+                <RefreshIcon className="w-4 h-4" />
+                <span>Updated: {formatDate(member.updatedAt)}</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-500">
+                <EmailIcon className="w-4 h-4" />
+                <span>ID: {member._id?.slice(0, 12)}...</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Close
+            </button>
+            <button
+              onClick={onEdit}
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              <EditIcon className="w-4 h-4" />
+              Edit
+            </button>
+            <button
+              onClick={onDelete}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              <DeleteIcon className="w-4 h-4" />
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================
 // MAIN COMPONENT
 // ============================================
 export const TeamMemberManagement: React.FC = () => {
   // Use the custom hook
-  const { 
-    members, 
-    loading, 
-    error, 
-    createMember, 
-    updateMember, 
+  const {
+    members,
+    loading,
+    error,
+    createMember,
+    updateMember,
     deleteMember,
-    validateForm 
+    validateForm,
   } = useTeamMember();
 
   // Local state
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState<boolean>(false);
+  const [viewingMember, setViewingMember] = useState<TeamMember | null>(null);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [deletingMemberId, setDeletingMemberId] = useState<string | null>(null);
   const [formData, setFormData] = useState<TeamMemberFormData>({
-    name: '',
-    role: '',
-    bio: '',
+    name: "",
+    role: "",
+    bio: "",
     image: null,
-    imagePreview: '',
+    imagePreview: "",
     social: {
-      linkedin: '',
-      twitter: '',
+      linkedin: "",
+      twitter: "",
     },
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [notification, setNotification] = useState<{
-    type: 'success' | 'error';
+    type: "success" | "error";
     message: string;
     visible: boolean;
-  }>({ type: 'success', message: '', visible: false });
+  }>({ type: "success", message: "", visible: false });
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
-  
+
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -447,10 +654,10 @@ export const TeamMemberManagement: React.FC = () => {
     setIsFormValid(Object.keys(errors).length === 0);
   }, [formData, editingMember, validateForm]);
 
-  const showNotification = (type: 'success' | 'error', message: string) => {
+  const showNotification = (type: "success" | "error", message: string) => {
     setNotification({ type, message, visible: true });
     setTimeout(() => {
-      setNotification(prev => ({ ...prev, visible: false }));
+      setNotification((prev) => ({ ...prev, visible: false }));
     }, 5000);
   };
 
@@ -468,14 +675,14 @@ export const TeamMemberManagement: React.FC = () => {
     } else {
       setEditingMember(null);
       setFormData({
-        name: '',
-        role: '',
-        bio: '',
+        name: "",
+        role: "",
+        bio: "",
         image: null,
-        imagePreview: '',
+        imagePreview: "",
         social: {
-          linkedin: '',
-          twitter: '',
+          linkedin: "",
+          twitter: "",
         },
       });
     }
@@ -486,36 +693,66 @@ export const TeamMemberManagement: React.FC = () => {
     setIsModalOpen(false);
     setEditingMember(null);
     setFormData({
-      name: '',
-      role: '',
-      bio: '',
+      name: "",
+      role: "",
+      bio: "",
       image: null,
-      imagePreview: '',
+      imagePreview: "",
       social: {
-        linkedin: '',
-        twitter: '',
+        linkedin: "",
+        twitter: "",
       },
     });
     setFormErrors({});
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleViewMember = (member: TeamMember) => {
+    setViewingMember(member);
+    setIsViewModalOpen(true);
+  };
+
+  const handleCloseViewModal = () => {
+    setIsViewModalOpen(false);
+    setViewingMember(null);
+  };
+
+  const handleEditFromView = () => {
+    if (viewingMember) {
+      handleCloseViewModal();
+      handleOpenModal(viewingMember);
+    }
+  };
+
+  const handleDeleteFromView = () => {
+    if (viewingMember?._id) {
+      setDeletingMemberId(viewingMember._id);
+      setIsDeleteModalOpen(true);
+      handleCloseViewModal();
+    }
+  };
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
-    
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.');
-      setFormData(prev => ({
+
+    if (name.includes(".")) {
+      const [parent, child] = name.split(".");
+      setFormData((prev) => ({
         ...prev,
         [parent]: {
-          ...(prev[parent as keyof TeamMemberFormData] as Record<string, string>),
+          ...(prev[parent as keyof TeamMemberFormData] as Record<
+            string,
+            string
+          >),
           [child]: value,
         },
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         [name]: value,
       }));
@@ -527,26 +764,29 @@ export const TeamMemberManagement: React.FC = () => {
     if (file) {
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        setFormErrors(prev => ({ ...prev, image: 'Image size should be less than 5MB' }));
+        setFormErrors((prev) => ({
+          ...prev,
+          image: "Image size should be less than 5MB",
+        }));
         return;
       }
-      
+
       // Validate file type
-      if (!file.type.startsWith('image/')) {
-        setFormErrors(prev => ({ ...prev, image: 'File must be an image' }));
+      if (!file.type.startsWith("image/")) {
+        setFormErrors((prev) => ({ ...prev, image: "File must be an image" }));
         return;
       }
 
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
           image: file,
           imagePreview: reader.result as string,
         }));
         // Clear image error if it exists
         if (formErrors.image) {
-          setFormErrors(prev => {
+          setFormErrors((prev) => {
             const newErrors = { ...prev };
             delete newErrors.image;
             return newErrors;
@@ -558,19 +798,19 @@ export const TeamMemberManagement: React.FC = () => {
   };
 
   const handleRemoveImage = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       image: null,
-      imagePreview: '',
+      imagePreview: "",
     }));
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const errors = validateForm(formData, editingMember);
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
@@ -581,15 +821,16 @@ export const TeamMemberManagement: React.FC = () => {
     try {
       if (editingMember) {
         await updateMember(editingMember._id!, formData);
-        showNotification('success', 'Team member updated successfully!');
+        showNotification("success", "Team member updated successfully!");
       } else {
         await createMember(formData);
-        showNotification('success', 'Team member added successfully!');
+        showNotification("success", "Team member added successfully!");
       }
       handleCloseModal();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to save team member';
-      showNotification('error', message);
+      const message =
+        err instanceof Error ? err.message : "Failed to save team member";
+      showNotification("error", message);
     } finally {
       setIsSubmitting(false);
     }
@@ -597,16 +838,17 @@ export const TeamMemberManagement: React.FC = () => {
 
   const handleDelete = async () => {
     if (!deletingMemberId) return;
-    
+
     setIsSubmitting(true);
     try {
       await deleteMember(deletingMemberId);
-      showNotification('success', 'Team member deleted successfully!');
+      showNotification("success", "Team member deleted successfully!");
       setIsDeleteModalOpen(false);
       setDeletingMemberId(null);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to delete team member';
-      showNotification('error', message);
+      const message =
+        err instanceof Error ? err.message : "Failed to delete team member";
+      showNotification("error", message);
     } finally {
       setIsSubmitting(false);
     }
@@ -630,7 +872,9 @@ export const TeamMemberManagement: React.FC = () => {
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
           <ErrorIcon className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">Error Loading Team Members</h3>
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            Error Loading Team Members
+          </h3>
           <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
@@ -647,20 +891,30 @@ export const TeamMemberManagement: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-8">
       {/* Notification */}
       {notification.visible && (
-        <div className={`fixed top-4 right-4 z-50 flex items-center gap-3 p-4 rounded-lg shadow-lg transform transition-all duration-500 ${
-          notification.type === 'success' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
-        }`}>
-          {notification.type === 'success' ? <SuccessSVG /> : <ErrorSVG />}
+        <div
+          className={`fixed top-4 right-4 z-50 flex items-center gap-3 p-4 rounded-lg shadow-lg transform transition-all duration-500 ${
+            notification.type === "success"
+              ? "bg-green-50 border border-green-200"
+              : "bg-red-50 border border-red-200"
+          }`}
+        >
+          {notification.type === "success" ? <SuccessSVG /> : <ErrorSVG />}
           <div>
-            <h3 className={`font-semibold ${notification.type === 'success' ? 'text-green-800' : 'text-red-800'}`}>
-              {notification.type === 'success' ? 'Success!' : 'Error!'}
+            <h3
+              className={`font-semibold ${notification.type === "success" ? "text-green-800" : "text-red-800"}`}
+            >
+              {notification.type === "success" ? "Success!" : "Error!"}
             </h3>
-            <p className={`text-sm ${notification.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+            <p
+              className={`text-sm ${notification.type === "success" ? "text-green-600" : "text-red-600"}`}
+            >
               {notification.message}
             </p>
           </div>
-          <button 
-            onClick={() => setNotification(prev => ({ ...prev, visible: false }))}
+          <button
+            onClick={() =>
+              setNotification((prev) => ({ ...prev, visible: false }))
+            }
             className="ml-4 text-gray-400 hover:text-gray-600"
           >
             <CloseIcon className="w-5 h-5" />
@@ -676,7 +930,9 @@ export const TeamMemberManagement: React.FC = () => {
               <PeopleIcon className="w-8 h-8 text-indigo-600" />
               Team Management
             </h1>
-            <p className="text-gray-500 mt-1">Manage your team members and their information</p>
+            <p className="text-gray-500 mt-1">
+              Manage your team members and their information
+            </p>
           </div>
           <button
             onClick={() => handleOpenModal()}
@@ -691,8 +947,12 @@ export const TeamMemberManagement: React.FC = () => {
         {members.length === 0 ? (
           <div className="bg-white rounded-xl shadow-lg p-12 text-center">
             <PeopleIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-600 mb-2">No Team Members Yet</h3>
-            <p className="text-gray-500 mb-4">Start building your team by adding the first member.</p>
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">
+              No Team Members Yet
+            </h3>
+            <p className="text-gray-500 mb-4">
+              Start building your team by adding the first member.
+            </p>
             <button
               onClick={() => handleOpenModal()}
               className="inline-flex items-center gap-2 px-4 py-2 border-2 border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors"
@@ -714,11 +974,19 @@ export const TeamMemberManagement: React.FC = () => {
                     alt={member.name}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-black bg-opacity-20 flex items-end p-4">
+                  <div className="absolute inset-0 bg-opacity-20 flex items-end p-4">
                     <div className="flex gap-2">
+                      <button
+                        onClick={() => handleViewMember(member)}
+                        className="p-2 bg-white rounded-full hover:bg-indigo-50 transition-colors shadow-md"
+                        title="View Details"
+                      >
+                        <VisibilityIcon className="w-4 h-4 text-indigo-600" />
+                      </button>
                       <button
                         onClick={() => handleOpenModal(member)}
                         className="p-2 bg-white rounded-full hover:bg-indigo-50 transition-colors shadow-md"
+                        title="Edit"
                       >
                         <EditIcon className="w-4 h-4 text-indigo-600" />
                       </button>
@@ -728,6 +996,7 @@ export const TeamMemberManagement: React.FC = () => {
                           setIsDeleteModalOpen(true);
                         }}
                         className="p-2 bg-white rounded-full hover:bg-red-50 transition-colors shadow-md"
+                        title="Delete"
                       >
                         <DeleteIcon className="w-4 h-4 text-red-600" />
                       </button>
@@ -735,23 +1004,28 @@ export const TeamMemberManagement: React.FC = () => {
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-800">{member.name}</h3>
+                  <h3 className="text-xl font-bold text-gray-800">
+                    {member.name}
+                  </h3>
                   <span className="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium mt-1 mb-2">
                     {member.role}
                   </span>
-                  <p className="text-gray-600 text-sm mt-2 line-clamp-2">{member.bio}</p>
+                  <p className="text-gray-600 text-sm mt-2 line-clamp-2">
+                    {member.bio}
+                  </p>
                   <div className="flex gap-3 mt-4 pt-4 border-t border-gray-100">
-                    {member.social.linkedin && member.social.linkedin !== '#' && (
-                      <a
-                        href={member.social.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-gray-400 hover:text-indigo-600 transition-colors"
-                      >
-                        <LinkedInIcon className="w-5 h-5" />
-                      </a>
-                    )}
-                    {member.social.twitter && member.social.twitter !== '#' && (
+                    {member.social.linkedin &&
+                      member.social.linkedin !== "#" && (
+                        <a
+                          href={member.social.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-gray-400 hover:text-indigo-600 transition-colors"
+                        >
+                          <LinkedInIcon className="w-5 h-5" />
+                        </a>
+                      )}
+                    {member.social.twitter && member.social.twitter !== "#" && (
                       <a
                         href={member.social.twitter}
                         target="_blank"
@@ -768,13 +1042,22 @@ export const TeamMemberManagement: React.FC = () => {
           </div>
         )}
 
+        {/* View Modal */}
+        <ViewModal
+          member={viewingMember}
+          isOpen={isViewModalOpen}
+          onClose={handleCloseViewModal}
+          onEdit={handleEditFromView}
+          onDelete={handleDeleteFromView}
+        />
+
         {/* Create/Edit Modal */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-white z-10">
                 <h2 className="text-2xl font-bold text-gray-800">
-                  {editingMember ? 'Edit Team Member' : 'Add Team Member'}
+                  {editingMember ? "Edit Team Member" : "Add Team Member"}
                 </h2>
                 <button
                   onClick={handleCloseModal}
@@ -797,23 +1080,22 @@ export const TeamMemberManagement: React.FC = () => {
                       value={formData.name}
                       onChange={handleInputChange}
                       className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all ${
-                        formErrors.name ? 'border-red-500' : 'border-gray-300'
+                        formErrors.name ? "border-red-500" : "border-gray-300"
                       }`}
                       placeholder="Enter full name"
                     />
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                      {formData.name && (
-                        formErrors.name ? (
+                      {formData.name &&
+                        (formErrors.name ? (
                           <ErrorIcon className="w-5 h-5 text-red-500" />
                         ) : (
                           <CheckCircleIcon className="w-5 h-5 text-green-500" />
-                        )
-                      )}
+                        ))}
                     </div>
                   </div>
-                  <ValidationIndicator 
-                    field="name" 
-                    formErrors={formErrors} 
+                  <ValidationIndicator
+                    field="name"
+                    formErrors={formErrors}
                     formData={formData}
                     editingMember={editingMember}
                   />
@@ -832,23 +1114,22 @@ export const TeamMemberManagement: React.FC = () => {
                       value={formData.role}
                       onChange={handleInputChange}
                       className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all ${
-                        formErrors.role ? 'border-red-500' : 'border-gray-300'
+                        formErrors.role ? "border-red-500" : "border-gray-300"
                       }`}
                       placeholder="e.g., CEO, Developer"
                     />
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                      {formData.role && (
-                        formErrors.role ? (
+                      {formData.role &&
+                        (formErrors.role ? (
                           <ErrorIcon className="w-5 h-5 text-red-500" />
                         ) : (
                           <CheckCircleIcon className="w-5 h-5 text-green-500" />
-                        )
-                      )}
+                        ))}
                     </div>
                   </div>
-                  <ValidationIndicator 
-                    field="role" 
-                    formErrors={formErrors} 
+                  <ValidationIndicator
+                    field="role"
+                    formErrors={formErrors}
                     formData={formData}
                     editingMember={editingMember}
                   />
@@ -867,23 +1148,22 @@ export const TeamMemberManagement: React.FC = () => {
                       onChange={handleInputChange}
                       rows={4}
                       className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none ${
-                        formErrors.bio ? 'border-red-500' : 'border-gray-300'
+                        formErrors.bio ? "border-red-500" : "border-gray-300"
                       }`}
                       placeholder="Write a brief bio..."
                     />
                     <div className="absolute right-3 top-3">
-                      {formData.bio && (
-                        formErrors.bio ? (
+                      {formData.bio &&
+                        (formErrors.bio ? (
                           <ErrorIcon className="w-5 h-5 text-red-500" />
                         ) : (
                           <CheckCircleIcon className="w-5 h-5 text-green-500" />
-                        )
-                      )}
+                        ))}
                     </div>
                   </div>
-                  <ValidationIndicator 
-                    field="bio" 
-                    formErrors={formErrors} 
+                  <ValidationIndicator
+                    field="bio"
+                    formErrors={formErrors}
                     formData={formData}
                     editingMember={editingMember}
                   />
@@ -907,12 +1187,16 @@ export const TeamMemberManagement: React.FC = () => {
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
                         className={`w-full px-4 py-2 border-2 border-dashed rounded-lg transition-colors flex items-center justify-center gap-2 ${
-                          formErrors.image ? 'border-red-500' : 'border-gray-300 hover:border-indigo-500'
+                          formErrors.image
+                            ? "border-red-500"
+                            : "border-gray-300 hover:border-indigo-500"
                         }`}
                       >
                         <ImageIcon className="w-5 h-5 text-gray-400" />
                         <span className="text-gray-600">
-                          {formData.imagePreview ? 'Change Image' : 'Upload Image'}
+                          {formData.imagePreview
+                            ? "Change Image"
+                            : "Upload Image"}
                         </span>
                       </button>
                     </div>
@@ -933,13 +1217,15 @@ export const TeamMemberManagement: React.FC = () => {
                       </div>
                     )}
                   </div>
-                  <ValidationIndicator 
-                    field="image" 
-                    formErrors={formErrors} 
+                  <ValidationIndicator
+                    field="image"
+                    formErrors={formErrors}
                     formData={formData}
                     editingMember={editingMember}
                   />
-                  <p className="text-xs text-gray-500 mt-1">Max file size: 5MB. Supported formats: JPEG, PNG, GIF</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Max file size: 5MB. Supported formats: JPEG, PNG, GIF
+                  </p>
                 </div>
 
                 {/* Social Links */}
@@ -956,14 +1242,16 @@ export const TeamMemberManagement: React.FC = () => {
                         value={formData.social.linkedin}
                         onChange={handleInputChange}
                         className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all ${
-                          formErrors.linkedin ? 'border-red-500' : 'border-gray-300'
+                          formErrors.linkedin
+                            ? "border-red-500"
+                            : "border-gray-300"
                         }`}
                         placeholder="https://linkedin.com/in/username"
                       />
                     </div>
-                    <ValidationIndicator 
-                      field="linkedin" 
-                      formErrors={formErrors} 
+                    <ValidationIndicator
+                      field="linkedin"
+                      formErrors={formErrors}
                       formData={formData}
                       editingMember={editingMember}
                     />
@@ -980,14 +1268,16 @@ export const TeamMemberManagement: React.FC = () => {
                         value={formData.social.twitter}
                         onChange={handleInputChange}
                         className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all ${
-                          formErrors.twitter ? 'border-red-500' : 'border-gray-300'
+                          formErrors.twitter
+                            ? "border-red-500"
+                            : "border-gray-300"
                         }`}
                         placeholder="https://twitter.com/username"
                       />
                     </div>
-                    <ValidationIndicator 
-                      field="twitter" 
-                      formErrors={formErrors} 
+                    <ValidationIndicator
+                      field="twitter"
+                      formErrors={formErrors}
                       formData={formData}
                       editingMember={editingMember}
                     />
@@ -1008,8 +1298,8 @@ export const TeamMemberManagement: React.FC = () => {
                     disabled={!isFormValid || isSubmitting}
                     className={`flex items-center gap-2 px-6 py-2 rounded-lg text-white transition-all ${
                       isFormValid && !isSubmitting
-                        ? 'bg-indigo-600 hover:bg-indigo-700'
-                        : 'bg-gray-400 cursor-not-allowed'
+                        ? "bg-indigo-600 hover:bg-indigo-700"
+                        : "bg-gray-400 cursor-not-allowed"
                     }`}
                   >
                     {isSubmitting ? (
@@ -1020,7 +1310,7 @@ export const TeamMemberManagement: React.FC = () => {
                     ) : (
                       <>
                         <SaveIcon className="w-5 h-5" />
-                        {editingMember ? 'Update' : 'Create'}
+                        {editingMember ? "Update" : "Create"}
                       </>
                     )}
                   </button>
@@ -1043,7 +1333,8 @@ export const TeamMemberManagement: React.FC = () => {
                 Delete Team Member
               </h3>
               <p className="text-gray-600 text-center mb-6">
-                Are you sure you want to delete this team member? This action cannot be undone.
+                Are you sure you want to delete this team member? This action
+                cannot be undone.
               </p>
               <div className="flex justify-center gap-3">
                 <button
@@ -1080,4 +1371,3 @@ export const TeamMemberManagement: React.FC = () => {
     </div>
   );
 };
-
