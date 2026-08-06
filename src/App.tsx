@@ -839,6 +839,7 @@ import { TeamMemberManagement } from "./components/dashboard/admin/components/te
 import axios from "axios";
 import { TestimonialManagement } from "./components/dashboard/admin/components/testimonials/TestimonialManagement";
 import { TextSnippet } from "@mui/icons-material";
+import { VerificationPage } from "./components/verify/Verification";
 
 // Types
 interface UserData {
@@ -1439,6 +1440,7 @@ export default function App() {
         <Route path="/help" element={<Help />} />
         <Route path="/house/rent" element={<HouseOnRent />} />
         <Route path="/testimonials" element={<Testimonials />} />
+        <Route path="/verification/email/status" element={<VerificationPage />} />
 
         {/* ============================================================ */}
         {/* ADMIN ROUTES */}
