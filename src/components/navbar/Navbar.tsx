@@ -281,7 +281,7 @@ const translations = {
     alreadyHaveAccount: "Already have an account?",
     dontHaveAccount: "Don't have an account?",
     home: "Home",
-    experience: "Houses on rent",
+    experience: "Houses",
     services: "Services",
     about: "About",
     testimonials: "Testimonials",
@@ -401,7 +401,7 @@ const translations = {
     alreadyHaveAccount: "Vous avez déjà un compte ?",
     dontHaveAccount: "Vous n'avez pas de compte ?",
     home: "Accueil",
-    experience: "Maisons à louer",
+    experience: "Maisons",
     services: "Services",
     about: "À propos",
     testimonials: "Témoignages",
@@ -525,7 +525,7 @@ const translations = {
     alreadyHaveAccount: "Ufite konti?",
     dontHaveAccount: "Nta konti ufite?",
     home: "Ahabanza",
-    experience: "Amazu akodeshwa",
+    experience: "Amazu",
     services: "Serivisi",
     about: "Ibijyanye",
     testimonials: "Ibyababwiye",
@@ -1918,7 +1918,6 @@ export const Navbar = () => {
                     onClick={handleDashboardNavigation}
                   >
                     <DashboardIcon className="w-4 h-4 inline mr-1" />
-                    {getDashboardLabel()}
                   </motion.button>
                   <motion.button
                     whileHover={{
@@ -2520,9 +2519,9 @@ export const Navbar = () => {
                           </div>
                           {passwordStrength === "weak" && (
                             <p className="text-xs text-red-500 mt-1">
-                              ⚠️ Password is too weak. Use at least 8
-                              characters with uppercase, lowercase, numbers, and
-                              special characters.
+                              ⚠️ Password is too weak. Use at least 8 characters
+                              with uppercase, lowercase, numbers, and special
+                              characters.
                             </p>
                           )}
                         </div>
