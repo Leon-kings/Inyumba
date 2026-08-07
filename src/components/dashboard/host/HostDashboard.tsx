@@ -1,9 +1,11 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
+import axios from "axios";
 
 // Material-UI Icons
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -15,11 +17,9 @@ import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import EditIcon from "@mui/icons-material/Edit";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import VerifiedIcon from "@mui/icons-material/Verified";
-import AddHomeIcon from "@mui/icons-material/AddHome";
 import HouseIcon from "@mui/icons-material/House";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import BedIcon from "@mui/icons-material/Bed";
@@ -43,6 +43,82 @@ import {
   AreaChart,
   Area,
 } from "recharts";
+
+// Types
+interface House {
+  _id: string;
+  houseId: string;
+  name: string;
+  description: string;
+  images: { url: string }[];
+  location: {
+    province: string;
+    district: string;
+    sector: string;
+    cell: string;
+    village: string;
+  };
+  university: string;
+  pricePerMonth: number;
+  bedrooms: number;
+  bathrooms: number;
+  maxGuests: number;
+  amenities: string[];
+  status: "available" | "pending" | "unavailable" | "maintenance";
+  rating: number;
+  totalReviews: number;
+  host: {
+    name: string;
+    email: string;
+    phone: string;
+    responseRate: number;
+    responseTime: string;
+  };
+  availability: {
+    startDate: string;
+    endDate: string;
+  };
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface Booking {
+  _id: string;
+  bookingId: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  idNumber: string;
+  university: string;
+  studentId: string;
+  purpose: string;
+  houseId: string;
+  houseName: string;
+  houseType: string;
+  district: string;
+  sector: string;
+  cell: string;
+  village: string;
+  ownerName: string;
+  ownerContact: string;
+  ownerEmail: string;
+  checkIn: string;
+  checkOut: string;
+  months: number;
+  guests: number;
+  specialRequests: string;
+  monthlyRent: number;
+  serviceFee: number;
+  totalAmount: number;
+  paymentMethod: "momo" | "bank" | "cash";
+  momoNumber: string;
+  paymentStatus: "pending" | "verified" | "failed";
+  status: "pending" | "confirmed" | "cancelled" | "completed";
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 // Translations
 const translations = {
@@ -92,7 +168,7 @@ const translations = {
     refunded: "Refunded",
     checkIn: "Check-in",
     checkOut: "Check-out",
-    nights: "Nights",
+    nights: "Months",
     totalPrice: "Total Price",
     editProfile: "Edit Profile",
     saveChanges: "Save Changes",
@@ -111,8 +187,8 @@ const translations = {
     manageProperties: "Manage Properties",
     propertyName: "Property Name",
     propertyType: "Property Type",
-    pricePerNight: "Price per Night",
-    rooms: "Rooms",
+    pricePerNight: "Price per Month",
+    rooms: "Bedrooms",
     bathrooms: "Bathrooms",
     amenities: "Amenities",
     address: "Address",
@@ -190,7 +266,7 @@ const translations = {
     manageProperties: "Gérer les Propriétés",
     propertyName: "Nom de la Propriété",
     propertyType: "Type de Propriété",
-    pricePerNight: "Prix par Nuit",
+    pricePerNight: "Prix par Mois",
     rooms: "Chambres",
     bathrooms: "Salles de Bain",
     amenities: "Équipements",
@@ -250,7 +326,7 @@ const translations = {
     refunded: "Byasubijwe",
     checkIn: "Kwinjira",
     checkOut: "Kuva",
-    nights: "Ijoro",
+    nights: "Amezi",
     totalPrice: "Igiciro Cyose",
     editProfile: "Hindura Ibyawe",
     saveChanges: "Bika Ibyahinduwe",
@@ -269,7 +345,7 @@ const translations = {
     manageProperties: "Gucunga Amazu",
     propertyName: "Izina ry'Inzu",
     propertyType: "Ubwoko bw'Inzu",
-    pricePerNight: "Igiciro ku Ijoro",
+    pricePerNight: "Igiciro ku Kwezi",
     rooms: "Ibyumba",
     bathrooms: "Ahabagirirwa",
     amenities: "Ibikoresho",
@@ -282,18 +358,17 @@ const translations = {
     viewProperty: "Reba Inzu",
     editProperty: "Hindura Inzu",
     deleteProperty: "Kuraho Inzu",
-  }
+  },
 };
 
-// Helper function to get language from cookies
-const getLanguageFromCookies = (): 'en' | 'fr' | 'rw' => {
-  const lang = Cookies.get('language') as 'en' | 'fr' | 'rw';
-  return lang || 'en';
+// Helper functions
+const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
+  const lang = Cookies.get("language") as "en" | "fr" | "rw";
+  return lang || "en";
 };
 
-// Helper function to get user from localStorage
 const getUserFromStorage = () => {
-  const user = localStorage.getItem('user');
+  const user = localStorage.getItem("user");
   if (user) {
     try {
       return JSON.parse(user);
@@ -304,165 +379,274 @@ const getUserFromStorage = () => {
   return null;
 };
 
+const getToken = (): string => {
+  try {
+    return localStorage.getItem("token") || "";
+  } catch (error) {
+    console.error("Error reading token from localStorage:", error);
+    return "";
+  }
+};
+
+// API Base URL
+const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
+
+// Axios instance
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+api.interceptors.request.use(
+  (config) => {
+    const token = getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
+
 // Chart Colors
 const COLORS = ["#FF385C", "#4F46E5", "#22C55E", "#F59E0B", "#8B5CF6"];
 
 export const HostDashboard: React.FC = () => {
-  // Get language from cookies
-  const [lang, setLang] = useState<'en' | 'fr' | 'rw'>(getLanguageFromCookies());
+  const [lang, setLang] = useState<"en" | "fr" | "rw">(
+    getLanguageFromCookies(),
+  );
   const [user, setUser] = useState<any>(getUserFromStorage());
   const [loading, setLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
+
+  // Data states
+  const [houses, setHouses] = useState<House[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
+
+  // Statistics
+  const [stats, setStats] = useState({
+    totalProperties: 0,
+    activeProperties: 0,
+    totalBookings: 0,
+    totalEarnings: 0,
+    averageRating: 0,
+    pendingBookings: 0,
+    completedBookings: 0,
+    cancelledBookings: 0,
+  });
+
+  // Chart data
+  const [bookingTrendData, setBookingTrendData] = useState<any[]>([]);
+  const [earningsTrendData, setEarningsTrendData] = useState<any[]>([]);
+  const [propertyDistributionData, setPropertyDistributionData] = useState<
+    any[]
+  >([]);
+  const [monthlyEarningsData, setMonthlyEarningsData] = useState<any[]>([]);
 
   // Profile edit state
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
     name: user?.name || "",
     email: user?.email || "",
-    phone: user?.phone || "+250 788 123 456",
-    location: user?.location || "Musanze, Rwanda",
+    phone: user?.phone || "",
+    location: user?.location || "",
   });
   const [isSaving, setIsSaving] = useState(false);
 
-  // Host statistics
-  const [stats] = useState({
-    totalProperties: 5,
-    activeProperties: 4,
-    totalBookings: 28,
-    totalEarnings: 2450000,
-    averageRating: 4.8,
-    pendingBookings: 3,
-    completedBookings: 22,
-    cancelledBookings: 3,
-  });
-
-  // Booking data for charts
-  const [bookingData] = useState([
-    { month: "Jan", bookings: 2, earnings: 250000 },
-    { month: "Feb", bookings: 3, earnings: 330000 },
-    { month: "Mar", bookings: 4, earnings: 440000 },
-    { month: "Apr", bookings: 3, earnings: 310000 },
-    { month: "May", bookings: 5, earnings: 520000 },
-    { month: "Jun", bookings: 4, earnings: 420000 },
-  ]);
-
-  const propertyDistributionData = [
-    { name: "Houses", value: 3 },
-    { name: "Apartments", value: 1 },
-    { name: "Rooms", value: 1 },
-  ];
-
-  // Properties list
-  const properties = [
-    {
-      id: 1,
-      name: "INES Ruhengeri Student Lodge",
-      type: "House",
-      location: "Cyabararika, Muhoza, Musanze",
-      price: 110500,
-      rooms: 4,
-      bathrooms: 2,
-      status: "active",
-      rating: 4.9,
-      image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=100&h=100&fit=crop",
-    },
-    {
-      id: 2,
-      name: "Kigombe Student Apartments",
-      type: "Apartment",
-      location: "Kigombe, Muhoza, Musanze",
-      price: 91000,
-      rooms: 3,
-      bathrooms: 1,
-      status: "active",
-      rating: 4.7,
-      image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=100&h=100&fit=crop",
-    },
-    {
-      id: 3,
-      name: "Ruhengeri City Hostel",
-      type: "Room",
-      location: "Ruhengeri, Muhoza, Musanze",
-      price: 65000,
-      rooms: 1,
-      bathrooms: 1,
-      status: "active",
-      rating: 4.6,
-      image: "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=100&h=100&fit=crop",
-    },
-    {
-      id: 4,
-      name: "Busogo Student Village",
-      type: "House",
-      location: "Busogo, Musanze",
-      price: 104000,
-      rooms: 3,
-      bathrooms: 2,
-      status: "inactive",
-      rating: 4.8,
-      image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=100&h=100&fit=crop",
-    },
-    {
-      id: 5,
-      name: "Muhoza Guest House",
-      type: "House",
-      location: "Muhoza, Musanze",
-      price: 85000,
-      rooms: 2,
-      bathrooms: 1,
-      status: "active",
-      rating: 4.5,
-      image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=100&h=100&fit=crop",
-    },
-  ];
-
-  const recentBookings = [
-    {
-      id: 1,
-      propertyName: "INES Ruhengeri Student Lodge",
-      studentName: "Jean Paul Mugisha",
-      checkIn: "2024-02-01",
-      checkOut: "2024-03-01",
-      nights: 30,
-      amount: 110500,
-      status: "confirmed",
-      image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=100&h=100&fit=crop",
-    },
-    {
-      id: 2,
-      propertyName: "Kigombe Student Apartments",
-      studentName: "Marie Claire Uwimana",
-      checkIn: "2024-01-15",
-      checkOut: "2024-02-15",
-      nights: 30,
-      amount: 91000,
-      status: "completed",
-      image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=100&h=100&fit=crop",
-    },
-    {
-      id: 3,
-      propertyName: "Busogo Student Village",
-      studentName: "David Niyonzima",
-      checkIn: "2024-03-01",
-      checkOut: "2024-04-01",
-      nights: 30,
-      amount: 104000,
-      status: "pending",
-      image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=100&h=100&fit=crop",
-    },
-  ];
-
   const t = translations[lang];
 
-  // Listen for language changes in cookies
+  // Fetch data from API
+  const fetchData = async () => {
+    const email = user?.email || getUserFromStorage()?.email;
+    if (!email) {
+      toast.warning("Please login to view your dashboard");
+      setIsFetching(false);
+      return;
+    }
+
+    setIsFetching(true);
+    setLoading(true);
+
+    try {
+      // Fetch houses by email
+      console.log("🔍 Fetching houses for:", email);
+      const housesResponse = await api.get(`/houses/${email}`);
+      let housesData: House[] = [];
+      if (
+        housesResponse.data.success &&
+        Array.isArray(housesResponse.data.data)
+      ) {
+        housesData = housesResponse.data.data;
+      } else if (Array.isArray(housesResponse.data)) {
+        housesData = housesResponse.data;
+      } else if (
+        housesResponse.data.data &&
+        Array.isArray(housesResponse.data.data)
+      ) {
+        housesData = housesResponse.data.data;
+      }
+      console.log("🏠 Houses loaded:", housesData.length);
+      setHouses(housesData);
+
+      // Fetch bookings by email
+      console.log("🔍 Fetching bookings for:", email);
+      try {
+        const bookingsResponse = await api.get(`/bookings/${email}`);
+        let bookingsData: Booking[] = [];
+        if (
+          bookingsResponse.data.success &&
+          Array.isArray(bookingsResponse.data.data)
+        ) {
+          bookingsData = bookingsResponse.data.data;
+        } else if (Array.isArray(bookingsResponse.data)) {
+          bookingsData = bookingsResponse.data;
+        } else if (
+          bookingsResponse.data.data &&
+          Array.isArray(bookingsResponse.data.data)
+        ) {
+          bookingsData = bookingsResponse.data.data;
+        }
+        console.log("📊 Bookings loaded:", bookingsData.length);
+        setBookings(bookingsData);
+        setFilteredBookings(bookingsData);
+      } catch (bookingError: any) {
+        console.error("❌ Error fetching bookings:", bookingError);
+        // Try fallback - fetch all bookings and filter
+        if (bookingError.response?.status === 404) {
+          try {
+            console.log("🔄 Trying fallback: fetching all bookings");
+            const allBookingsResponse = await api.get("/bookings");
+            let allBookingsData: Booking[] = [];
+            if (
+              allBookingsResponse.data.success &&
+              Array.isArray(allBookingsResponse.data.data)
+            ) {
+              allBookingsData = allBookingsResponse.data.data;
+            } else if (Array.isArray(allBookingsResponse.data)) {
+              allBookingsData = allBookingsResponse.data;
+            } else if (
+              allBookingsResponse.data.data &&
+              Array.isArray(allBookingsResponse.data.data)
+            ) {
+              allBookingsData = allBookingsResponse.data.data;
+            }
+            // Filter by owner email
+            const hostBookings = allBookingsData.filter(
+              (b) => b.ownerEmail === email,
+            );
+            console.log("📊 Filtered bookings:", hostBookings.length);
+            setBookings(hostBookings);
+            setFilteredBookings(hostBookings);
+          } catch (fallbackError) {
+            console.error("❌ Fallback fetch failed:", fallbackError);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("❌ Error fetching data:", error);
+      toast.error("Failed to load dashboard data");
+    } finally {
+      setIsFetching(false);
+      setLoading(false);
+    }
+  };
+
+  // Update statistics and charts when data changes
   useEffect(() => {
-    const handleCookieChange = () => {
+    if (houses.length === 0 && bookings.length === 0) return;
+
+    // Calculate statistics
+    const totalProperties = houses.length;
+    const activeProperties = houses.filter(
+      (h) => h.status === "available",
+    ).length;
+    const totalBookings = bookings.length;
+    const totalEarnings = bookings.reduce((sum, b) => sum + b.totalAmount, 0);
+    const averageRating =
+      houses.length > 0
+        ? houses.reduce((sum, h) => sum + h.rating, 0) / houses.length
+        : 0;
+    const pendingBookings = bookings.filter(
+      (b) => b.status === "pending",
+    ).length;
+    const completedBookings = bookings.filter(
+      (b) => b.status === "completed",
+    ).length;
+    const cancelledBookings = bookings.filter(
+      (b) => b.status === "cancelled",
+    ).length;
+
+    setStats({
+      totalProperties,
+      activeProperties,
+      totalBookings,
+      totalEarnings,
+      averageRating,
+      pendingBookings,
+      completedBookings,
+      cancelledBookings,
+    });
+
+    // Calculate property distribution
+    const distribution: Record<string, number> = {};
+    houses.forEach((house) => {
+      const type = house.houseId?.includes("APT")
+        ? "Apartment"
+        : house.houseId?.includes("RMS")
+          ? "Room"
+          : "House";
+      distribution[type] = (distribution[type] || 0) + 1;
+    });
+    setPropertyDistributionData(
+      Object.entries(distribution).map(([name, value]) => ({ name, value })),
+    );
+
+    // Calculate monthly trends
+    const monthlyMap: Record<string, { bookings: number; earnings: number }> =
+      {};
+
+    bookings.forEach((booking) => {
+      const date = new Date(booking.createdAt);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+
+      if (!monthlyMap[monthKey]) {
+        monthlyMap[monthKey] = { bookings: 0, earnings: 0 };
+      }
+      monthlyMap[monthKey].bookings += 1;
+      monthlyMap[monthKey].earnings += booking.totalAmount;
+    });
+
+    const sortedMonths = Object.keys(monthlyMap).sort();
+    const trendData = sortedMonths.map((key) => ({
+      month: key.split("-")[1],
+      bookings: monthlyMap[key].bookings,
+      earnings: monthlyMap[key].earnings,
+    }));
+
+    setBookingTrendData(trendData);
+    setEarningsTrendData(trendData);
+    setMonthlyEarningsData(trendData);
+  }, [houses, bookings]);
+
+  // Initial fetch
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Listen for language changes
+  useEffect(() => {
+    const interval = setInterval(() => {
       const newLang = getLanguageFromCookies();
       if (newLang !== lang) {
         setLang(newLang);
       }
-    };
-
-    const interval = setInterval(handleCookieChange, 1000);
+    }, 1000);
     return () => clearInterval(interval);
   }, [lang]);
 
@@ -476,17 +660,16 @@ export const HostDashboard: React.FC = () => {
     setEditForm({
       name: user?.name || "",
       email: user?.email || "",
-      phone: user?.phone || "+250 788 123 456",
-      location: user?.location || "Musanze, Rwanda",
+      phone: user?.phone || "",
+      location: user?.location || "",
     });
   };
 
   const handleSaveProfile = async () => {
     setIsSaving(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
       const updatedUser = { ...user, ...editForm };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+      localStorage.setItem("user", JSON.stringify(updatedUser));
       setUser(updatedUser);
       toast.success(`✅ ${t.profileUpdated}`);
       setIsEditing(false);
@@ -499,34 +682,42 @@ export const HostDashboard: React.FC = () => {
   };
 
   const handleRefresh = () => {
-    setLoading(true);
+    fetchData();
     toast.info("Refreshing dashboard...");
-    setTimeout(() => {
-      setLoading(false);
-      toast.success("Dashboard refreshed!");
-    }, 1000);
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "pending": return "bg-yellow-100 text-yellow-800";
-      case "confirmed": return "bg-blue-100 text-blue-800";
-      case "completed": return "bg-green-100 text-green-800";
-      case "cancelled": return "bg-red-100 text-red-800";
-      case "rejected": return "bg-gray-100 text-gray-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "confirmed":
+        return "bg-blue-100 text-blue-800";
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      case "available":
+        return "bg-green-100 text-green-800";
+      case "unavailable":
+        return "bg-gray-100 text-gray-800";
+      case "maintenance":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "pending": return t.pending;
-      case "confirmed": return t.confirmed;
-      case "completed": return t.completed;
-      case "cancelled": return t.cancelled;
-      case "rejected": return t.rejected;
-      default: return status;
-    }
+    const labels: Record<string, string> = {
+      pending: t.pending,
+      confirmed: t.confirmed,
+      completed: t.completed,
+      cancelled: t.cancelled,
+      available: "Available",
+      unavailable: "Unavailable",
+      maintenance: "Maintenance",
+    };
+    return labels[status] || status;
   };
 
   const formatCurrency = (amount: number) => {
@@ -548,30 +739,37 @@ export const HostDashboard: React.FC = () => {
       value: stats.totalProperties,
       icon: <HouseIcon />,
       color: "bg-blue-500",
-      change: "+20%",
     },
     {
       title: t.totalBookings,
       value: stats.totalBookings,
       icon: <BookingIcon />,
       color: "bg-green-500",
-      change: "+18%",
     },
     {
       title: t.totalEarnings,
       value: formatCurrency(stats.totalEarnings),
       icon: <AttachMoneyIcon />,
       color: "bg-purple-500",
-      change: "+25%",
     },
     {
       title: t.averageRating,
-      value: `${stats.averageRating}/5`,
+      value: `${stats.averageRating.toFixed(1)}/5`,
       icon: <StarIcon />,
       color: "bg-yellow-500",
-      change: "+5%",
     },
   ];
+
+  if (isFetching) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#FF385C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-500">{t.loading}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -600,7 +798,9 @@ export const HostDashboard: React.FC = () => {
                 className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 disabled={loading}
               >
-                <RefreshIcon className={`w-5 h-5 ${loading ? "animate-spin" : ""}`} />
+                <RefreshIcon
+                  className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}
+                />
               </button>
             </div>
           </div>
@@ -622,7 +822,9 @@ export const HostDashboard: React.FC = () => {
                     <input
                       type="text"
                       value={editForm.name}
-                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, name: e.target.value })
+                      }
                       className="border border-gray-300 rounded-lg px-2 py-1 text-xl font-bold"
                     />
                   ) : (
@@ -635,15 +837,13 @@ export const HostDashboard: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                   <PhoneIcon className="w-4 h-4" />
-                  <span>{user?.phone || "+250 788 123 456"}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <LocationOnIcon className="w-4 h-4" />
-                  <span>{user?.location || "Musanze, Rwanda"}</span>
+                  <span>{user?.phone || "Not provided"}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
                   <VerifiedIcon className="w-4 h-4 text-green-500" />
-                  <span className="text-green-600 font-medium">Verified Host</span>
+                  <span className="text-green-600 font-medium">
+                    Verified Host
+                  </span>
                 </div>
               </div>
             </div>
@@ -697,7 +897,9 @@ export const HostDashboard: React.FC = () => {
                 <input
                   type="email"
                   value={editForm.email}
-                  onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, email: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
                 />
               </div>
@@ -708,7 +910,9 @@ export const HostDashboard: React.FC = () => {
                 <input
                   type="text"
                   value={editForm.phone}
-                  onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, phone: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
                 />
               </div>
@@ -719,7 +923,9 @@ export const HostDashboard: React.FC = () => {
                 <input
                   type="text"
                   value={editForm.location}
-                  onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, location: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
                 />
               </div>
@@ -743,10 +949,6 @@ export const HostDashboard: React.FC = () => {
                 >
                   {stat.icon}
                 </div>
-                <div className="flex items-center gap-1 text-sm font-medium text-green-500">
-                  <TrendingUpIcon className="w-3 h-3" />
-                  {stat.change}
-                </div>
               </div>
               <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
               <p className="text-sm text-gray-500 mt-1">{stat.title}</p>
@@ -762,37 +964,60 @@ export const HostDashboard: React.FC = () => {
               <h3 className="text-lg font-semibold text-gray-900">
                 {t.bookingTrend}
               </h3>
-              <span className="text-sm text-green-500 font-medium">+18%</span>
             </div>
             <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={bookingData}>
-                  <defs>
-                    <linearGradient id="bookingGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#FF385C" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#FF385C" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
-                  <XAxis dataKey="month" stroke="#6B7280" fontSize={12} />
-                  <YAxis stroke="#6B7280" fontSize={12} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#1F2937",
-                      border: "none",
-                      borderRadius: "8px",
-                      color: "#fff",
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="bookings"
-                    stroke="#FF385C"
-                    strokeWidth={3}
-                    fill="url(#bookingGradient)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+              {bookingTrendData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={bookingTrendData}>
+                    <defs>
+                      <linearGradient
+                        id="bookingGradient"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="5%"
+                          stopColor="#FF385C"
+                          stopOpacity={0.3}
+                        />
+                        <stop
+                          offset="95%"
+                          stopColor="#FF385C"
+                          stopOpacity={0}
+                        />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#374151"
+                      opacity={0.1}
+                    />
+                    <XAxis dataKey="month" stroke="#6B7280" fontSize={12} />
+                    <YAxis stroke="#6B7280" fontSize={12} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#1F2937",
+                        border: "none",
+                        borderRadius: "8px",
+                        color: "#fff",
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="bookings"
+                      stroke="#FF385C"
+                      strokeWidth={3}
+                      fill="url(#bookingGradient)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center text-gray-400">
+                  {t.noData}
+                </div>
+              )}
             </div>
           </div>
 
@@ -802,26 +1027,45 @@ export const HostDashboard: React.FC = () => {
               <h3 className="text-lg font-semibold text-gray-900">
                 {t.earningsTrend}
               </h3>
-              <span className="text-sm text-green-500 font-medium">+25%</span>
             </div>
             <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={bookingData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
-                  <XAxis dataKey="month" stroke="#6B7280" fontSize={12} />
-                  <YAxis stroke="#6B7280" fontSize={12} tickFormatter={(value) => `RWF ${value/1000}K`} />
-                  <Tooltip
-                    formatter={(value: any) => `RWF ${value.toLocaleString()}`}
-                    contentStyle={{
-                      backgroundColor: "#1F2937",
-                      border: "none",
-                      borderRadius: "8px",
-                      color: "#fff",
-                    }}
-                  />
-                  <Bar dataKey="earnings" fill="#4F46E5" radius={[8, 8, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              {earningsTrendData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={earningsTrendData}>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#374151"
+                      opacity={0.1}
+                    />
+                    <XAxis dataKey="month" stroke="#6B7280" fontSize={12} />
+                    <YAxis
+                      stroke="#6B7280"
+                      fontSize={12}
+                      tickFormatter={(value) => `RWF ${value / 1000}K`}
+                    />
+                    <Tooltip
+                      formatter={(value: any) =>
+                        `RWF ${value.toLocaleString()}`
+                      }
+                      contentStyle={{
+                        backgroundColor: "#1F2937",
+                        border: "none",
+                        borderRadius: "8px",
+                        color: "#fff",
+                      }}
+                    />
+                    <Bar
+                      dataKey="earnings"
+                      fill="#4F46E5"
+                      radius={[8, 8, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center text-gray-400">
+                  {t.noData}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -834,37 +1078,46 @@ export const HostDashboard: React.FC = () => {
               {t.propertyDistribution}
             </h3>
             <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={propertyDistributionData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
-                    paddingAngle={2}
-                    dataKey="value"
-                    label={({ name, percent }) => {
-                      const percentValue = percent || 0;
-                      return `${name} ${(percentValue * 100).toFixed(0)}%`;
-                    }}
-                    labelLine={false}
-                  >
-                    {propertyDistributionData.map((_entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#1F2937",
-                      border: "none",
-                      borderRadius: "8px",
-                      color: "#fff",
-                    }}
-                  />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+              {propertyDistributionData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={propertyDistributionData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={2}
+                      dataKey="value"
+                      label={({ name, percent }) => {
+                        const percentValue = percent || 0;
+                        return `${name} ${(percentValue * 100).toFixed(0)}%`;
+                      }}
+                      labelLine={false}
+                    >
+                      {propertyDistributionData.map((_entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#1F2937",
+                        border: "none",
+                        borderRadius: "8px",
+                        color: "#fff",
+                      }}
+                    />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center text-gray-400">
+                  {t.noData}
+                </div>
+              )}
             </div>
           </div>
 
@@ -874,32 +1127,47 @@ export const HostDashboard: React.FC = () => {
               <h3 className="text-lg font-semibold text-gray-900">
                 {t.monthlyEarnings}
               </h3>
-              <span className="text-sm text-purple-500 font-medium">+22%</span>
             </div>
             <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={bookingData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
-                  <XAxis dataKey="month" stroke="#6B7280" fontSize={12} />
-                  <YAxis stroke="#6B7280" fontSize={12} tickFormatter={(value) => `RWF ${value/1000}K`} />
-                  <Tooltip
-                    formatter={(value: any) => `RWF ${value.toLocaleString()}`}
-                    contentStyle={{
-                      backgroundColor: "#1F2937",
-                      border: "none",
-                      borderRadius: "8px",
-                      color: "#fff",
-                    }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="earnings"
-                    stroke="#8B5CF6"
-                    strokeWidth={3}
-                    dot={{ fill: "#8B5CF6", strokeWidth: 2 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              {monthlyEarningsData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={monthlyEarningsData}>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#374151"
+                      opacity={0.1}
+                    />
+                    <XAxis dataKey="month" stroke="#6B7280" fontSize={12} />
+                    <YAxis
+                      stroke="#6B7280"
+                      fontSize={12}
+                      tickFormatter={(value) => `RWF ${value / 1000}K`}
+                    />
+                    <Tooltip
+                      formatter={(value: any) =>
+                        `RWF ${value.toLocaleString()}`
+                      }
+                      contentStyle={{
+                        backgroundColor: "#1F2937",
+                        border: "none",
+                        borderRadius: "8px",
+                        color: "#fff",
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="earnings"
+                      stroke="#8B5CF6"
+                      strokeWidth={3}
+                      dot={{ fill: "#8B5CF6", strokeWidth: 2 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center text-gray-400">
+                  {t.noData}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -915,65 +1183,71 @@ export const HostDashboard: React.FC = () => {
                 {t.viewAll}
                 <ArrowForwardIcon className="w-4 h-4" />
               </button>
-              <button className="px-3 py-1.5 bg-[#FF385C] text-white rounded-lg text-sm font-medium hover:bg-[#E31C5F] transition-colors flex items-center gap-1">
-                <AddHomeIcon className="w-4 h-4" />
-                {t.addProperty}
-              </button>
             </div>
           </div>
           <div className="divide-y divide-gray-100">
-            {properties.length === 0 ? (
+            {houses.length === 0 ? (
               <div className="px-6 py-8 text-center text-gray-500">
                 <HouseIcon className="w-12 h-12 mx-auto text-gray-300 mb-2" />
                 <p>{t.noProperties}</p>
               </div>
             ) : (
-              properties.map((property) => (
+              houses.slice(0, 5).map((house) => (
                 <motion.div
-                  key={property.id}
+                  key={house._id}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   className="px-6 py-4 flex items-center gap-4 hover:bg-gray-50 transition-colors"
                 >
                   <img
-                    src={property.image}
-                    alt={property.name}
+                    src={
+                      house.images?.[0]?.url ||
+                      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=100&h=100&fit=crop"
+                    }
+                    alt={house.name}
                     className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
                   />
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-semibold text-gray-900">
-                      {property.name}
+                      {house.name}
                     </h4>
                     <p className="text-xs text-gray-500 flex items-center gap-1">
                       <LocationOnIcon className="w-3 h-3" />
-                      {property.location}
+                      {house.location.village}, {house.location.district}
                     </p>
                     <div className="flex flex-wrap items-center gap-2 mt-1">
                       <span className="text-xs text-gray-500">
                         <BedIcon className="w-3 h-3 inline mr-0.5" />
-                        {property.rooms} rooms
+                        {house.bedrooms} rooms
                       </span>
                       <span className="text-xs text-gray-500">
                         <BathroomIcon className="w-3 h-3 inline mr-0.5" />
-                        {property.bathrooms} baths
+                        {house.bathrooms} baths
                       </span>
                       <span className="text-xs text-gray-500">
                         <AttachMoneyIcon className="w-3 h-3 inline mr-0.5" />
-                        {formatCurrency(property.price)}
+                        {formatCurrency(house.pricePerMonth)}
                       </span>
                     </div>
                   </div>
                   <div className="text-right flex-shrink-0">
                     <div className="flex items-center gap-1 text-sm font-medium text-gray-700">
                       <StarIcon className="w-3.5 h-3.5 text-yellow-400 fill-current" />
-                      {property.rating}
+                      {house.rating.toFixed(1)}
                     </div>
-                    <span className={`px-2 py-0.5 text-xs rounded-full ${property.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                      {property.status === 'active' ? 'Active' : 'Inactive'}
+                    <span
+                      className={`px-2 py-0.5 text-xs rounded-full ${getStatusColor(house.status)}`}
+                    >
+                      {getStatusLabel(house.status)}
                     </span>
                   </div>
                 </motion.div>
               ))
+            )}
+            {houses.length > 5 && (
+              <div className="px-6 py-3 text-center text-sm text-gray-500">
+                And {houses.length - 5} more properties...
+              </div>
             )}
           </div>
         </div>
@@ -990,51 +1264,59 @@ export const HostDashboard: React.FC = () => {
             </button>
           </div>
           <div className="divide-y divide-gray-100">
-            {recentBookings.length === 0 ? (
+            {filteredBookings.length === 0 ? (
               <div className="px-6 py-8 text-center text-gray-500">
                 <BookingIcon className="w-12 h-12 mx-auto text-gray-300 mb-2" />
                 <p>{t.noBookings}</p>
               </div>
             ) : (
-              recentBookings.map((booking) => (
+              filteredBookings.slice(0, 5).map((booking) => (
                 <motion.div
-                  key={booking.id}
+                  key={booking._id}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   className="px-6 py-4 flex items-center gap-4 hover:bg-gray-50 transition-colors"
                 >
                   <img
-                    src={booking.image}
-                    alt={booking.propertyName}
+                    src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=100&h=100&fit=crop"
+                    alt={booking.houseName}
                     className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
                   />
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-semibold text-gray-900">
-                      {booking.propertyName}
+                      {booking.houseName}
                     </h4>
                     <p className="text-xs text-gray-500">
-                      Student: {booking.studentName}
+                      Student: {booking.fullName}
                     </p>
                     <div className="flex flex-wrap items-center gap-2 mt-1">
                       <span className="text-xs text-gray-500">
                         <CalendarTodayIcon className="w-3 h-3 inline mr-0.5" />
-                        {formatDate(booking.checkIn)} - {formatDate(booking.checkOut)}
+                        {formatDate(booking.checkIn)} -{" "}
+                        {formatDate(booking.checkOut)}
                       </span>
                       <span className="text-xs text-gray-500">
-                        • {booking.nights} {t.nights}
+                        • {booking.months} {t.nights}
                       </span>
                     </div>
                   </div>
                   <div className="text-right flex-shrink-0">
                     <p className="text-sm font-bold text-[#FF385C]">
-                      {formatCurrency(booking.amount)}
+                      {formatCurrency(booking.totalAmount)}
                     </p>
-                    <span className={`px-2 py-0.5 text-xs rounded-full ${getStatusColor(booking.status)}`}>
+                    <span
+                      className={`px-2 py-0.5 text-xs rounded-full ${getStatusColor(booking.status)}`}
+                    >
                       {getStatusLabel(booking.status)}
                     </span>
                   </div>
                 </motion.div>
               ))
+            )}
+            {filteredBookings.length > 5 && (
+              <div className="px-6 py-3 text-center text-sm text-gray-500">
+                And {filteredBookings.length - 5} more bookings...
+              </div>
             )}
           </div>
         </div>
@@ -1052,4 +1334,3 @@ export const HostDashboard: React.FC = () => {
     </div>
   );
 };
-

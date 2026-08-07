@@ -803,8 +803,6 @@ import HomeIcon from "@mui/icons-material/Home";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import EmailIcon from "@mui/icons-material/Email";
-import SettingsIcon from "@mui/icons-material/Settings";
-import ReportIcon from "@mui/icons-material/Assessment";
 import HouseIcon from "@mui/icons-material/House";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 
@@ -838,7 +836,7 @@ import { Testimonials } from "./pages/testimonials/Testimonials";
 import { TeamMemberManagement } from "./components/dashboard/admin/components/team/TeamManagemnt";
 import axios from "axios";
 import { TestimonialManagement } from "./components/dashboard/admin/components/testimonials/TestimonialManagement";
-import { TextSnippet } from "@mui/icons-material";
+import { AccessTime, TextSnippet } from "@mui/icons-material";
 import { VerificationPage } from "./components/verify/Verification";
 
 // Types
@@ -1023,7 +1021,7 @@ const Sidebar = ({
     { id: "requests", label: "Requests", icon: <TrendingUpIcon /> },
     { id: "messages", label: "Messages", icon: <EmailIcon /> },
     { id: "testimonials", label: "Testimonials", icon: <TextSnippet /> },
-    // { id: "settings", label: "Settings", icon: <SettingsIcon /> },
+    { id: "logs", label: "Logs", icon: <AccessTime /> },
   ];
 
   // User Menu Items
@@ -1041,10 +1039,6 @@ const Sidebar = ({
     { id: "dashboard", label: "Dashboard", icon: <DashboardIcon /> },
     { id: "houses", label: "My Houses", icon: <HouseIcon /> },
     { id: "bookings", label: "Bookings", icon: <AttachMoneyIcon /> },
-    { id: "requests", label: "Requests", icon: <TrendingUpIcon /> },
-    { id: "messages", label: "Messages", icon: <EmailIcon /> },
-    { id: "earnings", label: "Earnings", icon: <ReportIcon /> },
-    { id: "settings", label: "Settings", icon: <SettingsIcon /> },
   ];
 
   const getMenuItems = () => {
@@ -1080,10 +1074,6 @@ const Sidebar = ({
         dashboard: "/host/dashboard",
         houses: "/host/management",
         bookings: "/host/bookings",
-        requests: "/host/requests",
-        messages: "/host/messages",
-        earnings: "/host/earnings",
-        settings: "/host/settings",
       };
       return pathMap[itemId] || "/host/dashboard";
     }
