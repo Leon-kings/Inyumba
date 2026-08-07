@@ -1,15 +1,13 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable preserve-caught-error */
 // Verification.tsx
-import React, { useState, useEffect, useCallback } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useState, useEffect, useCallback } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
-
   CheckCircle,
- 
   Refresh,
   ArrowForward,
   Security,
@@ -19,8 +17,9 @@ import {
   Home,
   ErrorOutlineOutlined,
   MailOutlineOutlined,
-} from '@mui/icons-material';
-import axios, { AxiosError } from 'axios';
+  WarningAmber,
+} from "@mui/icons-material";
+import axios, { AxiosError } from "axios";
 
 // ===========================
 // TYPES
@@ -49,44 +48,57 @@ interface ResendResponse {
   message: string;
 }
 
+interface ValidationErrors {
+  email?: string;
+  code?: string;
+}
+
 // ===========================
 // API CONFIGURATION
 // ===========================
-const API_BASE_URL = 'https://rene-inyumba-nodejs.onrender.com';
+const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
 // ===========================
 // API SERVICES
 // ===========================
-const verifyEmail = async (data: { email: string; code: string }): Promise<VerifyResponse> => {
+const verifyEmail = async (data: {
+  email: string;
+  code: string;
+}): Promise<VerifyResponse> => {
   try {
-    const response = await api.post<VerifyResponse>('/auth/verify-email', data);
+    const response = await api.post<VerifyResponse>("/auth/verify-email", data);
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {
       const apiError = error.response?.data as ApiErrorResponse;
-      throw new Error(apiError?.message || 'Verification failed');
+      throw new Error(apiError?.message || "Verification failed");
     }
-    throw new Error('Verification failed');
+    throw new Error("Verification failed");
   }
 };
 
-const resendVerificationCode = async (data: { email: string }): Promise<ResendResponse> => {
+const resendVerificationCode = async (data: {
+  email: string;
+}): Promise<ResendResponse> => {
   try {
-    const response = await api.post<ResendResponse>('/auth/resend-verification', data);
+    const response = await api.post<ResendResponse>(
+      "/auth/resend-verification",
+      data,
+    );
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {
       const apiError = error.response?.data as ApiErrorResponse;
-      throw new Error(apiError?.message || 'Failed to resend code');
+      throw new Error(apiError?.message || "Failed to resend code");
     }
-    throw new Error('Failed to resend code');
+    throw new Error("Failed to resend code");
   }
 };
 
@@ -94,14 +106,18 @@ const resendVerificationCode = async (data: { email: string }): Promise<ResendRe
 // MODAL COMPONENTS
 // ===========================
 
-// Success Modal Props
+// Success Modal
 interface SuccessModalProps {
   isOpen: boolean;
   onClose: () => void;
   email: string;
 }
 
-const SuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose, email }) => {
+const SuccessModal: React.FC<SuccessModalProps> = ({
+  isOpen,
+  onClose,
+  email,
+}) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -123,24 +139,26 @@ const SuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose, email }) =
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                 className="inline-flex items-center justify-center w-24 h-24 bg-green-100 rounded-full mb-4"
               >
                 <CheckCircle className="text-green-500 text-5xl" />
               </motion.div>
-              
+
               <h2 className="text-2xl font-bold text-gray-800 mb-2">
                 Verification Successful! 🎉
               </h2>
-              
+
               <p className="text-gray-600 mb-2">
-                Your email <span className="font-medium text-gray-800">{email}</span> has been verified.
+                Your email{" "}
+                <span className="font-medium text-gray-800">{email}</span> has
+                been verified.
               </p>
-              
+
               <p className="text-sm text-gray-500 mb-6">
                 Welcome to our platform! You'll be redirected shortly.
               </p>
-              
+
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={onClose}
@@ -158,7 +176,7 @@ const SuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose, email }) =
   );
 };
 
-// Error Modal Props
+// Error Modal
 interface ErrorModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -166,7 +184,12 @@ interface ErrorModalProps {
   onRetry: () => void;
 }
 
-const ErrorModal: React.FC<ErrorModalProps> = ({ isOpen, onClose, message, onRetry }) => {
+const ErrorModal: React.FC<ErrorModalProps> = ({
+  isOpen,
+  onClose,
+  message,
+  onRetry,
+}) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -186,20 +209,20 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ isOpen, onClose, message, onRet
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                 className="inline-flex items-center justify-center w-24 h-24 bg-red-100 rounded-full mb-4"
               >
                 <ErrorOutlineOutlined className="text-red-500 text-5xl" />
               </motion.div>
-              
+
               <h2 className="text-2xl font-bold text-gray-800 mb-2">
                 Verification Failed
               </h2>
-              
+
               <p className="text-gray-600 mb-6">
-                {message || 'Something went wrong. Please try again.'}
+                {message || "Something went wrong. Please try again."}
               </p>
-              
+
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={onClose}
@@ -223,14 +246,18 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ isOpen, onClose, message, onRet
   );
 };
 
-// Confirm Modal Props
+// Confirm Modal
 interface ConfirmModalProps {
   isOpen: boolean;
   onClose: () => void;
   email: string;
 }
 
-const ConfirmModal: React.FC<ConfirmModalProps> = ({ isOpen, onClose, email }) => {
+const ConfirmModal: React.FC<ConfirmModalProps> = ({
+  isOpen,
+  onClose,
+  email,
+}) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -250,28 +277,26 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({ isOpen, onClose, email }) =
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                 className="inline-flex items-center justify-center w-24 h-24 bg-blue-100 rounded-full mb-4"
               >
                 <MailOutlineOutlined className="text-blue-500 text-5xl" />
               </motion.div>
-              
+
               <h2 className="text-2xl font-bold text-gray-800 mb-2">
                 Code Resent! 📧
               </h2>
-              
+
               <p className="text-gray-600 mb-2">
                 A new verification code has been sent to
               </p>
-              
-              <p className="font-medium text-gray-800 mb-6">
-                {email}
-              </p>
-              
+
+              <p className="font-medium text-gray-800 mb-6">{email}</p>
+
               <p className="text-sm text-gray-500 mb-6">
                 Please check your email and enter the new code.
               </p>
-              
+
               <button
                 onClick={onClose}
                 className="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-200"
@@ -287,43 +312,114 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({ isOpen, onClose, email }) =
 };
 
 // ===========================
+// VALIDATION HELPERS
+// ===========================
+const validateEmail = (email: string): string | undefined => {
+  if (!email) {
+    return "Email is required";
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return "Please enter a valid email address";
+  }
+  return undefined;
+};
+
+const validateCode = (code: string): string | undefined => {
+  if (!code) {
+    return "Verification code is required";
+  }
+  if (code.length !== 6) {
+    return "Code must be exactly 6 characters";
+  }
+  if (!/^[A-Z0-9]+$/.test(code)) {
+    return "Code must contain only letters and numbers";
+  }
+  return undefined;
+};
+
+// ===========================
 // MAIN COMPONENT: VerificationPage
 // ===========================
 export const VerificationPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  
+
   // State
-  const [email, setEmail] = useState<string>('');
-  const [code, setCode] = useState<string>('');
+  const [email, setEmail] = useState<string>("");
+  const [code, setCode] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isResending, setIsResending] = useState<boolean>(false);
   const [isVerified, setIsVerified] = useState<boolean>(false);
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
   const [showErrorModal, setShowErrorModal] = useState<boolean>(false);
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const [countdown, setCountdown] = useState<number>(0);
+
+  // Validation states
+  const [touched, setTouched] = useState<{ email: boolean; code: boolean }>({
+    email: false,
+    code: false,
+  });
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
+    {},
+  );
+  const [isFormValid, setIsFormValid] = useState<boolean>(false);
 
   // Get email and code from URL params
   useEffect(() => {
-    const emailParam = searchParams.get('email');
-    const codeParam = searchParams.get('code');
-    
+    const emailParam = searchParams.get("email");
+    const codeParam = searchParams.get("code");
+
     if (emailParam) {
       setEmail(decodeURIComponent(emailParam));
+      setTouched((prev) => ({ ...prev, email: true }));
     }
     if (codeParam) {
       setCode(codeParam.toUpperCase());
+      setTouched((prev) => ({ ...prev, code: true }));
     }
   }, [searchParams]);
 
   // ===========================
-  // HANDLE VERIFY (moved before useEffect that uses it)
+  // VALIDATION EFFECT
+  // ===========================
+  useEffect(() => {
+    const errors: ValidationErrors = {};
+    const emailError = validateEmail(email);
+    const codeError = validateCode(code);
+
+    if (emailError) errors.email = emailError;
+    if (codeError) errors.code = codeError;
+
+    setValidationErrors(errors);
+
+    // Check if form is valid
+    const isValid =
+      Object.keys(errors).length === 0 && email.length > 0 && code.length > 0;
+    setIsFormValid(isValid);
+  }, [email, code]);
+
+  // ===========================
+  // HANDLE FIELD BLUR
+  // ===========================
+  const handleFieldBlur = (field: "email" | "code") => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  };
+
+  // ===========================
+  // HANDLE VERIFY
   // ===========================
   const handleVerify = useCallback(async () => {
-    if (!email || !code) {
-      toast.error('Please enter both email and verification code');
+    // Validate before submitting
+    const emailError = validateEmail(email);
+    const codeError = validateCode(code);
+
+    if (emailError || codeError) {
+      setTouched({ email: true, code: true });
+      if (emailError) toast.error(emailError);
+      if (codeError) toast.error(codeError);
       return;
     }
 
@@ -331,24 +427,27 @@ export const VerificationPage: React.FC = () => {
 
     try {
       const response = await verifyEmail({ email, code });
-      
+
       if (response.success) {
         setIsVerified(true);
         setShowSuccessModal(true);
-        toast.success('Email verified successfully! 🎉');
-        
+        toast.success("Email verified successfully! 🎉");
+
         // Redirect to home after 3 seconds
         setTimeout(() => {
           setShowSuccessModal(false);
-          navigate('/');
+          navigate("/");
         }, 3000);
       } else {
-        setErrorMessage(response.message || 'Verification failed');
+        setErrorMessage(response.message || "Verification failed");
         setShowErrorModal(true);
-        toast.error(response.message || 'Verification failed');
+        toast.error(response.message || "Verification failed");
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Something went wrong. Please try again.';
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again.";
       setErrorMessage(errorMessage);
       setShowErrorModal(true);
       toast.error(errorMessage);
@@ -357,15 +456,15 @@ export const VerificationPage: React.FC = () => {
     }
   }, [email, code, navigate]);
 
-  // Auto-submit if both email and code are present
+  // Auto-submit if both email and code are present and valid
   useEffect(() => {
-    if (email && code && !isVerified) {
+    if (email && code && isFormValid && !isVerified && !isLoading) {
       const timer = setTimeout(() => {
         handleVerify();
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [email, code, isVerified, handleVerify]);
+  }, [email, code, isFormValid, isVerified, isLoading, handleVerify]);
 
   // Countdown timer for resend
   useEffect(() => {
@@ -379,8 +478,11 @@ export const VerificationPage: React.FC = () => {
   // HANDLE RESEND CODE
   // ===========================
   const handleResendCode = async () => {
-    if (!email) {
-      toast.error('Please enter your email address');
+    // Validate email before resending
+    const emailError = validateEmail(email);
+    if (emailError) {
+      setTouched((prev) => ({ ...prev, email: true }));
+      toast.error(emailError);
       return;
     }
 
@@ -389,15 +491,16 @@ export const VerificationPage: React.FC = () => {
 
     try {
       const response = await resendVerificationCode({ email });
-      
+
       if (response.success) {
-        toast.success('New verification code sent to your email!');
+        toast.success("New verification code sent to your email!");
         setShowConfirmModal(true);
       } else {
-        toast.error(response.message || 'Failed to resend code');
+        toast.error(response.message || "Failed to resend code");
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to resend code';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to resend code";
       toast.error(errorMessage);
     } finally {
       setIsResending(false);
@@ -409,7 +512,7 @@ export const VerificationPage: React.FC = () => {
   // ===========================
   const handleCloseSuccessModal = () => {
     setShowSuccessModal(false);
-    navigate('/');
+    navigate("/");
   };
 
   const handleCloseErrorModal = () => {
@@ -422,7 +525,8 @@ export const VerificationPage: React.FC = () => {
 
   const handleRetry = () => {
     setShowErrorModal(false);
-    setCode('');
+    setCode("");
+    setTouched((prev) => ({ ...prev, code: true }));
   };
 
   // ===========================
@@ -460,7 +564,7 @@ export const VerificationPage: React.FC = () => {
         >
           {/* Close Button */}
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate("/")}
             className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
           >
             <Close />
@@ -471,12 +575,12 @@ export const VerificationPage: React.FC = () => {
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
               className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full mb-4 shadow-lg"
             >
               <MailOutlineOutlined className="text-white text-3xl" />
             </motion.div>
-            
+
             <motion.h1
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -485,7 +589,7 @@ export const VerificationPage: React.FC = () => {
             >
               Email Verification
             </motion.h1>
-            
+
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -511,7 +615,13 @@ export const VerificationPage: React.FC = () => {
           )}
 
           {/* Form */}
-          <form onSubmit={(e) => { e.preventDefault(); handleVerify(); }} className="space-y-5">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleVerify();
+            }}
+            className="space-y-5"
+          >
             {/* Email Input */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -520,19 +630,50 @@ export const VerificationPage: React.FC = () => {
             >
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email Address
+                <span className="text-red-500 ml-1">*</span>
               </label>
               <div className="relative">
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  onBlur={() => handleFieldBlur("email")}
                   placeholder="your@email.com"
                   disabled={isVerified}
-                  className="w-full px-4 py-3 pl-11 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none disabled:bg-gray-50 disabled:text-gray-500"
+                  className={`
+                    w-full px-4 py-3 pl-11 border rounded-lg 
+                    focus:ring-2 focus:ring-indigo-500 focus:border-transparent 
+                    transition-all outline-none disabled:bg-gray-50 disabled:text-gray-500
+                    ${touched.email && validationErrors.email ? "border-red-500 bg-red-50" : "border-gray-300"}
+                    ${touched.email && !validationErrors.email && email ? "border-green-500 bg-green-50" : ""}
+                  `}
                   required
                 />
                 <MailOutlineOutlined className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
+
+                {/* Validation icons */}
+                {touched.email && email && !validationErrors.email && (
+                  <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 text-lg" />
+                )}
+                {touched.email && validationErrors.email && (
+                  <WarningAmber className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500 text-lg" />
+                )}
               </div>
+
+              {/* Error message */}
+              <AnimatePresence>
+                {touched.email && validationErrors.email && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mt-1 text-sm text-red-500 flex items-center gap-1"
+                  >
+                    <WarningAmber className="text-sm" />
+                    {validationErrors.email}
+                  </motion.p>
+                )}
+              </AnimatePresence>
             </motion.div>
 
             {/* Code Input */}
@@ -543,25 +684,83 @@ export const VerificationPage: React.FC = () => {
             >
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Verification Code
+                <span className="text-red-500 ml-1">*</span>
               </label>
               <div className="relative">
                 <input
                   type="text"
                   value={code}
-                  onChange={(e) => setCode(e.target.value.toUpperCase().slice(0, 6))}
+                  onChange={(e) =>
+                    setCode(e.target.value.toUpperCase().slice(0, 6))
+                  }
+                  onBlur={() => handleFieldBlur("code")}
                   placeholder="XXXXXX"
                   maxLength={6}
                   disabled={isVerified}
-                  className="w-full px-4 py-3 pl-11 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none uppercase font-mono text-lg tracking-widest disabled:bg-gray-50 disabled:text-gray-500"
+                  className={`
+                    w-full px-4 py-3 pl-11 border rounded-lg 
+                    focus:ring-2 focus:ring-indigo-500 focus:border-transparent 
+                    transition-all outline-none uppercase font-mono text-lg tracking-widest 
+                    disabled:bg-gray-50 disabled:text-gray-500
+                    ${touched.code && validationErrors.code ? "border-red-500 bg-red-50" : "border-gray-300"}
+                    ${touched.code && !validationErrors.code && code ? "border-green-500 bg-green-50" : ""}
+                  `}
                   required
                 />
                 <Security className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
+
+                {/* Validation icons */}
+                {touched.code && code && !validationErrors.code && (
+                  <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 text-lg" />
+                )}
+                {touched.code && validationErrors.code && (
+                  <WarningAmber className="absolute right-3 top-1/2 transform -translate-y-1/2 text-red-500 text-lg" />
+                )}
               </div>
+
               <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
                 <Schedule className="text-xs" />
                 Enter the 6-digit code from your email
               </p>
+
+              {/* Error message */}
+              <AnimatePresence>
+                {touched.code && validationErrors.code && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mt-1 text-sm text-red-500 flex items-center gap-1"
+                  >
+                    <WarningAmber className="text-sm" />
+                    {validationErrors.code}
+                  </motion.p>
+                )}
+              </AnimatePresence>
             </motion.div>
+
+            {/* Form validation summary */}
+            <AnimatePresence>
+              {Object.keys(validationErrors).length > 0 &&
+                (touched.email || touched.code) && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2"
+                  >
+                    <WarningAmber className="text-red-500 text-sm mt-0.5" />
+                    <div className="text-sm text-red-600">
+                      Please fix the following errors before submitting:
+                      <ul className="list-disc list-inside mt-1 space-y-0.5">
+                        {Object.values(validationErrors).map((error, index) => (
+                          <li key={index}>{error}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Verify Button */}
             <motion.button
@@ -569,14 +768,38 @@ export const VerificationPage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
               type="submit"
-              disabled={isLoading || isVerified}
-              className="w-full py-3 px-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-lg hover:shadow-lg hover:scale-[1.02] transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+              disabled={!isFormValid || isLoading || isVerified}
+              className={`
+                w-full py-3 px-4 text-white font-semibold rounded-lg 
+                transition-all duration-200 flex items-center justify-center gap-2
+                ${
+                  !isFormValid || isLoading || isVerified
+                    ? "bg-gray-400 cursor-not-allowed opacity-70"
+                    : "bg-gradient-to-r from-indigo-500 to-purple-600 hover:shadow-lg hover:scale-[1.02]"
+                }
+              `}
             >
               {isLoading ? (
                 <>
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   Verifying...
                 </>
@@ -602,7 +825,7 @@ export const VerificationPage: React.FC = () => {
             className="mt-6 text-center"
           >
             <p className="text-sm text-gray-500">
-              Didn't receive the code?{' '}
+              Didn't receive the code?{" "}
               <button
                 onClick={handleResendCode}
                 disabled={isResending || countdown > 0 || isVerified}
@@ -610,16 +833,32 @@ export const VerificationPage: React.FC = () => {
               >
                 {isResending ? (
                   <span className="flex items-center gap-1">
-                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin h-4 w-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Sending...
                   </span>
                 ) : countdown > 0 ? (
                   `Resend in ${countdown}s`
                 ) : (
-                  'Resend Code'
+                  "Resend Code"
                 )}
               </button>
             </p>
@@ -662,4 +901,3 @@ export const VerificationPage: React.FC = () => {
     </>
   );
 };
-

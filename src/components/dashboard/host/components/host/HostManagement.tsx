@@ -1,1211 +1,1391 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
-import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import Cookies from 'js-cookie';
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Cookies from "js-cookie";
+import axios, { AxiosError } from "axios";
 
-// Types
-interface HostProfile {
-  id: string;
-  userId: string;
+// API Base URL
+const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
+
+// Types based on the House model
+interface Host {
   name: string;
   email: string;
   phone: string;
-  role: 'host' | 'admin' | 'user';
-  avatar?: string;
-  joinedDate: string;
-  bio?: string;
-  company?: string;
-  verified: boolean;
-  rating: number;
-  totalReviews: number;
   responseRate: number;
   responseTime: string;
-  properties: Property[];
-  bankDetails?: {
-    bankName: string;
-    accountNumber: string;
-    accountHolder: string;
-  };
-  preferences: {
-    language: string;
-    currency: string;
-    notifications: {
-      email: boolean;
-      sms: boolean;
-      push: boolean;
-    };
-  };
-  createdAt: string;
-  updatedAt: string;
 }
 
-interface Property {
-  id: string;
-  hostId: string;
+interface Location {
+  province: string;
+  district: string;
+  sector: string;
+  cell: string;
+  village: string;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+}
+
+interface Image {
+  public_id: string;
+  url: string;
+  secure_url: string;
+  file?: File;
+}
+
+interface Availability {
+  startDate: string;
+  endDate: string;
+}
+
+interface House {
+  _id?: string;
+  houseId: string;
   name: string;
   description: string;
-  images: string[];
-  address: {
-    district: string;
-    sector: string;
-    cell: string;
-    village: string;
-    street?: string;
-    coordinates?: {
-      lat: number;
-      lng: number;
-    };
-  };
+  images: Image[];
+  location: Location;
   university: string;
-  type: 'apartment' | 'house' | 'studio' | 'room' | 'villa';
+  pricePerMonth: number;
   bedrooms: number;
   bathrooms: number;
   maxGuests: number;
-  pricePerNight: number;
-  priceRWF: number;
   amenities: string[];
-  availability: {
-    startDate: string;
-    endDate: string;
-    isAvailable: boolean;
-  }[];
-  status: 'active' | 'inactive' | 'pending' | 'suspended';
-  views: number;
-  bookings: number;
+  status: "available" | "pending" | "unavailable" | "maintenance";
   rating: number;
   totalReviews: number;
-  createdAt: string;
-  updatedAt: string;
+  host: Host;
+  availability: Availability;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // Translations
 const translations = {
   en: {
-    hostManagement: 'Host Management',
-    manageHostProfile: 'Manage your host profile and properties',
-    profile: 'Profile',
-    properties: 'Properties',
-    settings: 'Settings',
-    editProfile: 'Edit Profile',
-    addProperty: 'Add Property',
-    editProperty: 'Edit Property',
-    deleteProperty: 'Delete Property',
-    deleteConfirmation: 'Are you sure you want to delete this property?',
-    actionUndone: 'This action cannot be undone.',
-    cancel: 'Cancel',
-    delete: 'Delete',
-    deleting: 'Deleting...',
-    propertyDeleted: 'Property deleted successfully!',
-    deleteFailed: 'Failed to delete property',
-    profileUpdated: 'Profile updated successfully!',
-    profileUpdateFailed: 'Failed to update profile',
-    propertyCreated: 'Property created successfully!',
-    propertyUpdated: 'Property updated successfully!',
-    createFailed: 'Failed to create property',
-    updateFailed: 'Failed to update property',
-    totalProperties: 'Total Properties',
-    activeProperties: 'Active',
-    pendingProperties: 'Pending',
-    inactiveProperties: 'Inactive',
-    totalViews: 'Total Views',
-    totalBookings: 'Total Bookings',
-    rating: 'Rating',
-    searchProperties: 'Search properties...',
-    allStatus: 'All Status',
-    allTypes: 'All Types',
-    property: 'Property',
-    type: 'Type',
-    location: 'Location',
-    status: 'Status',
-    price: 'Price',
-    actions: 'Actions',
-    noProperties: 'No properties found',
-    adjustFilters: 'Try adjusting your search or filters',
-    showing: 'Showing',
-    of: 'of',
-    propertiesCount: 'properties',
-    viewProperty: 'View Property',
-    propertyDetails: 'Property Details',
-    propertyName: 'Property Name',
-    description: 'Description',
-    bedrooms: 'Bedrooms',
-    bathrooms: 'Bathrooms',
-    maxGuests: 'Max Guests',
-    pricePerNight: 'Price per Night',
-    university: 'University',
-    district: 'District',
-    sector: 'Sector',
-    cell: 'Cell',
-    village: 'Village',
-    amenities: 'Amenities',
-    availability: 'Availability',
-    images: 'Images',
-    close: 'Close',
-    save: 'Save',
-    saving: 'Saving...',
-    create: 'Create',
-    update: 'Update',
-    name: 'Name',
-    email: 'Email',
-    phone: 'Phone',
-    bio: 'Bio',
-    company: 'Company',
-    language: 'Language',
-    currency: 'Currency',
-    notifications: 'Notifications',
-    emailNotifications: 'Email Notifications',
-    smsNotifications: 'SMS Notifications',
-    pushNotifications: 'Push Notifications',
-    bankName: 'Bank Name',
-    accountNumber: 'Account Number',
-    accountHolder: 'Account Holder',
-    verified: 'Verified',
-    responseRate: 'Response Rate',
-    responseTime: 'Response Time',
-    memberSince: 'Member Since',
-    totalReviews: 'Total Reviews',
-    apartment: 'Apartment',
-    house: 'House',
-    studio: 'Studio',
-    room: 'Room',
-    villa: 'Villa',
-    active: 'Active',
-    inactive: 'Inactive',
-    pending: 'Pending',
-    suspended: 'Suspended',
-    all: 'All',
-    selectStatus: 'Select Status',
-    selectType: 'Select Type',
-    enterName: 'Enter property name',
-    enterDescription: 'Enter property description',
-    enterPrice: 'Enter price per night',
-    enterBedrooms: 'Enter number of bedrooms',
-    enterBathrooms: 'Enter number of bathrooms',
-    enterMaxGuests: 'Enter maximum guests',
-    uploadImage: 'Upload Image',
-    addAmenity: 'Add Amenity',
-    remove: 'Remove',
-    startDate: 'Start Date',
-    endDate: 'End Date',
-    isAvailable: 'Is Available',
-    permissions: {
-      adminOnly: 'Only admins can change host status',
-      cannotEdit: 'You cannot edit this property',
-      cannotDelete: 'You cannot delete this property',
-    },
-    statuses: {
-      pending: 'Pending',
-      reviewing: 'Reviewing',
-      resolved: 'Resolved',
-      rejected: 'Rejected',
+    hostManagement: "Host Management",
+    manageHostProfile: "Manage your properties and listings",
+    properties: "Properties",
+    addProperty: "Add Property",
+    editProperty: "Edit Property",
+    deleteProperty: "Delete Property",
+    deleteConfirmation: "Are you sure you want to delete this property?",
+    actionUndone: "This action cannot be undone.",
+    cancel: "Cancel",
+    delete: "Delete",
+    deleting: "Deleting...",
+    propertyDeleted: "Property deleted successfully!",
+    deleteFailed: "Failed to delete property",
+    propertyCreated: "Property created successfully!",
+    propertyUpdated: "Property updated successfully!",
+    createFailed: "Failed to create property",
+    updateFailed: "Failed to update property",
+    totalProperties: "Total Properties",
+    availableProperties: "Available",
+    pendingProperties: "Pending",
+    unavailableProperties: "Unavailable",
+    maintenanceProperties: "Maintenance",
+    totalReviews: "Total Reviews",
+    rating: "Rating",
+    searchProperties: "Search properties...",
+    allStatus: "All Status",
+    property: "Property",
+    location: "Location",
+    status: "Status",
+    price: "Price",
+    actions: "Actions",
+    noProperties: "No properties found",
+    adjustFilters: "Try adjusting your search or filters",
+    showing: "Showing",
+    of: "of",
+    propertiesCount: "properties",
+    viewProperty: "View Property",
+    propertyDetails: "Property Details",
+    propertyName: "Property Name",
+    description: "Description",
+    bedrooms: "Bedrooms",
+    bathrooms: "Bathrooms",
+    maxGuests: "Max Guests",
+    pricePerMonth: "Price per Month",
+    university: "University",
+    province: "Province",
+    district: "District",
+    sector: "Sector",
+    cell: "Cell",
+    village: "Village",
+    amenities: "Amenities",
+    availability: "Availability",
+    images: "Images",
+    close: "Close",
+    save: "Save",
+    saving: "Saving...",
+    create: "Create",
+    update: "Update",
+    name: "Name",
+    email: "Email",
+    phone: "Phone",
+    available: "Available",
+    unavailable: "Unavailable",
+    maintenance: "Maintenance",
+    pending: "Pending",
+    all: "All",
+    selectStatus: "Select Status",
+    enterName: "Enter property name",
+    enterDescription: "Enter property description",
+    enterPrice: "Enter price per month",
+    enterBedrooms: "Enter number of bedrooms",
+    enterBathrooms: "Enter number of bathrooms",
+    enterMaxGuests: "Enter maximum guests",
+    addAmenity: "Add Amenity",
+    remove: "Remove",
+    startDate: "Start Date",
+    endDate: "End Date",
+    provincePlaceholder: "Select province",
+    districtPlaceholder: "Enter district",
+    sectorPlaceholder: "Enter sector",
+    cellPlaceholder: "Enter cell",
+    villagePlaceholder: "Enter village",
+    hostName: "Host Name",
+    hostEmail: "Host Email",
+    hostPhone: "Host Phone",
+    responseRate: "Response Rate %",
+    responseTime: "Response Time",
+    uploadImages: "Upload Images",
+    dropImages: "Drop images here or click to upload",
+    imagePreview: "Image Preview",
+    addImage: "Add Image",
+    noImage: "No image",
+    selectFiles: "Select Files",
+    dragDrop: "Drag & drop images here",
+    validation: {
+      nameRequired: "Property name is required",
+      nameMinLength: "Name must be at least 3 characters",
+      nameMaxLength: "Name cannot exceed 100 characters",
+      descriptionRequired: "Description is required",
+      descriptionMinLength: "Description must be at least 20 characters",
+      descriptionMaxLength: "Description cannot exceed 2000 characters",
+      provinceRequired: "Province is required",
+      districtRequired: "District is required",
+      sectorRequired: "Sector is required",
+      cellRequired: "Cell is required",
+      villageRequired: "Village is required",
+      universityRequired: "University is required",
+      priceRequired: "Price is required",
+      priceMin: "Price must be greater than 0",
+      bedroomsRequired: "Bedrooms is required",
+      bedroomsMin: "Bedrooms must be at least 0",
+      bathroomsRequired: "Bathrooms is required",
+      bathroomsMin: "Bathrooms must be at least 0",
+      maxGuestsRequired: "Max guests is required",
+      maxGuestsMin: "Max guests must be at least 1",
+      hostNameRequired: "Host name is required",
+      hostEmailRequired: "Host email is required",
+      hostEmailInvalid: "Please enter a valid email",
+      imagesRequired: "At least one image is required",
     },
   },
   fr: {
-    hostManagement: 'Gestion des Hôtes',
-    manageHostProfile: 'Gérez votre profil hôte et vos propriétés',
-    profile: 'Profil',
-    properties: 'Propriétés',
-    settings: 'Paramètres',
-    editProfile: 'Modifier le Profil',
-    addProperty: 'Ajouter une Propriété',
-    editProperty: 'Modifier la Propriété',
-    deleteProperty: 'Supprimer la Propriété',
-    deleteConfirmation: 'Êtes-vous sûr de vouloir supprimer cette propriété ?',
-    actionUndone: 'Cette action est irréversible.',
-    cancel: 'Annuler',
-    delete: 'Supprimer',
-    deleting: 'Suppression...',
-    propertyDeleted: 'Propriété supprimée avec succès !',
-    deleteFailed: 'Échec de la suppression de la propriété',
-    profileUpdated: 'Profil mis à jour avec succès !',
-    profileUpdateFailed: 'Échec de la mise à jour du profil',
-    propertyCreated: 'Propriété créée avec succès !',
-    propertyUpdated: 'Propriété mise à jour avec succès !',
-    createFailed: 'Échec de la création de la propriété',
-    updateFailed: 'Échec de la mise à jour de la propriété',
-    totalProperties: 'Total des Propriétés',
-    activeProperties: 'Actif',
-    pendingProperties: 'En Attente',
-    inactiveProperties: 'Inactif',
-    totalViews: 'Vues Totales',
-    totalBookings: 'Réservations Totales',
-    rating: 'Évaluation',
-    searchProperties: 'Rechercher des propriétés...',
-    allStatus: 'Tous les Statuts',
-    allTypes: 'Tous les Types',
-    property: 'Propriété',
-    type: 'Type',
-    location: 'Emplacement',
-    status: 'Statut',
-    price: 'Prix',
-    actions: 'Actions',
-    noProperties: 'Aucune propriété trouvée',
-    adjustFilters: 'Essayez d\'ajuster votre recherche ou vos filtres',
-    showing: 'Affichage',
-    of: 'de',
-    propertiesCount: 'propriétés',
-    viewProperty: 'Voir la Propriété',
-    propertyDetails: 'Détails de la Propriété',
-    propertyName: 'Nom de la Propriété',
-    description: 'Description',
-    bedrooms: 'Chambres',
-    bathrooms: 'Salles de Bain',
-    maxGuests: 'Max Invités',
-    pricePerNight: 'Prix par Nuit',
-    university: 'Université',
-    district: 'District',
-    sector: 'Secteur',
-    cell: 'Cellule',
-    village: 'Village',
-    amenities: 'Équipements',
-    availability: 'Disponibilité',
-    images: 'Images',
-    close: 'Fermer',
-    save: 'Enregistrer',
-    saving: 'Enregistrement...',
-    create: 'Créer',
-    update: 'Mettre à Jour',
-    name: 'Nom',
-    email: 'Email',
-    phone: 'Téléphone',
-    bio: 'Bio',
-    company: 'Entreprise',
-    language: 'Langue',
-    currency: 'Devise',
-    notifications: 'Notifications',
-    emailNotifications: 'Notifications par Email',
-    smsNotifications: 'Notifications par SMS',
-    pushNotifications: 'Notifications Push',
-    bankName: 'Nom de la Banque',
-    accountNumber: 'Numéro de Compte',
-    accountHolder: 'Titulaire du Compte',
-    verified: 'Vérifié',
-    responseRate: 'Taux de Réponse',
-    responseTime: 'Temps de Réponse',
-    memberSince: 'Membre depuis',
-    totalReviews: 'Total des Avis',
-    apartment: 'Appartement',
-    house: 'Maison',
-    studio: 'Studio',
-    room: 'Chambre',
-    villa: 'Villa',
-    active: 'Actif',
-    inactive: 'Inactif',
-    pending: 'En Attente',
-    suspended: 'Suspendu',
-    all: 'Tous',
-    selectStatus: 'Sélectionner le Statut',
-    selectType: 'Sélectionner le Type',
-    enterName: 'Entrez le nom de la propriété',
-    enterDescription: 'Entrez la description de la propriété',
-    enterPrice: 'Entrez le prix par nuit',
-    enterBedrooms: 'Entrez le nombre de chambres',
-    enterBathrooms: 'Entrez le nombre de salles de bain',
-    enterMaxGuests: 'Entrez le nombre maximum d\'invités',
-    uploadImage: 'Télécharger une Image',
-    addAmenity: 'Ajouter un Équipement',
-    remove: 'Supprimer',
-    startDate: 'Date de Début',
-    endDate: 'Date de Fin',
-    isAvailable: 'Disponible',
-    permissions: {
-      adminOnly: 'Seuls les administrateurs peuvent changer le statut',
-      cannotEdit: 'Vous ne pouvez pas modifier cette propriété',
-      cannotDelete: 'Vous ne pouvez pas supprimer cette propriété',
-    },
-    statuses: {
-      pending: 'En Attente',
-      reviewing: 'En Révision',
-      resolved: 'Résolu',
-      rejected: 'Rejeté',
+    hostManagement: "Gestion des Hôtes",
+    manageHostProfile: "Gérez vos propriétés et annonces",
+    properties: "Propriétés",
+    addProperty: "Ajouter une Propriété",
+    editProperty: "Modifier la Propriété",
+    deleteProperty: "Supprimer la Propriété",
+    deleteConfirmation: "Êtes-vous sûr de vouloir supprimer cette propriété ?",
+    actionUndone: "Cette action est irréversible.",
+    cancel: "Annuler",
+    delete: "Supprimer",
+    deleting: "Suppression...",
+    propertyDeleted: "Propriété supprimée avec succès !",
+    deleteFailed: "Échec de la suppression de la propriété",
+    propertyCreated: "Propriété créée avec succès !",
+    propertyUpdated: "Propriété mise à jour avec succès !",
+    createFailed: "Échec de la création de la propriété",
+    updateFailed: "Échec de la mise à jour de la propriété",
+    totalProperties: "Total des Propriétés",
+    availableProperties: "Disponible",
+    pendingProperties: "En Attente",
+    unavailableProperties: "Indisponible",
+    maintenanceProperties: "Maintenance",
+    totalReviews: "Total des Avis",
+    rating: "Évaluation",
+    searchProperties: "Rechercher des propriétés...",
+    allStatus: "Tous les Statuts",
+    property: "Propriété",
+    location: "Emplacement",
+    status: "Statut",
+    price: "Prix",
+    actions: "Actions",
+    noProperties: "Aucune propriété trouvée",
+    adjustFilters: "Essayez d'ajuster votre recherche ou vos filtres",
+    showing: "Affichage",
+    of: "de",
+    propertiesCount: "propriétés",
+    viewProperty: "Voir la Propriété",
+    propertyDetails: "Détails de la Propriété",
+    propertyName: "Nom de la Propriété",
+    description: "Description",
+    bedrooms: "Chambres",
+    bathrooms: "Salles de Bain",
+    maxGuests: "Max Invités",
+    pricePerMonth: "Prix par Mois",
+    university: "Université",
+    province: "Province",
+    district: "District",
+    sector: "Secteur",
+    cell: "Cellule",
+    village: "Village",
+    amenities: "Équipements",
+    availability: "Disponibilité",
+    images: "Images",
+    close: "Fermer",
+    save: "Enregistrer",
+    saving: "Enregistrement...",
+    create: "Créer",
+    update: "Mettre à Jour",
+    name: "Nom",
+    email: "Email",
+    phone: "Téléphone",
+    available: "Disponible",
+    unavailable: "Indisponible",
+    maintenance: "Maintenance",
+    pending: "En Attente",
+    all: "Tous",
+    selectStatus: "Sélectionner le Statut",
+    enterName: "Entrez le nom de la propriété",
+    enterDescription: "Entrez la description de la propriété",
+    enterPrice: "Entrez le prix par mois",
+    enterBedrooms: "Entrez le nombre de chambres",
+    enterBathrooms: "Entrez le nombre de salles de bain",
+    enterMaxGuests: "Entrez le nombre maximum d'invités",
+    addAmenity: "Ajouter un Équipement",
+    remove: "Supprimer",
+    startDate: "Date de Début",
+    endDate: "Date de Fin",
+    provincePlaceholder: "Sélectionner la province",
+    districtPlaceholder: "Entrez le district",
+    sectorPlaceholder: "Entrez le secteur",
+    cellPlaceholder: "Entrez la cellule",
+    villagePlaceholder: "Entrez le village",
+    hostName: "Nom de l'Hôte",
+    hostEmail: "Email de l'Hôte",
+    hostPhone: "Téléphone de l'Hôte",
+    responseRate: "Taux de Réponse %",
+    responseTime: "Temps de Réponse",
+    uploadImages: "Télécharger des Images",
+    dropImages: "Déposez les images ici ou cliquez pour télécharger",
+    imagePreview: "Aperçu de l'Image",
+    addImage: "Ajouter une Image",
+    noImage: "Pas d'image",
+    selectFiles: "Sélectionner des Fichiers",
+    dragDrop: "Glissez-déposez les images ici",
+    validation: {
+      nameRequired: "Le nom de la propriété est requis",
+      nameMinLength: "Le nom doit contenir au moins 3 caractères",
+      nameMaxLength: "Le nom ne peut pas dépasser 100 caractères",
+      descriptionRequired: "La description est requise",
+      descriptionMinLength:
+        "La description doit contenir au moins 20 caractères",
+      descriptionMaxLength:
+        "La description ne peut pas dépasser 2000 caractères",
+      provinceRequired: "La province est requise",
+      districtRequired: "Le district est requis",
+      sectorRequired: "Le secteur est requis",
+      cellRequired: "La cellule est requise",
+      villageRequired: "Le village est requis",
+      universityRequired: "L'université est requise",
+      priceRequired: "Le prix est requis",
+      priceMin: "Le prix doit être supérieur à 0",
+      bedroomsRequired: "Les chambres sont requises",
+      bedroomsMin: "Les chambres doivent être au moins 0",
+      bathroomsRequired: "Les salles de bain sont requises",
+      bathroomsMin: "Les salles de bain doivent être au moins 0",
+      maxGuestsRequired: "Le nombre max d'invités est requis",
+      maxGuestsMin: "Le nombre max d'invités doit être au moins 1",
+      hostNameRequired: "Le nom de l'hôte est requis",
+      hostEmailRequired: "L'email de l'hôte est requis",
+      hostEmailInvalid: "Veuillez entrer un email valide",
+      imagesRequired: "Au moins une image est requise",
     },
   },
   rw: {
-    hostManagement: 'Gucunga Abatambyi',
-    manageHostProfile: 'Gucunga amakuru yawe n\'amazu yawe',
-    profile: 'Profil',
-    properties: 'Amazu',
-    settings: 'Igenamiterere',
-    editProfile: 'Hindura Profil',
-    addProperty: 'Ongera Inzu',
-    editProperty: 'Hindura Inzu',
-    deleteProperty: 'Kuraho Inzu',
-    deleteConfirmation: 'Uri kwizera ko ushaka gukuraho iyi nzu?',
-    actionUndone: 'Iki gikorwa ntikishobora guhindurwa.',
-    cancel: 'Reka',
-    delete: 'Kuraho',
-    deleting: 'Birakurwaho...',
-    propertyDeleted: 'Inzu yakuweho neza!',
-    deleteFailed: 'Kuraho inzu birananiranye',
-    profileUpdated: 'Profil yavuguruwe neza!',
-    profileUpdateFailed: 'Kuvugurura profil birananiranye',
-    propertyCreated: 'Inzu yakozwe neza!',
-    propertyUpdated: 'Inzu yavuguruwe neza!',
-    createFailed: 'Kora inzu birananiranye',
-    updateFailed: 'Kuvugurura inzu birananiranye',
-    totalProperties: 'Amazu Yose',
-    activeProperties: 'Ariho',
-    pendingProperties: 'Bitegereje',
-    inactiveProperties: 'Ntaho',
-    totalViews: 'Amashusho Yose',
-    totalBookings: 'Ibyemezo Byose',
-    rating: 'Amanota',
-    searchProperties: 'Shakisha amazu...',
-    allStatus: 'Ihagaze Ryose',
-    allTypes: 'Ubwoko Bwose',
-    property: 'Inzu',
-    type: 'Ubwoko',
-    location: 'Aho Gihe',
-    status: 'Ihagaze',
-    price: 'Igiciro',
-    actions: 'Ibikorwa',
-    noProperties: 'Nta nzu yabonetse',
-    adjustFilters: 'Gerageza guhindura uburyo ushakisha cyangwa amatungo',
-    showing: 'Bereka',
-    of: 'muri',
-    propertiesCount: 'amazu',
-    viewProperty: 'Reba Inzu',
-    propertyDetails: 'Ibisobanuro by\'Inzu',
-    propertyName: 'Izina ry\'Inzu',
-    description: 'Ibisobanuro',
-    bedrooms: 'Ibyumba',
-    bathrooms: 'Amazu y\'isuku',
-    maxGuests: 'Abashyitsi Benshi',
-    pricePerNight: 'Igiciro ku Ijoro',
-    university: 'Kaminuza',
-    district: 'Akarere',
-    sector: 'Umurenge',
-    cell: 'Akagari',
-    village: 'Umudugudu',
-    amenities: 'Ibikoresho',
-    availability: 'Kuboneka',
-    images: 'Amashusho',
-    close: 'Funga',
-    save: 'Bika',
-    saving: 'Birabikwa...',
-    create: 'Kora',
-    update: 'Vugurura',
-    name: 'Izina',
-    email: 'Imeri',
-    phone: 'Telefone',
-    bio: 'Ibisobanuro',
-    company: 'Ishyirahamwe',
-    language: 'Ururimi',
-    currency: 'Ifaranga',
-    notifications: 'Imenyesha',
-    emailNotifications: 'Imenyesha kuri Email',
-    smsNotifications: 'Imenyesha kuri SMS',
-    pushNotifications: 'Imenyesha Push',
-    bankName: 'Izina ry\'Banki',
-    accountNumber: 'Nomero ya Konti',
-    accountHolder: 'Nyiri Konti',
-    verified: 'Byemejwe',
-    responseRate: 'Ugusubiza',
-    responseTime: 'Igihe cyo Gusubiza',
-    memberSince: 'Yinjiye kuva',
-    totalReviews: 'Ibitekerezo Byose',
-    apartment: 'Apartamento',
-    house: 'Inzu',
-    studio: 'Studio',
-    room: 'Icyumba',
-    villa: 'Villa',
-    active: 'Ariho',
-    inactive: 'Ntaho',
-    pending: 'Bitegereje',
-    suspended: 'Byahagaritswe',
-    all: 'Byose',
-    selectStatus: 'Hitamo Ihagaze',
-    selectType: 'Hitamo Ubwoko',
-    enterName: 'Andika izina ry\'inzu',
-    enterDescription: 'Andika ibisobanuro by\'inzu',
-    enterPrice: 'Andika igiciro ku ijoro',
-    enterBedrooms: 'Andika umubare w\'ibyumba',
-    enterBathrooms: 'Andika umubare w\'amazu y\'isuku',
-    enterMaxGuests: 'Andika umubare w\'abashyitsi',
-    uploadImage: 'Ongeraho Ishusho',
-    addAmenity: 'Ongeraho Ibikoresho',
-    remove: 'Kuraho',
-    startDate: 'Itariki yo Gutangira',
-    endDate: 'Itariki yo Kurangira',
-    isAvailable: 'Irahari',
-    permissions: {
-      adminOnly: 'Abayobozi gusa nibo bashobora guhindura ihagaze',
-      cannotEdit: 'Ntushobora guhindura iyi nzu',
-      cannotDelete: 'Ntushobora gukuraho iyi nzu',
-    },
-    statuses: {
-      pending: 'Bitegereje',
-      reviewing: 'Birisuzumwa',
-      resolved: 'Byakemutse',
-      rejected: 'Byangijwe',
+    hostManagement: "Gucunga Amazu",
+    manageHostProfile: "Gucunga amazu yawe n'amatangazo",
+    properties: "Amazu",
+    addProperty: "Ongera Inzu",
+    editProperty: "Hindura Inzu",
+    deleteProperty: "Kuraho Inzu",
+    deleteConfirmation: "Uri kwizera ko ushaka gukuraho iyi nzu?",
+    actionUndone: "Iki gikorwa ntikishobora guhindurwa.",
+    cancel: "Reka",
+    delete: "Kuraho",
+    deleting: "Birakurwaho...",
+    propertyDeleted: "Inzu yakuweho neza!",
+    deleteFailed: "Kuraho inzu birananiranye",
+    propertyCreated: "Inzu yakozwe neza!",
+    propertyUpdated: "Inzu yavuguruwe neza!",
+    createFailed: "Kora inzu birananiranye",
+    updateFailed: "Kuvugurura inzu birananiranye",
+    totalProperties: "Amazu Yose",
+    availableProperties: "Irahari",
+    pendingProperties: "Bitegereje",
+    unavailableProperties: "Ntaho",
+    maintenanceProperties: "Muri Maintenance",
+    totalReviews: "Ibitekerezo Byose",
+    rating: "Amanota",
+    searchProperties: "Shakisha amazu...",
+    allStatus: "Ihagaze Ryose",
+    property: "Inzu",
+    location: "Aho Gihe",
+    status: "Ihagaze",
+    price: "Igiciro",
+    actions: "Ibikorwa",
+    noProperties: "Nta nzu yabonetse",
+    adjustFilters: "Gerageza guhindura uburyo ushakisha",
+    showing: "Bereka",
+    of: "muri",
+    propertiesCount: "amazu",
+    viewProperty: "Reba Inzu",
+    propertyDetails: "Ibisobanuro by'Inzu",
+    propertyName: "Izina ry'Inzu",
+    description: "Ibisobanuro",
+    bedrooms: "Ibyumba",
+    bathrooms: "Amazu y'isuku",
+    maxGuests: "Abashyitsi Benshi",
+    pricePerMonth: "Igiciro ku Kwezi",
+    university: "Kaminuza",
+    province: "Intara",
+    district: "Akarere",
+    sector: "Umurenge",
+    cell: "Akagari",
+    village: "Umudugudu",
+    amenities: "Ibikoresho",
+    availability: "Kuboneka",
+    images: "Amashusho",
+    close: "Funga",
+    save: "Bika",
+    saving: "Birabikwa...",
+    create: "Kora",
+    update: "Vugurura",
+    name: "Izina",
+    email: "Imeri",
+    phone: "Telefone",
+    available: "Irahari",
+    unavailable: "Ntaho",
+    maintenance: "Muri Maintenance",
+    pending: "Bitegereje",
+    all: "Byose",
+    selectStatus: "Hitamo Ihagaze",
+    enterName: "Andika izina ry'inzu",
+    enterDescription: "Andika ibisobanuro by'inzu",
+    enterPrice: "Andika igiciro ku kwezi",
+    enterBedrooms: "Andika umubare w'ibyumba",
+    enterBathrooms: "Andika umubare w'amazu y'isuku",
+    enterMaxGuests: "Andika umubare w'abashyitsi",
+    addAmenity: "Ongeraho Ibikoresho",
+    remove: "Kuraho",
+    startDate: "Itariki yo Gutangira",
+    endDate: "Itariki yo Kurangira",
+    provincePlaceholder: "Hitamo Intara",
+    districtPlaceholder: "Andika Akarere",
+    sectorPlaceholder: "Andika Umurenge",
+    cellPlaceholder: "Andika Akagari",
+    villagePlaceholder: "Andika Umudugudu",
+    hostName: "Izina ry'Umutambyi",
+    hostEmail: "Imeri y'Umutambyi",
+    hostPhone: "Telefone y'Umutambyi",
+    responseRate: "Ugusubiza %",
+    responseTime: "Igihe cyo Gusubiza",
+    uploadImages: "Ongeraho Amashusho",
+    dropImages: "Shyira amashusho hano cyangwa kanda guterura",
+    imagePreview: "Reba Ishusho",
+    addImage: "Ongeraho Ishusho",
+    noImage: "Nta shusho",
+    selectFiles: "Hitamo Amashusho",
+    dragDrop: "Kurura no gushyira amashusho hano",
+    validation: {
+      nameRequired: "Izina ry'inzu rirasabwa",
+      nameMinLength: "Izina rigomba kugira byibura inyuguti 3",
+      nameMaxLength: "Izina ntirigomba kurenga inyuguti 100",
+      descriptionRequired: "Ibisobanuro birakenewe",
+      descriptionMinLength: "Ibisobanuro bigomba kugira byibura inyuguti 20",
+      descriptionMaxLength: "Ibisobanuro ntibigomba kurenga inyuguti 2000",
+      provinceRequired: "Intara irakenewe",
+      districtRequired: "Akarere gakenewe",
+      sectorRequired: "Umurenge urakenewe",
+      cellRequired: "Akagari gakenewe",
+      villageRequired: "Umudugudu urakenewe",
+      universityRequired: "Kaminuza irakenewe",
+      priceRequired: "Igiciro gikenewe",
+      priceMin: "Igiciro kigomba kuba kirenze 0",
+      bedroomsRequired: "Ibyumba birakenewe",
+      bedroomsMin: "Ibyumba bigomba kuba byibura 0",
+      bathroomsRequired: "Amazu y'isuku arakenewe",
+      bathroomsMin: "Amazu y'isuku agomba kuba byibura 0",
+      maxGuestsRequired: "Abashyitsi benshi barakenewe",
+      maxGuestsMin: "Abashyitsi benshi bagomba kuba byibura 1",
+      hostNameRequired: "Izina ry'umutambyi rirakenewe",
+      hostEmailRequired: "Imeri y'umutambyi irakenewe",
+      hostEmailInvalid: "Andika imeri ikwiye",
+      imagesRequired: "Byibura ishusho imwe irakenewe",
     },
   },
 };
 
-// Helper function to get language from cookies
-const getLanguageFromCookies = (): 'en' | 'fr' | 'rw' => {
-  const lang = Cookies.get('language') as 'en' | 'fr' | 'rw';
-  return lang || 'en';
+// ============================================================
+// HELPER FUNCTIONS - UPDATED to use localStorage
+// ============================================================
+const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
+  const lang = Cookies.get("language") as "en" | "fr" | "rw";
+  return lang || "en";
 };
 
-// Helper function to get user role from cookies
-const getUserRole = (): 'admin' | 'user' | 'host' => {
-  const role = Cookies.get('userRole') as 'admin' | 'user' | 'host';
-  return role || 'user';
-};
-
-// Helper function to get user email from cookies
 const getUserEmail = (): string => {
-  return Cookies.get('userEmail') || '';
-};
-
-// Helper function to get user name from cookies
-const getUserName = (): string => {
-  return Cookies.get('userName') || '';
-};
-
-// Storage key
-const STORAGE_KEY_HOST = 'host_data';
-
-// Generate unique ID
-const generateId = (): string => {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
-};
-
-// Initial host profile
-const getInitialHostProfile = (userEmail: string, userName: string): HostProfile => {
-  return {
-    id: generateId(),
-    userId: userEmail,
-    name: userName || 'John Doe',
-    email: userEmail || 'host@example.com',
-    phone: '+250788123456',
-    role: 'host',
-    joinedDate: new Date().toISOString(),
-    bio: 'Experienced host with multiple properties in Rwanda. Dedicated to providing comfortable and affordable accommodation for students and visitors.',
-    company: 'Rwanda Host Properties',
-    verified: true,
-    rating: 4.8,
-    totalReviews: 127,
-    responseRate: 98,
-    responseTime: '2 hours',
-    properties: [],
-    bankDetails: {
-      bankName: 'Bank of Kigali',
-      accountNumber: '1234567890',
-      accountHolder: 'John Doe',
-    },
-    preferences: {
-      language: 'en',
-      currency: 'RWF',
-      notifications: {
-        email: true,
-        sms: true,
-        push: true,
-      },
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-};
-
-// Initial properties
-const getInitialProperties = (hostId: string): Property[] => {
-  return [
-    {
-      id: '1',
-      hostId: hostId,
-      name: 'INES Ruhengeri Student Lodge',
-      description: 'Modern student accommodation near INES-Ruhengeri. Fully furnished rooms with high-speed internet, study areas, and 24/7 security.',
-      images: [
-        'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop',
-      ],
-      address: {
-        district: 'Musanze',
-        sector: 'Muhoza',
-        cell: 'Cyabararika',
-        village: 'Cyabararika',
-      },
-      university: 'INES-Ruhengeri',
-      type: 'apartment',
-      bedrooms: 4,
-      bathrooms: 2,
-      maxGuests: 8,
-      pricePerNight: 85,
-      priceRWF: 110500,
-      amenities: ['WiFi', 'Kitchen', 'Parking', 'Security', 'Study Area', 'Laundry'],
-      availability: [
-        {
-          startDate: '2024-01-01',
-          endDate: '2024-12-31',
-          isAvailable: true,
-        },
-      ],
-      status: 'active',
-      views: 156,
-      bookings: 45,
-      rating: 4.9,
-      totalReviews: 23,
-      createdAt: '2024-01-01T00:00:00Z',
-      updatedAt: '2024-01-01T00:00:00Z',
-    },
-    {
-      id: '2',
-      hostId: hostId,
-      name: 'Kigombe Student Apartments',
-      description: 'Spacious apartments located in a quiet neighborhood. Perfect for students looking for a peaceful study environment.',
-      images: [
-        'https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400&h=300&fit=crop',
-        'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop',
-      ],
-      address: {
-        district: 'Musanze',
-        sector: 'Muhoza',
-        cell: 'Kigombe',
-        village: 'Kigombe',
-      },
-      university: 'INES-Ruhengeri',
-      type: 'house',
-      bedrooms: 3,
-      bathrooms: 2,
-      maxGuests: 6,
-      pricePerNight: 70,
-      priceRWF: 91000,
-      amenities: ['WiFi', 'Kitchen', 'Parking', 'Garden', 'Furnished'],
-      availability: [
-        {
-          startDate: '2024-02-01',
-          endDate: '2024-06-30',
-          isAvailable: true,
-        },
-      ],
-      status: 'pending',
-      views: 89,
-      bookings: 12,
-      rating: 4.5,
-      totalReviews: 8,
-      createdAt: '2024-01-15T00:00:00Z',
-      updatedAt: '2024-01-15T00:00:00Z',
-    },
-  ];
-};
-
-// Helper functions
-const getHostData = (userEmail: string, userName: string): { profile: HostProfile; properties: Property[] } => {
-  const storedData = localStorage.getItem(STORAGE_KEY_HOST);
-  if (storedData) {
-    const data = JSON.parse(storedData);
-    return data;
+  try {
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      return user.email || "";
+    }
+    return "";
+  } catch (error) {
+    console.error("Error reading user email from localStorage:", error);
+    return "";
   }
-  // Initialize with initial data
-  const hostProfile = getInitialHostProfile(userEmail, userName);
-  const properties = getInitialProperties(hostProfile.id);
-  const data = { profile: hostProfile, properties };
-  localStorage.setItem(STORAGE_KEY_HOST, JSON.stringify(data));
-  return data;
 };
 
-const saveHostData = (profile: HostProfile, properties: Property[]): void => {
-  const data = { profile, properties };
-  localStorage.setItem(STORAGE_KEY_HOST, JSON.stringify(data));
+const getUserName = (): string => {
+  try {
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      return user.name || "";
+    }
+    return "";
+  } catch (error) {
+    console.error("Error reading user name from localStorage:", error);
+    return "";
+  }
+};
+
+const getToken = (): string => {
+  try {
+    return localStorage.getItem("token") || "";
+  } catch (error) {
+    console.error("Error reading token from localStorage:", error);
+    return "";
+  }
+};
+
+// ============================================================
+// API SERVICE - UPDATED with token interceptor
+// ============================================================
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Add request interceptor for authentication
+api.interceptors.request.use(
+  (config) => {
+    const token = getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
+
+// House API functions
+const houseApi = {
+  getHouses: async (email: string): Promise<House[]> => {
+    const response = await api.get(`/houses/${email}`);
+    // The API returns { success: true, total: 1, data: [...] }
+    return response.data.data || [];
+  },
+
+  createHouse: async (formData: FormData): Promise<House> => {
+    const response = await api.post("/houses", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data.data || response.data;
+  },
+
+  updateHouse: async (id: string, formData: FormData): Promise<House> => {
+    const response = await api.put(`/houses/${id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data.data || response.data;
+  },
+
+  deleteHouse: async (id: string): Promise<void> => {
+    await api.delete(`/houses/${id}`);
+  },
+};
+
+// Icons
+const Icons = {
+  Home: () => (
+    <svg
+      className="w-6 h-6"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+      />
+    </svg>
+  ),
+  Plus: () => (
+    <svg
+      className="w-5 h-5"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M12 4v16m8-8H4"
+      />
+    </svg>
+  ),
+  Edit: () => (
+    <svg
+      className="w-4 h-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+      />
+    </svg>
+  ),
+  Delete: () => (
+    <svg
+      className="w-4 h-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+      />
+    </svg>
+  ),
+  View: () => (
+    <svg
+      className="w-4 h-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+      />
+    </svg>
+  ),
+  Search: () => (
+    <svg
+      className="w-5 h-5"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+      />
+    </svg>
+  ),
+  Filter: () => (
+    <svg
+      className="w-5 h-5"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+      />
+    </svg>
+  ),
+  Close: () => (
+    <svg
+      className="w-5 h-5"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M6 18L18 6M6 6l12 12"
+      />
+    </svg>
+  ),
+  Check: () => (
+    <svg
+      className="w-4 h-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M5 13l4 4L19 7"
+      />
+    </svg>
+  ),
+  Upload: () => (
+    <svg
+      className="w-8 h-8"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+      />
+    </svg>
+  ),
+  Bed: () => (
+    <svg
+      className="w-4 h-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M4 8h16M4 16h16M4 12h16M4 20h16"
+      />
+    </svg>
+  ),
+  Bath: () => (
+    <svg
+      className="w-4 h-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M5 5h14M5 5v14M5 5h14M5 19h14M5 19v-4M5 19H3M19 19v-4"
+      />
+    </svg>
+  ),
+  User: () => (
+    <svg
+      className="w-4 h-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+      />
+    </svg>
+  ),
+  Location: () => (
+    <svg
+      className="w-4 h-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+      />
+    </svg>
+  ),
+  University: () => (
+    <svg
+      className="w-4 h-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2M12 3v4m4-2h.01M4 7h.01M8 7h.01M16 7h.01M4 11h16M4 15h16M4 19h16"
+      />
+    </svg>
+  ),
 };
 
 export const HostManagement: React.FC = () => {
-  // Get language and user info from cookies
-  const [lang, setLang] = useState<'en' | 'fr' | 'rw'>(getLanguageFromCookies());
-  const userRole = getUserRole();
+  const [lang, setLang] = useState<"en" | "fr" | "rw">(
+    getLanguageFromCookies(),
+  );
   const userEmail = getUserEmail();
   const userName = getUserName();
-  
-  const [hostProfile, setHostProfile] = useState<HostProfile | null>(null);
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [filterType, setFilterType] = useState<string>('all');
+
+  const [houses, setHouses] = useState<House[]>([]);
+  const [filteredHouses, setFilteredHouses] = useState<House[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   // Modal states
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [selectedHouse, setSelectedHouse] = useState<House | null>(null);
 
-  // Profile form state
-  const [profileFormData, setProfileFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    bio: '',
-    company: '',
-    language: 'en',
-    currency: 'RWF',
-    emailNotifications: true,
-    smsNotifications: true,
-    pushNotifications: true,
-    bankName: '',
-    accountNumber: '',
-    accountHolder: '',
-  });
+  // Form validation states
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>(
+    {},
+  );
 
-  // Property form state
+  // Image upload states
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Property form state - REMOVED availability fields
   const [propertyFormData, setPropertyFormData] = useState({
-    name: '',
-    description: '',
-    university: '',
-    type: 'apartment' as Property['type'],
+    name: "",
+    description: "",
+    university: "",
+    location: {
+      province: "",
+      district: "",
+      sector: "",
+      cell: "",
+      village: "",
+    },
+    pricePerMonth: 0,
     bedrooms: 1,
     bathrooms: 1,
     maxGuests: 2,
-    pricePerNight: 0,
-    priceRWF: 0,
-    district: '',
-    sector: '',
-    cell: '',
-    village: '',
     amenities: [] as string[],
-    images: [] as string[],
-    status: 'active' as Property['status'],
-    availability: {
-      startDate: '',
-      endDate: '',
-      isAvailable: true,
+    status: "pending" as House["status"],
+    host: {
+      name: userName || "",
+      email: userEmail || "",
+      phone: "",
+      responseRate: 0,
+      responseTime: "24 hours",
     },
   });
-  const [amenityInput, setAmenityInput] = useState('');
-  const [imageInput, setImageInput] = useState('');
+
+  const [amenityInput, setAmenityInput] = useState("");
 
   // Statistics
   const [stats, setStats] = useState({
     total: 0,
-    active: 0,
+    available: 0,
     pending: 0,
-    inactive: 0,
-    suspended: 0,
-    totalViews: 0,
-    totalBookings: 0,
+    unavailable: 0,
+    maintenance: 0,
+    totalReviews: 0,
     averageRating: 0,
   });
 
   const t = translations[lang];
-  const isAdmin = userRole === 'admin';
 
-  // Listen for language changes in cookies
+  // Listen for language changes
   useEffect(() => {
-    const handleCookieChange = () => {
+    const interval = setInterval(() => {
       const newLang = getLanguageFromCookies();
-      if (newLang !== lang) {
-        setLang(newLang);
-      }
-    };
-
-    const interval = setInterval(handleCookieChange, 1000);
+      if (newLang !== lang) setLang(newLang);
+    }, 1000);
     return () => clearInterval(interval);
   }, [lang]);
 
-  // Load host data
-  const loadHostData = useCallback(() => {
+  // Load houses
+  const loadHouses = useCallback(async () => {
+    const email = getUserEmail();
+    console.log("🔍 Loading houses for email:", email);
+
+    if (!email) {
+      console.warn("⚠️ No email found in localStorage");
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
-      const data = getHostData(userEmail, userName);
-      setHostProfile(data.profile);
-      setProperties(data.properties);
-      setFilteredProperties(data.properties);
-      
-      // Set profile form data
-      if (data.profile) {
-        setProfileFormData({
-          name: data.profile.name,
-          email: data.profile.email,
-          phone: data.profile.phone,
-          bio: data.profile.bio || '',
-          company: data.profile.company || '',
-          language: data.profile.preferences.language,
-          currency: data.profile.preferences.currency,
-          emailNotifications: data.profile.preferences.notifications.email,
-          smsNotifications: data.profile.preferences.notifications.sms,
-          pushNotifications: data.profile.preferences.notifications.push,
-          bankName: data.profile.bankDetails?.bankName || '',
-          accountNumber: data.profile.bankDetails?.accountNumber || '',
-          accountHolder: data.profile.bankDetails?.accountHolder || '',
-        });
-      }
+      const data = await houseApi.getHouses(email);
+      console.log("✅ Houses loaded:", data);
+      // Ensure each house has an images array
+      const housesWithImages = data.map((house) => ({
+        ...house,
+        images: house.images || [],
+      }));
+      setHouses(housesWithImages);
+      setFilteredHouses(housesWithImages);
     } catch (error) {
-      console.error('Error loading host data:', error);
-      toast.error('Failed to load host data');
+      console.error("❌ Error loading houses:", error);
+      toast.error("Failed to load houses");
     } finally {
       setLoading(false);
     }
-  }, [userEmail, userName]);
+  }, []);
 
   useEffect(() => {
-    loadHostData();
-  }, [loadHostData]);
+    loadHouses();
+  }, [loadHouses]);
 
-  // Filter properties
+  // Filter houses
   useEffect(() => {
-    let filtered = [...properties];
-
+    let filtered = [...houses];
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(
-        (p) =>
-          p.name.toLowerCase().includes(term) ||
-          p.university.toLowerCase().includes(term) ||
-          p.address.district.toLowerCase().includes(term) ||
-          p.address.sector.toLowerCase().includes(term) ||
-          p.address.village.toLowerCase().includes(term),
+        (h) =>
+          h.name.toLowerCase().includes(term) ||
+          h.university.toLowerCase().includes(term) ||
+          h.location.district.toLowerCase().includes(term) ||
+          h.location.village.toLowerCase().includes(term),
       );
     }
-
-    if (filterStatus !== 'all') {
-      filtered = filtered.filter((p) => p.status === filterStatus);
+    if (filterStatus !== "all") {
+      filtered = filtered.filter((h) => h.status === filterStatus);
     }
-
-    if (filterType !== 'all') {
-      filtered = filtered.filter((p) => p.type === filterType);
-    }
-
-    setFilteredProperties(filtered);
-  }, [properties, searchTerm, filterStatus, filterType]);
+    setFilteredHouses(filtered);
+  }, [houses, searchTerm, filterStatus]);
 
   // Update statistics
   useEffect(() => {
-    const total = properties.length;
-    const active = properties.filter((p) => p.status === 'active').length;
-    const pending = properties.filter((p) => p.status === 'pending').length;
-    const inactive = properties.filter((p) => p.status === 'inactive').length;
-    const suspended = properties.filter((p) => p.status === 'suspended').length;
-    const totalViews = properties.reduce((sum, p) => sum + p.views, 0);
-    const totalBookings = properties.reduce((sum, p) => sum + p.bookings, 0);
-    const avgRating = properties.length > 0 
-      ? properties.reduce((sum, p) => sum + p.rating, 0) / properties.length 
-      : 0;
-
     setStats({
-      total,
-      active,
-      pending,
-      inactive,
-      suspended,
-      totalViews,
-      totalBookings,
-      averageRating: avgRating,
+      total: houses.length,
+      available: houses.filter((h) => h.status === "available").length,
+      pending: houses.filter((h) => h.status === "pending").length,
+      unavailable: houses.filter((h) => h.status === "unavailable").length,
+      maintenance: houses.filter((h) => h.status === "maintenance").length,
+      totalReviews: houses.reduce((sum, h) => sum + h.totalReviews, 0),
+      averageRating:
+        houses.length > 0
+          ? houses.reduce((sum, h) => sum + h.rating, 0) / houses.length
+          : 0,
     });
-  }, [properties]);
+  }, [houses]);
 
-  // Get status badge color
+  // Get status badge
   const getStatusColor = (status: string): string => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'inactive':
-        return 'bg-gray-100 text-gray-800';
-      case 'suspended':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+    const colors = {
+      available: "bg-green-100 text-green-800 border-green-200",
+      pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
+      unavailable: "bg-gray-100 text-gray-800 border-gray-200",
+      maintenance: "bg-red-100 text-red-800 border-red-200",
+    };
+    return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800";
   };
 
-  // Get status label
   const getStatusLabel = (status: string): string => {
-    switch (status) {
-      case 'active':
-        return t.active;
-      case 'pending':
-        return t.pending;
-      case 'inactive':
-        return t.inactive;
-      case 'suspended':
-        return t.suspended;
-      default:
-        return status;
-    }
-  };
-
-  // Get type label
-  const getTypeLabel = (type: string): string => {
-    switch (type) {
-      case 'apartment':
-        return t.apartment;
-      case 'house':
-        return t.house;
-      case 'studio':
-        return t.studio;
-      case 'room':
-        return t.room;
-      case 'villa':
-        return t.villa;
-      default:
-        return type;
-    }
-  };
-
-  // Format date
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
+    const labels = {
+      available: t.available,
+      pending: t.pending,
+      unavailable: t.unavailable,
+      maintenance: t.maintenance,
+    };
+    return labels[status as keyof typeof labels] || status;
   };
 
   const formatCurrency = (amount: number): string => {
     return `RWF ${amount.toLocaleString()}`;
   };
 
-  // Check if user can edit property
-  const canEditProperty = (property: Property): boolean => {
-    return Boolean(isAdmin) || Boolean(hostProfile && property.hostId === hostProfile.id);
-  };
-
-  const canDeleteProperty = (property: Property): boolean => {
-    return Boolean(isAdmin) || Boolean(hostProfile && property.hostId === hostProfile.id);
-  };
-
-  // Handle profile update
-  const handleUpdateProfile = async () => {
-    if (!hostProfile) return;
-
-    setSubmitting(true);  
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const updatedProfile: HostProfile = {
-        ...hostProfile,
-        name: profileFormData.name,
-        email: profileFormData.email,
-        phone: profileFormData.phone,
-        bio: profileFormData.bio,
-        company: profileFormData.company,
-        preferences: {
-          language: profileFormData.language,
-          currency: profileFormData.currency,
-          notifications: {
-            email: profileFormData.emailNotifications,
-            sms: profileFormData.smsNotifications,
-            push: profileFormData.pushNotifications,
-          },
-        },
-        bankDetails: {
-          bankName: profileFormData.bankName,
-          accountNumber: profileFormData.accountNumber,
-          accountHolder: profileFormData.accountHolder,
-        },
-        updatedAt: new Date().toISOString(),
-      };
-
-      setHostProfile(updatedProfile);
-      saveHostData(updatedProfile, properties);
-      toast.success(`✅ ${t.profileUpdated}`);
-      setIsProfileModalOpen(false);
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast.error(`❌ ${t.profileUpdateFailed}`);
-    } finally {
-      setSubmitting(false);
+  // Amenity functions
+  const addAmenity = () => {
+    if (
+      amenityInput.trim() &&
+      !propertyFormData.amenities.includes(amenityInput.trim())
+    ) {
+      setPropertyFormData((prev) => ({
+        ...prev,
+        amenities: [...prev.amenities, amenityInput.trim()],
+      }));
+      setAmenityInput("");
     }
   };
 
-  // Handle create property
+  const removeAmenity = (amenityToRemove: string) => {
+    setPropertyFormData((prev) => ({
+      ...prev,
+      amenities: prev.amenities.filter(
+        (amenity) => amenity !== amenityToRemove,
+      ),
+    }));
+  };
+
+  // Validate form - REMOVED availability validation
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    const v = t.validation;
+
+    if (!propertyFormData.name.trim()) errors.name = v.nameRequired;
+    else if (propertyFormData.name.length < 3) errors.name = v.nameMinLength;
+    else if (propertyFormData.name.length > 100) errors.name = v.nameMaxLength;
+
+    if (!propertyFormData.description.trim())
+      errors.description = v.descriptionRequired;
+    else if (propertyFormData.description.length < 20)
+      errors.description = v.descriptionMinLength;
+    else if (propertyFormData.description.length > 2000)
+      errors.description = v.descriptionMaxLength;
+
+    if (!propertyFormData.location.province)
+      errors.province = v.provinceRequired;
+    if (!propertyFormData.location.district.trim())
+      errors.district = v.districtRequired;
+    if (!propertyFormData.location.sector.trim())
+      errors.sector = v.sectorRequired;
+    if (!propertyFormData.location.cell.trim()) errors.cell = v.cellRequired;
+    if (!propertyFormData.location.village.trim())
+      errors.village = v.villageRequired;
+
+    if (!propertyFormData.university.trim())
+      errors.university = v.universityRequired;
+
+    if (propertyFormData.pricePerMonth <= 0) errors.pricePerMonth = v.priceMin;
+
+    if (propertyFormData.bedrooms < 0) errors.bedrooms = v.bedroomsMin;
+    if (propertyFormData.bathrooms < 0) errors.bathrooms = v.bathroomsMin;
+    if (propertyFormData.maxGuests < 1) errors.maxGuests = v.maxGuestsMin;
+
+    if (!propertyFormData.host.name.trim())
+      errors.hostName = v.hostNameRequired;
+    if (!propertyFormData.host.email.trim())
+      errors.hostEmail = v.hostEmailRequired;
+    else if (!/\S+@\S+\.\S+/.test(propertyFormData.host.email))
+      errors.hostEmail = v.hostEmailInvalid;
+
+    if (imageFiles.length === 0 && !selectedHouse)
+      errors.images = v.imagesRequired;
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleFieldBlur = (field: string) => {
+    setTouchedFields((prev) => ({ ...prev, [field]: true }));
+  };
+
+  const hasError = (field: string): boolean => {
+    return touchedFields[field] && !!formErrors[field];
+  };
+
+  const isValidField = (field: string): boolean => {
+    return touchedFields[field] && !formErrors[field];
+  };
+
+  // Handle input change
+  const handleInputChange = (field: string, value: any) => {
+    const keys = field.split(".");
+    if (keys.length > 1) {
+      setPropertyFormData((prev) => ({
+        ...prev,
+        [keys[0]]: {
+          ...(prev[keys[0] as keyof typeof prev] as any),
+          [keys[1]]: value,
+        },
+      }));
+    } else {
+      setPropertyFormData((prev) => ({ ...prev, [field]: value }));
+    }
+    setFormErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[field];
+      return newErrors;
+    });
+  };
+
+  const handleLocationChange = (field: string, value: string) => {
+    setPropertyFormData((prev) => ({
+      ...prev,
+      location: { ...prev.location, [field]: value },
+    }));
+    setFormErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[field];
+      return newErrors;
+    });
+  };
+
+  // Image handling
+  const handleImageUpload = (files: FileList | null) => {
+    if (!files) return;
+    const fileArray = Array.from(files);
+    setImageFiles((prev) => [...prev, ...fileArray]);
+
+    fileArray.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreviews((prev) => [...prev, e.target?.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    setFormErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors.images;
+      return newErrors;
+    });
+  };
+
+  const removeImage = (index: number) => {
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Create FormData for API - REMOVED availability fields
+  const createFormData = (): FormData => {
+    const formData = new FormData();
+
+    // Append all fields
+    formData.append("name", propertyFormData.name);
+    formData.append("description", propertyFormData.description);
+    formData.append("university", propertyFormData.university);
+    formData.append("pricePerMonth", String(propertyFormData.pricePerMonth));
+    formData.append("bedrooms", String(propertyFormData.bedrooms));
+    formData.append("bathrooms", String(propertyFormData.bathrooms));
+    formData.append("maxGuests", String(propertyFormData.maxGuests));
+    formData.append("status", propertyFormData.status);
+
+    // Location
+    Object.entries(propertyFormData.location).forEach(([key, value]) => {
+      formData.append(`location[${key}]`, value);
+    });
+
+    // Host
+    Object.entries(propertyFormData.host).forEach(([key, value]) => {
+      formData.append(`host[${key}]`, String(value));
+    });
+
+    // Amenities
+    propertyFormData.amenities.forEach((amenity) => {
+      formData.append("amenities[]", amenity);
+    });
+
+    // Images
+    imageFiles.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    return formData;
+  };
+
+  // CRUD Operations
   const handleCreateProperty = async () => {
-    if (!hostProfile) return;
-
-    setSubmitting(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Calculate default dates
-      const today = new Date();
-      const oneYearLater = new Date(today);
-      oneYearLater.setFullYear(today.getFullYear() + 1);
-
-      const newProperty: Property = {
-        id: generateId(),
-        hostId: hostProfile.id,
-        name: propertyFormData.name,
-        description: propertyFormData.description,
-        images: propertyFormData.images.length > 0 ? propertyFormData.images : ['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop'],
-        address: {
-          district: propertyFormData.district,
-          sector: propertyFormData.sector,
-          cell: propertyFormData.cell,
-          village: propertyFormData.village,
-        },
-        university: propertyFormData.university,
-        type: propertyFormData.type,
-        bedrooms: propertyFormData.bedrooms,
-        bathrooms: propertyFormData.bathrooms,
-        maxGuests: propertyFormData.maxGuests,
-        pricePerNight: propertyFormData.pricePerNight,
-        priceRWF: propertyFormData.priceRWF,
-        amenities: propertyFormData.amenities,
-        availability: [
-          {
-            startDate: propertyFormData.availability.startDate || today.toISOString().split('T')[0],
-            endDate: propertyFormData.availability.endDate || oneYearLater.toISOString().split('T')[0],
-            isAvailable: propertyFormData.availability.isAvailable,
-          },
-        ],
-        status: propertyFormData.status,
-        views: 0,
-        bookings: 0,
-        rating: 0,
-        totalReviews: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
-      const updatedProperties = [newProperty, ...properties];
-      setProperties(updatedProperties);
-      saveHostData(hostProfile, updatedProperties);
-      toast.success(`✅ ${t.propertyCreated}`);
-      setIsCreateModalOpen(false);
-      resetPropertyForm();
-    } catch (error) {
-      console.error('Error creating property:', error);
-      toast.error(`❌ ${t.createFailed}`);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  // Handle update property
-  const handleUpdateProperty = async () => {
-    if (!selectedProperty || !hostProfile) return;
-
-    setSubmitting(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const updatedProperty: Property = {
-        ...selectedProperty,
-        name: propertyFormData.name,
-        description: propertyFormData.description,
-        university: propertyFormData.university,
-        type: propertyFormData.type,
-        bedrooms: propertyFormData.bedrooms,
-        bathrooms: propertyFormData.bathrooms,
-        maxGuests: propertyFormData.maxGuests,
-        pricePerNight: propertyFormData.pricePerNight,
-        priceRWF: propertyFormData.priceRWF,
-        address: {
-          district: propertyFormData.district,
-          sector: propertyFormData.sector,
-          cell: propertyFormData.cell,
-          village: propertyFormData.village,
-        },
-        amenities: propertyFormData.amenities,
-        images: propertyFormData.images.length > 0 ? propertyFormData.images : selectedProperty.images,
-        status: propertyFormData.status,
-        updatedAt: new Date().toISOString(),
-      };
-
-      const updatedProperties = properties.map((p) =>
-        p.id === selectedProperty.id ? updatedProperty : p
-      );
-      setProperties(updatedProperties);
-      saveHostData(hostProfile, updatedProperties);
-      toast.success(`✅ ${t.propertyUpdated}`);
-      setIsEditModalOpen(false);
-      setSelectedProperty(null);
-      resetPropertyForm();
-    } catch (error) {
-      console.error('Error updating property:', error);
-      toast.error(`❌ ${t.updateFailed}`);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  // Handle delete property
-  const handleDeleteProperty = async () => {
-    if (!selectedProperty || !hostProfile) return;
-
-    setSubmitting(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      const updatedProperties = properties.filter((p) => p.id !== selectedProperty.id);
-      setProperties(updatedProperties);
-      saveHostData(hostProfile, updatedProperties);
-      toast.success(`🗑️ ${t.propertyDeleted}`);
-      setIsDeleteModalOpen(false);
-      setSelectedProperty(null);
-    } catch (error) {
-      console.error('Error deleting property:', error);
-      toast.error(`❌ ${t.deleteFailed}`);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  // Handle status update
-  const handleStatusUpdate = async (propertyId: string, newStatus: Property['status']) => {
-    if (!isAdmin) {
-      toast.warning(t.permissions.adminOnly);
+    if (!validateForm()) {
+      toast.error("Please fix all validation errors");
       return;
     }
 
+    setSubmitting(true);
     try {
-      const updatedProperties = properties.map((p) =>
-        p.id === propertyId ? { ...p, status: newStatus, updatedAt: new Date().toISOString() } : p
-      );
-      setProperties(updatedProperties);
-      if (hostProfile) saveHostData(hostProfile, updatedProperties);
-      toast.success(`✅ Status updated to ${getStatusLabel(newStatus)}`);
+      const formData = createFormData();
+      const newHouse = await houseApi.createHouse(formData);
+      const houseWithImages = {
+        ...newHouse,
+        images: newHouse.images || [],
+      };
+      setHouses((prev) => [houseWithImages, ...prev]);
+      toast.success(`✅ ${t.propertyCreated}`);
+      setIsCreateModalOpen(false);
+      resetForm();
     } catch (error) {
-      console.error('Error updating status:', error);
-      toast.error('❌ Failed to update status');
+      console.error("Error creating property:", error);
+      const axiosError = error as AxiosError;
+      const errorMessage = axiosError.response?.data
+        ? typeof axiosError.response?.data === "string"
+          ? axiosError.response?.data
+          : JSON.stringify(axiosError.response?.data)
+        : t.createFailed;
+      toast.error(`❌ ${errorMessage}`);
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  // Reset property form
-  const resetPropertyForm = () => {
+  const handleUpdateProperty = async () => {
+    if (!selectedHouse) return;
+    if (!validateForm()) {
+      toast.error("Please fix all validation errors");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const formData = createFormData();
+      const updatedHouse = await houseApi.updateHouse(
+        selectedHouse._id!,
+        formData,
+      );
+      const houseWithImages = {
+        ...updatedHouse,
+        images: updatedHouse.images || [],
+      };
+      setHouses((prev) =>
+        prev.map((h) => (h._id === selectedHouse._id ? houseWithImages : h)),
+      );
+      toast.success(`✅ ${t.propertyUpdated}`);
+      setIsEditModalOpen(false);
+      setSelectedHouse(null);
+      resetForm();
+    } catch (error) {
+      console.error("Error updating property:", error);
+      const axiosError = error as AxiosError;
+      const errorMessage = axiosError.response?.data
+        ? typeof axiosError.response?.data === "string"
+          ? axiosError.response?.data
+          : JSON.stringify(axiosError.response?.data)
+        : t.updateFailed;
+      toast.error(`❌ ${errorMessage}`);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteProperty = async () => {
+    if (!selectedHouse) return;
+
+    setSubmitting(true);
+    try {
+      await houseApi.deleteHouse(selectedHouse._id!);
+      setHouses((prev) => prev.filter((h) => h._id !== selectedHouse._id));
+      toast.success(`🗑️ ${t.propertyDeleted}`);
+      setIsDeleteModalOpen(false);
+      setSelectedHouse(null);
+    } catch (error) {
+      console.error("Error deleting property:", error);
+      const axiosError = error as AxiosError;
+      toast.error(`❌ ${axiosError.response?.data || t.deleteFailed}`);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Reset form - REMOVED availability fields
+  const resetForm = () => {
     setPropertyFormData({
-      name: '',
-      description: '',
-      university: '',
-      type: 'apartment',
+      name: "",
+      description: "",
+      university: "",
+      location: {
+        province: "",
+        district: "",
+        sector: "",
+        cell: "",
+        village: "",
+      },
+      pricePerMonth: 0,
       bedrooms: 1,
       bathrooms: 1,
       maxGuests: 2,
-      pricePerNight: 0,
-      priceRWF: 0,
-      district: '',
-      sector: '',
-      cell: '',
-      village: '',
       amenities: [],
-      images: [],
-      status: 'active',
-      availability: {
-        startDate: '',
-        endDate: '',
-        isAvailable: true,
+      status: "pending",
+      host: {
+        name: userName || "",
+        email: userEmail || "",
+        phone: "",
+        responseRate: 0,
+        responseTime: "24 hours",
       },
     });
-    setAmenityInput('');
-    setImageInput('');
-  };
-
-  // Add amenity
-  const addAmenity = () => {
-    if (amenityInput.trim() && !propertyFormData.amenities.includes(amenityInput.trim())) {
-      setPropertyFormData({
-        ...propertyFormData,
-        amenities: [...propertyFormData.amenities, amenityInput.trim()],
-      });
-      setAmenityInput('');
-    }
-  };
-
-  // Remove amenity
-  const removeAmenity = (amenity: string) => {
-    setPropertyFormData({
-      ...propertyFormData,
-      amenities: propertyFormData.amenities.filter((a) => a !== amenity),
-    });
-  };
-
-  // Add image
-  const addImage = () => {
-    if (imageInput.trim() && !propertyFormData.images.includes(imageInput.trim())) {
-      setPropertyFormData({
-        ...propertyFormData,
-        images: [...propertyFormData.images, imageInput.trim()],
-      });
-      setImageInput('');
-    }
-  };
-
-  // Remove image
-  const removeImage = (image: string) => {
-    setPropertyFormData({
-      ...propertyFormData,
-      images: propertyFormData.images.filter((i) => i !== image),
-    });
+    setImageFiles([]);
+    setImagePreviews([]);
+    setAmenityInput("");
+    setFormErrors({});
+    setTouchedFields({});
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   // Open modals
-  const openProfileModal = () => {
-    if (hostProfile) {
-      setProfileFormData({
-        name: hostProfile.name,
-        email: hostProfile.email,
-        phone: hostProfile.phone,
-        bio: hostProfile.bio || '',
-        company: hostProfile.company || '',
-        language: hostProfile.preferences.language,
-        currency: hostProfile.preferences.currency,
-        emailNotifications: hostProfile.preferences.notifications.email,
-        smsNotifications: hostProfile.preferences.notifications.sms,
-        pushNotifications: hostProfile.preferences.notifications.push,
-        bankName: hostProfile.bankDetails?.bankName || '',
-        accountNumber: hostProfile.bankDetails?.accountNumber || '',
-        accountHolder: hostProfile.bankDetails?.accountHolder || '',
-      });
-    }
-    setIsProfileModalOpen(true);
-  };
-
-  const openViewModal = (property: Property) => {
-    setSelectedProperty(property);
+  const openViewModal = (house: House) => {
+    setSelectedHouse(house);
     setIsViewModalOpen(true);
   };
 
-  const openEditModal = (property: Property) => {
-    setSelectedProperty(property);
+  const openEditModal = (house: House) => {
+    setSelectedHouse(house);
     setPropertyFormData({
-      name: property.name,
-      description: property.description,
-      university: property.university,
-      type: property.type,
-      bedrooms: property.bedrooms,
-      bathrooms: property.bathrooms,
-      maxGuests: property.maxGuests,
-      pricePerNight: property.pricePerNight,
-      priceRWF: property.priceRWF,
-      district: property.address.district,
-      sector: property.address.sector,
-      cell: property.address.cell,
-      village: property.address.village,
-      amenities: property.amenities,
-      images: property.images,
-      status: property.status,
-      availability: property.availability[0] || {
-        startDate: '',
-        endDate: '',
-        isAvailable: true,
-      },
+      name: house.name,
+      description: house.description,
+      university: house.university,
+      location: house.location,
+      pricePerMonth: house.pricePerMonth,
+      bedrooms: house.bedrooms,
+      bathrooms: house.bathrooms,
+      maxGuests: house.maxGuests,
+      amenities: house.amenities || [],
+      status: house.status,
+      host: house.host,
     });
+    setImageFiles([]);
+    setImagePreviews(house.images ? house.images.map((img) => img.url) : []);
     setIsEditModalOpen(true);
   };
 
-  const openDeleteModal = (property: Property) => {
-    setSelectedProperty(property);
+  const openDeleteModal = (house: House) => {
+    setSelectedHouse(house);
     setIsDeleteModalOpen(true);
   };
 
   const openCreateModal = () => {
-    resetPropertyForm();
+    resetForm();
     setIsCreateModalOpen(true);
+  };
+
+  // Render input with validation
+  const renderInput = (
+    label: string,
+    field: string,
+    type: string = "text",
+    placeholder: string = "",
+    required: boolean = true,
+    value?: string | number,
+    onChange?: (
+      e: React.ChangeEvent<
+        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      >,
+    ) => void,
+  ) => {
+    const fieldName = field.includes(".") ? field.split(".")[1] : field;
+    const error = formErrors[fieldName];
+    const isTouched = touchedFields[fieldName];
+    const isValid = isTouched && !error;
+
+    return (
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        {type === "textarea" ? (
+          <textarea
+            value={(value as string) || ""}
+            onChange={onChange}
+            onBlur={() => handleFieldBlur(fieldName)}
+            rows={3}
+            className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all resize-none ${
+              hasError(fieldName)
+                ? "border-red-500 bg-red-50"
+                : isValid
+                  ? "border-green-500 bg-green-50"
+                  : "border-gray-300"
+            }`}
+            placeholder={placeholder}
+          />
+        ) : type === "select" ? (
+          <select
+            value={(value as string) || ""}
+            onChange={onChange}
+            onBlur={() => handleFieldBlur(fieldName)}
+            className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white transition-all ${
+              hasError(fieldName)
+                ? "border-red-500 bg-red-50"
+                : isValid
+                  ? "border-green-500 bg-green-50"
+                  : "border-gray-300"
+            }`}
+          >
+            {placeholder && <option value="">{placeholder}</option>}
+            {onChange && (onChange as any).options}
+          </select>
+        ) : (
+          <input
+            type={type}
+            value={(value as string) || ""}
+            onChange={onChange}
+            onBlur={() => handleFieldBlur(fieldName)}
+            className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
+              hasError(fieldName)
+                ? "border-red-500 bg-red-50"
+                : isValid
+                  ? "border-green-500 bg-green-50"
+                  : "border-gray-300"
+            }`}
+            placeholder={placeholder}
+            min={type === "number" ? 0 : undefined}
+          />
+        )}
+        {hasError(fieldName) && (
+          <p className="mt-1 text-sm text-red-500">{error}</p>
+        )}
+        {isValid && (
+          <p className="mt-1 text-sm text-green-500 flex items-center gap-1">
+            <Icons.Check /> Valid
+          </p>
+        )}
+      </div>
+    );
   };
 
   // Modal variants
   const modalVariants = {
-    hidden: { opacity: 0, scale: 0.8, y: 30 },
+    hidden: { opacity: 0, scale: 0.9, y: 20 },
     visible: { opacity: 1, scale: 1, y: 0 },
-    exit: { opacity: 0, scale: 0.8, y: 30 },
+    exit: { opacity: 0, scale: 0.9, y: 20 },
   };
 
   const overlayVariants = {
@@ -1217,585 +1397,253 @@ export const HostManagement: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
-        <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-16 h-16 border-4 border-[#FF385C] border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
+  // Use optional chaining to safely access selectedHouse.images.length
+  const isFormValid =
+    Object.keys(formErrors).length === 0 &&
+    (imageFiles.length > 0 ||
+      (selectedHouse &&
+        selectedHouse.images &&
+        selectedHouse.images.length > 0)) &&
+    propertyFormData.name.trim().length >= 3 &&
+    propertyFormData.description.trim().length >= 20;
+
   return (
-    <div className="p-4 sm:p-6 md:p-8 bg-gray-50 min-h-screen">
+    <div className="p-4 sm:p-6 md:p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
       {/* Header */}
-      <div className="mb-6">
+      <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
-              <svg className="w-7 h-7 text-[#FF385C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 flex items-center gap-3">
+              <span className="p-2 bg-[#FF385C]/10 rounded-2xl">
+                <Icons.Home />
+              </span>
               {t.hostManagement}
             </h1>
-            <p className="text-sm text-gray-500 mt-1">{t.manageHostProfile}</p>
+            <p className="text-sm text-gray-500 mt-1 ml-2">
+              {t.manageHostProfile}
+            </p>
           </div>
-          <div className="flex items-center gap-2">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={openProfileModal}
-              className="px-4 py-2 bg-[#FF385C] text-white rounded-lg text-sm font-medium hover:bg-[#E31C5F] transition-colors flex items-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              {t.editProfile}
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={openCreateModal}
-              className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition-colors flex items-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-              </svg>
-              {t.addProperty}
-            </motion.button>
-          </div>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={openCreateModal}
+            className="px-6 py-3 bg-gradient-to-r from-[#FF385C] to-[#E31C5F] text-white rounded-xl font-medium hover:shadow-lg transition-all flex items-center gap-2"
+          >
+            <Icons.Plus />
+            {t.addProperty}
+          </motion.button>
         </div>
       </div>
 
-      {/* Profile Summary */}
-      {hostProfile && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-[#FF385C] text-white flex items-center justify-center text-2xl font-bold flex-shrink-0">
-              {hostProfile.name.charAt(0).toUpperCase()}
-            </div>
-            <div className="flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-xl font-bold text-gray-900">{hostProfile.name}</h2>
-                {hostProfile.verified && (
-                  <span className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-                    {t.verified}
-                  </span>
-                )}
-                <span className={`px-2 py-0.5 ${getStatusColor(hostProfile.role === 'admin' ? 'active' : 'pending')} rounded-full text-xs font-medium`}>
-                  {hostProfile.role}
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-3 mt-1 text-sm text-gray-600">
-                <span>{hostProfile.email}</span>
-                <span>•</span>
-                <span>{hostProfile.phone}</span>
-                <span>•</span>
-                <span>{t.memberSince} {formatDate(hostProfile.joinedDate)}</span>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-4 text-sm">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-gray-900">{hostProfile.rating.toFixed(1)}</p>
-                <p className="text-xs text-gray-500">{t.rating}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-gray-900">{hostProfile.totalReviews}</p>
-                <p className="text-xs text-gray-500">{t.totalReviews}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-gray-900">{hostProfile.responseRate}%</p>
-                <p className="text-xs text-gray-500">{t.responseRate}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-gray-900">{hostProfile.responseTime}</p>
-                <p className="text-xs text-gray-500">{t.responseTime}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
-        <motion.div whileHover={{ y: -2 }} className="bg-white rounded-xl p-3 shadow-sm border border-gray-200">
-          <p className="text-xs text-gray-500">{t.totalProperties}</p>
-          <p className="text-xl font-bold text-gray-900">{stats.total}</p>
-        </motion.div>
-        <motion.div whileHover={{ y: -2 }} className="bg-green-50 rounded-xl p-3 shadow-sm border border-green-200">
-          <p className="text-xs text-green-600">{t.activeProperties}</p>
-          <p className="text-xl font-bold text-green-700">{stats.active}</p>
-        </motion.div>
-        <motion.div whileHover={{ y: -2 }} className="bg-yellow-50 rounded-xl p-3 shadow-sm border border-yellow-200">
-          <p className="text-xs text-yellow-600">{t.pendingProperties}</p>
-          <p className="text-xl font-bold text-yellow-700">{stats.pending}</p>
-        </motion.div>
-        <motion.div whileHover={{ y: -2 }} className="bg-gray-50 rounded-xl p-3 shadow-sm border border-gray-200">
-          <p className="text-xs text-gray-500">{t.inactiveProperties}</p>
-          <p className="text-xl font-bold text-gray-900">{stats.inactive}</p>
-        </motion.div>
-        <motion.div whileHover={{ y: -2 }} className="bg-blue-50 rounded-xl p-3 shadow-sm border border-blue-200">
-          <p className="text-xs text-blue-600">{t.totalViews}</p>
-          <p className="text-xl font-bold text-blue-700">{stats.totalViews}</p>
-        </motion.div>
-        <motion.div whileHover={{ y: -2 }} className="bg-purple-50 rounded-xl p-3 shadow-sm border border-purple-200">
-          <p className="text-xs text-purple-600">{t.totalBookings}</p>
-          <p className="text-xl font-bold text-purple-700">{stats.totalBookings}</p>
-        </motion.div>
-        <motion.div whileHover={{ y: -2 }} className="bg-orange-50 rounded-xl p-3 shadow-sm border border-orange-200">
-          <p className="text-xs text-orange-600">{t.rating}</p>
-          <p className="text-xl font-bold text-orange-700">{stats.averageRating.toFixed(1)}</p>
-        </motion.div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 mb-8">
+        {[
+          {
+            label: t.totalProperties,
+            value: stats.total,
+            color: "bg-gradient-to-br from-blue-500 to-blue-600",
+          },
+          {
+            label: t.availableProperties,
+            value: stats.available,
+            color: "bg-gradient-to-br from-green-500 to-green-600",
+          },
+          {
+            label: t.pendingProperties,
+            value: stats.pending,
+            color: "bg-gradient-to-br from-yellow-500 to-yellow-600",
+          },
+          {
+            label: t.unavailableProperties,
+            value: stats.unavailable,
+            color: "bg-gradient-to-br from-gray-500 to-gray-600",
+          },
+          {
+            label: t.maintenanceProperties,
+            value: stats.maintenance,
+            color: "bg-gradient-to-br from-red-500 to-red-600",
+          },
+          {
+            label: t.totalReviews,
+            value: stats.totalReviews,
+            color: "bg-gradient-to-br from-purple-500 to-purple-600",
+          },
+          {
+            label: t.rating,
+            value: stats.averageRating.toFixed(1),
+            color: "bg-gradient-to-br from-orange-500 to-orange-600",
+          },
+        ].map((stat, index) => (
+          <motion.div
+            key={index}
+            whileHover={{ y: -2, scale: 1.02 }}
+            className={`${stat.color} rounded-xl p-3 shadow-lg text-white`}
+          >
+            <p className="text-xs opacity-90">{stat.label}</p>
+            <p className="text-2xl font-bold">{stat.value}</p>
+          </motion.div>
+        ))}
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 mb-6">
+      <div className="bg-white rounded-2xl p-4 shadow-lg border border-gray-100 mb-6">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
-            <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <Icons.Search />
+            </span>
             <input
               type="text"
               placeholder={t.searchProperties}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
             />
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex gap-2">
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
+              className="px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
             >
               <option value="all">{t.allStatus}</option>
-              <option value="active">{t.active}</option>
+              <option value="available">{t.available}</option>
               <option value="pending">{t.pending}</option>
-              <option value="inactive">{t.inactive}</option>
-              <option value="suspended">{t.suspended}</option>
-            </select>
-            <select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
-            >
-              <option value="all">{t.allTypes}</option>
-              <option value="apartment">{t.apartment}</option>
-              <option value="house">{t.house}</option>
-              <option value="studio">{t.studio}</option>
-              <option value="room">{t.room}</option>
-              <option value="villa">{t.villa}</option>
+              <option value="unavailable">{t.unavailable}</option>
+              <option value="maintenance">{t.maintenance}</option>
             </select>
             <button
               onClick={() => {
-                setSearchTerm('');
-                setFilterStatus('all');
-                setFilterType('all');
+                setSearchTerm("");
+                setFilterStatus("all");
               }}
-              className="px-3 py-2 text-gray-600 hover:text-gray-900 transition-colors"
+              className="px-4 py-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <Icons.Filter />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Properties Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t.property}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                  {t.type}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                  {t.location}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t.status}
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                  {t.price}
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t.actions}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredProperties.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-                    <svg className="w-12 h-12 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                    <p>{t.noProperties}</p>
-                    <p className="text-sm">{t.adjustFilters}</p>
-                  </td>
-                </tr>
-              ) : (
-                filteredProperties.map((property) => (
-                  <motion.tr
-                    key={property.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="hover:bg-gray-50 transition-colors cursor-pointer"
-                    onClick={() => openViewModal(property)}
-                  >
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={property.images[0] || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop'}
-                          alt={property.name}
-                          className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
-                        />
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">
-                            {property.name}
-                          </p>
-                          <p className="text-xs text-gray-500 truncate">
-                            {property.university}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 hidden md:table-cell">
-                      <span className="px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full text-xs">
-                        {getTypeLabel(property.type)}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 hidden lg:table-cell">
-                      <p className="text-sm text-gray-600">{property.address.village}</p>
-                      <p className="text-xs text-gray-400">{property.address.district}</p>
-                    </td>
-                    <td className="px-4 py-3">
-                      {isAdmin ? (
-                        <div className="flex items-center gap-2">
-                          <span className={`px-2 py-0.5 text-xs rounded-full ${getStatusColor(property.status)}`}>
-                            {getStatusLabel(property.status)}
-                          </span>
-                          <select
-                            value={property.status}
-                            onChange={(e) => handleStatusUpdate(property.id, e.target.value as Property['status'])}
-                            className="px-2 py-1 text-xs border rounded-lg focus:ring-2 focus:ring-[#FF385C] outline-none"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <option value="active">{t.active}</option>
-                            <option value="pending">{t.pending}</option>
-                            <option value="inactive">{t.inactive}</option>
-                            <option value="suspended">{t.suspended}</option>
-                          </select>
-                        </div>
-                      ) : (
-                        <span className={`px-2 py-0.5 text-xs rounded-full ${getStatusColor(property.status)}`}>
-                          {getStatusLabel(property.status)}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 hidden lg:table-cell">
-                      <p className="text-sm font-medium text-gray-900">
-                        {formatCurrency(property.priceRWF)}
-                      </p>
-                      <p className="text-xs text-gray-400">per night</p>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-center gap-1">
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openViewModal(property);
-                          }}
-                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          title={t.viewProperty}
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
-                        </motion.button>
-                        {canEditProperty(property) && (
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openEditModal(property);
-                            }}
-                            className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                            title={t.editProperty}
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                            </svg>
-                          </motion.button>
-                        )}
-                        {canDeleteProperty(property) && (
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openDeleteModal(property);
-                            }}
-                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title={t.deleteProperty}
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </motion.button>
-                        )}
-                        {!canEditProperty(property) && !canDeleteProperty(property) && !isAdmin && (
-                          <span className="text-xs text-gray-400">View only</span>
-                        )}
-                      </div>
-                    </td>
-                  </motion.tr>
-                ))
-              )}
-            </tbody>
-          </table>
+      {/* Properties Grid */}
+      {filteredHouses.length === 0 ? (
+        <div className="bg-white rounded-2xl p-12 text-center shadow-lg border border-gray-100">
+          <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <Icons.Home />
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            {t.noProperties}
+          </h3>
+          <p className="text-gray-500">{t.adjustFilters}</p>
+          <button
+            onClick={openCreateModal}
+            className="mt-4 px-6 py-2.5 bg-[#FF385C] text-white rounded-xl hover:bg-[#E31C5F] transition-all"
+          >
+            {t.addProperty}
+          </button>
         </div>
-        <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
-          <p className="text-sm text-gray-500">
-            {t.showing} {filteredProperties.length} {t.of} {properties.length} {t.propertiesCount}
-          </p>
-        </div>
-      </div>
-
-      {/* Edit Profile Modal */}
-      <AnimatePresence>
-        {isProfileModalOpen && hostProfile && (
-          <>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredHouses.map((house) => (
             <motion.div
-              variants={overlayVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-              onClick={() => setIsProfileModalOpen(false)}
-            />
-            <motion.div
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 z-[101] flex items-center justify-center p-4"
+              key={house._id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -4 }}
+              className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all"
             >
-              <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white relative">
-                <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl z-10">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-[#FF385C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    <h2 className="text-xl font-semibold text-gray-900">{t.editProfile}</h2>
-                  </div>
-                  <motion.button
-                    whileHover={{ rotate: 90, scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setIsProfileModalOpen(false)}
-                    className="p-1.5 rounded-full transition-colors hover:bg-gray-100 text-gray-500"
+              <div className="relative h-48 overflow-hidden">
+                <img
+                  src={
+                    house.images && house.images.length > 0
+                      ? house.images[0].url
+                      : "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop"
+                  }
+                  alt={house.name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-3 right-3">
+                  <span
+                    className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(house.status)}`}
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </motion.button>
+                    {getStatusLabel(house.status)}
+                  </span>
                 </div>
-
-                <div className="p-6 space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.name} *</label>
-                      <input
-                        type="text"
-                        value={profileFormData.name}
-                        onChange={(e) => setProfileFormData({ ...profileFormData, name: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.email} *</label>
-                      <input
-                        type="email"
-                        value={profileFormData.email}
-                        onChange={(e) => setProfileFormData({ ...profileFormData, email: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      />
-                    </div>
+                {house.rating > 0 && (
+                  <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-sm text-white px-2.5 py-1 rounded-lg text-sm flex items-center gap-1">
+                    ⭐ {house.rating.toFixed(1)}
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.phone} *</label>
-                      <input
-                        type="text"
-                        value={profileFormData.phone}
-                        onChange={(e) => setProfileFormData({ ...profileFormData, phone: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.company}</label>
-                      <input
-                        type="text"
-                        value={profileFormData.company}
-                        onChange={(e) => setProfileFormData({ ...profileFormData, company: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      />
-                    </div>
-                  </div>
-
+                )}
+              </div>
+              <div className="p-4">
+                <h3 className="text-lg font-semibold text-gray-900 truncate">
+                  {house.name}
+                </h3>
+                <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                  <Icons.Location />
+                  {house.location.village}, {house.location.district}
+                </p>
+                <div className="flex items-center gap-2 mt-2 text-sm">
+                  <span className="flex items-center gap-1 text-gray-600">
+                    <Icons.Bed /> {house.bedrooms}
+                  </span>
+                  <span className="text-gray-300">|</span>
+                  <span className="flex items-center gap-1 text-gray-600">
+                    <Icons.Bath /> {house.bathrooms}
+                  </span>
+                  <span className="text-gray-300">|</span>
+                  <span className="flex items-center gap-1 text-gray-600">
+                    <Icons.User /> {house.maxGuests}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.bio}</label>
-                    <textarea
-                      value={profileFormData.bio}
-                      onChange={(e) => setProfileFormData({ ...profileFormData, bio: e.target.value })}
-                      rows={3}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm resize-none"
-                    />
+                    <p className="text-sm font-bold text-[#FF385C]">
+                      {formatCurrency(house.pricePerMonth)}
+                    </p>
+                    <p className="text-xs text-gray-500">per month</p>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.language}</label>
-                      <select
-                        value={profileFormData.language}
-                        onChange={(e) => setProfileFormData({ ...profileFormData, language: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
-                      >
-                        <option value="en">English</option>
-                        <option value="fr">Français</option>
-                        <option value="rw">Kinyarwanda</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.currency}</label>
-                      <select
-                        value={profileFormData.currency}
-                        onChange={(e) => setProfileFormData({ ...profileFormData, currency: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
-                      >
-                        <option value="RWF">RWF</option>
-                        <option value="USD">USD</option>
-                        <option value="EUR">EUR</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="border-t border-gray-200 pt-4">
-                    <h3 className="text-sm font-medium text-gray-900 mb-3">{t.notifications}</h3>
-                    <div className="space-y-2">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={profileFormData.emailNotifications}
-                          onChange={(e) => setProfileFormData({ ...profileFormData, emailNotifications: e.target.checked })}
-                          className="rounded border-gray-300 text-[#FF385C] focus:ring-[#FF385C]"
-                        />
-                        <span className="text-sm text-gray-700">{t.emailNotifications}</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={profileFormData.smsNotifications}
-                          onChange={(e) => setProfileFormData({ ...profileFormData, smsNotifications: e.target.checked })}
-                          className="rounded border-gray-300 text-[#FF385C] focus:ring-[#FF385C]"
-                        />
-                        <span className="text-sm text-gray-700">{t.smsNotifications}</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={profileFormData.pushNotifications}
-                          onChange={(e) => setProfileFormData({ ...profileFormData, pushNotifications: e.target.checked })}
-                          className="rounded border-gray-300 text-[#FF385C] focus:ring-[#FF385C]"
-                        />
-                        <span className="text-sm text-gray-700">{t.pushNotifications}</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="border-t border-gray-200 pt-4">
-                    <h3 className="text-sm font-medium text-gray-900 mb-3">{t.bankName}</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.bankName}</label>
-                        <input
-                          type="text"
-                          value={profileFormData.bankName}
-                          onChange={(e) => setProfileFormData({ ...profileFormData, bankName: e.target.value })}
-                          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.accountNumber}</label>
-                        <input
-                          type="text"
-                          value={profileFormData.accountNumber}
-                          onChange={(e) => setProfileFormData({ ...profileFormData, accountNumber: e.target.value })}
-                          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                        />
-                      </div>
-                    </div>
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.accountHolder}</label>
-                      <input
-                        type="text"
-                        value={profileFormData.accountHolder}
-                        onChange={(e) => setProfileFormData({ ...profileFormData, accountHolder: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 pt-4 border-t border-gray-200">
+                  <div className="flex gap-1">
                     <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleUpdateProfile}
-                      disabled={submitting}
-                      className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors flex items-center justify-center gap-2 ${
-                        submitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#FF385C] hover:bg-[#E31C5F]'
-                      }`}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => openViewModal(house)}
+                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
                     >
-                      {submitting ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          {t.saving}
-                        </>
-                      ) : (
-                        <>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                          </svg>
-                          {t.save}
-                        </>
-                      )}
+                      <Icons.View />
                     </motion.button>
                     <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => setIsProfileModalOpen(false)}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => openEditModal(house)}
+                      className="p-2 text-green-600 hover:bg-green-50 rounded-xl transition-all"
                     >
-                      {t.cancel}
+                      <Icons.Edit />
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => openDeleteModal(house)}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                    >
+                      <Icons.Delete />
                     </motion.button>
                   </div>
                 </div>
               </div>
             </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+          ))}
+        </div>
+      )}
 
       {/* View Property Modal */}
       <AnimatePresence>
-        {isViewModalOpen && selectedProperty && (
+        {isViewModalOpen && selectedHouse && (
           <>
             <motion.div
               variants={overlayVariants}
@@ -1813,154 +1661,154 @@ export const HostManagement: React.FC = () => {
               className="fixed inset-0 z-[101] flex items-center justify-center p-4"
             >
               <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white relative">
-                <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl z-10">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-[#FF385C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                    <h2 className="text-xl font-semibold text-gray-900">{t.propertyDetails}</h2>
-                  </div>
+                <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl">
+                  <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                    <Icons.Home />
+                    {t.propertyDetails}
+                  </h2>
                   <motion.button
-                    whileHover={{ rotate: 90, scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    whileHover={{ rotate: 90 }}
                     onClick={() => setIsViewModalOpen(false)}
-                    className="p-1.5 rounded-full transition-colors hover:bg-gray-100 text-gray-500"
+                    className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <Icons.Close />
                   </motion.button>
                 </div>
-
                 <div className="p-6 space-y-4">
-                  {/* Images */}
-                  <div className="grid grid-cols-2 gap-2">
-                    {selectedProperty.images.map((img, index) => (
-                      <img
-                        key={index}
-                        src={img}
-                        alt={`${selectedProperty.name} ${index + 1}`}
-                        className={`rounded-lg object-cover h-48 ${index === 0 ? 'col-span-2' : ''}`}
-                      />
-                    ))}
-                  </div>
-
-                  <h3 className="text-2xl font-bold text-gray-900">{selectedProperty.name}</h3>
-
+                  {selectedHouse.images && selectedHouse.images.length > 0 ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      {selectedHouse.images.map((img, index) => (
+                        <img
+                          key={index}
+                          src={img.url}
+                          alt={selectedHouse.name}
+                          className={`rounded-xl object-cover h-48 ${index === 0 ? "col-span-2" : ""}`}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="bg-gray-100 rounded-xl h-48 flex items-center justify-center">
+                      <p className="text-gray-500">No images available</p>
+                    </div>
+                  )}
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    {selectedHouse.name}
+                  </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.type}</label>
-                      <p className="text-sm font-medium text-gray-900 mt-1">{getTypeLabel(selectedProperty.type)}</p>
+                      <p className="text-sm font-medium text-gray-500">
+                        {t.status}
+                      </p>
+                      <span
+                        className={`px-2.5 py-1 text-sm font-medium rounded-full ${getStatusColor(selectedHouse.status)}`}
+                      >
+                        {getStatusLabel(selectedHouse.status)}
+                      </span>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.status}</label>
-                      <p className="mt-1">
-                        <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(selectedProperty.status)}`}>
-                          {getStatusLabel(selectedProperty.status)}
-                        </span>
+                      <p className="text-sm font-medium text-gray-500">
+                        {t.pricePerMonth}
+                      </p>
+                      <p className="text-lg font-bold text-[#FF385C]">
+                        {formatCurrency(selectedHouse.pricePerMonth)}
                       </p>
                     </div>
                   </div>
-
                   <div>
-                    <label className="text-xs font-medium text-gray-500">{t.description}</label>
-                    <p className="text-sm text-gray-700 mt-1">{selectedProperty.description}</p>
+                    <p className="text-sm font-medium text-gray-500">
+                      {t.description}
+                    </p>
+                    <p className="text-sm text-gray-700 mt-1">
+                      {selectedHouse.description}
+                    </p>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.bedrooms}</label>
-                      <p className="text-sm font-medium text-gray-900 mt-1">{selectedProperty.bedrooms}</p>
+                      <p className="text-sm font-medium text-gray-500">
+                        {t.bedrooms}
+                      </p>
+                      <p className="text-lg font-semibold">
+                        {selectedHouse.bedrooms}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.bathrooms}</label>
-                      <p className="text-sm font-medium text-gray-900 mt-1">{selectedProperty.bathrooms}</p>
+                      <p className="text-sm font-medium text-gray-500">
+                        {t.bathrooms}
+                      </p>
+                      <p className="text-lg font-semibold">
+                        {selectedHouse.bathrooms}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.maxGuests}</label>
-                      <p className="text-sm font-medium text-gray-900 mt-1">{selectedProperty.maxGuests}</p>
+                      <p className="text-sm font-medium text-gray-500">
+                        {t.maxGuests}
+                      </p>
+                      <p className="text-lg font-semibold">
+                        {selectedHouse.maxGuests}
+                      </p>
                     </div>
                   </div>
-
                   <div>
-                    <label className="text-xs font-medium text-gray-500">{t.location}</label>
-                    <div className="mt-1 space-y-1 text-sm text-gray-700">
-                      <p>{t.district}: {selectedProperty.address.district}</p>
-                      <p>{t.sector}: {selectedProperty.address.sector}</p>
-                      <p>{t.cell}: {selectedProperty.address.cell}</p>
-                      <p>{t.village}: {selectedProperty.address.village}</p>
-                    </div>
+                    <p className="text-sm font-medium text-gray-500">
+                      {t.location}
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      {selectedHouse.location.village},{" "}
+                      {selectedHouse.location.sector},<br />
+                      {selectedHouse.location.district},{" "}
+                      {selectedHouse.location.province}
+                    </p>
                   </div>
-
                   <div>
-                    <label className="text-xs font-medium text-gray-500">{t.university}</label>
-                    <p className="text-sm font-medium text-gray-900 mt-1">{selectedProperty.university}</p>
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-medium text-gray-500">{t.amenities}</label>
-                    <div className="mt-1 flex flex-wrap gap-1">
-                      {selectedProperty.amenities.map((amenity) => (
-                        <span key={amenity} className="px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full text-xs">
-                          {amenity}
+                    <p className="text-sm font-medium text-gray-500">
+                      {t.amenities}
+                    </p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {selectedHouse.amenities &&
+                      selectedHouse.amenities.length > 0 ? (
+                        selectedHouse.amenities.map((amenity) => (
+                          <span
+                            key={amenity}
+                            className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
+                          >
+                            {amenity}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-sm text-gray-400">
+                          No amenities
                         </span>
-                      ))}
+                      )}
                     </div>
                   </div>
-
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-xs text-gray-500">{t.pricePerNight}</label>
-                        <p className="text-sm font-semibold text-gray-900">{formatCurrency(selectedProperty.priceRWF)}</p>
-                      </div>
-                      <div>
-                        <label className="text-xs text-gray-500">Stats</label>
-                        <p className="text-sm font-medium text-gray-900">
-                          {selectedProperty.views} views • {selectedProperty.bookings} bookings
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
-                    {canEditProperty(selectedProperty) && (
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-                          setIsViewModalOpen(false);
-                          openEditModal(selectedProperty);
-                        }}
-                        className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                        {t.editProperty}
-                      </motion.button>
-                    )}
-                    {canDeleteProperty(selectedProperty) && (
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-                          setIsViewModalOpen(false);
-                          openDeleteModal(selectedProperty);
-                        }}
-                        className="px-4 py-2.5 border border-red-300 text-red-600 rounded-lg font-medium hover:bg-red-50 transition-colors flex items-center gap-2"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                        {t.delete}
-                      </motion.button>
-                    )}
+                  <div className="flex gap-3 pt-4 border-t border-gray-200">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        setIsViewModalOpen(false);
+                        openEditModal(selectedHouse);
+                      }}
+                      className="px-4 py-2.5 bg-[#FF385C] text-white rounded-xl hover:bg-[#E31C5F] transition-colors flex items-center gap-2"
+                    >
+                      <Icons.Edit /> {t.editProperty}
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        setIsViewModalOpen(false);
+                        openDeleteModal(selectedHouse);
+                      }}
+                      className="px-4 py-2.5 border border-red-300 text-red-600 rounded-xl hover:bg-red-50 transition-colors flex items-center gap-2"
+                    >
+                      <Icons.Delete /> {t.delete}
+                    </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setIsViewModalOpen(false)}
-                      className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors ml-auto"
+                      className="px-4 py-2.5 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors ml-auto"
                     >
                       {t.close}
                     </motion.button>
@@ -1972,363 +1820,9 @@ export const HostManagement: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Edit Property Modal */}
+      {/* Create/Edit Property Modal */}
       <AnimatePresence>
-        {isEditModalOpen && selectedProperty && (
-          <>
-            <motion.div
-              variants={overlayVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-              onClick={() => {
-                setIsEditModalOpen(false);
-                setSelectedProperty(null);
-                resetPropertyForm();
-              }}
-            />
-            <motion.div
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-            >
-              <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white relative">
-                <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl z-10">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-[#FF385C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                    </svg>
-                    <h2 className="text-xl font-semibold text-gray-900">{t.editProperty}</h2>
-                  </div>
-                  <motion.button
-                    whileHover={{ rotate: 90, scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => {
-                      setIsEditModalOpen(false);
-                      setSelectedProperty(null);
-                      resetPropertyForm();
-                    }}
-                    className="p-1.5 rounded-full transition-colors hover:bg-gray-100 text-gray-500"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </motion.button>
-                </div>
-
-                <div className="p-6 space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.propertyName} *</label>
-                    <input
-                      type="text"
-                      value={propertyFormData.name}
-                      onChange={(e) => setPropertyFormData({ ...propertyFormData, name: e.target.value })}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      placeholder={t.enterName}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.description} *</label>
-                    <textarea
-                      value={propertyFormData.description}
-                      onChange={(e) => setPropertyFormData({ ...propertyFormData, description: e.target.value })}
-                      rows={3}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm resize-none"
-                      placeholder={t.enterDescription}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.university} *</label>
-                      <input
-                        type="text"
-                        value={propertyFormData.university}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, university: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.type} *</label>
-                      <select
-                        value={propertyFormData.type}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, type: e.target.value as Property['type'] })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
-                      >
-                        <option value="apartment">{t.apartment}</option>
-                        <option value="house">{t.house}</option>
-                        <option value="studio">{t.studio}</option>
-                        <option value="room">{t.room}</option>
-                        <option value="villa">{t.villa}</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.bedrooms} *</label>
-                      <input
-                        type="number"
-                        value={propertyFormData.bedrooms}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, bedrooms: parseInt(e.target.value) || 0 })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                        min="1"
-                        placeholder={t.enterBedrooms}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.bathrooms} *</label>
-                      <input
-                        type="number"
-                        value={propertyFormData.bathrooms}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, bathrooms: parseInt(e.target.value) || 0 })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                        min="1"
-                        placeholder={t.enterBathrooms}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.maxGuests} *</label>
-                      <input
-                        type="number"
-                        value={propertyFormData.maxGuests}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, maxGuests: parseInt(e.target.value) || 0 })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                        min="1"
-                        placeholder={t.enterMaxGuests}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.pricePerNight} (USD) *</label>
-                      <input
-                        type="number"
-                        value={propertyFormData.pricePerNight}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, pricePerNight: parseInt(e.target.value) || 0 })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                        min="0"
-                        placeholder={t.enterPrice}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.pricePerNight} (RWF) *</label>
-                      <input
-                        type="number"
-                        value={propertyFormData.priceRWF}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, priceRWF: parseInt(e.target.value) || 0 })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                        min="0"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.district} *</label>
-                      <input
-                        type="text"
-                        value={propertyFormData.district}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, district: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.sector} *</label>
-                      <input
-                        type="text"
-                        value={propertyFormData.sector}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, sector: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.cell} *</label>
-                      <input
-                        type="text"
-                        value={propertyFormData.cell}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, cell: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.village} *</label>
-                      <input
-                        type="text"
-                        value={propertyFormData.village}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, village: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.amenities}</label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={amenityInput}
-                        onChange={(e) => setAmenityInput(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && addAmenity()}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                        placeholder="Add amenity..."
-                      />
-                      <button
-                        onClick={addAmenity}
-                        className="px-3 py-2 bg-[#FF385C] text-white rounded-lg hover:bg-[#E31C5F] transition-colors"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                      </button>
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {propertyFormData.amenities.map((amenity) => (
-                        <span key={amenity} className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs flex items-center gap-1">
-                          {amenity}
-                          <button onClick={() => removeAmenity(amenity)} className="hover:text-red-500">
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.images}</label>
-                    <div className="flex gap-2">
-                      <input
-                        type="url"
-                        value={imageInput}
-                        onChange={(e) => setImageInput(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && addImage()}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                        placeholder="Enter image URL..."
-                      />
-                      <button
-                        onClick={addImage}
-                        className="px-3 py-2 bg-[#FF385C] text-white rounded-lg hover:bg-[#E31C5F] transition-colors"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                      </button>
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {propertyFormData.images.map((image) => (
-                        <div key={image} className="relative">
-                          <img src={image} alt="Property" className="w-16 h-16 object-cover rounded-lg" />
-                          <button
-                            onClick={() => removeImage(image)}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5"
-                          >
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.status}</label>
-                    <select
-                      value={propertyFormData.status}
-                      onChange={(e) => setPropertyFormData({ ...propertyFormData, status: e.target.value as Property['status'] })}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
-                    >
-                      <option value="active">{t.active}</option>
-                      <option value="pending">{t.pending}</option>
-                      <option value="inactive">{t.inactive}</option>
-                      <option value="suspended">{t.suspended}</option>
-                    </select>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.startDate}</label>
-                      <input
-                        type="date"
-                        value={propertyFormData.availability.startDate}
-                        onChange={(e) => setPropertyFormData({
-                          ...propertyFormData,
-                          availability: { ...propertyFormData.availability, startDate: e.target.value }
-                        })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.endDate}</label>
-                      <input
-                        type="date"
-                        value={propertyFormData.availability.endDate}
-                        onChange={(e) => setPropertyFormData({
-                          ...propertyFormData,
-                          availability: { ...propertyFormData.availability, endDate: e.target.value }
-                        })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 pt-4 border-t border-gray-200">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleUpdateProperty}
-                      disabled={submitting}
-                      className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors flex items-center justify-center gap-2 ${
-                        submitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#FF385C] hover:bg-[#E31C5F]'
-                      }`}
-                    >
-                      {submitting ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          {t.saving}
-                        </>
-                      ) : (
-                        <>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                          </svg>
-                          {t.update}
-                        </>
-                      )}
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => {
-                        setIsEditModalOpen(false);
-                        setSelectedProperty(null);
-                        resetPropertyForm();
-                      }}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-                    >
-                      {t.cancel}
-                    </motion.button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Create Property Modal */}
-      <AnimatePresence>
-        {isCreateModalOpen && (
+        {(isCreateModalOpen || isEditModalOpen) && (
           <>
             <motion.div
               variants={overlayVariants}
@@ -2338,7 +1832,8 @@ export const HostManagement: React.FC = () => {
               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
               onClick={() => {
                 setIsCreateModalOpen(false);
-                resetPropertyForm();
+                setIsEditModalOpen(false);
+                resetForm();
               }}
             />
             <motion.div
@@ -2348,207 +1843,452 @@ export const HostManagement: React.FC = () => {
               exit="exit"
               className="fixed inset-0 z-[101] flex items-center justify-center p-4"
             >
-              <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white relative">
-                <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl z-10">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-[#FF385C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    <h2 className="text-xl font-semibold text-gray-900">{t.addProperty}</h2>
-                  </div>
+              <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white relative">
+                <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl">
+                  <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                    {isEditModalOpen ? <Icons.Edit /> : <Icons.Plus />}
+                    {isEditModalOpen ? t.editProperty : t.addProperty}
+                  </h2>
                   <motion.button
-                    whileHover={{ rotate: 90, scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    whileHover={{ rotate: 90 }}
                     onClick={() => {
                       setIsCreateModalOpen(false);
-                      resetPropertyForm();
+                      setIsEditModalOpen(false);
+                      resetForm();
                     }}
-                    className="p-1.5 rounded-full transition-colors hover:bg-gray-100 text-gray-500"
+                    className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <Icons.Close />
                   </motion.button>
                 </div>
-
                 <div className="p-6 space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.propertyName} *</label>
-                    <input
-                      type="text"
-                      value={propertyFormData.name}
-                      onChange={(e) => setPropertyFormData({ ...propertyFormData, name: e.target.value })}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      placeholder={t.enterName}
-                    />
-                  </div>
+                  {/* Basic Information */}
+                  {renderInput(
+                    t.propertyName,
+                    "name",
+                    "text",
+                    t.enterName,
+                    true,
+                    propertyFormData.name,
+                    (e) =>
+                      handleInputChange(
+                        "name",
+                        (e.target as HTMLInputElement).value,
+                      ),
+                  )}
+                  {renderInput(
+                    t.description,
+                    "description",
+                    "textarea",
+                    t.enterDescription,
+                    true,
+                    propertyFormData.description,
+                    (e) =>
+                      handleInputChange(
+                        "description",
+                        (e.target as HTMLTextAreaElement).value,
+                      ),
+                  )}
+                  {renderInput(
+                    t.university,
+                    "university",
+                    "text",
+                    "Enter university name",
+                    true,
+                    propertyFormData.university,
+                    (e) =>
+                      handleInputChange(
+                        "university",
+                        (e.target as HTMLInputElement).value,
+                      ),
+                  )}
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.description} *</label>
-                    <textarea
-                      value={propertyFormData.description}
-                      onChange={(e) => setPropertyFormData({ ...propertyFormData, description: e.target.value })}
-                      rows={3}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm resize-none"
-                      placeholder={t.enterDescription}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.university} *</label>
+                  {/* Location */}
+                  <div className="border-t border-gray-200 pt-4">
+                    <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
+                      <Icons.Location /> {t.location}
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                          {t.province} <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={propertyFormData.location.province}
+                          onChange={(e) =>
+                            handleLocationChange("province", e.target.value)
+                          }
+                          onBlur={() => handleFieldBlur("province")}
+                          className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white transition-all ${
+                            hasError("province")
+                              ? "border-red-500 bg-red-50"
+                              : isValidField("province")
+                                ? "border-green-500 bg-green-50"
+                                : "border-gray-300"
+                          }`}
+                        >
+                          <option value="">{t.provincePlaceholder}</option>
+                          <option value="Kigali">Kigali</option>
+                          <option value="Northern">Northern</option>
+                          <option value="Southern">Southern</option>
+                          <option value="Eastern">Eastern</option>
+                          <option value="Western">Western</option>
+                        </select>
+                        {hasError("province") && (
+                          <p className="mt-1 text-sm text-red-500">
+                            {formErrors.province}
+                          </p>
+                        )}
+                        {isValidField("province") && (
+                          <p className="mt-1 text-sm text-green-500 flex items-center gap-1">
+                            <Icons.Check /> Valid
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                          {t.district} <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={propertyFormData.location.district}
+                          onChange={(e) =>
+                            handleLocationChange("district", e.target.value)
+                          }
+                          onBlur={() => handleFieldBlur("district")}
+                          placeholder={t.districtPlaceholder}
+                          className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
+                            hasError("district")
+                              ? "border-red-500 bg-red-50"
+                              : isValidField("district")
+                                ? "border-green-500 bg-green-50"
+                                : "border-gray-300"
+                          }`}
+                        />
+                        {hasError("district") && (
+                          <p className="mt-1 text-sm text-red-500">
+                            {formErrors.district}
+                          </p>
+                        )}
+                        {isValidField("district") && (
+                          <p className="mt-1 text-sm text-green-500 flex items-center gap-1">
+                            <Icons.Check /> Valid
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                          {t.sector} <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={propertyFormData.location.sector}
+                          onChange={(e) =>
+                            handleLocationChange("sector", e.target.value)
+                          }
+                          onBlur={() => handleFieldBlur("sector")}
+                          placeholder={t.sectorPlaceholder}
+                          className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
+                            hasError("sector")
+                              ? "border-red-500 bg-red-50"
+                              : isValidField("sector")
+                                ? "border-green-500 bg-green-50"
+                                : "border-gray-300"
+                          }`}
+                        />
+                        {hasError("sector") && (
+                          <p className="mt-1 text-sm text-red-500">
+                            {formErrors.sector}
+                          </p>
+                        )}
+                        {isValidField("sector") && (
+                          <p className="mt-1 text-sm text-green-500 flex items-center gap-1">
+                            <Icons.Check /> Valid
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                          {t.cell} <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={propertyFormData.location.cell}
+                          onChange={(e) =>
+                            handleLocationChange("cell", e.target.value)
+                          }
+                          onBlur={() => handleFieldBlur("cell")}
+                          placeholder={t.cellPlaceholder}
+                          className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
+                            hasError("cell")
+                              ? "border-red-500 bg-red-50"
+                              : isValidField("cell")
+                                ? "border-green-500 bg-green-50"
+                                : "border-gray-300"
+                          }`}
+                        />
+                        {hasError("cell") && (
+                          <p className="mt-1 text-sm text-red-500">
+                            {formErrors.cell}
+                          </p>
+                        )}
+                        {isValidField("cell") && (
+                          <p className="mt-1 text-sm text-green-500 flex items-center gap-1">
+                            <Icons.Check /> Valid
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        {t.village} <span className="text-red-500">*</span>
+                      </label>
                       <input
                         type="text"
-                        value={propertyFormData.university}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, university: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
+                        value={propertyFormData.location.village}
+                        onChange={(e) =>
+                          handleLocationChange("village", e.target.value)
+                        }
+                        onBlur={() => handleFieldBlur("village")}
+                        placeholder={t.villagePlaceholder}
+                        className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
+                          hasError("village")
+                            ? "border-red-500 bg-red-50"
+                            : isValidField("village")
+                              ? "border-green-500 bg-green-50"
+                              : "border-gray-300"
+                        }`}
                       />
+                      {hasError("village") && (
+                        <p className="mt-1 text-sm text-red-500">
+                          {formErrors.village}
+                        </p>
+                      )}
+                      {isValidField("village") && (
+                        <p className="mt-1 text-sm text-green-500 flex items-center gap-1">
+                          <Icons.Check /> Valid
+                        </p>
+                      )}
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.type} *</label>
-                      <select
-                        value={propertyFormData.type}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, type: e.target.value as Property['type'] })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
+                  </div>
+
+                  {/* Pricing and Details */}
+                  <div className="border-t border-gray-200 pt-4">
+                    <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
                       >
-                        <option value="apartment">{t.apartment}</option>
-                        <option value="house">{t.house}</option>
-                        <option value="studio">{t.studio}</option>
-                        <option value="room">{t.room}</option>
-                        <option value="villa">{t.villa}</option>
-                      </select>
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v1m0 3V9m0 6V15m0 6v-3"
+                        />
+                      </svg>
+                      Pricing & Details
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      {renderInput(
+                        t.pricePerMonth,
+                        "pricePerMonth",
+                        "number",
+                        t.enterPrice,
+                        true,
+                        propertyFormData.pricePerMonth,
+                        (e) =>
+                          handleInputChange(
+                            "pricePerMonth",
+                            parseFloat((e.target as HTMLInputElement).value) ||
+                              0,
+                          ),
+                      )}
+                      {renderInput(
+                        t.bedrooms,
+                        "bedrooms",
+                        "number",
+                        t.enterBedrooms,
+                        true,
+                        propertyFormData.bedrooms,
+                        (e) =>
+                          handleInputChange(
+                            "bedrooms",
+                            parseInt((e.target as HTMLInputElement).value) || 0,
+                          ),
+                      )}
+                      {renderInput(
+                        t.bathrooms,
+                        "bathrooms",
+                        "number",
+                        t.enterBathrooms,
+                        true,
+                        propertyFormData.bathrooms,
+                        (e) =>
+                          handleInputChange(
+                            "bathrooms",
+                            parseInt((e.target as HTMLInputElement).value) || 0,
+                          ),
+                      )}
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                      {renderInput(
+                        t.maxGuests,
+                        "maxGuests",
+                        "number",
+                        t.enterMaxGuests,
+                        true,
+                        propertyFormData.maxGuests,
+                        (e) =>
+                          handleInputChange(
+                            "maxGuests",
+                            parseInt((e.target as HTMLInputElement).value) || 0,
+                          ),
+                      )}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                          {t.status} <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={propertyFormData.status}
+                          onChange={(e) =>
+                            handleInputChange("status", e.target.value)
+                          }
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
+                        >
+                          <option value="pending">{t.pending}</option>
+                          <option value="available">{t.available}</option>
+                          <option value="unavailable">{t.unavailable}</option>
+                          <option value="maintenance">{t.maintenance}</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.bedrooms} *</label>
-                      <input
-                        type="number"
-                        value={propertyFormData.bedrooms}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, bedrooms: parseInt(e.target.value) || 0 })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                        min="1"
-                        placeholder={t.enterBedrooms}
-                      />
+                  {/* Host Information */}
+                  <div className="border-t border-gray-200 pt-4">
+                    <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
+                      <Icons.User /> Host Information
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {renderInput(
+                        t.hostName,
+                        "hostName",
+                        "text",
+                        "Enter host name",
+                        true,
+                        propertyFormData.host.name,
+                        (e) =>
+                          handleInputChange(
+                            "host.name",
+                            (e.target as HTMLInputElement).value,
+                          ),
+                      )}
+                      {renderInput(
+                        t.hostEmail,
+                        "hostEmail",
+                        "email",
+                        "Enter host email",
+                        true,
+                        propertyFormData.host.email,
+                        (e) =>
+                          handleInputChange(
+                            "host.email",
+                            (e.target as HTMLInputElement).value,
+                          ),
+                      )}
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.bathrooms} *</label>
-                      <input
-                        type="number"
-                        value={propertyFormData.bathrooms}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, bathrooms: parseInt(e.target.value) || 0 })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                        min="1"
-                        placeholder={t.enterBathrooms}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.maxGuests} *</label>
-                      <input
-                        type="number"
-                        value={propertyFormData.maxGuests}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, maxGuests: parseInt(e.target.value) || 0 })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                        min="1"
-                        placeholder={t.enterMaxGuests}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.pricePerNight} (USD) *</label>
-                      <input
-                        type="number"
-                        value={propertyFormData.pricePerNight}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, pricePerNight: parseInt(e.target.value) || 0 })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                        min="0"
-                        placeholder={t.enterPrice}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.pricePerNight} (RWF) *</label>
-                      <input
-                        type="number"
-                        value={propertyFormData.priceRWF}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, priceRWF: parseInt(e.target.value) || 0 })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                        min="0"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.district} *</label>
-                      <input
-                        type="text"
-                        value={propertyFormData.district}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, district: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.sector} *</label>
-                      <input
-                        type="text"
-                        value={propertyFormData.sector}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, sector: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                      {renderInput(
+                        t.hostPhone,
+                        "hostPhone",
+                        "text",
+                        "Enter host phone",
+                        false,
+                        propertyFormData.host.phone,
+                        (e) =>
+                          handleInputChange(
+                            "host.phone",
+                            (e.target as HTMLInputElement).value,
+                          ),
+                      )}
+                      {renderInput(
+                        t.responseRate,
+                        "responseRate",
+                        "number",
+                        "0-100",
+                        false,
+                        propertyFormData.host.responseRate,
+                        (e) =>
+                          handleInputChange(
+                            "host.responseRate",
+                            parseFloat((e.target as HTMLInputElement).value) ||
+                              0,
+                          ),
+                      )}
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.cell} *</label>
-                      <input
-                        type="text"
-                        value={propertyFormData.cell}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, cell: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.village} *</label>
-                      <input
-                        type="text"
-                        value={propertyFormData.village}
-                        onChange={(e) => setPropertyFormData({ ...propertyFormData, village: e.target.value })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.amenities}</label>
+                  {/* Amenities */}
+                  <div className="border-t border-gray-200 pt-4">
+                    <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      {t.amenities}
+                    </h3>
                     <div className="flex gap-2">
                       <input
                         type="text"
                         value={amenityInput}
                         onChange={(e) => setAmenityInput(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && addAmenity()}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
+                        onKeyPress={(e) => e.key === "Enter" && addAmenity()}
+                        className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
                         placeholder="Add amenity..."
                       />
                       <button
                         onClick={addAmenity}
-                        className="px-3 py-2 bg-[#FF385C] text-white rounded-lg hover:bg-[#E31C5F] transition-colors"
+                        className="px-4 py-2.5 bg-[#FF385C] text-white rounded-xl hover:bg-[#E31C5F] transition-colors"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                        </svg>
+                        <Icons.Plus />
                       </button>
                     </div>
-                    <div className="mt-2 flex flex-wrap gap-1">
+                    <div className="mt-2 flex flex-wrap gap-1.5">
                       {propertyFormData.amenities.map((amenity) => (
-                        <span key={amenity} className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs flex items-center gap-1">
+                        <span
+                          key={amenity}
+                          className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs flex items-center gap-1.5 border border-blue-200"
+                        >
                           {amenity}
-                          <button onClick={() => removeAmenity(amenity)} className="hover:text-red-500">
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                          <button
+                            onClick={() => removeAmenity(amenity)}
+                            className="hover:text-red-500"
+                          >
+                            <svg
+                              className="w-3 h-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M6 18L18 6M6 6l12 12"
+                              />
                             </svg>
                           </button>
                         </span>
@@ -2556,105 +2296,123 @@ export const HostManagement: React.FC = () => {
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.images}</label>
-                    <div className="flex gap-2">
-                      <input
-                        type="url"
-                        value={imageInput}
-                        onChange={(e) => setImageInput(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && addImage()}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                        placeholder="Enter image URL..."
-                      />
-                      <button
-                        onClick={addImage}
-                        className="px-3 py-2 bg-[#FF385C] text-white rounded-lg hover:bg-[#E31C5F] transition-colors"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                      </button>
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {propertyFormData.images.map((image) => (
-                        <div key={image} className="relative">
-                          <img src={image} alt="Property" className="w-16 h-16 object-cover rounded-lg" />
-                          <button
-                            onClick={() => removeImage(image)}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5"
-                          >
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.status}</label>
-                    <select
-                      value={propertyFormData.status}
-                      onChange={(e) => setPropertyFormData({ ...propertyFormData, status: e.target.value as Property['status'] })}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
+                  {/* Image Upload */}
+                  <div className="border-t border-gray-200 pt-4">
+                    <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
+                      <Icons.Upload /> {t.uploadImages}{" "}
+                      <span className="text-red-500">*</span>
+                    </h3>
+                    <div
+                      className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
+                        hasError("images")
+                          ? "border-red-500 bg-red-50"
+                          : imageFiles.length > 0 || imagePreviews.length > 0
+                            ? "border-green-500 bg-green-50"
+                            : "border-gray-300 hover:border-[#FF385C] hover:bg-gray-50"
+                      }`}
+                      onClick={() => fileInputRef.current?.click()}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        handleImageUpload(e.dataTransfer.files);
+                      }}
+                      onDragOver={(e) => e.preventDefault()}
                     >
-                      <option value="active">{t.active}</option>
-                      <option value="pending">{t.pending}</option>
-                      <option value="inactive">{t.inactive}</option>
-                      <option value="suspended">{t.suspended}</option>
-                    </select>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => handleImageUpload(e.target.files)}
+                      />
+                      <Icons.Upload />
+                      <p className="mt-2 text-sm text-gray-600">{t.dragDrop}</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        PNG, JPG, JPEG up to 5MB
+                      </p>
+                    </div>
+                    {(imagePreviews.length > 0 ||
+                      (selectedHouse &&
+                        selectedHouse.images &&
+                        selectedHouse.images.length > 0)) && (
+                      <div className="mt-3 grid grid-cols-4 gap-2">
+                        {imagePreviews.map((preview, index) => (
+                          <div key={index} className="relative group">
+                            <img
+                              src={preview}
+                              alt={`Preview ${index}`}
+                              className="w-full h-20 object-cover rounded-xl"
+                            />
+                            <button
+                              onClick={() => removeImage(index)}
+                              className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <svg
+                                className="w-3.5 h-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        ))}
+                        {selectedHouse &&
+                          selectedHouse.images &&
+                          selectedHouse.images.map((img, index) => (
+                            <div
+                              key={`existing-${index}`}
+                              className="relative group"
+                            >
+                              <img
+                                src={img.url}
+                                alt={`Existing ${index}`}
+                                className="w-full h-20 object-cover rounded-xl"
+                              />
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                    {hasError("images") && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {formErrors.images}
+                      </p>
+                    )}
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.startDate}</label>
-                      <input
-                        type="date"
-                        value={propertyFormData.availability.startDate}
-                        onChange={(e) => setPropertyFormData({
-                          ...propertyFormData,
-                          availability: { ...propertyFormData.availability, startDate: e.target.value }
-                        })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.endDate}</label>
-                      <input
-                        type="date"
-                        value={propertyFormData.availability.endDate}
-                        onChange={(e) => setPropertyFormData({
-                          ...propertyFormData,
-                          availability: { ...propertyFormData.availability, endDate: e.target.value }
-                        })}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-                      />
-                    </div>
-                  </div>
+                  {/* REMOVED: Availability section - Start Date and End Date fields are no longer needed */}
 
                   <div className="flex gap-3 pt-4 border-t border-gray-200">
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={handleCreateProperty}
-                      disabled={submitting}
-                      className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors flex items-center justify-center gap-2 ${
-                        submitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#FF385C] hover:bg-[#E31C5F]'
+                      onClick={
+                        isEditModalOpen
+                          ? handleUpdateProperty
+                          : handleCreateProperty
+                      }
+                      disabled={submitting || !isFormValid}
+                      className={`flex-1 px-6 py-3 rounded-xl text-white font-medium transition-all flex items-center justify-center gap-2 ${
+                        submitting || !isFormValid
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-gradient-to-r from-[#FF385C] to-[#E31C5F] hover:shadow-lg"
                       }`}
                     >
                       {submitting ? (
                         <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                           {t.saving}
                         </>
                       ) : (
                         <>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                          </svg>
-                          {t.create}
+                          {isEditModalOpen ? <Icons.Edit /> : <Icons.Plus />}
+                          {isEditModalOpen ? t.update : t.create}
                         </>
                       )}
                     </motion.button>
@@ -2663,9 +2421,10 @@ export const HostManagement: React.FC = () => {
                       whileTap={{ scale: 0.98 }}
                       onClick={() => {
                         setIsCreateModalOpen(false);
-                        resetPropertyForm();
+                        setIsEditModalOpen(false);
+                        resetForm();
                       }}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                      className="flex-1 px-6 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
                     >
                       {t.cancel}
                     </motion.button>
@@ -2679,7 +2438,7 @@ export const HostManagement: React.FC = () => {
 
       {/* Delete Confirmation Modal */}
       <AnimatePresence>
-        {isDeleteModalOpen && selectedProperty && (
+        {isDeleteModalOpen && selectedHouse && (
           <>
             <motion.div
               variants={overlayVariants}
@@ -2689,7 +2448,7 @@ export const HostManagement: React.FC = () => {
               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
               onClick={() => {
                 setIsDeleteModalOpen(false);
-                setSelectedProperty(null);
+                setSelectedHouse(null);
               }}
             />
             <motion.div
@@ -2699,30 +2458,25 @@ export const HostManagement: React.FC = () => {
               exit="exit"
               className="fixed inset-0 z-[101] flex items-center justify-center p-4"
             >
-              <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative">
-                <div className="p-6">
-                  <div className="flex items-center justify-center mb-4">
-                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                      <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </div>
+              <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white">
+                <div className="p-6 text-center">
+                  <div className="w-20 h-20 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
+                    <Icons.Delete />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">{t.deleteProperty}</h3>
-                  <p className="text-gray-500 text-center mb-6">
-                    {t.deleteConfirmation}
-                    <br />
-                    <span className="text-sm text-gray-400">{t.actionUndone}</span>
-                  </p>
-                  <div className="flex gap-3">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    {t.deleteProperty}
+                  </h3>
+                  <p className="text-gray-500 mb-2">{t.deleteConfirmation}</p>
+                  <p className="text-sm text-gray-400">{t.actionUndone}</p>
+                  <div className="flex gap-3 mt-6">
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => {
                         setIsDeleteModalOpen(false);
-                        setSelectedProperty(null);
+                        setSelectedHouse(null);
                       }}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
                     >
                       {t.cancel}
                     </motion.button>
@@ -2731,8 +2485,10 @@ export const HostManagement: React.FC = () => {
                       whileTap={{ scale: 0.98 }}
                       onClick={handleDeleteProperty}
                       disabled={submitting}
-                      className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors ${
-                        submitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'
+                      className={`flex-1 px-4 py-2.5 rounded-xl text-white font-medium transition-colors ${
+                        submitting
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-red-600 hover:bg-red-700"
                       }`}
                     >
                       {submitting ? (
