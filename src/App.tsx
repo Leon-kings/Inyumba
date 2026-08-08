@@ -1031,7 +1031,7 @@ const Sidebar = ({
     { id: "bookings", label: "My Bookings", icon: <AttachMoneyIcon /> },
     { id: "requests", label: "My Requests", icon: <TrendingUpIcon /> },
     { id: "messages", label: "Messages", icon: <EmailIcon /> },
-    { id: "favorites", label: "Favorites", icon: <HomeIcon /> },
+  
   ];
 
   // Host Menu Items

@@ -1,17 +1,45 @@
+/* eslint-disable preserve-caught-error */
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
+import axios, { AxiosError } from "axios";
 
-// Types
+// Types - Updated to match the API response
 interface UserData {
-  id: number;
+  id: string;
   name: string;
   email: string;
+  phone: string;
   role: "admin" | "user" | "host";
-  avatar?: string;
-  joinedDate?: string;
+  isActive: boolean;
+  isEmailVerified: boolean;
+  lastLogin: string | null;
+  createdAt: string;
+  updatedAt: string;
+  statistics?: {
+    totalIncome: number;
+    totalExpenses: number;
+    totalSavings: number;
+    monthlyIncome: number;
+    monthlyExpenses: number;
+    monthlyBudget: number;
+    membersCount: number;
+  };
+}
+
+// API Response wrapper for single user
+interface SingleUserResponse {
+  success: boolean;
+  user: UserData;
+}
+
+// API Response for update operations
+interface UpdateResponse {
+  success: boolean;
+  message?: string;
+  user?: UserData;
 }
 
 // Translations
@@ -20,7 +48,7 @@ const translations = {
     accountSettings: "Account Settings",
     manageProfile: "Manage your profile information and security settings",
     profileInformation: "Profile Information",
-    securitySettings: "Security Settings", 
+    securitySettings: "Security Settings",
     editName: "Edit Name",
     changePassword: "Change Password",
     fullName: "Full Name",
@@ -49,6 +77,14 @@ const translations = {
     host: "Host",
     profile: "Profile",
     response: "Response",
+    fetchError: "Failed to fetch user data",
+    noUserFound: "No user found with this email",
+    phone: "Phone",
+    status: "Status",
+    active: "Active",
+    inactive: "Inactive",
+    verified: "Verified",
+    notVerified: "Not Verified",
   },
   fr: {
     accountSettings: "Paramètres du Compte",
@@ -84,6 +120,14 @@ const translations = {
     host: "Hôte",
     profile: "Profil",
     response: "Réponse",
+    fetchError: "Échec de la récupération des données utilisateur",
+    noUserFound: "Aucun utilisateur trouvé avec cet e-mail",
+    phone: "Téléphone",
+    status: "Statut",
+    active: "Actif",
+    inactive: "Inactif",
+    verified: "Vérifié",
+    notVerified: "Non vérifié",
   },
   rw: {
     accountSettings: "Igenamiterere ya Konti",
@@ -118,6 +162,14 @@ const translations = {
     host: "Umutambyi",
     profile: "Profil",
     response: "Igisubizo",
+    fetchError: "Kubona amakuru y'umukoresha byananiranye",
+    noUserFound: "Nta mukoresha wabonetse ufite iyi imeri",
+    phone: "Telefone",
+    status: "Imiterere",
+    active: "Igikora",
+    inactive: "Ntigikora",
+    verified: "Yemejwe",
+    notVerified: "Ntiyemejwe",
   },
 };
 
@@ -127,28 +179,122 @@ const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
   return lang || "en";
 };
 
-// Mock API functions (replace with actual API calls)
-const mockGetUserByEmail = async (email: string): Promise<UserData> => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  return {
-    id: 1,
-    name: "John Doe",
-    email: email || "john@example.com",
-    role: "user",
-    joinedDate: "2024-01-15",
-  };
+// Helper function to get user email from multiple sources
+const getUserEmailFromStorage = (): string => {
+  // Try multiple possible locations
+  const sources = [
+    // Check localStorage for userEmail key
+    localStorage.getItem("userEmail"),
+    // Check localStorage for user object and extract email
+    (() => {
+      try {
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          return user.email || null;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+      return null;
+    })(),
+    // Check cookies for userEmail
+    Cookies.get("userEmail"),
+    // Check cookies for email
+    Cookies.get("email"),
+    // Check localStorage for email key
+    localStorage.getItem("email"),
+  ];
+
+  // Return the first non-empty value
+  for (const source of sources) {
+    if (source && source.trim()) {
+      // console.log("✅ Found email:", source);
+      return source;
+    }
+  }
+
+  console.warn("⚠️ No email found in any storage location");
+  return "";
 };
 
-const mockUpdateUser = async (
-  email: string,
+// API Base URL
+const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
+
+// Create axios instance with default config
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Add auth token interceptor
+apiClient.interceptors.request.use(
+  (config) => {
+    const token =
+      Cookies.get("authToken") ||
+      localStorage.getItem("authToken") ||
+      localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
+
+// API functions
+const fetchUserByEmail = async (email: string): Promise<UserData> => {
+  try {
+    const response = await apiClient.get<SingleUserResponse>(
+      `/auth/${encodeURIComponent(email)}`,
+    );
+
+    if (!response.data.success || !response.data.user) {
+      throw new Error("User not found");
+    }
+
+    return response.data.user;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response?.status === 404) {
+        throw new Error("User not found");
+      }
+      const errorData = axiosError.response?.data as { message?: string };
+      throw new Error(
+        errorData?.message || axiosError.message || "Failed to fetch user",
+      );
+    }
+    throw error;
+  }
+};
+
+const updateUser = async (
+  userId: string,
   data: { name?: string; password?: string },
 ): Promise<{ success: boolean; message: string }> => {
-  await new Promise((resolve) => setTimeout(resolve, 1500));
-  console.log("Updating user:", email, data);
-  return {
-    success: true,
-    message: "Profile updated successfully!",
-  };
+  try {
+    const response = await apiClient.put<UpdateResponse>(
+      `/auth/${userId}`,
+      data,
+    );
+
+    return {
+      success: true,
+      message: response.data?.message || "Profile updated successfully!",
+    };
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      const errorData = axiosError.response?.data as { message?: string };
+      throw new Error(
+        errorData?.message || axiosError.message || "Failed to update user",
+      );
+    }
+    throw error;
+  }
 };
 
 export const MeManagement: React.FC = () => {
@@ -179,8 +325,8 @@ export const MeManagement: React.FC = () => {
     confirmPassword?: string;
   }>({});
 
-  // Get user email from cookies
-  const userEmail = Cookies.get("userEmail") || "";
+  // Get user email from localStorage or cookies
+  const userEmail = getUserEmailFromStorage();
   const t = translations[lang];
 
   // Listen for language changes in cookies
@@ -192,25 +338,40 @@ export const MeManagement: React.FC = () => {
       }
     };
 
-    // Check for cookie changes every second (polling)
     const interval = setInterval(handleCookieChange, 1000);
     return () => clearInterval(interval);
   }, [lang]);
 
+  // Fetch user data using the email-specific endpoint
   const fetchUserData = useCallback(async () => {
     try {
       setLoading(true);
-      const email = userEmail || "john@example.com";
-      const data = await mockGetUserByEmail(email);
-      setUserData(data);
-      setFormData((prev) => ({ ...prev, name: data.name }));
+
+      const currentEmail = getUserEmailFromStorage();
+
+      if (!currentEmail) {
+        console.warn("⚠️ No email found in any storage location");
+        toast.error(`❌ ${t.noUserFound}`);
+        setLoading(false);
+        return;
+      }
+
+      const user = await fetchUserByEmail(currentEmail);
+      setUserData(user);
+      setFormData((prev) => ({ ...prev, name: user.name }));
     } catch (err) {
       console.error("Error fetching user data:", err);
-      toast.error(`❌ ${t.nameUpdateFailed}`);
+      if (err instanceof Error && err.message === "User not found") {
+        toast.error(`❌ ${t.noUserFound}`);
+      } else {
+        const errorMessage = err instanceof Error ? err.message : t.fetchError;
+        toast.error(`❌ ${errorMessage}`);
+      }
+      setUserData(null);
     } finally {
       setLoading(false);
     }
-  }, [userEmail, t]);
+  }, [t]);
 
   useEffect(() => {
     fetchUserData();
@@ -260,18 +421,23 @@ export const MeManagement: React.FC = () => {
 
   const handleUpdateName = async () => {
     if (!validateName()) return;
+    if (!userData) {
+      toast.error(`❌ ${t.nameUpdateFailed}`);
+      return;
+    }
 
     try {
       setSaving(true);
-      const email = userEmail || "john@example.com";
-      await mockUpdateUser(email, { name: formData.name });
+      await updateUser(userData.id, { name: formData.name });
 
       setUserData((prev) => (prev ? { ...prev, name: formData.name } : null));
       setEditMode((prev) => ({ ...prev, name: false }));
       toast.success(`✅ ${t.nameUpdated}`);
     } catch (err) {
       console.error("Error updating name:", err);
-      toast.error(`❌ ${t.nameUpdateFailed}`);
+      const errorMessage =
+        err instanceof Error ? err.message : t.nameUpdateFailed;
+      toast.error(`❌ ${errorMessage}`);
     } finally {
       setSaving(false);
     }
@@ -279,11 +445,14 @@ export const MeManagement: React.FC = () => {
 
   const handleUpdatePassword = async () => {
     if (!validatePassword()) return;
+    if (!userData) {
+      toast.error(`❌ ${t.passwordUpdateFailed}`);
+      return;
+    }
 
     try {
       setSaving(true);
-      const email = userEmail || "john@example.com";
-      await mockUpdateUser(email, { password: formData.newPassword });
+      await updateUser(userData.id, { password: formData.newPassword });
 
       setFormData((prev) => ({
         ...prev,
@@ -295,7 +464,9 @@ export const MeManagement: React.FC = () => {
       toast.success(`✅ ${t.passwordUpdated}`);
     } catch (err) {
       console.error("Error updating password:", err);
-      toast.error(`❌ ${t.passwordUpdateFailed}`);
+      const errorMessage =
+        err instanceof Error ? err.message : t.passwordUpdateFailed;
+      toast.error(`❌ ${errorMessage}`);
     } finally {
       setSaving(false);
     }
@@ -322,10 +493,54 @@ export const MeManagement: React.FC = () => {
     }
   };
 
+  // Format date for display
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
         <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="text-center">
+          <svg
+            className="w-16 h-16 text-gray-400 mx-auto mb-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+            />
+          </svg>
+          <h3 className="text-xl font-semibold text-gray-600">
+            {t.noUserFound}
+          </h3>
+          <p className="text-gray-500 mt-2">
+            {userEmail ? `Email: ${userEmail}` : "No email provided"}
+          </p>
+          <button
+            onClick={fetchUserData}
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
@@ -346,7 +561,7 @@ export const MeManagement: React.FC = () => {
                 {t.manageProfile}
               </p>
             </div>
-            <div className="text-left md:text-right">
+            <div className="flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-1 px-3 py-1 bg-white/20 text-white font-semibold rounded-full text-sm">
                 <svg
                   className="w-4 h-4"
@@ -359,11 +574,25 @@ export const MeManagement: React.FC = () => {
                     clipRule="evenodd"
                   />
                 </svg>
-                {userData?.role === "admin"
+                {userData.role === "admin"
                   ? t.admin
-                  : userData?.role === "host"
+                  : userData.role === "host"
                     ? t.host
                     : t.user}
+              </span>
+              <span
+                className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold ${
+                  userData.isActive
+                    ? "bg-green-500/20 text-green-100"
+                    : "bg-red-500/20 text-red-100"
+                }`}
+              >
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    userData.isActive ? "bg-green-400" : "bg-red-400"
+                  }`}
+                ></span>
+                {userData.isActive ? t.active : t.inactive}
               </span>
             </div>
           </div>
@@ -377,11 +606,26 @@ export const MeManagement: React.FC = () => {
             <div className="text-center p-6 sm:p-8">
               <div className="relative inline-block">
                 <div className="w-[120px] h-[120px] mx-auto rounded-full border-4 border-white shadow-lg bg-gradient-to-r from-blue-500 to-purple-600 text-5xl flex items-center justify-center text-white">
-                  {userData?.name?.charAt(0) || "U"}
+                  {userData.name?.charAt(0) || "U"}
                 </div>
+                {userData.isEmailVerified && (
+                  <div className="absolute bottom-0 right-0 bg-green-500 rounded-full p-1 border-2 border-white">
+                    <svg
+                      className="w-4 h-4 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                )}
               </div>
 
-              <h2 className="text-xl font-semibold mt-4">{userData?.name}</h2>
+              <h2 className="text-xl font-semibold mt-4">{userData.name}</h2>
               <p className="text-sm text-gray-600 flex items-center justify-center gap-1">
                 <svg
                   className="w-4 h-4"
@@ -396,23 +640,38 @@ export const MeManagement: React.FC = () => {
                     d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
                   />
                 </svg>
-                {userData?.email}
+                {userData.email}
               </p>
 
               <hr className="my-4 border-gray-200" />
 
-              <div className="text-left">
-                <p className="text-sm text-gray-600 mb-2">
+              <div className="text-left space-y-2">
+                <p className="text-sm text-gray-600">
+                  <strong>{t.phone}:</strong> {userData.phone || "N/A"}
+                </p>
+                <p className="text-sm text-gray-600">
                   <strong>{t.role}:</strong>{" "}
-                  {userData?.role === "admin"
+                  {userData.role === "admin"
                     ? t.admin
-                    : userData?.role === "host"
+                    : userData.role === "host"
                       ? t.host
                       : t.user}
                 </p>
                 <p className="text-sm text-gray-600">
                   <strong>{t.memberSince}:</strong>{" "}
-                  {userData?.joinedDate || "N/A"}
+                  {formatDate(userData.createdAt)}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <strong>{t.status}:</strong>{" "}
+                  <span
+                    className={
+                      userData.isEmailVerified
+                        ? "text-green-600"
+                        : "text-yellow-600"
+                    }
+                  >
+                    {userData.isEmailVerified ? t.verified : t.notVerified}
+                  </span>
                 </p>
               </div>
             </div>
@@ -484,7 +743,7 @@ export const MeManagement: React.FC = () => {
                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                       />
                     </svg>
-                    <span className="font-medium">{userData?.name}</span>
+                    <span className="font-medium">{userData.name}</span>
                   </div>
                 ) : (
                   <div className="space-y-3">
