@@ -1,4 +1,3 @@
-
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -636,9 +635,7 @@ export const ManagersDashboard: React.FC = () => {
   // Get house distribution by location (province)
   const getHouseDistributionData = () => {
     if (!houseData || houseData.data.length === 0) {
-      return [
-        { name: "No Data", value: 1 },
-      ];
+      return [{ name: "No Data", value: 1 }];
     }
 
     const provinceMap = new Map<string, number>();
@@ -759,11 +756,15 @@ export const ManagersDashboard: React.FC = () => {
       .slice(0, 4);
 
     return topHouses.map((house) => ({
-      name: house.name.length > 15 ? `${house.name.substring(0, 15)}...` : house.name,
+      name:
+        house.name.length > 15
+          ? `${house.name.substring(0, 15)}...`
+          : house.name,
       students: house.maxGuests || 0,
       houses: 1,
       revenue: formatCurrency(house.pricePerMonth || 0),
-      growth: house.rating > 0 ? Math.min(Math.round(house.rating * 10), 25) : 0,
+      growth:
+        house.rating > 0 ? Math.min(Math.round(house.rating * 10), 25) : 0,
     }));
   };
 
@@ -787,8 +788,18 @@ export const ManagersDashboard: React.FC = () => {
     }
 
     const monthNames = [
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
     ];
 
     const monthMap = new Map();
@@ -1225,9 +1236,7 @@ export const ManagersDashboard: React.FC = () => {
                       </div>
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span>
-                        {performer.students} guests
-                      </span>
+                      <span>{performer.students} guests</span>
                       <span>
                         {performer.houses} {t.houses}
                       </span>
