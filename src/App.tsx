@@ -3700,7 +3700,12 @@ import { Testimonials } from "./pages/testimonials/Testimonials";
 import { TeamMemberManagement } from "./components/dashboard/admin/components/team/TeamManagemnt";
 import axios from "axios";
 import { TestimonialManagement } from "./components/dashboard/admin/components/testimonials/TestimonialManagement";
-import { HouseRounded, Info, LoginSharp, TextSnippet } from "@mui/icons-material";
+import {
+  HouseRounded,
+  Info,
+  LoginSharp,
+  TextSnippet,
+} from "@mui/icons-material";
 import { VerificationPage } from "./components/verify/Verification";
 import { HouseManagement } from "./components/dashboard/admin/components/house/HouseManagement";
 import { ManagersDashboard } from "./components/dashboard/managers/ManagerDashboard";
@@ -3710,8 +3715,8 @@ import { ManagerHouseManagement } from "./components/dashboard/managers/componen
 import { ManagerMessageManagement } from "./components/dashboard/managers/components/messages/ManagerMessagesManagement";
 import { ManagerTestimonialManagement } from "./components/dashboard/managers/components/testimonials/ManagerTestimonialManagement";
 import { ManagerRequestManagement } from "./components/dashboard/managers/components/request/ManagerRequestManagement";
-import { LogsManagement } from "./components/dashboard/admin/components/logs/LogsManagement";
-// import { LogsManagement } from "./components/dashboard/admin/components/logs/LogsManagement";
+import { AdminLogsManagement } from "./components/dashboard/admin/components/logs/AdminLogsManagement";
+import { ManagerLogsManagement } from "./components/dashboard/managers/components/logs/ManagerLogsManagement";
 
 // Types
 interface UserData {
@@ -5367,12 +5372,12 @@ export default function App() {
           }
         />
 
-                <Route
+        <Route
           path="/dashboard/logs"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <DashboardLayout>
-                <LogsManagement />
+                <AdminLogsManagement />
               </DashboardLayout>
             </ProtectedRoute>
           }
@@ -5555,7 +5560,7 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={["manager"]}>
               <DashboardLayout>
-                <LogsManagement />
+                <ManagerLogsManagement />
               </DashboardLayout>
             </ProtectedRoute>
           }
