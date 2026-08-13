@@ -27,7 +27,7 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
 import PersonIcon from "@mui/icons-material/Person";
 import VerifiedIcon from "@mui/icons-material/Verified";
-import ErrorIcon from "@mui/icons-material/Error";
+import BlockIcon from "@mui/icons-material/Block";
 
 // Types based on the Booking model
 interface PaymentScreenshot {
@@ -82,35 +82,6 @@ interface BookingUI extends Booking {
   formattedCheckIn: string;
   formattedCheckOut: string;
   formattedTotal: string;
-}
-
-// Form validation errors interface
-interface FormErrors {
-  fullName?: string;
-  email?: string;
-  phone?: string;
-  idNumber?: string;
-  university?: string;
-  studentId?: string;
-  purpose?: string;
-  houseId?: string;
-  houseName?: string;
-  houseType?: string;
-  district?: string;
-  sector?: string;
-  cell?: string;
-  village?: string;
-  ownerName?: string;
-  ownerContact?: string;
-  ownerEmail?: string;
-  checkIn?: string;
-  checkOut?: string;
-  months?: string;
-  guests?: string;
-  monthlyRent?: string;
-  serviceFee?: string;
-  paymentMethod?: string;
-  momoNumber?: string;
 }
 
 // Translations
@@ -211,21 +182,14 @@ const translations = {
       cancelled: "Cancelled",
       completed: "Completed",
     },
-    createBooking: "Create New Booking",
-    required: "This field is required",
-    invalidEmail: "Please enter a valid email address",
-    invalidPhone: "Please enter a valid phone number",
-    invalidNumber: "Please enter a valid number",
-    invalidDate: "Please enter a valid date",
-    minValue: "Value must be at least {min}",
-    maxValue: "Value must not exceed {max}",
-    validationError: "Please fix all validation errors",
-    allFieldsVerified: "All fields verified",
     verifyPayment: "Verify Payment",
     verifyPaymentConfirmation: "Are you sure you want to verify this payment?",
     paymentVerified: "Payment verified successfully!",
     paymentVerificationFailed: "Failed to verify payment",
     cancelBookingConfirmation: "Are you sure you want to cancel this booking?",
+    notAuthorized: "You are not authorized to create bookings",
+    viewOnly: "View Only - Manager Access",
+    noCreateAccess: "Managers can only view and update existing bookings",
   },
   fr: {
     bookingManagement: "Gestion des Réservations",
@@ -323,21 +287,14 @@ const translations = {
       cancelled: "Annulé",
       completed: "Terminé",
     },
-    createBooking: "Créer une Nouvelle Réservation",
-    required: "Ce champ est requis",
-    invalidEmail: "Veuillez entrer une adresse email valide",
-    invalidPhone: "Veuillez entrer un numéro de téléphone valide",
-    invalidNumber: "Veuillez entrer un nombre valide",
-    invalidDate: "Veuillez entrer une date valide",
-    minValue: "La valeur doit être au moins {min}",
-    maxValue: "La valeur ne doit pas dépasser {max}",
-    validationError: "Veuillez corriger toutes les erreurs de validation",
-    allFieldsVerified: "Tous les champs sont vérifiés",
     verifyPayment: "Vérifier le Paiement",
     verifyPaymentConfirmation: "Êtes-vous sûr de vouloir vérifier ce paiement ?",
     paymentVerified: "Paiement vérifié avec succès !",
     paymentVerificationFailed: "Échec de la vérification du paiement",
     cancelBookingConfirmation: "Êtes-vous sûr de vouloir annuler cette réservation ?",
+    notAuthorized: "Vous n'êtes pas autorisé à créer des réservations",
+    viewOnly: "Visualisation uniquement - Accès Manager",
+    noCreateAccess: "Les managers peuvent uniquement visualiser et mettre à jour les réservations existantes",
   },
   rw: {
     bookingManagement: "Gucunga Ibyanditswe",
@@ -435,21 +392,14 @@ const translations = {
       cancelled: "Byahagaritswe",
       completed: "Byarangiye",
     },
-    createBooking: "Kurema Icyanditswe Gishya",
-    required: "Iki gikurikira kirakenewe",
-    invalidEmail: "Tanga imeri ikoreshwa neza",
-    invalidPhone: "Tanga numero ya telefone ikoreshwa neza",
-    invalidNumber: "Tanga numero ikoreshwa neza",
-    invalidDate: "Tanga itariki ikoreshwa neza",
-    minValue: "Agaciro kagombye kuba byibuze {min}",
-    maxValue: "Agaciro ntikagombye kurenza {max}",
-    validationError: "Kosora amakosa yose yo kwemeza",
-    allFieldsVerified: "Amakosa yose yemejwe",
     verifyPayment: "Kemeza Amahoro",
     verifyPaymentConfirmation: "Uri kwizera ko ushaka kwemeza aya mahoro?",
     paymentVerified: "Amahoro yemejwe neza!",
     paymentVerificationFailed: "Kwemeza amahoro byananiranye",
     cancelBookingConfirmation: "Uri kwizera ko ushaka guhagarika iki cyanditswe?",
+    notAuthorized: "Ntabwo uremewe kurema ibyanditswe",
+    viewOnly: "Reba gusa - Uburenganzira bwa Manager",
+    noCreateAccess: "Abagenzuzi bashobora gusa kureba no kuvugurura ibyanditswe bihari",
   },
 };
 
@@ -464,21 +414,17 @@ const API_URL = "https://rene-inyumba-nodejs.onrender.com/bookings";
 
 // Helper function to safely get booking data from API response
 const getBookingData = (response: any): Booking => {
-  // If response has data property, use it
   if (response && response.data) {
     return response.data;
   }
-  // If response itself is the booking object
   if (response && response._id) {
     return response;
   }
-  // Fallback: return the response as is
   return response || {};
 };
 
 // Helper function to transform booking to UI format
 const transformBookingToUI = (booking: any): BookingUI => {
-  // Ensure booking has all required fields with defaults
   const safeBooking: Booking = {
     _id: booking?._id || "",
     bookingId: booking?.bookingId || "",
@@ -568,18 +514,7 @@ const transformBookingToUI = (booking: any): BookingUI => {
   };
 };
 
-// Validation functions
-const validateEmail = (email: string): boolean => {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return re.test(email);
-};
-
-const validatePhone = (phone: string): boolean => {
-  const re = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/;
-  return re.test(phone);
-};
-
-export const BookingManagement: React.FC = () => {
+export const ManagerBookingManagement: React.FC = () => {
   // Get language from cookies
   const [lang, setLang] = useState<"en" | "fr" | "rw">(
     getLanguageFromCookies(),
@@ -598,7 +533,6 @@ export const BookingManagement: React.FC = () => {
   const [isCompletedModalOpen, setIsCompletedModalOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [isVerifyPaymentModalOpen, setIsVerifyPaymentModalOpen] = useState(false);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<BookingUI | null>(null);
   
   // Edit form state
@@ -607,44 +541,6 @@ export const BookingManagement: React.FC = () => {
     paymentStatus: "pending",
     notes: "",
   });
-
-  // Create form state
-  const [createFormData, setCreateFormData] = useState<Partial<Booking>>({
-    fullName: "",
-    email: "",
-    phone: "",
-    idNumber: "",
-    university: "",
-    studentId: "",
-    purpose: "",
-    houseId: "",
-    houseName: "",
-    houseType: "",
-    district: "",
-    sector: "",
-    cell: "",
-    village: "",
-    ownerName: "",
-    ownerContact: "",
-    ownerEmail: "",
-    checkIn: "",
-    checkOut: "",
-    months: 1,
-    guests: 1,
-    specialRequests: "",
-    monthlyRent: 0,
-    serviceFee: 0,
-    totalAmount: 0,
-    paymentMethod: "momo",
-    momoNumber: "",
-    paymentStatus: "pending",
-    status: "pending",
-    notes: "",
-  });
-
-  const [formErrors, setFormErrors] = useState<FormErrors>({});
-  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
-  const [isFormValid, setIsFormValid] = useState(false);
 
   // Loading states
   const [isLoading, setIsLoading] = useState(false);
@@ -691,272 +587,6 @@ export const BookingManagement: React.FC = () => {
     } finally {
       setIsFetching(false);
     }
-  };
-
-  // Validate create form
-  const validateCreateForm = (): boolean => {
-    const errors: FormErrors = {};
-    let isValid = true;
-
-    // Full Name validation
-    if (!createFormData.fullName || createFormData.fullName.trim().length < 2) {
-      errors.fullName = t.required;
-      isValid = false;
-    }
-
-    // Email validation
-    if (!createFormData.email) {
-      errors.email = t.required;
-      isValid = false;
-    } else if (!validateEmail(createFormData.email)) {
-      errors.email = t.invalidEmail;
-      isValid = false;
-    }
-
-    // Phone validation
-    if (!createFormData.phone) {
-      errors.phone = t.required;
-      isValid = false;
-    } else if (!validatePhone(createFormData.phone)) {
-      errors.phone = t.invalidPhone;
-      isValid = false;
-    }
-
-    // ID Number validation
-    if (!createFormData.idNumber || createFormData.idNumber.trim().length < 3) {
-      errors.idNumber = t.required;
-      isValid = false;
-    }
-
-    // University validation
-    if (!createFormData.university || createFormData.university.trim().length < 2) {
-      errors.university = t.required;
-      isValid = false;
-    }
-
-    // Student ID validation
-    if (!createFormData.studentId || createFormData.studentId.trim().length < 2) {
-      errors.studentId = t.required;
-      isValid = false;
-    }
-
-    // Purpose validation
-    if (!createFormData.purpose || createFormData.purpose.trim().length < 2) {
-      errors.purpose = t.required;
-      isValid = false;
-    }
-
-    // House Name validation
-    if (!createFormData.houseName || createFormData.houseName.trim().length < 2) {
-      errors.houseName = t.required;
-      isValid = false;
-    }
-
-    // House Type validation
-    if (!createFormData.houseType || createFormData.houseType.trim().length < 2) {
-      errors.houseType = t.required;
-      isValid = false;
-    }
-
-    // Location validations
-    if (!createFormData.district || createFormData.district.trim().length < 2) {
-      errors.district = t.required;
-      isValid = false;
-    }
-    if (!createFormData.sector || createFormData.sector.trim().length < 2) {
-      errors.sector = t.required;
-      isValid = false;
-    }
-    if (!createFormData.cell || createFormData.cell.trim().length < 2) {
-      errors.cell = t.required;
-      isValid = false;
-    }
-    if (!createFormData.village || createFormData.village.trim().length < 2) {
-      errors.village = t.required;
-      isValid = false;
-    }
-
-    // Owner validations
-    if (!createFormData.ownerName || createFormData.ownerName.trim().length < 2) {
-      errors.ownerName = t.required;
-      isValid = false;
-    }
-    if (!createFormData.ownerContact || createFormData.ownerContact.trim().length < 5) {
-      errors.ownerContact = t.required;
-      isValid = false;
-    }
-    if (!createFormData.ownerEmail) {
-      errors.ownerEmail = t.required;
-      isValid = false;
-    } else if (!validateEmail(createFormData.ownerEmail)) {
-      errors.ownerEmail = t.invalidEmail;
-      isValid = false;
-    }
-
-    // Check In validation
-    if (!createFormData.checkIn) {
-      errors.checkIn = t.required;
-      isValid = false;
-    }
-
-    // Check Out validation
-    if (!createFormData.checkOut) {
-      errors.checkOut = t.required;
-      isValid = false;
-    } else if (createFormData.checkIn && createFormData.checkOut) {
-      const checkInDate = new Date(createFormData.checkIn);
-      const checkOutDate = new Date(createFormData.checkOut);
-      if (checkOutDate <= checkInDate) {
-        errors.checkOut = "Check out must be after check in";
-        isValid = false;
-      }
-    }
-
-    // Months validation
-    if (!createFormData.months || createFormData.months < 1) {
-      errors.months = t.required;
-      isValid = false;
-    }
-
-    // Guests validation
-    if (!createFormData.guests || createFormData.guests < 1) {
-      errors.guests = t.required;
-      isValid = false;
-    }
-
-    // Monthly Rent validation
-    if (!createFormData.monthlyRent || createFormData.monthlyRent <= 0) {
-      errors.monthlyRent = t.required;
-      isValid = false;
-    }
-
-    // Service Fee validation
-    if (createFormData.serviceFee === undefined || createFormData.serviceFee < 0) {
-      errors.serviceFee = t.required;
-      isValid = false;
-    }
-
-    // Payment Method validation
-    if (!createFormData.paymentMethod) {
-      errors.paymentMethod = t.required;
-      isValid = false;
-    }
-
-    // MoMo Number validation (required if payment method is momo)
-    if (createFormData.paymentMethod === "momo" && (!createFormData.momoNumber || createFormData.momoNumber.trim().length < 5)) {
-      errors.momoNumber = t.required;
-      isValid = false;
-    }
-
-    setFormErrors(errors);
-    setIsFormValid(isValid);
-    return isValid;
-  };
-
-  // Handle create form field changes
-  const handleCreateFormChange = (field: keyof Booking, value: any) => {
-    setCreateFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-
-    // Mark field as touched
-    setTouchedFields((prev) => new Set(prev).add(field));
-
-    // Auto-calculate total amount
-    if (field === "monthlyRent" || field === "serviceFee" || field === "months") {
-      const monthlyRent = field === "monthlyRent" ? value : createFormData.monthlyRent || 0;
-      const serviceFee = field === "serviceFee" ? value : createFormData.serviceFee || 0;
-      const months = field === "months" ? value : createFormData.months || 1;
-      const totalAmount = (monthlyRent * months) + serviceFee;
-      setCreateFormData((prev) => ({
-        ...prev,
-        totalAmount,
-      }));
-    }
-  };
-
-  // Handle create form blur
-  const handleCreateFormBlur = (field: string) => {
-    setTouchedFields((prev) => new Set(prev).add(field));
-    validateCreateForm();
-  };
-
-  // Create booking
-  const handleCreateBooking = async () => {
-    if (!validateCreateForm()) {
-      toast.error(`❌ ${t.validationError}`);
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(createFormData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      const bookingData = getBookingData(result);
-      const transformedBooking = transformBookingToUI(bookingData);
-      setBookings((prev) => [transformedBooking, ...prev]);
-
-      toast.success(`✅ Booking created successfully!`);
-      setIsCreateModalOpen(false);
-      resetCreateForm();
-    } catch (error) {
-      toast.error(`❌ Failed to create booking`);
-      console.error("Create booking error:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // Reset create form
-  const resetCreateForm = () => {
-    setCreateFormData({
-      fullName: "",
-      email: "",
-      phone: "",
-      idNumber: "",
-      university: "",
-      studentId: "",
-      purpose: "",
-      houseId: "",
-      houseName: "",
-      houseType: "",
-      district: "",
-      sector: "",
-      cell: "",
-      village: "",
-      ownerName: "",
-      ownerContact: "",
-      ownerEmail: "",
-      checkIn: "",
-      checkOut: "",
-      months: 1,
-      guests: 1,
-      specialRequests: "",
-      monthlyRent: 0,
-      serviceFee: 0,
-      totalAmount: 0,
-      paymentMethod: "momo",
-      momoNumber: "",
-      paymentStatus: "pending",
-      status: "pending",
-      notes: "",
-    });
-    setFormErrors({});
-    setTouchedFields(new Set());
-    setIsFormValid(false);
   };
 
   // Listen for language changes in cookies
@@ -1382,6 +1012,15 @@ export const BookingManagement: React.FC = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Manager Access Notice */}
+      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center gap-3">
+        <BlockIcon className="text-blue-600 w-5 h-5" />
+        <div>
+          <p className="text-sm text-blue-700 font-medium">{t.viewOnly}</p>
+          <p className="text-xs text-blue-600">{t.noCreateAccess}</p>
+        </div>
+      </div>
+
       {/* Header */}
       <div className="mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -1393,12 +1032,6 @@ export const BookingManagement: React.FC = () => {
             <p className="text-sm text-gray-500 mt-1">{t.manageBookings}</p>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="px-4 py-2 bg-[#FF385C] text-white rounded-lg hover:bg-[#E31C5F] transition-colors flex items-center gap-2 text-sm font-medium"
-            >
-              <span className="text-lg">+</span> {t.createBooking}
-            </button>
             <button
               onClick={fetchBookings}
               className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
@@ -1681,814 +1314,6 @@ export const BookingManagement: React.FC = () => {
           </p>
         </div>
       </div>
-
-      {/* Create Booking Modal */}
-      <AnimatePresence>
-        {isCreateModalOpen && (
-          <>
-            <motion.div
-              variants={overlayVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-              onClick={() => setIsCreateModalOpen(false)}
-            />
-            <motion.div
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-            >
-              <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white relative">
-                <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl z-10">
-                  <div className="flex items-center gap-2">
-                    <CalendarTodayIcon className="text-[#FF385C] w-5 h-5" />
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      {t.createBooking}
-                    </h2>
-                    {isFormValid && touchedFields.size > 0 && (
-                      <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full flex items-center gap-1">
-                        <VerifiedIcon className="w-3 h-3" />
-                        {t.allFieldsVerified}
-                      </span>
-                    )}
-                  </div>
-                  <motion.button
-                    whileHover={{ rotate: 90, scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setIsCreateModalOpen(false)}
-                    className="p-1 rounded-full transition-colors hover:bg-gray-100 text-gray-500"
-                  >
-                    <CloseIcon className="w-5 h-5" />
-                  </motion.button>
-                </div>
-
-                <div className="p-6 space-y-6">
-                  {/* Guest Information */}
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                      <PersonIcon className="w-4 h-4 text-[#FF385C]" />
-                      {t.guestInformation}
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Full Name <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={createFormData.fullName || ""}
-                            onChange={(e) => handleCreateFormChange("fullName", e.target.value)}
-                            onBlur={() => handleCreateFormBlur("fullName")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.fullName && touchedFields.has("fullName") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Enter guest full name"
-                          />
-                          {touchedFields.has("fullName") && !formErrors.fullName && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.fullName && touchedFields.has("fullName") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.fullName}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.email} <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="email"
-                            value={createFormData.email || ""}
-                            onChange={(e) => handleCreateFormChange("email", e.target.value)}
-                            onBlur={() => handleCreateFormBlur("email")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.email && touchedFields.has("email") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Enter guest email"
-                          />
-                          {touchedFields.has("email") && !formErrors.email && createFormData.email && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.email && touchedFields.has("email") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.email}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.phone} <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="tel"
-                            value={createFormData.phone || ""}
-                            onChange={(e) => handleCreateFormChange("phone", e.target.value)}
-                            onBlur={() => handleCreateFormBlur("phone")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.phone && touchedFields.has("phone") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Enter guest phone number"
-                          />
-                          {touchedFields.has("phone") && !formErrors.phone && createFormData.phone && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.phone && touchedFields.has("phone") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.phone}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.idNumber} <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={createFormData.idNumber || ""}
-                            onChange={(e) => handleCreateFormChange("idNumber", e.target.value)}
-                            onBlur={() => handleCreateFormBlur("idNumber")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.idNumber && touchedFields.has("idNumber") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Enter ID number"
-                          />
-                          {touchedFields.has("idNumber") && !formErrors.idNumber && createFormData.idNumber && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.idNumber && touchedFields.has("idNumber") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.idNumber}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.university} <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={createFormData.university || ""}
-                            onChange={(e) => handleCreateFormChange("university", e.target.value)}
-                            onBlur={() => handleCreateFormBlur("university")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.university && touchedFields.has("university") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Enter university name"
-                          />
-                          {touchedFields.has("university") && !formErrors.university && createFormData.university && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.university && touchedFields.has("university") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.university}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.studentId} <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={createFormData.studentId || ""}
-                            onChange={(e) => handleCreateFormChange("studentId", e.target.value)}
-                            onBlur={() => handleCreateFormBlur("studentId")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.studentId && touchedFields.has("studentId") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Enter student ID"
-                          />
-                          {touchedFields.has("studentId") && !formErrors.studentId && createFormData.studentId && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.studentId && touchedFields.has("studentId") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.studentId}
-                          </p>
-                        )}
-                      </div>
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.purpose} <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={createFormData.purpose || ""}
-                            onChange={(e) => handleCreateFormChange("purpose", e.target.value)}
-                            onBlur={() => handleCreateFormBlur("purpose")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.purpose && touchedFields.has("purpose") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Enter purpose of booking"
-                          />
-                          {touchedFields.has("purpose") && !formErrors.purpose && createFormData.purpose && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.purpose && touchedFields.has("purpose") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.purpose}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* House Information */}
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                      <HomeIcon className="w-4 h-4 text-[#FF385C]" />
-                      {t.houseInformation}
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.houseName} <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={createFormData.houseName || ""}
-                            onChange={(e) => handleCreateFormChange("houseName", e.target.value)}
-                            onBlur={() => handleCreateFormBlur("houseName")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.houseName && touchedFields.has("houseName") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Enter house name"
-                          />
-                          {touchedFields.has("houseName") && !formErrors.houseName && createFormData.houseName && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.houseName && touchedFields.has("houseName") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.houseName}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.houseType} <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={createFormData.houseType || ""}
-                            onChange={(e) => handleCreateFormChange("houseType", e.target.value)}
-                            onBlur={() => handleCreateFormBlur("houseType")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.houseType && touchedFields.has("houseType") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Enter house type (e.g., Apartment, Villa)"
-                          />
-                          {touchedFields.has("houseType") && !formErrors.houseType && createFormData.houseType && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.houseType && touchedFields.has("houseType") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.houseType}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          District <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={createFormData.district || ""}
-                            onChange={(e) => handleCreateFormChange("district", e.target.value)}
-                            onBlur={() => handleCreateFormBlur("district")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.district && touchedFields.has("district") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Enter district"
-                          />
-                          {touchedFields.has("district") && !formErrors.district && createFormData.district && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.district && touchedFields.has("district") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.district}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Sector <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={createFormData.sector || ""}
-                            onChange={(e) => handleCreateFormChange("sector", e.target.value)}
-                            onBlur={() => handleCreateFormBlur("sector")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.sector && touchedFields.has("sector") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Enter sector"
-                          />
-                          {touchedFields.has("sector") && !formErrors.sector && createFormData.sector && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.sector && touchedFields.has("sector") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.sector}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Cell <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={createFormData.cell || ""}
-                            onChange={(e) => handleCreateFormChange("cell", e.target.value)}
-                            onBlur={() => handleCreateFormBlur("cell")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.cell && touchedFields.has("cell") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Enter cell"
-                          />
-                          {touchedFields.has("cell") && !formErrors.cell && createFormData.cell && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.cell && touchedFields.has("cell") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.cell}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Village <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={createFormData.village || ""}
-                            onChange={(e) => handleCreateFormChange("village", e.target.value)}
-                            onBlur={() => handleCreateFormBlur("village")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.village && touchedFields.has("village") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Enter village"
-                          />
-                          {touchedFields.has("village") && !formErrors.village && createFormData.village && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.village && touchedFields.has("village") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.village}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Owner Information */}
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                      <PersonIcon className="w-4 h-4 text-[#FF385C]" />
-                      {t.owner}
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Owner Name <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={createFormData.ownerName || ""}
-                            onChange={(e) => handleCreateFormChange("ownerName", e.target.value)}
-                            onBlur={() => handleCreateFormBlur("ownerName")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.ownerName && touchedFields.has("ownerName") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Enter owner name"
-                          />
-                          {touchedFields.has("ownerName") && !formErrors.ownerName && createFormData.ownerName && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.ownerName && touchedFields.has("ownerName") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.ownerName}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Owner Contact <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={createFormData.ownerContact || ""}
-                            onChange={(e) => handleCreateFormChange("ownerContact", e.target.value)}
-                            onBlur={() => handleCreateFormBlur("ownerContact")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.ownerContact && touchedFields.has("ownerContact") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Enter owner contact"
-                          />
-                          {touchedFields.has("ownerContact") && !formErrors.ownerContact && createFormData.ownerContact && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.ownerContact && touchedFields.has("ownerContact") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.ownerContact}
-                          </p>
-                        )}
-                      </div>
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Owner Email <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="email"
-                            value={createFormData.ownerEmail || ""}
-                            onChange={(e) => handleCreateFormChange("ownerEmail", e.target.value)}
-                            onBlur={() => handleCreateFormBlur("ownerEmail")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.ownerEmail && touchedFields.has("ownerEmail") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Enter owner email"
-                          />
-                          {touchedFields.has("ownerEmail") && !formErrors.ownerEmail && createFormData.ownerEmail && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.ownerEmail && touchedFields.has("ownerEmail") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.ownerEmail}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Booking Details */}
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                      <AssignmentIcon className="w-4 h-4 text-[#FF385C]" />
-                      {t.bookingInformation}
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.checkIn} <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="date"
-                            value={createFormData.checkIn || ""}
-                            onChange={(e) => handleCreateFormChange("checkIn", e.target.value)}
-                            onBlur={() => handleCreateFormBlur("checkIn")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.checkIn && touchedFields.has("checkIn") ? "border-red-500" : "border-gray-300"
-                            }`}
-                          />
-                          {touchedFields.has("checkIn") && !formErrors.checkIn && createFormData.checkIn && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.checkIn && touchedFields.has("checkIn") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.checkIn}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.checkOut} <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="date"
-                            value={createFormData.checkOut || ""}
-                            onChange={(e) => handleCreateFormChange("checkOut", e.target.value)}
-                            onBlur={() => handleCreateFormBlur("checkOut")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.checkOut && touchedFields.has("checkOut") ? "border-red-500" : "border-gray-300"
-                            }`}
-                          />
-                          {touchedFields.has("checkOut") && !formErrors.checkOut && createFormData.checkOut && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.checkOut && touchedFields.has("checkOut") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.checkOut}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.months} <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="number"
-                            min="1"
-                            max="24"
-                            value={createFormData.months || ""}
-                            onChange={(e) => handleCreateFormChange("months", parseInt(e.target.value) || 0)}
-                            onBlur={() => handleCreateFormBlur("months")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.months && touchedFields.has("months") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Number of months"
-                          />
-                          {touchedFields.has("months") && !formErrors.months && createFormData.months && createFormData.months > 0 && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.months && touchedFields.has("months") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.months}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.guests} <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="number"
-                            min="1"
-                            max="20"
-                            value={createFormData.guests || ""}
-                            onChange={(e) => handleCreateFormChange("guests", parseInt(e.target.value) || 0)}
-                            onBlur={() => handleCreateFormBlur("guests")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.guests && touchedFields.has("guests") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Number of guests"
-                          />
-                          {touchedFields.has("guests") && !formErrors.guests && createFormData.guests && createFormData.guests > 0 && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.guests && touchedFields.has("guests") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.guests}
-                          </p>
-                        )}
-                      </div>
-                      <div className="md:col-span-3">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.specialRequests}
-                        </label>
-                        <textarea
-                          value={createFormData.specialRequests || ""}
-                          onChange={(e) => handleCreateFormChange("specialRequests", e.target.value)}
-                          rows={2}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm resize-none"
-                          placeholder="Any special requests?"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Payment Information */}
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                      <PaymentIcon className="w-4 h-4 text-[#FF385C]" />
-                      {t.paymentInformation}
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.monthlyRent} <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="number"
-                            min="0"
-                            step="1000"
-                            value={createFormData.monthlyRent || ""}
-                            onChange={(e) => handleCreateFormChange("monthlyRent", parseFloat(e.target.value) || 0)}
-                            onBlur={() => handleCreateFormBlur("monthlyRent")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.monthlyRent && touchedFields.has("monthlyRent") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Monthly rent amount"
-                          />
-                          {touchedFields.has("monthlyRent") && !formErrors.monthlyRent && createFormData.monthlyRent && createFormData.monthlyRent > 0 && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.monthlyRent && touchedFields.has("monthlyRent") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.monthlyRent}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.serviceFee} <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="number"
-                            min="0"
-                            step="100"
-                            value={createFormData.serviceFee || ""}
-                            onChange={(e) => handleCreateFormChange("serviceFee", parseFloat(e.target.value) || 0)}
-                            onBlur={() => handleCreateFormBlur("serviceFee")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                              formErrors.serviceFee && touchedFields.has("serviceFee") ? "border-red-500" : "border-gray-300"
-                            }`}
-                            placeholder="Service fee amount"
-                          />
-                          {touchedFields.has("serviceFee") && !formErrors.serviceFee && createFormData.serviceFee !== undefined && createFormData.serviceFee >= 0 && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.serviceFee && touchedFields.has("serviceFee") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.serviceFee}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.totalAmount}
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="number"
-                            value={createFormData.totalAmount || 0}
-                            readOnly
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-sm font-medium text-gray-900"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.paymentMethod} <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <select
-                            value={createFormData.paymentMethod || "momo"}
-                            onChange={(e) => handleCreateFormChange("paymentMethod", e.target.value)}
-                            onBlur={() => handleCreateFormBlur("paymentMethod")}
-                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white ${
-                              formErrors.paymentMethod && touchedFields.has("paymentMethod") ? "border-red-500" : "border-gray-300"
-                            }`}
-                          >
-                            <option value="momo">MoMo</option>
-                            <option value="bank">Bank</option>
-                            <option value="cash">Cash</option>
-                          </select>
-                          {touchedFields.has("paymentMethod") && !formErrors.paymentMethod && createFormData.paymentMethod && (
-                            <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                          )}
-                        </div>
-                        {formErrors.paymentMethod && touchedFields.has("paymentMethod") && (
-                          <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                            <ErrorIcon className="w-3 h-3" />
-                            {formErrors.paymentMethod}
-                          </p>
-                        )}
-                      </div>
-                      {createFormData.paymentMethod === "momo" && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            {t.momoNumber} <span className="text-red-500">*</span>
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="text"
-                              value={createFormData.momoNumber || ""}
-                              onChange={(e) => handleCreateFormChange("momoNumber", e.target.value)}
-                              onBlur={() => handleCreateFormBlur("momoNumber")}
-                              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                                formErrors.momoNumber && touchedFields.has("momoNumber") ? "border-red-500" : "border-gray-300"
-                              }`}
-                              placeholder="Enter MoMo number"
-                            />
-                            {touchedFields.has("momoNumber") && !formErrors.momoNumber && createFormData.momoNumber && (
-                              <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-                            )}
-                          </div>
-                          {formErrors.momoNumber && touchedFields.has("momoNumber") && (
-                            <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                              <ErrorIcon className="w-3 h-3" />
-                              {formErrors.momoNumber}
-                            </p>
-                          )}
-                        </div>
-                      )}
-                      <div className="md:col-span-3">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.notes}
-                        </label>
-                        <textarea
-                          value={createFormData.notes || ""}
-                          onChange={(e) => handleCreateFormChange("notes", e.target.value)}
-                          rows={2}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm resize-none"
-                          placeholder="Additional notes..."
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 pt-4 border-t border-gray-200">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleCreateBooking}
-                      disabled={isSubmitting || !isFormValid}
-                      className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors flex items-center justify-center gap-2 ${
-                        isSubmitting || !isFormValid
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-[#FF385C] hover:bg-[#E31C5F]"
-                      }`}
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          {t.loading}
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-4 h-4" />
-                          {t.createBooking}
-                        </>
-                      )}
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => {
-                        setIsCreateModalOpen(false);
-                        resetCreateForm();
-                      }}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-                    >
-                      {t.cancel}
-                    </motion.button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
 
       {/* View Booking Modal */}
       <AnimatePresence>
