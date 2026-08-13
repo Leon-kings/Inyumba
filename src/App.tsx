@@ -3715,8 +3715,9 @@ import { ManagerHouseManagement } from "./components/dashboard/managers/componen
 import { ManagerMessageManagement } from "./components/dashboard/managers/components/messages/ManagerMessagesManagement";
 import { ManagerTestimonialManagement } from "./components/dashboard/managers/components/testimonials/ManagerTestimonialManagement";
 import { ManagerRequestManagement } from "./components/dashboard/managers/components/request/ManagerRequestManagement";
-// import { AdminLogsManagement } from "./components/dashboard/admin/components/logs/AdminLogsManagement";
-// import { ManagerLogsManagement } from "./components/dashboard/managers/components/logs/ManagerLogsManagement";
+import { ActivitiesManagement } from "./components/changes/manager/ActivitiesManagement";
+import { ActionsManagement } from "./components/changes/admin/ActionsManagementView";
+
 
 // Types
 interface UserData {
@@ -5372,16 +5373,16 @@ export default function App() {
           }
         />
 
-        {/* <Route
+        <Route
           path="/dashboard/logs"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <DashboardLayout>
-                <AdminLogsManagement />
+                <ActionsManagement />
               </DashboardLayout>
             </ProtectedRoute>
           }
-        /> */}
+        />
         <Route
           path="/dashboard/messages"
           element={
@@ -5555,16 +5556,16 @@ export default function App() {
           }
         />
 
-        {/* <Route
+        <Route
           path="/manager/logs"
           element={
             <ProtectedRoute allowedRoles={["manager"]}>
               <DashboardLayout>
-                <ManagerLogsManagement />
+                <ActivitiesManagement />
               </DashboardLayout>
             </ProtectedRoute>
           }
-        /> */}
+        />
 
         <Route
           path="/manager/requests"
