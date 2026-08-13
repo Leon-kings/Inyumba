@@ -370,7 +370,7 @@ const formatCurrencyFull = (value: number): string => {
   return `RWF ${value.toLocaleString()}`;
 };
 
-export const Dashboard: React.FC = () => {
+export const ManagersDashboard: React.FC = () => {
   // Get language from cookies
   const [lang, setLang] = useState<"en" | "fr" | "rw">(
     getLanguageFromCookies(),
