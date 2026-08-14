@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect } from "react";
@@ -138,7 +139,8 @@ const translations = {
     cancelBooking: "Cancel Booking",
     cancelConfirmation: "Are you sure you want to cancel this booking?",
     completedBooking: "Mark as Completed",
-    completedConfirmation: "Are you sure you want to mark this booking as completed?",
+    completedConfirmation:
+      "Are you sure you want to mark this booking as completed?",
     verified: "Verified",
     failed: "Failed",
     paymentStatus: "Payment Status",
@@ -190,6 +192,13 @@ const translations = {
     notAuthorized: "You are not authorized to create bookings",
     viewOnly: "View Only - Manager Access",
     noCreateAccess: "Managers can only view and update existing bookings",
+    view: "View",
+    edit: "Edit",
+    deleteAction: "Delete",
+    confirm: "Confirm",
+    verify: "Verify",
+    cancelAction: "Cancel",
+    complete: "Complete",
   },
   fr: {
     bookingManagement: "Gestion des Réservations",
@@ -218,7 +227,8 @@ const translations = {
     viewBooking: "Voir la Réservation",
     editBooking: "Modifier la Réservation",
     deleteBooking: "Supprimer la Réservation",
-    deleteConfirmation: "Êtes-vous sûr de vouloir supprimer cette réservation ?",
+    deleteConfirmation:
+      "Êtes-vous sûr de vouloir supprimer cette réservation ?",
     actionUndone: "Cette action est irréversible.",
     cancel: "Annuler",
     delete: "Supprimer",
@@ -239,11 +249,13 @@ const translations = {
     loading: "Chargement...",
     fetchError: "Échec du chargement des réservations",
     confirmBooking: "Confirmer la Réservation",
-    confirmConfirmation: "Êtes-vous sûr de vouloir confirmer cette réservation ?",
+    confirmConfirmation:
+      "Êtes-vous sûr de vouloir confirmer cette réservation ?",
     cancelBooking: "Annuler la Réservation",
     cancelConfirmation: "Êtes-vous sûr de vouloir annuler cette réservation ?",
     completedBooking: "Marquer comme Terminé",
-    completedConfirmation: "Êtes-vous sûr de vouloir marquer cette réservation comme terminée ?",
+    completedConfirmation:
+      "Êtes-vous sûr de vouloir marquer cette réservation comme terminée ?",
     verified: "Vérifié",
     failed: "Échoué",
     paymentStatus: "Statut de Paiement",
@@ -288,13 +300,23 @@ const translations = {
       completed: "Terminé",
     },
     verifyPayment: "Vérifier le Paiement",
-    verifyPaymentConfirmation: "Êtes-vous sûr de vouloir vérifier ce paiement ?",
+    verifyPaymentConfirmation:
+      "Êtes-vous sûr de vouloir vérifier ce paiement ?",
     paymentVerified: "Paiement vérifié avec succès !",
     paymentVerificationFailed: "Échec de la vérification du paiement",
-    cancelBookingConfirmation: "Êtes-vous sûr de vouloir annuler cette réservation ?",
+    cancelBookingConfirmation:
+      "Êtes-vous sûr de vouloir annuler cette réservation ?",
     notAuthorized: "Vous n'êtes pas autorisé à créer des réservations",
     viewOnly: "Visualisation uniquement - Accès Manager",
-    noCreateAccess: "Les managers peuvent uniquement visualiser et mettre à jour les réservations existantes",
+    noCreateAccess:
+      "Les managers peuvent uniquement visualiser et mettre à jour les réservations existantes",
+    view: "Voir",
+    edit: "Modifier",
+    deleteAction: "Supprimer",
+    confirm: "Confirmer",
+    verify: "Vérifier",
+    cancelAction: "Annuler",
+    complete: "Terminer",
   },
   rw: {
     bookingManagement: "Gucunga Ibyanditswe",
@@ -304,7 +326,8 @@ const translations = {
     confirmed: "Byemejwe",
     cancelled: "Byahagaritswe",
     completed: "Byarangiye",
-    searchBookings: "Shakisha ukurikije izina, imeri cyangwa ID y'icyanditswe...",
+    searchBookings:
+      "Shakisha ukurikije izina, imeri cyangwa ID y'icyanditswe...",
     allStatus: "Ihagaze Ryose",
     booking: "Icyanditswe",
     guest: "Umushyitsi",
@@ -348,7 +371,8 @@ const translations = {
     cancelBooking: "Hagarika Icyanditswe",
     cancelConfirmation: "Uri kwizera ko ushaka guhagarika iki cyanditswe?",
     completedBooking: "Shyira ku Rangiye",
-    completedConfirmation: "Uri kwizera ko ushaka gushyira iki cyanditswe ku rangiye?",
+    completedConfirmation:
+      "Uri kwizera ko ushaka gushyira iki cyanditswe ku rangiye?",
     verified: "Byagenzuwe",
     failed: "Byananiwe",
     paymentStatus: "Ihagaze ry'Amahoro",
@@ -396,10 +420,19 @@ const translations = {
     verifyPaymentConfirmation: "Uri kwizera ko ushaka kwemeza aya mahoro?",
     paymentVerified: "Amahoro yemejwe neza!",
     paymentVerificationFailed: "Kwemeza amahoro byananiranye",
-    cancelBookingConfirmation: "Uri kwizera ko ushaka guhagarika iki cyanditswe?",
+    cancelBookingConfirmation:
+      "Uri kwizera ko ushaka guhagarika iki cyanditswe?",
     notAuthorized: "Ntabwo uremewe kurema ibyanditswe",
     viewOnly: "Reba gusa - Uburenganzira bwa Manager",
-    noCreateAccess: "Abagenzuzi bashobora gusa kureba no kuvugurura ibyanditswe bihari",
+    noCreateAccess:
+      "Abagenzuzi bashobora gusa kureba no kuvugurura ibyanditswe bihari",
+    view: "Reba",
+    edit: "Hindura",
+    deleteAction: "Kuraho",
+    confirm: "Emeza",
+    verify: "Kemeza",
+    cancelAction: "Hagarika",
+    complete: "Rangiza",
   },
 };
 
@@ -424,7 +457,10 @@ const getBookingData = (response: any): Booking => {
 };
 
 // Helper function to transform booking to UI format
-const transformBookingToUI = (booking: any): BookingUI => {
+const transformBookingToUI = (
+  booking: any,
+  lang: "en" | "fr" | "rw",
+): BookingUI => {
   const safeBooking: Booking = {
     _id: booking?._id || "",
     bookingId: booking?.bookingId || "",
@@ -463,6 +499,8 @@ const transformBookingToUI = (booking: any): BookingUI => {
     updatedAt: booking?.updatedAt || "",
   };
 
+  const t = translations[lang];
+
   const statusColors: Record<string, string> = {
     pending: "bg-yellow-100 text-yellow-800",
     confirmed: "bg-green-100 text-green-800",
@@ -471,10 +509,10 @@ const transformBookingToUI = (booking: any): BookingUI => {
   };
 
   const statusLabels: Record<string, string> = {
-    pending: "Pending",
-    confirmed: "Confirmed",
-    cancelled: "Cancelled",
-    completed: "Completed",
+    pending: t.statuses.pending,
+    confirmed: t.statuses.confirmed,
+    cancelled: t.statuses.cancelled,
+    completed: t.statuses.completed,
   };
 
   const paymentStatusColors: Record<string, string> = {
@@ -484,9 +522,9 @@ const transformBookingToUI = (booking: any): BookingUI => {
   };
 
   const paymentStatusLabels: Record<string, string> = {
-    pending: "Pending",
-    verified: "Verified",
-    failed: "Failed",
+    pending: t.paymentStatuses.pending,
+    verified: t.paymentStatuses.verified,
+    failed: t.paymentStatuses.failed,
   };
 
   const formatDate = (dateString: string): string => {
@@ -504,10 +542,17 @@ const transformBookingToUI = (booking: any): BookingUI => {
 
   return {
     ...safeBooking,
-    statusLabel: statusLabels[safeBooking.status] || safeBooking.status || "Pending",
-    statusColor: statusColors[safeBooking.status] || "bg-gray-100 text-gray-800",
-    paymentStatusLabel: paymentStatusLabels[safeBooking.paymentStatus] || safeBooking.paymentStatus || "Pending",
-    paymentStatusColor: paymentStatusColors[safeBooking.paymentStatus] || "bg-gray-100 text-gray-800",
+    statusLabel:
+      statusLabels[safeBooking.status] || safeBooking.status || "Pending",
+    statusColor:
+      statusColors[safeBooking.status] || "bg-gray-100 text-gray-800",
+    paymentStatusLabel:
+      paymentStatusLabels[safeBooking.paymentStatus] ||
+      safeBooking.paymentStatus ||
+      "Pending",
+    paymentStatusColor:
+      paymentStatusColors[safeBooking.paymentStatus] ||
+      "bg-gray-100 text-gray-800",
     formattedCheckIn: formatDate(safeBooking.checkIn),
     formattedCheckOut: formatDate(safeBooking.checkOut),
     formattedTotal: `RWF ${(safeBooking.totalAmount || 0).toLocaleString()}`,
@@ -532,9 +577,12 @@ export const ManagerBookingManagement: React.FC = () => {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isCompletedModalOpen, setIsCompletedModalOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-  const [isVerifyPaymentModalOpen, setIsVerifyPaymentModalOpen] = useState(false);
-  const [selectedBooking, setSelectedBooking] = useState<BookingUI | null>(null);
-  
+  const [isVerifyPaymentModalOpen, setIsVerifyPaymentModalOpen] =
+    useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<BookingUI | null>(
+    null,
+  );
+
   // Edit form state
   const [editFormData, setEditFormData] = useState<Partial<Booking>>({
     status: "pending",
@@ -567,7 +615,7 @@ export const ManagerBookingManagement: React.FC = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      
+
       let bookingsData: any[] = [];
       if (result.success && Array.isArray(result.data)) {
         bookingsData = result.data;
@@ -578,8 +626,10 @@ export const ManagerBookingManagement: React.FC = () => {
       } else if (result.bookings && Array.isArray(result.bookings)) {
         bookingsData = result.bookings;
       }
-      
-      const transformedBookings = bookingsData.map((booking: any) => transformBookingToUI(booking));
+
+      const transformedBookings = bookingsData.map((booking: any) =>
+        transformBookingToUI(booking, lang),
+      );
       setBookings(transformedBookings);
     } catch (error) {
       console.error("Error fetching bookings:", error);
@@ -602,10 +652,41 @@ export const ManagerBookingManagement: React.FC = () => {
     return () => clearInterval(interval);
   }, [lang]);
 
+  // Re-transform bookings when language changes
+  useEffect(() => {
+    if (bookings.length > 0) {
+      // Re-transform existing bookings with new language
+      const reTransformedBookings = bookings.map((booking) => {
+        // We need to get the raw data from the booking object
+        // Since we can't easily re-transform without raw data,
+        // we'll just update the labels using the current language
+        const statusLabels: Record<string, string> = {
+          pending: t.statuses.pending,
+          confirmed: t.statuses.confirmed,
+          cancelled: t.statuses.cancelled,
+          completed: t.statuses.completed,
+        };
+        const paymentStatusLabels: Record<string, string> = {
+          pending: t.paymentStatuses.pending,
+          verified: t.paymentStatuses.verified,
+          failed: t.paymentStatuses.failed,
+        };
+
+        return {
+          ...booking,
+          statusLabel: statusLabels[booking.status] || booking.status,
+          paymentStatusLabel:
+            paymentStatusLabels[booking.paymentStatus] || booking.paymentStatus,
+        };
+      });
+      setBookings(reTransformedBookings);
+    }
+  }, [lang]);
+
   // Initial fetch
   useEffect(() => {
     fetchBookings();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, []);
 
   // Filter bookings
@@ -743,18 +824,22 @@ export const ManagerBookingManagement: React.FC = () => {
 
       const result = await response.json();
       const bookingData = getBookingData(result);
-      const transformedBooking = transformBookingToUI(bookingData);
+      const transformedBooking = transformBookingToUI(bookingData, lang);
 
       setBookings((prevBookings) =>
         prevBookings.map((b) =>
-          b._id === selectedBooking._id ? transformedBooking : b
-        )
+          b._id === selectedBooking._id ? transformedBooking : b,
+        ),
       );
 
       toast.success(`✅ ${t.statusUpdated}`);
       setIsEditModalOpen(false);
       setSelectedBooking(null);
-      setEditFormData({ status: "pending", paymentStatus: "pending", notes: "" });
+      setEditFormData({
+        status: "pending",
+        paymentStatus: "pending",
+        notes: "",
+      });
     } catch (error) {
       toast.error(`❌ ${t.statusUpdateFailed}`);
       console.error("Update booking error:", error);
@@ -809,15 +894,15 @@ export const ManagerBookingManagement: React.FC = () => {
 
       const result = await response.json();
       const bookingData = getBookingData(result);
-      const transformedBooking = transformBookingToUI(bookingData);
+      const transformedBooking = transformBookingToUI(bookingData, lang);
 
       setBookings((prevBookings) =>
         prevBookings.map((b) =>
-          b._id === selectedBooking._id ? transformedBooking : b
-        )
+          b._id === selectedBooking._id ? transformedBooking : b,
+        ),
       );
 
-      toast.success(`✅ Booking confirmed successfully!`);
+      toast.success(`✅ ${t.confirmBooking} successful!`);
       setIsConfirmModalOpen(false);
       setSelectedBooking(null);
     } catch (error) {
@@ -847,15 +932,15 @@ export const ManagerBookingManagement: React.FC = () => {
 
       const result = await response.json();
       const bookingData = getBookingData(result);
-      const transformedBooking = transformBookingToUI(bookingData);
+      const transformedBooking = transformBookingToUI(bookingData, lang);
 
       setBookings((prevBookings) =>
         prevBookings.map((b) =>
-          b._id === selectedBooking._id ? transformedBooking : b
-        )
+          b._id === selectedBooking._id ? transformedBooking : b,
+        ),
       );
 
-      toast.success(`✅ Booking cancelled successfully!`);
+      toast.success(`✅ ${t.cancelBooking} successful!`);
       setIsCancelModalOpen(false);
       setSelectedBooking(null);
     } catch (error) {
@@ -886,15 +971,15 @@ export const ManagerBookingManagement: React.FC = () => {
 
       const result = await response.json();
       const bookingData = getBookingData(result);
-      const transformedBooking = transformBookingToUI(bookingData);
+      const transformedBooking = transformBookingToUI(bookingData, lang);
 
       setBookings((prevBookings) =>
         prevBookings.map((b) =>
-          b._id === selectedBooking._id ? transformedBooking : b
-        )
+          b._id === selectedBooking._id ? transformedBooking : b,
+        ),
       );
 
-      toast.success(`✅ Booking marked as completed!`);
+      toast.success(`✅ ${t.completedBooking} successful!`);
       setIsCompletedModalOpen(false);
       setSelectedBooking(null);
     } catch (error) {
@@ -911,27 +996,32 @@ export const ManagerBookingManagement: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`${API_URL}/${selectedBooking._id}/verify-payment`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${API_URL}/${selectedBooking._id}/verify-payment`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ paymentStatus: "verified" }),
         },
-        body: JSON.stringify({ paymentStatus: "verified" }),
-      });
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`,
+        );
       }
 
       const result = await response.json();
       const bookingData = getBookingData(result);
-      const transformedBooking = transformBookingToUI(bookingData);
+      const transformedBooking = transformBookingToUI(bookingData, lang);
 
       setBookings((prevBookings) =>
         prevBookings.map((b) =>
-          b._id === selectedBooking._id ? transformedBooking : b
-        )
+          b._id === selectedBooking._id ? transformedBooking : b,
+        ),
       );
 
       toast.success(`✅ ${t.paymentVerified}`);
@@ -1154,7 +1244,10 @@ export const ManagerBookingManagement: React.FC = () => {
             <tbody className="divide-y divide-gray-200">
               {filteredBookings.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                  <td
+                    colSpan={7}
+                    className="px-4 py-8 text-center text-gray-500"
+                  >
                     <CalendarTodayIcon className="w-12 h-12 mx-auto text-gray-300 mb-2" />
                     <p>{t.noBookings}</p>
                     <p className="text-sm">{t.adjustFilters}</p>
@@ -1223,38 +1316,51 @@ export const ManagerBookingManagement: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <p className="text-sm text-gray-600">{booking.formattedCheckIn}</p>
-                      <p className="text-xs text-gray-400">{booking.formattedCheckOut}</p>
+                      <p className="text-sm text-gray-600">
+                        {booking.formattedCheckIn}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {booking.formattedCheckOut}
+                      </p>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center justify-center gap-0.5 flex-nowrap">
+                      <div className="flex items-center justify-center gap-1 flex-wrap">
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                           onClick={() => openViewModal(booking)}
-                          className="p-1 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-1"
                           title={t.viewBooking}
                         >
                           <VisibilityIcon className="w-4 h-4" />
+                          <span className="text-xs hidden sm:inline">
+                            {t.view}
+                          </span>
                         </motion.button>
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                           onClick={() => openEditModal(booking)}
-                          className="p-1 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                          className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors flex items-center gap-1"
                           title={t.editBooking}
                         >
                           <EditIcon className="w-4 h-4" />
+                          <span className="text-xs hidden sm:inline">
+                            {t.edit}
+                          </span>
                         </motion.button>
                         {booking.status === "pending" && (
                           <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => openConfirmModal(booking)}
-                            className="p-1 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                            className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors flex items-center gap-1"
                             title={t.confirmBooking}
                           >
                             <CheckCircleIcon className="w-4 h-4" />
+                            <span className="text-xs hidden sm:inline">
+                              {t.confirm}
+                            </span>
                           </motion.button>
                         )}
                         {booking.paymentStatus === "pending" && (
@@ -1262,10 +1368,13 @@ export const ManagerBookingManagement: React.FC = () => {
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => openVerifyPaymentModal(booking)}
-                            className="p-1 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                            className="p-1.5 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors flex items-center gap-1"
                             title={t.verifyPayment}
                           >
                             <VerifiedIcon className="w-4 h-4" />
+                            <span className="text-xs hidden sm:inline">
+                              {t.verify}
+                            </span>
                           </motion.button>
                         )}
                         {booking.status === "pending" && (
@@ -1273,10 +1382,13 @@ export const ManagerBookingManagement: React.FC = () => {
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => openCancelModal(booking)}
-                            className="p-1 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+                            className="p-1.5 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors flex items-center gap-1"
                             title={t.cancelBooking}
                           >
                             <CancelIcon className="w-4 h-4" />
+                            <span className="text-xs hidden sm:inline">
+                              {t.cancelAction}
+                            </span>
                           </motion.button>
                         )}
                         {booking.status === "confirmed" && (
@@ -1284,20 +1396,26 @@ export const ManagerBookingManagement: React.FC = () => {
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => openCompletedModal(booking)}
-                            className="p-1 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                            className="p-1.5 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors flex items-center gap-1"
                             title={t.completedBooking}
                           >
                             <AssignmentIcon className="w-4 h-4" />
+                            <span className="text-xs hidden sm:inline">
+                              {t.complete}
+                            </span>
                           </motion.button>
                         )}
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                           onClick={() => openDeleteModal(booking)}
-                          className="p-1 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1"
                           title={t.deleteBooking}
                         >
                           <DeleteIcon className="w-4 h-4" />
+                          <span className="text-xs hidden sm:inline">
+                            {t.deleteAction}
+                          </span>
                         </motion.button>
                       </div>
                     </td>
@@ -1364,38 +1482,62 @@ export const ManagerBookingManagement: React.FC = () => {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4">
                       <div>
-                        <label className="text-xs font-medium text-gray-500">Full Name</label>
-                        <p className="text-sm font-medium text-gray-900">{selectedBooking.fullName}</p>
+                        <label className="text-xs font-medium text-gray-500">
+                          Full Name
+                        </label>
+                        <p className="text-sm font-medium text-gray-900">
+                          {selectedBooking.fullName}
+                        </p>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-gray-500">{t.email}</label>
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.email}
+                        </label>
                         <p className="text-sm text-gray-900 flex items-center gap-1">
                           <EmailIcon className="w-3 h-3 text-gray-400" />
                           {selectedBooking.email}
                         </p>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-gray-500">{t.phone}</label>
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.phone}
+                        </label>
                         <p className="text-sm text-gray-900 flex items-center gap-1">
                           <PhoneIcon className="w-3 h-3 text-gray-400" />
                           {selectedBooking.phone}
                         </p>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-gray-500">{t.idNumber}</label>
-                        <p className="text-sm text-gray-900">{selectedBooking.idNumber || "N/A"}</p>
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.idNumber}
+                        </label>
+                        <p className="text-sm text-gray-900">
+                          {selectedBooking.idNumber || "N/A"}
+                        </p>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-gray-500">{t.university}</label>
-                        <p className="text-sm text-gray-900">{selectedBooking.university || "N/A"}</p>
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.university}
+                        </label>
+                        <p className="text-sm text-gray-900">
+                          {selectedBooking.university || "N/A"}
+                        </p>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-gray-500">{t.studentId}</label>
-                        <p className="text-sm text-gray-900">{selectedBooking.studentId || "N/A"}</p>
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.studentId}
+                        </label>
+                        <p className="text-sm text-gray-900">
+                          {selectedBooking.studentId || "N/A"}
+                        </p>
                       </div>
                       <div className="md:col-span-2">
-                        <label className="text-xs font-medium text-gray-500">{t.purpose}</label>
-                        <p className="text-sm text-gray-900">{selectedBooking.purpose || "N/A"}</p>
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.purpose}
+                        </label>
+                        <p className="text-sm text-gray-900">
+                          {selectedBooking.purpose || "N/A"}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -1408,26 +1550,45 @@ export const ManagerBookingManagement: React.FC = () => {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4">
                       <div>
-                        <label className="text-xs font-medium text-gray-500">{t.houseName}</label>
-                        <p className="text-sm font-medium text-gray-900">{selectedBooking.houseName}</p>
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-gray-500">{t.houseType}</label>
-                        <p className="text-sm text-gray-900">{selectedBooking.houseType || "N/A"}</p>
-                      </div>
-                      <div className="md:col-span-2">
-                        <label className="text-xs font-medium text-gray-500">{t.location}</label>
-                        <p className="text-sm text-gray-900">
-                          {selectedBooking.district}, {selectedBooking.sector}, {selectedBooking.cell}, {selectedBooking.village}
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.houseName}
+                        </label>
+                        <p className="text-sm font-medium text-gray-900">
+                          {selectedBooking.houseName}
                         </p>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-gray-500">{t.owner}</label>
-                        <p className="text-sm text-gray-900">{selectedBooking.ownerName || "N/A"}</p>
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.houseType}
+                        </label>
+                        <p className="text-sm text-gray-900">
+                          {selectedBooking.houseType || "N/A"}
+                        </p>
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.location}
+                        </label>
+                        <p className="text-sm text-gray-900">
+                          {selectedBooking.district}, {selectedBooking.sector},{" "}
+                          {selectedBooking.cell}, {selectedBooking.village}
+                        </p>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-gray-500">Owner Contact</label>
-                        <p className="text-sm text-gray-900">{selectedBooking.ownerContact || "N/A"}</p>
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.owner}
+                        </label>
+                        <p className="text-sm text-gray-900">
+                          {selectedBooking.ownerName || "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-500">
+                          Owner Contact
+                        </label>
+                        <p className="text-sm text-gray-900">
+                          {selectedBooking.ownerContact || "N/A"}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -1440,27 +1601,45 @@ export const ManagerBookingManagement: React.FC = () => {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50 rounded-lg p-4">
                       <div>
-                        <label className="text-xs font-medium text-gray-500">{t.checkIn}</label>
-                        <p className="text-sm text-gray-900">{selectedBooking.formattedCheckIn}</p>
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.checkIn}
+                        </label>
+                        <p className="text-sm text-gray-900">
+                          {selectedBooking.formattedCheckIn}
+                        </p>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-gray-500">{t.checkOut}</label>
-                        <p className="text-sm text-gray-900">{selectedBooking.formattedCheckOut}</p>
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.checkOut}
+                        </label>
+                        <p className="text-sm text-gray-900">
+                          {selectedBooking.formattedCheckOut}
+                        </p>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-gray-500">{t.months}</label>
-                        <p className="text-sm text-gray-900">{selectedBooking.months}</p>
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.months}
+                        </label>
+                        <p className="text-sm text-gray-900">
+                          {selectedBooking.months}
+                        </p>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-gray-500">{t.guests}</label>
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.guests}
+                        </label>
                         <p className="text-sm text-gray-900 flex items-center gap-1">
                           <PeopleIcon className="w-3 h-3 text-gray-400" />
                           {selectedBooking.guests}
                         </p>
                       </div>
                       <div className="md:col-span-2">
-                        <label className="text-xs font-medium text-gray-500">{t.specialRequests}</label>
-                        <p className="text-sm text-gray-900">{selectedBooking.specialRequests || "None"}</p>
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.specialRequests}
+                        </label>
+                        <p className="text-sm text-gray-900">
+                          {selectedBooking.specialRequests || "None"}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -1473,36 +1652,62 @@ export const ManagerBookingManagement: React.FC = () => {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50 rounded-lg p-4">
                       <div>
-                        <label className="text-xs font-medium text-gray-500">{t.monthlyRent}</label>
-                        <p className="text-sm font-medium text-gray-900">{formatCurrency(selectedBooking.monthlyRent)}</p>
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.monthlyRent}
+                        </label>
+                        <p className="text-sm font-medium text-gray-900">
+                          {formatCurrency(selectedBooking.monthlyRent)}
+                        </p>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-gray-500">{t.serviceFee}</label>
-                        <p className="text-sm text-gray-900">{formatCurrency(selectedBooking.serviceFee)}</p>
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.serviceFee}
+                        </label>
+                        <p className="text-sm text-gray-900">
+                          {formatCurrency(selectedBooking.serviceFee)}
+                        </p>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-gray-500">{t.totalAmount}</label>
-                        <p className="text-sm font-bold text-gray-900">{selectedBooking.formattedTotal}</p>
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.totalAmount}
+                        </label>
+                        <p className="text-sm font-bold text-gray-900">
+                          {selectedBooking.formattedTotal}
+                        </p>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-gray-500">{t.paymentMethod}</label>
-                        <p className="text-sm text-gray-900 capitalize">{selectedBooking.paymentMethod}</p>
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.paymentMethod}
+                        </label>
+                        <p className="text-sm text-gray-900 capitalize">
+                          {selectedBooking.paymentMethod}
+                        </p>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-gray-500">{t.paymentStatus}</label>
-                        <span className={`mt-1 px-2 py-1 text-xs font-medium rounded-full ${getPaymentStatusColor(selectedBooking.paymentStatus)}`}>
+                        <label className="text-xs font-medium text-gray-500">
+                          {t.paymentStatus}
+                        </label>
+                        <span
+                          className={`mt-1 px-2 py-1 text-xs font-medium rounded-full ${getPaymentStatusColor(selectedBooking.paymentStatus)}`}
+                        >
                           {getPaymentStatusLabel(selectedBooking.paymentStatus)}
                         </span>
                       </div>
                       {selectedBooking.momoNumber && (
                         <div>
-                          <label className="text-xs font-medium text-gray-500">{t.momoNumber}</label>
-                          <p className="text-sm text-gray-900">{selectedBooking.momoNumber}</p>
+                          <label className="text-xs font-medium text-gray-500">
+                            {t.momoNumber}
+                          </label>
+                          <p className="text-sm text-gray-900">
+                            {selectedBooking.momoNumber}
+                          </p>
                         </div>
                       )}
                       {selectedBooking.paymentScreenshot?.url && (
                         <div className="md:col-span-3">
-                          <label className="text-xs font-medium text-gray-500">{t.paymentScreenshot}</label>
+                          <label className="text-xs font-medium text-gray-500">
+                            {t.paymentScreenshot}
+                          </label>
                           <div className="mt-1">
                             <button
                               onClick={() => setIsImageModalOpen(true)}
@@ -1523,9 +1728,13 @@ export const ManagerBookingManagement: React.FC = () => {
                   {/* Notes */}
                   {selectedBooking.notes && (
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.notes}</label>
+                      <label className="text-xs font-medium text-gray-500">
+                        {t.notes}
+                      </label>
                       <div className="mt-1 p-3 bg-gray-50 rounded-lg">
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedBooking.notes}</p>
+                        <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                          {selectedBooking.notes}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -1533,12 +1742,20 @@ export const ManagerBookingManagement: React.FC = () => {
                   {/* Dates */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.createdAt}</label>
-                      <p className="text-sm text-gray-900">{formatDate(selectedBooking.createdAt)}</p>
+                      <label className="text-xs font-medium text-gray-500">
+                        {t.createdAt}
+                      </label>
+                      <p className="text-sm text-gray-900">
+                        {formatDate(selectedBooking.createdAt)}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500">{t.updatedAt}</label>
-                      <p className="text-sm text-gray-900">{formatDate(selectedBooking.updatedAt)}</p>
+                      <label className="text-xs font-medium text-gray-500">
+                        {t.updatedAt}
+                      </label>
+                      <p className="text-sm text-gray-900">
+                        {formatDate(selectedBooking.updatedAt)}
+                      </p>
                     </div>
                   </div>
 
@@ -1603,7 +1820,12 @@ export const ManagerBookingManagement: React.FC = () => {
                     </label>
                     <select
                       value={editFormData.status || "pending"}
-                      onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value as any })}
+                      onChange={(e) =>
+                        setEditFormData({
+                          ...editFormData,
+                          status: e.target.value as any,
+                        })
+                      }
                       className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
                     >
                       <option value="pending">{t.statuses.pending}</option>
@@ -1619,11 +1841,20 @@ export const ManagerBookingManagement: React.FC = () => {
                     </label>
                     <select
                       value={editFormData.paymentStatus || "pending"}
-                      onChange={(e) => setEditFormData({ ...editFormData, paymentStatus: e.target.value as any })}
+                      onChange={(e) =>
+                        setEditFormData({
+                          ...editFormData,
+                          paymentStatus: e.target.value as any,
+                        })
+                      }
                       className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
                     >
-                      <option value="pending">{t.paymentStatuses.pending}</option>
-                      <option value="verified">{t.paymentStatuses.verified}</option>
+                      <option value="pending">
+                        {t.paymentStatuses.pending}
+                      </option>
+                      <option value="verified">
+                        {t.paymentStatuses.verified}
+                      </option>
                       <option value="failed">{t.paymentStatuses.failed}</option>
                     </select>
                   </div>
@@ -1634,7 +1865,12 @@ export const ManagerBookingManagement: React.FC = () => {
                     </label>
                     <textarea
                       value={editFormData.notes || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, notes: e.target.value })}
+                      onChange={(e) =>
+                        setEditFormData({
+                          ...editFormData,
+                          notes: e.target.value,
+                        })
+                      }
                       rows={4}
                       className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm resize-none"
                       placeholder="Add notes about this booking..."
@@ -2114,7 +2350,7 @@ export const ManagerBookingManagement: React.FC = () => {
                   className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
                 />
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white text-sm px-4 py-2 rounded-lg">
-                  Payment Screenshot
+                  {t.paymentScreenshot}
                 </div>
               </div>
             </motion.div>
