@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 // /* eslint-disable react-hooks/set-state-in-effect */
@@ -4326,11 +4325,28 @@ export const ManagerHouseManagement: React.FC = () => {
   };
 
   // ✅ FIXED: Only validate and show errors when field is touched or on submit
+  // const validateAndSetErrors = (fieldsToValidate?: string[]) => {
+  //   const errors = validateForm();
+  //   setFormErrors(errors);
+  //   return Object.keys(errors).length === 0;
+  // };
+
   const validateAndSetErrors = (fieldsToValidate?: string[]) => {
-    const errors = validateForm();
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
+  const errors = validateForm();
+
+  const filteredErrors = fieldsToValidate
+    ? Object.keys(errors).reduce((acc, field) => {
+        if (fieldsToValidate.includes(field)) {
+          acc[field] = errors[field];
+        }
+        return acc;
+      }, {} as typeof errors)
+    : errors;
+
+  setFormErrors(filteredErrors);
+
+  return Object.keys(filteredErrors).length === 0;
+};
 
   const handleFieldBlur = (field: string) => {
     setTouchedFields((prev) => ({ ...prev, [field]: true }));
