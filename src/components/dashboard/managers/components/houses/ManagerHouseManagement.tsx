@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 // /* eslint-disable react-hooks/set-state-in-effect */
 // import React, { useState, useEffect, useCallback, useRef } from "react";
@@ -163,6 +165,81 @@
 //     noImage: "No image",
 //     selectFiles: "Select Files",
 //     dragDrop: "Drag & drop images here",
+//     previous: "Previous",
+//     next: "Next",
+//     page: "Page",
+//     statuses: {
+//       available: "Available",
+//       pending: "Pending",
+//       unavailable: "Unavailable",
+//       maintenance: "Maintenance",
+//     },
+//     // Translated static content for common property data
+//     staticContent: {
+//       // Common property names
+//       propertyNames: {
+//         "Cozy Apartment": "Cozy Apartment",
+//         "Modern Studio": "Modern Studio",
+//         "Luxury Villa": "Luxury Villa",
+//         "Family House": "Family House",
+//         "City Center Flat": "City Center Flat",
+//         "Garden Cottage": "Garden Cottage",
+//         "Beachfront House": "Beachfront House",
+//         "Mountain View": "Mountain View",
+//         "Penthouse Suite": "Penthouse Suite",
+//         "Traditional Home": "Traditional Home",
+//       },
+//       // Common descriptions
+//       descriptions: {
+//         "The apartment in Kigali offers one bedroom and three bathrooms. The property includes a fully equipped kitchen, washing machine, and TV. Free WiFi":
+//           "The apartment in Kigali offers one bedroom and three bathrooms. The property includes a fully equipped kitchen, washing machine, and TV. Free WiFi",
+//         "Spacious house with garden": "Spacious house with garden",
+//         "Modern apartment with city view": "Modern apartment with city view",
+//         "Cozy studio near university": "Cozy studio near university",
+//         "Luxury villa with pool": "Luxury villa with pool",
+//       },
+//       // Common universities
+//       universities: {
+//         "University of Rwanda": "University of Rwanda",
+//         "Rwanda Polytechnic": "Rwanda Polytechnic",
+//         "African Leadership University": "African Leadership University",
+//         "University of Kigali": "University of Kigali",
+//         "Mount Kenya University": "Mount Kenya University",
+//         "Kigali Independent University": "Kigali Independent University",
+//       },
+//       // Common locations
+//       locations: {
+//         Kigali: "Kigali",
+//         "Gasabo District": "Gasabo District",
+//         "Nyarugenge District": "Nyarugenge District",
+//         "Kicukiro District": "Kicukiro District",
+//         "Remera Sector": "Remera Sector",
+//         "Kimihurura Sector": "Kimihurura Sector",
+//         "Kacyiru Sector": "Kacyiru Sector",
+//         "Gikondo Sector": "Gikondo Sector",
+//         "Nyarutarama Village": "Nyarutarama Village",
+//         "Kibagabaga Village": "Kibagabaga Village",
+//         "Rugando Village": "Rugando Village",
+//         "Kinyinya Village": "Kinyinya Village",
+//       },
+//       // Common amenities
+//       amenities: {
+//         "WiFi": "WiFi",
+//         "Kitchen": "Kitchen",
+//         "Washing Machine": "Washing Machine",
+//         "TV": "TV",
+//         "Pool": "Pool",
+//         "Gym": "Gym",
+//         "Parking": "Parking",
+//         "Air Conditioning": "Air Conditioning",
+//         "Heating": "Heating",
+//         "Balcony": "Balcony",
+//         "Garden": "Garden",
+//         "Security": "Security",
+//         "Elevator": "Elevator",
+//         "Furnished": "Furnished",
+//       },
+//     },
 //     validation: {
 //       nameRequired: "Property name is required",
 //       nameMinLength: "Name must be at least 3 characters",
@@ -285,6 +362,75 @@
 //     noImage: "Pas d'image",
 //     selectFiles: "Sélectionner des Fichiers",
 //     dragDrop: "Glissez-déposez les images ici",
+//     previous: "Précédent",
+//     next: "Suivant",
+//     page: "Page",
+//     statuses: {
+//       available: "Disponible",
+//       pending: "En Attente",
+//       unavailable: "Indisponible",
+//       maintenance: "Maintenance",
+//     },
+//     staticContent: {
+//       propertyNames: {
+//         "Cozy Apartment": "Appartement Confortable",
+//         "Modern Studio": "Studio Moderne",
+//         "Luxury Villa": "Villa de Luxe",
+//         "Family House": "Maison Familiale",
+//         "City Center Flat": "Appartement Centre-Ville",
+//         "Garden Cottage": "Maisonnette avec Jardin",
+//         "Beachfront House": "Maison en Bord de Mer",
+//         "Mountain View": "Vue sur la Montagne",
+//         "Penthouse Suite": "Suite Penthouse",
+//         "Traditional Home": "Maison Traditionnelle",
+//       },
+//       descriptions: {
+//         "The apartment in Kigali offers one bedroom and three bathrooms. The property includes a fully equipped kitchen, washing machine, and TV. Free WiFi":
+//           "L'appartement à Kigali offre une chambre et trois salles de bain. La propriété comprend une cuisine entièrement équipée, une machine à laver et une télévision. WiFi gratuit.",
+//         "Spacious house with garden": "Maison spacieuse avec jardin",
+//         "Modern apartment with city view": "Appartement moderne avec vue sur la ville",
+//         "Cozy studio near university": "Studio confortable près de l'université",
+//         "Luxury villa with pool": "Villa de luxe avec piscine",
+//       },
+//       universities: {
+//         "University of Rwanda": "Université du Rwanda",
+//         "Rwanda Polytechnic": "Polytechnique du Rwanda",
+//         "African Leadership University": "Université Africaine de Leadership",
+//         "University of Kigali": "Université de Kigali",
+//         "Mount Kenya University": "Université Mont Kenya",
+//         "Kigali Independent University": "Université Indépendante de Kigali",
+//       },
+//       locations: {
+//         Kigali: "Kigali",
+//         "Gasabo District": "District de Gasabo",
+//         "Nyarugenge District": "District de Nyarugenge",
+//         "Kicukiro District": "District de Kicukiro",
+//         "Remera Sector": "Secteur de Remera",
+//         "Kimihurura Sector": "Secteur de Kimihurura",
+//         "Kacyiru Sector": "Secteur de Kacyiru",
+//         "Gikondo Sector": "Secteur de Gikondo",
+//         "Nyarutarama Village": "Village de Nyarutarama",
+//         "Kibagabaga Village": "Village de Kibagabaga",
+//         "Rugando Village": "Village de Rugando",
+//         "Kinyinya Village": "Village de Kinyinya",
+//       },
+//       amenities: {
+//         "WiFi": "WiFi",
+//         "Kitchen": "Cuisine",
+//         "Washing Machine": "Machine à Laver",
+//         "TV": "Télévision",
+//         "Pool": "Piscine",
+//         "Gym": "Salle de Sport",
+//         "Parking": "Parking",
+//         "Air Conditioning": "Climatisation",
+//         "Heating": "Chauffage",
+//         "Balcony": "Balcon",
+//         "Garden": "Jardin",
+//         "Security": "Sécurité",
+//         "Elevator": "Ascenseur",
+//         "Furnished": "Meublé",
+//       },
+//     },
 //     validation: {
 //       nameRequired: "Le nom de la propriété est requis",
 //       nameMinLength: "Le nom doit contenir au moins 3 caractères",
@@ -409,6 +555,75 @@
 //     noImage: "Nta shusho",
 //     selectFiles: "Hitamo Amashusho",
 //     dragDrop: "Kurura no gushyira amashusho hano",
+//     previous: "Ibaye",
+//     next: "Ubutaha",
+//     page: "Urupapuro",
+//     statuses: {
+//       available: "Irahari",
+//       pending: "Bitegereje",
+//       unavailable: "Ntaho",
+//       maintenance: "Muri Maintenance",
+//     },
+//     staticContent: {
+//       propertyNames: {
+//         "Cozy Apartment": "Aparatari Ihoye",
+//         "Modern Studio": "Studio Igezweho",
+//         "Luxury Villa": "Villa Yoroshye",
+//         "Family House": "Inzu y'Umuryango",
+//         "City Center Flat": "Aparatari yo mu Mujyi",
+//         "Garden Cottage": "Inzu nto ifite Ubushamba",
+//         "Beachfront House": "Inzu ku Nkombe y'Ikinyaga",
+//         "Mountain View": "Reba Umusozi",
+//         "Penthouse Suite": "Penthouse Suite",
+//         "Traditional Home": "Inzu Gakondo",
+//       },
+//       descriptions: {
+//         "The apartment in Kigali offers one bedroom and three bathrooms. The property includes a fully equipped kitchen, washing machine, and TV. Free WiFi":
+//           "Aparatari i Kigali ifite icyumba kimwe n'amazu y'isuku atatu. Inzu irimo igikoni gishyizwe neza, mashini yo gukaraba, na TV. WiFi ku buntu.",
+//         "Spacious house with garden": "Inzu nini ifite ubushamba",
+//         "Modern apartment with city view": "Aparatari igezweho ireba umujyi",
+//         "Cozy studio near university": "Studio ihoye hafi ya kaminuza",
+//         "Luxury villa with pool": "Villa nziza ifite ikidandaza",
+//       },
+//       universities: {
+//         "University of Rwanda": "Kaminuza y'u Rwanda",
+//         "Rwanda Polytechnic": "Politekiniki y'u Rwanda",
+//         "African Leadership University": "Kaminuza y'Ububumenyi bw'Afurika",
+//         "University of Kigali": "Kaminuza ya Kigali",
+//         "Mount Kenya University": "Kaminuza ya Mount Kenya",
+//         "Kigali Independent University": "Kaminuza Igenga ya Kigali",
+//       },
+//       locations: {
+//         Kigali: "Kigali",
+//         "Gasabo District": "Akarere ka Gasabo",
+//         "Nyarugenge District": "Akarere ka Nyarugenge",
+//         "Kicukiro District": "Akarere ka Kicukiro",
+//         "Remera Sector": "Umurenge wa Remera",
+//         "Kimihurura Sector": "Umurenge wa Kimihurura",
+//         "Kacyiru Sector": "Umurenge wa Kacyiru",
+//         "Gikondo Sector": "Umurenge wa Gikondo",
+//         "Nyarutarama Village": "Umudugudu wa Nyarutarama",
+//         "Kibagabaga Village": "Umudugudu wa Kibagabaga",
+//         "Rugando Village": "Umudugudu wa Rugando",
+//         "Kinyinya Village": "Umudugudu wa Kinyinya",
+//       },
+//       amenities: {
+//         "WiFi": "WiFi",
+//         "Kitchen": "Igikoni",
+//         "Washing Machine": "Mashini yo Gukaraba",
+//         "TV": "TV",
+//         "Pool": "Ikidandaza",
+//         "Gym": "Salle ya Siporo",
+//         "Parking": "Parking",
+//         "Air Conditioning": "Ikikuba",
+//         "Heating": "Ubushyuhe",
+//         "Balcony": "Baranda",
+//         "Garden": "Ubushamba",
+//         "Security": "Umutekano",
+//         "Elevator": "Elevator",
+//         "Furnished": "Ishyizwe neza",
+//       },
+//     },
 //     validation: {
 //       nameRequired: "Izina ry'inzu rirasabwa",
 //       nameMinLength: "Izina rigomba kugira byibura inyuguti 3",
@@ -776,6 +991,120 @@
 //       />
 //     </svg>
 //   ),
+//   ChevronLeft: () => (
+//     <svg
+//       className="w-5 h-5"
+//       fill="none"
+//       stroke="currentColor"
+//       viewBox="0 0 24 24"
+//     >
+//       <path
+//         strokeLinecap="round"
+//         strokeLinejoin="round"
+//         strokeWidth="2"
+//         d="M15 19l-7-7 7-7"
+//       />
+//     </svg>
+//   ),
+//   ChevronRight: () => (
+//     <svg
+//       className="w-5 h-5"
+//       fill="none"
+//       stroke="currentColor"
+//       viewBox="0 0 24 24"
+//     >
+//       <path
+//         strokeLinecap="round"
+//         strokeLinejoin="round"
+//         strokeWidth="2"
+//         d="M9 5l7 7-7 7"
+//       />
+//     </svg>
+//   ),
+// };
+
+// // ============================================================
+// // TRANSLATION HELPER FUNCTIONS
+// // ============================================================
+
+// // Translate text using static content dictionary
+// const translateText = (
+//   text: string,
+//   lang: "en" | "fr" | "rw",
+//   category: keyof typeof translations.en.staticContent
+// ): string => {
+//   if (!text) return text;
+  
+//   const dict = translations[lang].staticContent[category] as Record<string, string>;
+//   // Check if the exact text exists in the dictionary
+//   if (dict[text]) {
+//     return dict[text];
+//   }
+  
+//   // If not found, try case-insensitive match
+//   const lowerText = text.toLowerCase();
+//   for (const [key, value] of Object.entries(dict)) {
+//     if (key.toLowerCase() === lowerText) {
+//       return value;
+//     }
+//   }
+  
+//   // If still not found, return the original text
+//   return text;
+// };
+
+// // Translate property name
+// const translatePropertyName = (name: string, lang: "en" | "fr" | "rw"): string => {
+//   return translateText(name, lang, "propertyNames");
+// };
+
+// // Translate description
+// const translateDescription = (description: string, lang: "en" | "fr" | "rw"): string => {
+//   return translateText(description, lang, "descriptions");
+// };
+
+// // Translate university name
+// const translateUniversity = (university: string, lang: "en" | "fr" | "rw"): string => {
+//   return translateText(university, lang, "universities");
+// };
+
+// // Translate location
+// const translateLocation = (location: string, lang: "en" | "fr" | "rw"): string => {
+//   return translateText(location, lang, "locations");
+// };
+
+// // Translate amenity
+// const translateAmenity = (amenity: string, lang: "en" | "fr" | "rw"): string => {
+//   return translateText(amenity, lang, "amenities");
+// };
+
+// // Translate all amenities in an array
+// const translateAmenities = (amenities: string[], lang: "en" | "fr" | "rw"): string[] => {
+//   return amenities.map(amenity => translateAmenity(amenity, lang));
+// };
+
+// // Translate entire house object
+// const translateHouse = (house: House, lang: "en" | "fr" | "rw"): House => {
+//   return {
+//     ...house,
+//     name: translatePropertyName(house.name, lang),
+//     description: translateDescription(house.description, lang),
+//     university: translateUniversity(house.university, lang),
+//     location: {
+//       ...house.location,
+//       province: translateLocation(house.location.province, lang),
+//       district: translateLocation(house.location.district, lang),
+//       sector: translateLocation(house.location.sector, lang),
+//       cell: translateLocation(house.location.cell, lang),
+//       village: translateLocation(house.location.village, lang),
+//     },
+//     amenities: translateAmenities(house.amenities, lang),
+//     host: {
+//       ...house.host,
+//       // Host name may not need translation, but we'll check
+//       name: translateText(house.host.name, lang, "propertyNames") || house.host.name,
+//     },
+//   };
 // };
 
 // export const ManagerHouseManagement: React.FC = () => {
@@ -791,6 +1120,10 @@
 //   const [filterStatus, setFilterStatus] = useState<string>("all");
 //   const [loading, setLoading] = useState(true);
 //   const [submitting, setSubmitting] = useState(false);
+
+//   // Pagination
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const itemsPerPage = 9;
 
 //   // Modal states
 //   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -852,11 +1185,17 @@
 
 //   const t = translations[lang];
 
-//   // Listen for language changes
+//   // Listen for language changes and re-translate houses
 //   useEffect(() => {
 //     const interval = setInterval(() => {
 //       const newLang = getLanguageFromCookies();
-//       if (newLang !== lang) setLang(newLang);
+//       if (newLang !== lang) {
+//         setLang(newLang);
+//         // Re-translate all houses when language changes
+//         setHouses(prevHouses => 
+//           prevHouses.map(house => translateHouse(house, newLang))
+//         );
+//       }
 //     }, 1000);
 //     return () => clearInterval(interval);
 //   }, [lang]);
@@ -871,15 +1210,20 @@
 //         ...house,
 //         images: house.images || [],
 //       }));
-//       setHouses(housesWithImages);
-//       setFilteredHouses(housesWithImages);
+//       // Translate all houses with current language
+//       const translatedHouses = housesWithImages.map(house => 
+//         translateHouse(house, lang)
+//       );
+//       setHouses(translatedHouses);
+//       setFilteredHouses(translatedHouses);
+//       setCurrentPage(1);
 //     } catch (error) {
 //       console.error("❌ Error loading houses:", error);
 //       toast.error("Failed to load houses");
 //     } finally {
 //       setLoading(false);
 //     }
-//   }, []);
+//   }, [lang]);
 
 //   useEffect(() => {
 //     loadHouses();
@@ -902,6 +1246,7 @@
 //       filtered = filtered.filter((h) => h.status === filterStatus);
 //     }
 //     setFilteredHouses(filtered);
+//     setCurrentPage(1);
 //   }, [houses, searchTerm, filterStatus]);
 
 //   // Update statistics
@@ -920,7 +1265,7 @@
 //     });
 //   }, [houses]);
 
-//   // Get status badge
+//   // Get status badge - TRANSLATED!
 //   const getStatusColor = (status: string): string => {
 //     const colors = {
 //       available: "bg-green-100 text-green-800 border-green-200",
@@ -931,12 +1276,13 @@
 //     return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800";
 //   };
 
+//   // Get status label - TRANSLATED from API data!
 //   const getStatusLabel = (status: string): string => {
 //     const labels = {
-//       available: t.available,
-//       pending: t.pending,
-//       unavailable: t.unavailable,
-//       maintenance: t.maintenance,
+//       available: t.statuses.available,
+//       pending: t.statuses.pending,
+//       unavailable: t.statuses.unavailable,
+//       maintenance: t.statuses.maintenance,
 //     };
 //     return labels[status as keyof typeof labels] || status;
 //   };
@@ -1140,7 +1486,9 @@
 //         ...newHouse,
 //         images: newHouse.images || [],
 //       };
-//       setHouses((prev) => [houseWithImages, ...prev]);
+//       // Translate the new house
+//       const translatedHouse = translateHouse(houseWithImages, lang);
+//       setHouses((prev) => [translatedHouse, ...prev]);
 //       toast.success(`✅ ${t.propertyCreated}`);
 //       setIsCreateModalOpen(false);
 //       resetForm();
@@ -1176,8 +1524,10 @@
 //         ...updatedHouse,
 //         images: updatedHouse.images || [],
 //       };
+//       // Translate the updated house
+//       const translatedHouse = translateHouse(houseWithImages, lang);
 //       setHouses((prev) =>
-//         prev.map((h) => (h._id === selectedHouse._id ? houseWithImages : h)),
+//         prev.map((h) => (h._id === selectedHouse._id ? translatedHouse : h)),
 //       );
 //       toast.success(`✅ ${t.propertyUpdated}`);
 //       setIsEditModalOpen(false);
@@ -1285,6 +1635,19 @@
 //   const openCreateModal = () => {
 //     resetForm();
 //     setIsCreateModalOpen(true);
+//   };
+
+//   // Pagination
+//   const totalPages = Math.ceil(filteredHouses.length / itemsPerPage);
+//   const startIndex = (currentPage - 1) * itemsPerPage;
+//   const endIndex = startIndex + itemsPerPage;
+//   const currentHouses = filteredHouses.slice(startIndex, endIndex);
+
+//   const goToPage = (page: number) => {
+//     if (page >= 1 && page <= totalPages) {
+//       setCurrentPage(page);
+//       window.scrollTo({ top: 0, behavior: "smooth" });
+//     }
 //   };
 
 //   // Render input with validation
@@ -1519,8 +1882,8 @@
 //         </div>
 //       </div>
 
-//       {/* Properties Grid */}
-//       {filteredHouses.length === 0 ? (
+//       {/* Properties Grid - All text is translated */}
+//       {currentHouses.length === 0 ? (
 //         <div className="bg-white rounded-2xl p-12 text-center shadow-lg border border-gray-100">
 //           <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
 //             <Icons.Home />
@@ -1537,100 +1900,187 @@
 //           </button>
 //         </div>
 //       ) : (
-//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-//           {filteredHouses.map((house) => (
-//             <motion.div
-//               key={house._id}
-//               initial={{ opacity: 0, y: 20 }}
-//               animate={{ opacity: 1, y: 0 }}
-//               whileHover={{ y: -4 }}
-//               className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all"
-//             >
-//               <div className="relative h-48 overflow-hidden">
-//                 <img
-//                   src={
-//                     house.images && house.images.length > 0
-//                       ? house.images[0].url
-//                       : "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop"
-//                   }
-//                   alt={house.name}
-//                   className="w-full h-full object-cover"
-//                 />
-//                 <div className="absolute top-3 right-3">
-//                   <span
-//                     className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(house.status)}`}
-//                   >
-//                     {getStatusLabel(house.status)}
-//                   </span>
-//                 </div>
-//                 {house.rating > 0 && (
-//                   <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-sm text-white px-2.5 py-1 rounded-lg text-sm flex items-center gap-1">
-//                     ⭐ {house.rating.toFixed(1)}
+//         <>
+//           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//             {currentHouses.map((house) => (
+//               <motion.div
+//                 key={house._id}
+//                 initial={{ opacity: 0, y: 20 }}
+//                 animate={{ opacity: 1, y: 0 }}
+//                 whileHover={{ y: -4 }}
+//                 className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all"
+//               >
+//                 <div className="relative h-48 overflow-hidden">
+//                   <img
+//                     src={
+//                       house.images && house.images.length > 0
+//                         ? house.images[0].url
+//                         : "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop"
+//                     }
+//                     alt={house.name}
+//                     className="w-full h-full object-cover"
+//                   />
+//                   <div className="absolute top-3 right-3">
+//                     <span
+//                       className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(house.status)}`}
+//                     >
+//                       {getStatusLabel(house.status)}
+//                     </span>
 //                   </div>
-//                 )}
+//                   {house.rating > 0 && (
+//                     <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-sm text-white px-2.5 py-1 rounded-lg text-sm flex items-center gap-1">
+//                       ⭐ {house.rating.toFixed(1)}
+//                     </div>
+//                   )}
+//                 </div>
+//                 <div className="p-4">
+//                   <h3 className="text-lg font-semibold text-gray-900 truncate">
+//                     {house.name}
+//                   </h3>
+//                   <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
+//                     <Icons.Location />
+//                     {house.location.village}, {house.location.district}
+//                   </p>
+//                   <div className="flex items-center gap-2 mt-2 text-sm">
+//                     <span className="flex items-center gap-1 text-gray-600">
+//                       <Icons.Bed /> {house.bedrooms}
+//                     </span>
+//                     <span className="text-gray-300">|</span>
+//                     <span className="flex items-center gap-1 text-gray-600">
+//                       <Icons.Bath /> {house.bathrooms}
+//                     </span>
+//                     <span className="text-gray-300">|</span>
+//                     <span className="flex items-center gap-1 text-gray-600">
+//                       <Icons.User /> {house.maxGuests}
+//                     </span>
+//                   </div>
+//                   <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+//                     <div>
+//                       <p className="text-sm font-bold text-[#FF385C]">
+//                         {formatCurrency(house.pricePerMonth)}
+//                       </p>
+//                       <p className="text-xs text-gray-500">per month</p>
+//                     </div>
+//                     <div className="flex gap-1">
+//                       <motion.button
+//                         whileHover={{ scale: 1.1 }}
+//                         whileTap={{ scale: 0.9 }}
+//                         onClick={() => openViewModal(house)}
+//                         className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+//                         title={t.viewProperty}
+//                       >
+//                         <Icons.View />
+//                       </motion.button>
+//                       <motion.button
+//                         whileHover={{ scale: 1.1 }}
+//                         whileTap={{ scale: 0.9 }}
+//                         onClick={() => openEditModal(house)}
+//                         className="p-2 text-green-600 hover:bg-green-50 rounded-xl transition-all"
+//                         title={t.editProperty}
+//                       >
+//                         <Icons.Edit />
+//                       </motion.button>
+//                       <motion.button
+//                         whileHover={{ scale: 1.1 }}
+//                         whileTap={{ scale: 0.9 }}
+//                         onClick={() => openDeleteModal(house)}
+//                         className="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-all"
+//                         title={t.deleteProperty}
+//                       >
+//                         <Icons.Delete />
+//                       </motion.button>
+//                     </div>
+//                   </div>
+//                 </div>
+//               </motion.div>
+//             ))}
+//           </div>
+
+//           {/* Pagination */}
+//           {totalPages > 1 && (
+//             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-4 border-t border-gray-200">
+//               <p className="text-sm text-gray-500">
+//                 {t.showing} {startIndex + 1} - {Math.min(endIndex, filteredHouses.length)} {t.of} {filteredHouses.length} {t.propertiesCount}
+//               </p>
+//               <div className="flex items-center gap-2">
+//                 <motion.button
+//                   whileHover={{ scale: 1.05 }}
+//                   whileTap={{ scale: 0.95 }}
+//                   onClick={() => goToPage(currentPage - 1)}
+//                   disabled={currentPage === 1}
+//                   className={`px-3 py-2 rounded-xl flex items-center gap-1 transition-all ${
+//                     currentPage === 1
+//                       ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+//                       : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-[#FF385C]"
+//                   }`}
+//                 >
+//                   <Icons.ChevronLeft />
+//                   {t.previous}
+//                 </motion.button>
+
+//                 <div className="flex items-center gap-1">
+//                   {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+//                     (page) => {
+//                       if (
+//                         page === 1 ||
+//                         page === totalPages ||
+//                         Math.abs(page - currentPage) <= 1
+//                       ) {
+//                         return (
+//                           <motion.button
+//                             key={page}
+//                             whileHover={{ scale: 1.05 }}
+//                             whileTap={{ scale: 0.95 }}
+//                             onClick={() => goToPage(page)}
+//                             className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${
+//                               currentPage === page
+//                                 ? "bg-[#FF385C] text-white shadow-md"
+//                                 : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-[#FF385C]"
+//                             }`}
+//                           >
+//                             {page}
+//                           </motion.button>
+//                         );
+//                       }
+//                       if (
+//                         (page === 2 && currentPage > 3) ||
+//                         (page === totalPages - 1 && currentPage < totalPages - 2)
+//                       ) {
+//                         return (
+//                           <span
+//                             key={page}
+//                             className="w-9 h-9 flex items-center justify-center text-gray-400"
+//                           >
+//                             …
+//                           </span>
+//                         );
+//                       }
+//                       return null;
+//                     },
+//                   )}
+//                 </div>
+
+//                 <motion.button
+//                   whileHover={{ scale: 1.05 }}
+//                   whileTap={{ scale: 0.95 }}
+//                   onClick={() => goToPage(currentPage + 1)}
+//                   disabled={currentPage === totalPages}
+//                   className={`px-3 py-2 rounded-xl flex items-center gap-1 transition-all ${
+//                     currentPage === totalPages
+//                       ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+//                       : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-[#FF385C]"
+//                   }`}
+//                 >
+//                   {t.next}
+//                   <Icons.ChevronRight />
+//                 </motion.button>
 //               </div>
-//               <div className="p-4">
-//                 <h3 className="text-lg font-semibold text-gray-900 truncate">
-//                   {house.name}
-//                 </h3>
-//                 <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
-//                   <Icons.Location />
-//                   {house.location.village}, {house.location.district}
-//                 </p>
-//                 <div className="flex items-center gap-2 mt-2 text-sm">
-//                   <span className="flex items-center gap-1 text-gray-600">
-//                     <Icons.Bed /> {house.bedrooms}
-//                   </span>
-//                   <span className="text-gray-300">|</span>
-//                   <span className="flex items-center gap-1 text-gray-600">
-//                     <Icons.Bath /> {house.bathrooms}
-//                   </span>
-//                   <span className="text-gray-300">|</span>
-//                   <span className="flex items-center gap-1 text-gray-600">
-//                     <Icons.User /> {house.maxGuests}
-//                   </span>
-//                 </div>
-//                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-//                   <div>
-//                     <p className="text-sm font-bold text-[#FF385C]">
-//                       {formatCurrency(house.pricePerMonth)}
-//                     </p>
-//                     <p className="text-xs text-gray-500">per month</p>
-//                   </div>
-//                   <div className="flex gap-1">
-//                     <motion.button
-//                       whileHover={{ scale: 1.1 }}
-//                       whileTap={{ scale: 0.9 }}
-//                       onClick={() => openViewModal(house)}
-//                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
-//                     >
-//                       <Icons.View />
-//                     </motion.button>
-//                     <motion.button
-//                       whileHover={{ scale: 1.1 }}
-//                       whileTap={{ scale: 0.9 }}
-//                       onClick={() => openEditModal(house)}
-//                       className="p-2 text-green-600 hover:bg-green-50 rounded-xl transition-all"
-//                     >
-//                       <Icons.Edit />
-//                     </motion.button>
-//                     <motion.button
-//                       whileHover={{ scale: 1.1 }}
-//                       whileTap={{ scale: 0.9 }}
-//                       onClick={() => openDeleteModal(house)}
-//                       className="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-all"
-//                     >
-//                       <Icons.Delete />
-//                     </motion.button>
-//                   </div>
-//                 </div>
-//               </div>
-//             </motion.div>
-//           ))}
-//         </div>
+//             </div>
+//           )}
+//         </>
 //       )}
 
-//       {/* View Property Modal */}
+//       {/* View Property Modal - All text is translated */}
 //       <AnimatePresence>
 //         {isViewModalOpen && selectedHouse && (
 //           <>
@@ -1677,7 +2127,7 @@
 //                     </div>
 //                   ) : (
 //                     <div className="bg-gray-100 rounded-xl h-48 flex items-center justify-center">
-//                       <p className="text-gray-500">No images available</p>
+//                       <p className="text-gray-500">{t.noImage}</p>
 //                     </div>
 //                   )}
 //                   <h3 className="text-2xl font-bold text-gray-900">
@@ -2510,6 +2960,11 @@
 
 
 
+
+
+
+
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect, useCallback, useRef } from "react";
@@ -2684,9 +3139,7 @@ const translations = {
       unavailable: "Unavailable",
       maintenance: "Maintenance",
     },
-    // Translated static content for common property data
     staticContent: {
-      // Common property names
       propertyNames: {
         "Cozy Apartment": "Cozy Apartment",
         "Modern Studio": "Modern Studio",
@@ -2699,7 +3152,6 @@ const translations = {
         "Penthouse Suite": "Penthouse Suite",
         "Traditional Home": "Traditional Home",
       },
-      // Common descriptions
       descriptions: {
         "The apartment in Kigali offers one bedroom and three bathrooms. The property includes a fully equipped kitchen, washing machine, and TV. Free WiFi":
           "The apartment in Kigali offers one bedroom and three bathrooms. The property includes a fully equipped kitchen, washing machine, and TV. Free WiFi",
@@ -2708,7 +3160,6 @@ const translations = {
         "Cozy studio near university": "Cozy studio near university",
         "Luxury villa with pool": "Luxury villa with pool",
       },
-      // Common universities
       universities: {
         "University of Rwanda": "University of Rwanda",
         "Rwanda Polytechnic": "Rwanda Polytechnic",
@@ -2717,7 +3168,6 @@ const translations = {
         "Mount Kenya University": "Mount Kenya University",
         "Kigali Independent University": "Kigali Independent University",
       },
-      // Common locations
       locations: {
         Kigali: "Kigali",
         "Gasabo District": "Gasabo District",
@@ -2732,7 +3182,6 @@ const translations = {
         "Rugando Village": "Rugando Village",
         "Kinyinya Village": "Kinyinya Village",
       },
-      // Common amenities
       amenities: {
         "WiFi": "WiFi",
         "Kitchen": "Kitchen",
@@ -3611,7 +4060,6 @@ const translateHouse = (house: House, lang: "en" | "fr" | "rw"): House => {
     amenities: translateAmenities(house.amenities, lang),
     host: {
       ...house.host,
-      // Host name may not need translation, but we'll check
       name: translateText(house.host.name, lang, "propertyNames") || house.host.name,
     },
   };
@@ -3710,7 +4158,7 @@ export const ManagerHouseManagement: React.FC = () => {
     return () => clearInterval(interval);
   }, [lang]);
 
-  // Load houses
+  // ✅ HOOK 1: loadHouses useCallback
   const loadHouses = useCallback(async () => {
     try {
       setLoading(true);
@@ -3735,11 +4183,12 @@ export const ManagerHouseManagement: React.FC = () => {
     }
   }, [lang]);
 
+  // ✅ HOOK 2: useEffect for loadHouses
   useEffect(() => {
     loadHouses();
   }, [loadHouses]);
 
-  // Filter houses
+  // ✅ HOOK 3: Filter houses
   useEffect(() => {
     let filtered = [...houses];
     if (searchTerm) {
@@ -3759,7 +4208,7 @@ export const ManagerHouseManagement: React.FC = () => {
     setCurrentPage(1);
   }, [houses, searchTerm, filterStatus]);
 
-  // Update statistics
+  // ✅ HOOK 4: Update statistics
   useEffect(() => {
     setStats({
       total: houses.length,
@@ -3774,6 +4223,10 @@ export const ManagerHouseManagement: React.FC = () => {
           : 0,
     });
   }, [houses]);
+
+  // ============================================================
+  // ALL HOOKS ABOVE - NOW WE CAN HAVE CONDITIONAL RETURNS
+  // ============================================================
 
   // Get status badge - TRANSLATED!
   const getStatusColor = (status: string): string => {
@@ -3824,8 +4277,8 @@ export const ManagerHouseManagement: React.FC = () => {
     }));
   };
 
-  // Validate form
-  const validateForm = () => {
+  // ✅ FIXED: Validate form - only called when triggered
+  const validateForm = (): Record<string, string> => {
     const errors: Record<string, string> = {};
     const v = t.validation;
 
@@ -3869,19 +4322,29 @@ export const ManagerHouseManagement: React.FC = () => {
     if (imageFiles.length === 0 && !selectedHouse)
       errors.images = v.imagesRequired;
 
+    return errors;
+  };
+
+  // ✅ FIXED: Only validate and show errors when field is touched or on submit
+  const validateAndSetErrors = (fieldsToValidate?: string[]) => {
+    const errors = validateForm();
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleFieldBlur = (field: string) => {
     setTouchedFields((prev) => ({ ...prev, [field]: true }));
+    // ✅ Only validate on blur for the specific field
+    validateAndSetErrors();
   };
 
   const hasError = (field: string): boolean => {
+    // ✅ Only show error if field has been touched AND there's an error
     return touchedFields[field] && !!formErrors[field];
   };
 
   const isValidField = (field: string): boolean => {
+    // ✅ Only show valid if field has been touched AND no error
     return touchedFields[field] && !formErrors[field];
   };
 
@@ -3899,9 +4362,12 @@ export const ManagerHouseManagement: React.FC = () => {
     } else {
       setPropertyFormData((prev) => ({ ...prev, [field]: value }));
     }
+    
+    // ✅ Clear error for this field when user types
     setFormErrors((prev) => {
       const newErrors = { ...prev };
-      delete newErrors[field];
+      const fieldName = field.includes(".") ? field.split(".")[1] : field;
+      delete newErrors[fieldName];
       return newErrors;
     });
   };
@@ -3911,6 +4377,7 @@ export const ManagerHouseManagement: React.FC = () => {
       ...prev,
       location: { ...prev.location, [field]: value },
     }));
+    // ✅ Clear error for this field when user types
     setFormErrors((prev) => {
       const newErrors = { ...prev };
       delete newErrors[field];
@@ -3932,6 +4399,7 @@ export const ManagerHouseManagement: React.FC = () => {
       reader.readAsDataURL(file);
     });
 
+    // ✅ Clear image error when images are added
     setFormErrors((prev) => {
       const newErrors = { ...prev };
       delete newErrors.images;
@@ -3981,9 +4449,37 @@ export const ManagerHouseManagement: React.FC = () => {
     return formData;
   };
 
-  // CRUD Operations
+  // ✅ FIXED: CRUD Operations - validate only on submit
   const handleCreateProperty = async () => {
-    if (!validateForm()) {
+    // ✅ Touch all fields before validation
+    const allFields = [
+      "name",
+      "description",
+      "university",
+      "province",
+      "district",
+      "sector",
+      "cell",
+      "village",
+      "pricePerMonth",
+      "bedrooms",
+      "bathrooms",
+      "maxGuests",
+      "hostName",
+      "hostEmail",
+      "images",
+    ];
+    const touched: Record<string, boolean> = {};
+    allFields.forEach((field) => {
+      touched[field] = true;
+    });
+    setTouchedFields(touched);
+
+    // ✅ Validate and set errors
+    const errors = validateForm();
+    setFormErrors(errors);
+    
+    if (Object.keys(errors).length > 0) {
       toast.error("Please fix all validation errors");
       return;
     }
@@ -3996,7 +4492,6 @@ export const ManagerHouseManagement: React.FC = () => {
         ...newHouse,
         images: newHouse.images || [],
       };
-      // Translate the new house
       const translatedHouse = translateHouse(houseWithImages, lang);
       setHouses((prev) => [translatedHouse, ...prev]);
       toast.success(`✅ ${t.propertyCreated}`);
@@ -4018,7 +4513,36 @@ export const ManagerHouseManagement: React.FC = () => {
 
   const handleUpdateProperty = async () => {
     if (!selectedHouse) return;
-    if (!validateForm()) {
+
+    // ✅ Touch all fields before validation
+    const allFields = [
+      "name",
+      "description",
+      "university",
+      "province",
+      "district",
+      "sector",
+      "cell",
+      "village",
+      "pricePerMonth",
+      "bedrooms",
+      "bathrooms",
+      "maxGuests",
+      "hostName",
+      "hostEmail",
+      "images",
+    ];
+    const touched: Record<string, boolean> = {};
+    allFields.forEach((field) => {
+      touched[field] = true;
+    });
+    setTouchedFields(touched);
+
+    // ✅ Validate and set errors
+    const errors = validateForm();
+    setFormErrors(errors);
+    
+    if (Object.keys(errors).length > 0) {
       toast.error("Please fix all validation errors");
       return;
     }
@@ -4034,7 +4558,6 @@ export const ManagerHouseManagement: React.FC = () => {
         ...updatedHouse,
         images: updatedHouse.images || [],
       };
-      // Translate the updated house
       const translatedHouse = translateHouse(houseWithImages, lang);
       setHouses((prev) =>
         prev.map((h) => (h._id === selectedHouse._id ? translatedHouse : h)),
@@ -4134,6 +4657,9 @@ export const ManagerHouseManagement: React.FC = () => {
     });
     setImageFiles([]);
     setImagePreviews(house.images ? house.images.map((img) => img.url) : []);
+    // ✅ Reset touched fields and errors for edit modal
+    setTouchedFields({});
+    setFormErrors({});
     setIsEditModalOpen(true);
   };
 
@@ -4257,6 +4783,7 @@ export const ManagerHouseManagement: React.FC = () => {
     exit: { opacity: 0 },
   };
 
+  // ✅ CONDITIONAL RETURN - AFTER ALL HOOKS HAVE BEEN CALLED
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -4265,14 +4792,34 @@ export const ManagerHouseManagement: React.FC = () => {
     );
   }
 
-  const isFormValid =
-    Object.keys(formErrors).length === 0 &&
-    (imageFiles.length > 0 ||
-      (selectedHouse &&
-        selectedHouse.images &&
-        selectedHouse.images.length > 0)) &&
-    propertyFormData.name.trim().length >= 3 &&
-    propertyFormData.description.trim().length >= 20;
+  // ✅ FIXED: isFormValid checks only touched fields
+  const isFormValid = () => {
+    // Check if all required fields have been touched
+    const requiredFields = [
+      "name",
+      "description",
+      "university",
+      "province",
+      "district",
+      "sector",
+      "cell",
+      "village",
+      "pricePerMonth",
+      "bedrooms",
+      "bathrooms",
+      "maxGuests",
+      "hostName",
+      "hostEmail",
+      "images",
+    ];
+    const allTouched = requiredFields.every((field) => touchedFields[field]);
+    
+    // If not all touched, form is not ready for submission
+    if (!allTouched) return false;
+    
+    // Check if there are any errors
+    return Object.keys(formErrors).length === 0;
+  };
 
   return (
     <div className="p-4 sm:p-6 md:p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
@@ -5344,9 +5891,9 @@ export const ManagerHouseManagement: React.FC = () => {
                           ? handleUpdateProperty
                           : handleCreateProperty
                       }
-                      disabled={submitting || !isFormValid}
+                      disabled={submitting || !isFormValid()}
                       className={`flex-1 px-6 py-3 rounded-xl text-white font-medium transition-all flex items-center justify-center gap-2 ${
-                        submitting || !isFormValid
+                        submitting || !isFormValid()
                           ? "bg-gray-400 cursor-not-allowed"
                           : "bg-gradient-to-r from-[#FF385C] to-[#E31C5F] hover:shadow-lg"
                       }`}

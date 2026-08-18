@@ -1,3 +1,4 @@
+
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 // /* eslint-disable react-hooks/set-state-in-effect */
 // import React, { useState, useEffect, useCallback, useRef } from "react";
@@ -9,6 +10,29 @@
 
 // // API Base URL
 // const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
+
+// // ============================================================
+// // TRANSLATION HELPER - Google Translate API
+// // ============================================================
+
+// const translateContent = async (text: string, targetLang: string): Promise<string> => {
+//   if (!text || targetLang === 'en') return text;
+//   if (targetLang === 'rw' || targetLang === 'fr') {
+//     try {
+//       const response = await axios.post(
+//         `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`
+//       );
+//       if (response.data && response.data[0] && response.data[0][0]) {
+//         return response.data[0][0][0] || text;
+//       }
+//       return text;
+//     } catch (error) {
+//       console.error('Translation error for text:', text, error);
+//       return text;
+//     }
+//   }
+//   return text;
+// };
 
 // // Types based on the House model
 // interface Host {
@@ -163,6 +187,7 @@
 //     noImage: "No image",
 //     selectFiles: "Select Files",
 //     dragDrop: "Drag & drop images here",
+//     loading: "Loading...",
 //     validation: {
 //       nameRequired: "Property name is required",
 //       nameMinLength: "Name must be at least 3 characters",
@@ -285,6 +310,7 @@
 //     noImage: "Pas d'image",
 //     selectFiles: "Sélectionner des Fichiers",
 //     dragDrop: "Glissez-déposez les images ici",
+//     loading: "Chargement...",
 //     validation: {
 //       nameRequired: "Le nom de la propriété est requis",
 //       nameMinLength: "Le nom doit contenir au moins 3 caractères",
@@ -409,6 +435,7 @@
 //     noImage: "Nta shusho",
 //     selectFiles: "Hitamo Amashusho",
 //     dragDrop: "Kurura no gushyira amashusho hano",
+//     loading: "Birakoreshwa...",
 //     validation: {
 //       nameRequired: "Izina ry'inzu rirasabwa",
 //       nameMinLength: "Izina rigomba kugira byibura inyuguti 3",
@@ -511,7 +538,6 @@
 // const houseApi = {
 //   getHouses: async (email: string): Promise<House[]> => {
 //     const response = await api.get(`/houses/${email}`);
-//     // The API returns { success: true, total: 1, data: [...] }
 //     return response.data.data || [];
 //   },
 
@@ -811,7 +837,7 @@
 //   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 //   const fileInputRef = useRef<HTMLInputElement>(null);
 
-//   // Property form state - REMOVED availability fields
+//   // Property form state
 //   const [propertyFormData, setPropertyFormData] = useState({
 //     name: "",
 //     description: "",
@@ -862,7 +888,7 @@
 //     return () => clearInterval(interval);
 //   }, [lang]);
 
-//   // Load houses
+//   // Load houses with translation
 //   const loadHouses = useCallback(async () => {
 //     const email = getUserEmail();
 //     console.log("🔍 Loading houses for email:", email);
@@ -876,8 +902,46 @@
 //       setLoading(true);
 //       const data = await houseApi.getHouses(email);
 //       console.log("✅ Houses loaded:", data);
-//       // Ensure each house has an images array
-//       const housesWithImages = data.map((house) => ({
+      
+//       // Translate house data if language is not English
+//       let processedData = data;
+//       if (lang !== 'en') {
+//         console.log(`Translating ${data.length} houses to ${lang}...`);
+//         const translatedHouses = [];
+//         for (const house of data) {
+//           try {
+//             const translatedHouse = {
+//               ...house,
+//               name: await translateContent(house.name, lang),
+//               description: await translateContent(house.description, lang),
+//               university: await translateContent(house.university, lang),
+//               location: {
+//                 ...house.location,
+//                 province: await translateContent(house.location.province, lang),
+//                 district: await translateContent(house.location.district, lang),
+//                 sector: await translateContent(house.location.sector, lang),
+//                 cell: await translateContent(house.location.cell, lang),
+//                 village: await translateContent(house.location.village, lang),
+//               },
+//               amenities: await Promise.all(
+//                 house.amenities.map((amenity: string) => translateContent(amenity, lang))
+//               ),
+//               host: {
+//                 ...house.host,
+//                 name: await translateContent(house.host.name, lang),
+//               },
+//             };
+//             translatedHouses.push(translatedHouse);
+//           } catch (err) {
+//             console.error('Error translating house:', house._id, err);
+//             translatedHouses.push(house);
+//           }
+//         }
+//         processedData = translatedHouses;
+//         console.log('Translated houses count:', processedData.length);
+//       }
+
+//       const housesWithImages = processedData.map((house) => ({
 //         ...house,
 //         images: house.images || [],
 //       }));
@@ -889,11 +953,11 @@
 //     } finally {
 //       setLoading(false);
 //     }
-//   }, []);
+//   }, [lang]);
 
 //   useEffect(() => {
 //     loadHouses();
-//   }, [loadHouses]);
+//   }, [loadHouses, lang]);
 
 //   // Filter houses
 //   useEffect(() => {
@@ -978,7 +1042,7 @@
 //     }));
 //   };
 
-//   // Validate form - REMOVED availability validation
+//   // Validate form
 //   const validateForm = () => {
 //     const errors: Record<string, string> = {};
 //     const v = t.validation;
@@ -1098,11 +1162,10 @@
 //     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
 //   };
 
-//   // Create FormData for API - REMOVED availability fields
+//   // Create FormData for API
 //   const createFormData = (): FormData => {
 //     const formData = new FormData();
 
-//     // Append all fields
 //     formData.append("name", propertyFormData.name);
 //     formData.append("description", propertyFormData.description);
 //     formData.append("university", propertyFormData.university);
@@ -1112,22 +1175,18 @@
 //     formData.append("maxGuests", String(propertyFormData.maxGuests));
 //     formData.append("status", propertyFormData.status);
 
-//     // Location
 //     Object.entries(propertyFormData.location).forEach(([key, value]) => {
 //       formData.append(`location[${key}]`, value);
 //     });
 
-//     // Host
 //     Object.entries(propertyFormData.host).forEach(([key, value]) => {
 //       formData.append(`host[${key}]`, String(value));
 //     });
 
-//     // Amenities
 //     propertyFormData.amenities.forEach((amenity) => {
 //       formData.append("amenities[]", amenity);
 //     });
 
-//     // Images
 //     imageFiles.forEach((file) => {
 //       formData.append("images", file);
 //     });
@@ -1226,7 +1285,7 @@
 //     }
 //   };
 
-//   // Reset form - REMOVED availability fields
+//   // Reset form
 //   const resetForm = () => {
 //     setPropertyFormData({
 //       name: "",
@@ -1398,11 +1457,11 @@
 //     return (
 //       <div className="flex justify-center items-center min-h-[400px]">
 //         <div className="w-16 h-16 border-4 border-[#FF385C] border-t-transparent rounded-full animate-spin"></div>
+//         <p className="ml-4 text-gray-500">{t.loading}</p>
 //       </div>
 //     );
 //   }
 
-//   // Use optional chaining to safely access selectedHouse.images.length
 //   const isFormValid =
 //     Object.keys(formErrors).length === 0 &&
 //     (imageFiles.length > 0 ||
@@ -2386,8 +2445,6 @@
 //                     )}
 //                   </div>
 
-//                   {/* REMOVED: Availability section - Start Date and End Date fields are no longer needed */}
-
 //                   <div className="flex gap-3 pt-4 border-t border-gray-200">
 //                     <motion.button
 //                       whileHover={{ scale: 1.02 }}
@@ -2398,11 +2455,9 @@
 //                           : handleCreateProperty
 //                       }
 //                       disabled={submitting || !isFormValid}
-//                       className={`flex-1 px-6 py-3 rounded-xl text-white font-medium transition-all flex items-center justify-center gap-2 ${
+//                       className={`flex-1 px-6 py-3 rounded-xl text-white font-medium transition-all flex items-center justify-center gap-2 ${(
 //                         submitting || !isFormValid
-//                           ? "bg-gray-400 cursor-not-allowed"
-//                           : "bg-gradient-to-r from-[#FF385C] to-[#E31C5F] hover:shadow-lg"
-//                       }`}
+//                       ) ? "bg-gray-400 cursor-not-allowed" : "bg-gradient-to-r from-[#FF385C] to-[#E31C5F] hover:shadow-lg"}`}
 //                     >
 //                       {submitting ? (
 //                         <>
@@ -2510,9 +2565,6 @@
 //     </div>
 //   );
 // };
-
-
-
 
 
 
@@ -3407,7 +3459,7 @@ export const HostManagement: React.FC = () => {
 
   const t = translations[lang];
 
-  // Listen for language changes
+  // ✅ HOOK 1: Listen for language changes
   useEffect(() => {
     const interval = setInterval(() => {
       const newLang = getLanguageFromCookies();
@@ -3416,7 +3468,7 @@ export const HostManagement: React.FC = () => {
     return () => clearInterval(interval);
   }, [lang]);
 
-  // Load houses with translation
+  // ✅ HOOK 2: loadHouses useCallback
   const loadHouses = useCallback(async () => {
     const email = getUserEmail();
     console.log("🔍 Loading houses for email:", email);
@@ -3483,11 +3535,12 @@ export const HostManagement: React.FC = () => {
     }
   }, [lang]);
 
+  // ✅ HOOK 3: useEffect for loadHouses
   useEffect(() => {
     loadHouses();
   }, [loadHouses, lang]);
 
-  // Filter houses
+  // ✅ HOOK 4: Filter houses
   useEffect(() => {
     let filtered = [...houses];
     if (searchTerm) {
@@ -3506,7 +3559,7 @@ export const HostManagement: React.FC = () => {
     setFilteredHouses(filtered);
   }, [houses, searchTerm, filterStatus]);
 
-  // Update statistics
+  // ✅ HOOK 5: Update statistics
   useEffect(() => {
     setStats({
       total: houses.length,
@@ -3521,6 +3574,10 @@ export const HostManagement: React.FC = () => {
           : 0,
     });
   }, [houses]);
+
+  // ============================================================
+  // ALL HOOKS ABOVE - NOW WE CAN HAVE CONDITIONAL RETURNS
+  // ============================================================
 
   // Get status badge
   const getStatusColor = (status: string): string => {
@@ -3570,8 +3627,8 @@ export const HostManagement: React.FC = () => {
     }));
   };
 
-  // Validate form
-  const validateForm = () => {
+  // ✅ FIXED: Validate form - returns errors without setting state
+  const validateForm = (): Record<string, string> => {
     const errors: Record<string, string> = {};
     const v = t.validation;
 
@@ -3615,19 +3672,29 @@ export const HostManagement: React.FC = () => {
     if (imageFiles.length === 0 && !selectedHouse)
       errors.images = v.imagesRequired;
 
+    return errors;
+  };
+
+  // ✅ FIXED: Validate and set errors - only called when needed
+  const validateAndSetErrors = () => {
+    const errors = validateForm();
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleFieldBlur = (field: string) => {
     setTouchedFields((prev) => ({ ...prev, [field]: true }));
+    // ✅ Only validate on blur - this will set errors
+    validateAndSetErrors();
   };
 
   const hasError = (field: string): boolean => {
+    // ✅ Only show error if field has been touched AND there's an error
     return touchedFields[field] && !!formErrors[field];
   };
 
   const isValidField = (field: string): boolean => {
+    // ✅ Only show valid if field has been touched AND no error
     return touchedFields[field] && !formErrors[field];
   };
 
@@ -3645,9 +3712,11 @@ export const HostManagement: React.FC = () => {
     } else {
       setPropertyFormData((prev) => ({ ...prev, [field]: value }));
     }
+    // ✅ Clear error for this field when user types
     setFormErrors((prev) => {
       const newErrors = { ...prev };
-      delete newErrors[field];
+      const fieldName = field.includes(".") ? field.split(".")[1] : field;
+      delete newErrors[fieldName];
       return newErrors;
     });
   };
@@ -3657,6 +3726,7 @@ export const HostManagement: React.FC = () => {
       ...prev,
       location: { ...prev.location, [field]: value },
     }));
+    // ✅ Clear error for this field when user types
     setFormErrors((prev) => {
       const newErrors = { ...prev };
       delete newErrors[field];
@@ -3678,6 +3748,7 @@ export const HostManagement: React.FC = () => {
       reader.readAsDataURL(file);
     });
 
+    // ✅ Clear image error when images are added
     setFormErrors((prev) => {
       const newErrors = { ...prev };
       delete newErrors.images;
@@ -3688,6 +3759,8 @@ export const HostManagement: React.FC = () => {
   const removeImage = (index: number) => {
     setImageFiles((prev) => prev.filter((_, i) => i !== index));
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    // ✅ Re-validate images when removing
+    validateAndSetErrors();
   };
 
   // Create FormData for API
@@ -3722,9 +3795,37 @@ export const HostManagement: React.FC = () => {
     return formData;
   };
 
-  // CRUD Operations
+  // ✅ FIXED: CRUD Operations - validate only on submit
   const handleCreateProperty = async () => {
-    if (!validateForm()) {
+    // ✅ Touch all fields before validation
+    const allFields = [
+      "name",
+      "description",
+      "university",
+      "province",
+      "district",
+      "sector",
+      "cell",
+      "village",
+      "pricePerMonth",
+      "bedrooms",
+      "bathrooms",
+      "maxGuests",
+      "hostName",
+      "hostEmail",
+      "images",
+    ];
+    const touched: Record<string, boolean> = {};
+    allFields.forEach((field) => {
+      touched[field] = true;
+    });
+    setTouchedFields(touched);
+
+    // ✅ Validate and set errors
+    const errors = validateForm();
+    setFormErrors(errors);
+    
+    if (Object.keys(errors).length > 0) {
       toast.error("Please fix all validation errors");
       return;
     }
@@ -3757,7 +3858,36 @@ export const HostManagement: React.FC = () => {
 
   const handleUpdateProperty = async () => {
     if (!selectedHouse) return;
-    if (!validateForm()) {
+
+    // ✅ Touch all fields before validation
+    const allFields = [
+      "name",
+      "description",
+      "university",
+      "province",
+      "district",
+      "sector",
+      "cell",
+      "village",
+      "pricePerMonth",
+      "bedrooms",
+      "bathrooms",
+      "maxGuests",
+      "hostName",
+      "hostEmail",
+      "images",
+    ];
+    const touched: Record<string, boolean> = {};
+    allFields.forEach((field) => {
+      touched[field] = true;
+    });
+    setTouchedFields(touched);
+
+    // ✅ Validate and set errors
+    const errors = validateForm();
+    setFormErrors(errors);
+    
+    if (Object.keys(errors).length > 0) {
       toast.error("Please fix all validation errors");
       return;
     }
@@ -3871,6 +4001,9 @@ export const HostManagement: React.FC = () => {
     });
     setImageFiles([]);
     setImagePreviews(house.images ? house.images.map((img) => img.url) : []);
+    // ✅ Reset touched fields and errors for edit modal
+    setTouchedFields({});
+    setFormErrors({});
     setIsEditModalOpen(true);
   };
 
@@ -3981,6 +4114,7 @@ export const HostManagement: React.FC = () => {
     exit: { opacity: 0 },
   };
 
+  // ✅ CONDITIONAL RETURN - AFTER ALL HOOKS HAVE BEEN CALLED
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -3990,14 +4124,34 @@ export const HostManagement: React.FC = () => {
     );
   }
 
-  const isFormValid =
-    Object.keys(formErrors).length === 0 &&
-    (imageFiles.length > 0 ||
-      (selectedHouse &&
-        selectedHouse.images &&
-        selectedHouse.images.length > 0)) &&
-    propertyFormData.name.trim().length >= 3 &&
-    propertyFormData.description.trim().length >= 20;
+  // ✅ FIXED: isFormValid checks only touched fields
+  const isFormValid = () => {
+    // Check if all required fields have been touched
+    const requiredFields = [
+      "name",
+      "description",
+      "university",
+      "province",
+      "district",
+      "sector",
+      "cell",
+      "village",
+      "pricePerMonth",
+      "bedrooms",
+      "bathrooms",
+      "maxGuests",
+      "hostName",
+      "hostEmail",
+      "images",
+    ];
+    const allTouched = requiredFields.every((field) => touchedFields[field]);
+    
+    // If not all touched, form is not ready for submission
+    if (!allTouched) return false;
+    
+    // Check if there are any errors
+    return Object.keys(formErrors).length === 0;
+  };
 
   return (
     <div className="p-4 sm:p-6 md:p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
@@ -4982,10 +5136,12 @@ export const HostManagement: React.FC = () => {
                           ? handleUpdateProperty
                           : handleCreateProperty
                       }
-                      disabled={submitting || !isFormValid}
-                      className={`flex-1 px-6 py-3 rounded-xl text-white font-medium transition-all flex items-center justify-center gap-2 ${(
-                        submitting || !isFormValid
-                      ) ? "bg-gray-400 cursor-not-allowed" : "bg-gradient-to-r from-[#FF385C] to-[#E31C5F] hover:shadow-lg"}`}
+                      disabled={submitting || !isFormValid()}
+                      className={`flex-1 px-6 py-3 rounded-xl text-white font-medium transition-all flex items-center justify-center gap-2 ${
+                        submitting || !isFormValid()
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-gradient-to-r from-[#FF385C] to-[#E31C5F] hover:shadow-lg"
+                      }`}
                     >
                       {submitting ? (
                         <>
