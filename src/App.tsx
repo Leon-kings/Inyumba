@@ -66,6 +66,7 @@ import {
   HouseRounded,
   Info,
   LoginSharp,
+  People,
   TextSnippet,
 } from "@mui/icons-material";
 import { VerificationPage } from "./components/verify/Verification";
@@ -79,6 +80,7 @@ import { ManagerTestimonialManagement } from "./components/dashboard/managers/co
 import { ManagerRequestManagement } from "./components/dashboard/managers/components/request/ManagerRequestManagement";
 import { ActivitiesManagement } from "./components/changes/manager/ActivitiesManagement";
 import { ActionsManagement } from "./components/changes/admin/ActionsManagementView";
+import { HostClientManagement } from "./components/dashboard/host/components/client/HostClientManagement";
 
 // Types
 interface UserData {
@@ -607,6 +609,7 @@ const Sidebar = ({
     { id: "dashboard", label: "Dashboard", icon: <DashboardIcon /> },
     { id: "houses", label: "My Houses", icon: <HouseIcon /> },
     { id: "bookings", label: "Bookings", icon: <AttachMoneyIcon /> },
+    { id: "clients", label: "Clients", icon: <People /> },
   ];
 
   // Manager Menu Items
@@ -657,6 +660,7 @@ const Sidebar = ({
         dashboard: "/host/dashboard",
         houses: "/host/management",
         bookings: "/host/bookings",
+        clients: "/host/clients",
       };
       return pathMap[itemId] || "/host/dashboard";
     } else if (user?.role === "manager") {
@@ -1996,6 +2000,17 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/host/clients"
+          element={
+            <ProtectedRoute allowedRoles={["host"]}>
+              <DashboardLayout>
+                <HostClientManagement />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/host/requests"
           element={

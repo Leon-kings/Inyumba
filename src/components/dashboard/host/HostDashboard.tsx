@@ -2289,7 +2289,7 @@ export const HostDashboard: React.FC = () => {
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">
-                    {t.hostDashboard}
+                    Landlord
                   </h1>
                   <p className="text-sm text-gray-500">
                     {t.welcome}, {user?.name || "Host"}!
