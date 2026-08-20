@@ -1,4 +1,3 @@
-
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 // /* eslint-disable react-hooks/set-state-in-effect */
 // import React, { useState, useEffect, useCallback, useRef } from "react";
@@ -173,9 +172,7 @@
 //       unavailable: "Unavailable",
 //       maintenance: "Maintenance",
 //     },
-//     // Translated static content for common property data
 //     staticContent: {
-//       // Common property names
 //       propertyNames: {
 //         "Cozy Apartment": "Cozy Apartment",
 //         "Modern Studio": "Modern Studio",
@@ -188,7 +185,6 @@
 //         "Penthouse Suite": "Penthouse Suite",
 //         "Traditional Home": "Traditional Home",
 //       },
-//       // Common descriptions
 //       descriptions: {
 //         "The apartment in Kigali offers one bedroom and three bathrooms. The property includes a fully equipped kitchen, washing machine, and TV. Free WiFi":
 //           "The apartment in Kigali offers one bedroom and three bathrooms. The property includes a fully equipped kitchen, washing machine, and TV. Free WiFi",
@@ -197,7 +193,6 @@
 //         "Cozy studio near university": "Cozy studio near university",
 //         "Luxury villa with pool": "Luxury villa with pool",
 //       },
-//       // Common universities
 //       universities: {
 //         "University of Rwanda": "University of Rwanda",
 //         "Rwanda Polytechnic": "Rwanda Polytechnic",
@@ -206,7 +201,6 @@
 //         "Mount Kenya University": "Mount Kenya University",
 //         "Kigali Independent University": "Kigali Independent University",
 //       },
-//       // Common locations
 //       locations: {
 //         Kigali: "Kigali",
 //         "Gasabo District": "Gasabo District",
@@ -221,7 +215,6 @@
 //         "Rugando Village": "Rugando Village",
 //         "Kinyinya Village": "Kinyinya Village",
 //       },
-//       // Common amenities
 //       amenities: {
 //         "WiFi": "WiFi",
 //         "Kitchen": "Kitchen",
@@ -1033,13 +1026,13 @@
 //   category: keyof typeof translations.en.staticContent
 // ): string => {
 //   if (!text) return text;
-  
+
 //   const dict = translations[lang].staticContent[category] as Record<string, string>;
 //   // Check if the exact text exists in the dictionary
 //   if (dict[text]) {
 //     return dict[text];
 //   }
-  
+
 //   // If not found, try case-insensitive match
 //   const lowerText = text.toLowerCase();
 //   for (const [key, value] of Object.entries(dict)) {
@@ -1047,7 +1040,7 @@
 //       return value;
 //     }
 //   }
-  
+
 //   // If still not found, return the original text
 //   return text;
 // };
@@ -1100,7 +1093,6 @@
 //     amenities: translateAmenities(house.amenities, lang),
 //     host: {
 //       ...house.host,
-//       // Host name may not need translation, but we'll check
 //       name: translateText(house.host.name, lang, "propertyNames") || house.host.name,
 //     },
 //   };
@@ -1191,7 +1183,7 @@
 //       if (newLang !== lang) {
 //         setLang(newLang);
 //         // Re-translate all houses when language changes
-//         setHouses(prevHouses => 
+//         setHouses(prevHouses =>
 //           prevHouses.map(house => translateHouse(house, newLang))
 //         );
 //       }
@@ -1199,7 +1191,7 @@
 //     return () => clearInterval(interval);
 //   }, [lang]);
 
-//   // Load houses
+//   // ✅ HOOK 1: loadHouses useCallback
 //   const loadHouses = useCallback(async () => {
 //     try {
 //       setLoading(true);
@@ -1210,7 +1202,7 @@
 //         images: house.images || [],
 //       }));
 //       // Translate all houses with current language
-//       const translatedHouses = housesWithImages.map(house => 
+//       const translatedHouses = housesWithImages.map(house =>
 //         translateHouse(house, lang)
 //       );
 //       setHouses(translatedHouses);
@@ -1224,11 +1216,12 @@
 //     }
 //   }, [lang]);
 
+//   // ✅ HOOK 2: useEffect for loadHouses
 //   useEffect(() => {
 //     loadHouses();
 //   }, [loadHouses]);
 
-//   // Filter houses
+//   // ✅ HOOK 3: Filter houses
 //   useEffect(() => {
 //     let filtered = [...houses];
 //     if (searchTerm) {
@@ -1248,7 +1241,7 @@
 //     setCurrentPage(1);
 //   }, [houses, searchTerm, filterStatus]);
 
-//   // Update statistics
+//   // ✅ HOOK 4: Update statistics
 //   useEffect(() => {
 //     setStats({
 //       total: houses.length,
@@ -1263,6 +1256,10 @@
 //           : 0,
 //     });
 //   }, [houses]);
+
+//   // ============================================================
+//   // ALL HOOKS ABOVE - NOW WE CAN HAVE CONDITIONAL RETURNS
+//   // ============================================================
 
 //   // Get status badge - TRANSLATED!
 //   const getStatusColor = (status: string): string => {
@@ -1313,8 +1310,8 @@
 //     }));
 //   };
 
-//   // Validate form
-//   const validateForm = () => {
+//   // ✅ FIXED: Validate form - only called when triggered
+//   const validateForm = (): Record<string, string> => {
 //     const errors: Record<string, string> = {};
 //     const v = t.validation;
 
@@ -1358,19 +1355,46 @@
 //     if (imageFiles.length === 0 && !selectedHouse)
 //       errors.images = v.imagesRequired;
 
-//     setFormErrors(errors);
-//     return Object.keys(errors).length === 0;
+//     return errors;
 //   };
+
+//   // ✅ FIXED: Only validate and show errors when field is touched or on submit
+//   // const validateAndSetErrors = (fieldsToValidate?: string[]) => {
+//   //   const errors = validateForm();
+//   //   setFormErrors(errors);
+//   //   return Object.keys(errors).length === 0;
+//   // };
+
+//   const validateAndSetErrors = (fieldsToValidate?: string[]) => {
+//   const errors = validateForm();
+
+//   const filteredErrors = fieldsToValidate
+//     ? Object.keys(errors).reduce((acc, field) => {
+//         if (fieldsToValidate.includes(field)) {
+//           acc[field] = errors[field];
+//         }
+//         return acc;
+//       }, {} as typeof errors)
+//     : errors;
+
+//   setFormErrors(filteredErrors);
+
+//   return Object.keys(filteredErrors).length === 0;
+// };
 
 //   const handleFieldBlur = (field: string) => {
 //     setTouchedFields((prev) => ({ ...prev, [field]: true }));
+//     // ✅ Only validate on blur for the specific field
+//     validateAndSetErrors();
 //   };
 
 //   const hasError = (field: string): boolean => {
+//     // ✅ Only show error if field has been touched AND there's an error
 //     return touchedFields[field] && !!formErrors[field];
 //   };
 
 //   const isValidField = (field: string): boolean => {
+//     // ✅ Only show valid if field has been touched AND no error
 //     return touchedFields[field] && !formErrors[field];
 //   };
 
@@ -1388,9 +1412,12 @@
 //     } else {
 //       setPropertyFormData((prev) => ({ ...prev, [field]: value }));
 //     }
+
+//     // ✅ Clear error for this field when user types
 //     setFormErrors((prev) => {
 //       const newErrors = { ...prev };
-//       delete newErrors[field];
+//       const fieldName = field.includes(".") ? field.split(".")[1] : field;
+//       delete newErrors[fieldName];
 //       return newErrors;
 //     });
 //   };
@@ -1400,6 +1427,7 @@
 //       ...prev,
 //       location: { ...prev.location, [field]: value },
 //     }));
+//     // ✅ Clear error for this field when user types
 //     setFormErrors((prev) => {
 //       const newErrors = { ...prev };
 //       delete newErrors[field];
@@ -1421,6 +1449,7 @@
 //       reader.readAsDataURL(file);
 //     });
 
+//     // ✅ Clear image error when images are added
 //     setFormErrors((prev) => {
 //       const newErrors = { ...prev };
 //       delete newErrors.images;
@@ -1470,9 +1499,37 @@
 //     return formData;
 //   };
 
-//   // CRUD Operations
+//   // ✅ FIXED: CRUD Operations - validate only on submit
 //   const handleCreateProperty = async () => {
-//     if (!validateForm()) {
+//     // ✅ Touch all fields before validation
+//     const allFields = [
+//       "name",
+//       "description",
+//       "university",
+//       "province",
+//       "district",
+//       "sector",
+//       "cell",
+//       "village",
+//       "pricePerMonth",
+//       "bedrooms",
+//       "bathrooms",
+//       "maxGuests",
+//       "hostName",
+//       "hostEmail",
+//       "images",
+//     ];
+//     const touched: Record<string, boolean> = {};
+//     allFields.forEach((field) => {
+//       touched[field] = true;
+//     });
+//     setTouchedFields(touched);
+
+//     // ✅ Validate and set errors
+//     const errors = validateForm();
+//     setFormErrors(errors);
+
+//     if (Object.keys(errors).length > 0) {
 //       toast.error("Please fix all validation errors");
 //       return;
 //     }
@@ -1485,7 +1542,6 @@
 //         ...newHouse,
 //         images: newHouse.images || [],
 //       };
-//       // Translate the new house
 //       const translatedHouse = translateHouse(houseWithImages, lang);
 //       setHouses((prev) => [translatedHouse, ...prev]);
 //       toast.success(`✅ ${t.propertyCreated}`);
@@ -1507,7 +1563,36 @@
 
 //   const handleUpdateProperty = async () => {
 //     if (!selectedHouse) return;
-//     if (!validateForm()) {
+
+//     // ✅ Touch all fields before validation
+//     const allFields = [
+//       "name",
+//       "description",
+//       "university",
+//       "province",
+//       "district",
+//       "sector",
+//       "cell",
+//       "village",
+//       "pricePerMonth",
+//       "bedrooms",
+//       "bathrooms",
+//       "maxGuests",
+//       "hostName",
+//       "hostEmail",
+//       "images",
+//     ];
+//     const touched: Record<string, boolean> = {};
+//     allFields.forEach((field) => {
+//       touched[field] = true;
+//     });
+//     setTouchedFields(touched);
+
+//     // ✅ Validate and set errors
+//     const errors = validateForm();
+//     setFormErrors(errors);
+
+//     if (Object.keys(errors).length > 0) {
 //       toast.error("Please fix all validation errors");
 //       return;
 //     }
@@ -1523,7 +1608,6 @@
 //         ...updatedHouse,
 //         images: updatedHouse.images || [],
 //       };
-//       // Translate the updated house
 //       const translatedHouse = translateHouse(houseWithImages, lang);
 //       setHouses((prev) =>
 //         prev.map((h) => (h._id === selectedHouse._id ? translatedHouse : h)),
@@ -1623,6 +1707,9 @@
 //     });
 //     setImageFiles([]);
 //     setImagePreviews(house.images ? house.images.map((img) => img.url) : []);
+//     // ✅ Reset touched fields and errors for edit modal
+//     setTouchedFields({});
+//     setFormErrors({});
 //     setIsEditModalOpen(true);
 //   };
 
@@ -1746,6 +1833,7 @@
 //     exit: { opacity: 0 },
 //   };
 
+//   // ✅ CONDITIONAL RETURN - AFTER ALL HOOKS HAVE BEEN CALLED
 //   if (loading) {
 //     return (
 //       <div className="flex justify-center items-center min-h-[400px]">
@@ -1754,14 +1842,34 @@
 //     );
 //   }
 
-//   const isFormValid =
-//     Object.keys(formErrors).length === 0 &&
-//     (imageFiles.length > 0 ||
-//       (selectedHouse &&
-//         selectedHouse.images &&
-//         selectedHouse.images.length > 0)) &&
-//     propertyFormData.name.trim().length >= 3 &&
-//     propertyFormData.description.trim().length >= 20;
+//   // ✅ FIXED: isFormValid checks only touched fields
+//   const isFormValid = () => {
+//     // Check if all required fields have been touched
+//     const requiredFields = [
+//       "name",
+//       "description",
+//       "university",
+//       "province",
+//       "district",
+//       "sector",
+//       "cell",
+//       "village",
+//       "pricePerMonth",
+//       "bedrooms",
+//       "bathrooms",
+//       "maxGuests",
+//       "hostName",
+//       "hostEmail",
+//       "images",
+//     ];
+//     const allTouched = requiredFields.every((field) => touchedFields[field]);
+
+//     // If not all touched, form is not ready for submission
+//     if (!allTouched) return false;
+
+//     // Check if there are any errors
+//     return Object.keys(formErrors).length === 0;
+//   };
 
 //   return (
 //     <div className="p-4 sm:p-6 md:p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
@@ -2833,9 +2941,9 @@
 //                           ? handleUpdateProperty
 //                           : handleCreateProperty
 //                       }
-//                       disabled={submitting || !isFormValid}
+//                       disabled={submitting || !isFormValid()}
 //                       className={`flex-1 px-6 py-3 rounded-xl text-white font-medium transition-all flex items-center justify-center gap-2 ${
-//                         submitting || !isFormValid
+//                         submitting || !isFormValid()
 //                           ? "bg-gray-400 cursor-not-allowed"
 //                           : "bg-gradient-to-r from-[#FF385C] to-[#E31C5F] hover:shadow-lg"
 //                       }`}
@@ -2947,34 +3055,316 @@
 //   );
 // };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 import axios, { AxiosError } from "axios";
 
 // API Base URL
 const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
+
+// ============================================================
+// MODAL COMPONENTS
+// ============================================================
+
+// Success Modal
+interface SuccessModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  message: string;
+  details?: string;
+}
+
+const SuccessModal: React.FC<SuccessModalProps> = ({
+  isOpen,
+  onClose,
+  title,
+  message,
+  details,
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 to-green-600" />
+        <div className="p-6">
+          <div className="flex items-center justify-center mb-4">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center relative">
+              <div className="absolute inset-0 rounded-full border-4 border-green-200 animate-ping opacity-75" />
+              <svg
+                className="w-10 h-10 text-green-600 relative z-10"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+            {title}
+          </h3>
+          <p className="text-gray-600 text-center mb-2">{message}</p>
+          {details && (
+            <p className="text-sm text-gray-400 text-center mb-6">{details}</p>
+          )}
+          <button
+            onClick={onClose}
+            className="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+          >
+            Got it!
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Error Modal
+interface ErrorModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  message: string;
+  details?: string;
+}
+
+const ErrorModal: React.FC<ErrorModalProps> = ({
+  isOpen,
+  onClose,
+  title,
+  message,
+  details,
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-400 to-red-600" />
+        <div className="p-6">
+          <div className="flex items-center justify-center mb-4">
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center relative">
+              <div className="absolute inset-0 rounded-full border-4 border-red-200 animate-ping opacity-75" />
+              <svg
+                className="w-10 h-10 text-red-600 relative z-10"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+            {title}
+          </h3>
+          <p className="text-gray-600 text-center mb-2">{message}</p>
+          {details && (
+            <p className="text-sm text-gray-400 text-center mb-6">{details}</p>
+          )}
+          <button
+            onClick={onClose}
+            className="w-full px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Confirm Modal
+interface ConfirmModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  icon?: React.ReactNode;
+  isSubmitting?: boolean;
+  type?: "danger" | "warning" | "info" | "success";
+}
+
+const ConfirmModal: React.FC<ConfirmModalProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmText = "Confirm",
+  cancelText = "Cancel",
+  icon,
+  isSubmitting = false,
+  type = "warning",
+}) => {
+  if (!isOpen) return null;
+
+  const getColors = () => {
+    switch (type) {
+      case "danger":
+        return {
+          iconBg: "bg-red-100",
+          iconColor: "text-red-600",
+          iconBorder: "border-red-200",
+          buttonBg: "bg-gradient-to-r from-red-500 to-red-600",
+          buttonHover: "hover:shadow-lg",
+        };
+      case "warning":
+        return {
+          iconBg: "bg-yellow-100",
+          iconColor: "text-yellow-600",
+          iconBorder: "border-yellow-200",
+          buttonBg: "bg-gradient-to-r from-yellow-500 to-yellow-600",
+          buttonHover: "hover:shadow-lg",
+        };
+      case "success":
+        return {
+          iconBg: "bg-green-100",
+          iconColor: "text-green-600",
+          iconBorder: "border-green-200",
+          buttonBg: "bg-gradient-to-r from-green-500 to-green-600",
+          buttonHover: "hover:shadow-lg",
+        };
+      default:
+        return {
+          iconBg: "bg-blue-100",
+          iconColor: "text-blue-600",
+          iconBorder: "border-blue-200",
+          buttonBg: "bg-gradient-to-r from-blue-500 to-blue-600",
+          buttonHover: "hover:shadow-lg",
+        };
+    }
+  };
+
+  const colors = getColors();
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div
+          className={`absolute top-0 left-0 right-0 h-1 ${colors.buttonBg}`}
+        />
+        <div className="p-6">
+          <div className="flex items-center justify-center mb-4">
+            <div
+              className={`w-20 h-20 ${colors.iconBg} rounded-full flex items-center justify-center relative`}
+            >
+              <div
+                className={`absolute inset-0 rounded-full border-4 ${colors.iconBorder} animate-ping opacity-75`}
+              />
+              <div className={`${colors.iconColor} relative z-10`}>
+                {icon ||
+                  (type === "danger" ? (
+                    <svg
+                      className="w-10 h-10"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  ) : type === "warning" ? (
+                    <svg
+                      className="w-10 h-10"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
+                    </svg>
+                  ) : type === "success" ? (
+                    <svg
+                      className="w-10 h-10"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      className="w-10 h-10"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                      />
+                    </svg>
+                  ))}
+              </div>
+            </div>
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+            {title}
+          </h3>
+          <p className="text-gray-600 text-center mb-6">{message}</p>
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              disabled={isSubmitting}
+              className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+            >
+              {cancelText}
+            </button>
+            <button
+              onClick={onConfirm}
+              disabled={isSubmitting}
+              className={`flex-1 px-4 py-2.5 ${colors.buttonBg} text-white rounded-xl font-medium ${colors.buttonHover} transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2`}
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                confirmText
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Types based on the House model
 interface Host {
@@ -3132,6 +3522,8 @@ const translations = {
     previous: "Previous",
     next: "Next",
     page: "Page",
+    success: "Success!",
+    error: "Error",
     statuses: {
       available: "Available",
       pending: "Pending",
@@ -3182,20 +3574,20 @@ const translations = {
         "Kinyinya Village": "Kinyinya Village",
       },
       amenities: {
-        "WiFi": "WiFi",
-        "Kitchen": "Kitchen",
+        WiFi: "WiFi",
+        Kitchen: "Kitchen",
         "Washing Machine": "Washing Machine",
-        "TV": "TV",
-        "Pool": "Pool",
-        "Gym": "Gym",
-        "Parking": "Parking",
+        TV: "TV",
+        Pool: "Pool",
+        Gym: "Gym",
+        Parking: "Parking",
         "Air Conditioning": "Air Conditioning",
-        "Heating": "Heating",
-        "Balcony": "Balcony",
-        "Garden": "Garden",
-        "Security": "Security",
-        "Elevator": "Elevator",
-        "Furnished": "Furnished",
+        Heating: "Heating",
+        Balcony: "Balcony",
+        Garden: "Garden",
+        Security: "Security",
+        Elevator: "Elevator",
+        Furnished: "Furnished",
       },
     },
     validation: {
@@ -3323,6 +3715,8 @@ const translations = {
     previous: "Précédent",
     next: "Suivant",
     page: "Page",
+    success: "Succès !",
+    error: "Erreur",
     statuses: {
       available: "Disponible",
       pending: "En Attente",
@@ -3346,8 +3740,10 @@ const translations = {
         "The apartment in Kigali offers one bedroom and three bathrooms. The property includes a fully equipped kitchen, washing machine, and TV. Free WiFi":
           "L'appartement à Kigali offre une chambre et trois salles de bain. La propriété comprend une cuisine entièrement équipée, une machine à laver et une télévision. WiFi gratuit.",
         "Spacious house with garden": "Maison spacieuse avec jardin",
-        "Modern apartment with city view": "Appartement moderne avec vue sur la ville",
-        "Cozy studio near university": "Studio confortable près de l'université",
+        "Modern apartment with city view":
+          "Appartement moderne avec vue sur la ville",
+        "Cozy studio near university":
+          "Studio confortable près de l'université",
         "Luxury villa with pool": "Villa de luxe avec piscine",
       },
       universities: {
@@ -3373,20 +3769,20 @@ const translations = {
         "Kinyinya Village": "Village de Kinyinya",
       },
       amenities: {
-        "WiFi": "WiFi",
-        "Kitchen": "Cuisine",
+        WiFi: "WiFi",
+        Kitchen: "Cuisine",
         "Washing Machine": "Machine à Laver",
-        "TV": "Télévision",
-        "Pool": "Piscine",
-        "Gym": "Salle de Sport",
-        "Parking": "Parking",
+        TV: "Télévision",
+        Pool: "Piscine",
+        Gym: "Salle de Sport",
+        Parking: "Parking",
         "Air Conditioning": "Climatisation",
-        "Heating": "Chauffage",
-        "Balcony": "Balcon",
-        "Garden": "Jardin",
-        "Security": "Sécurité",
-        "Elevator": "Ascenseur",
-        "Furnished": "Meublé",
+        Heating: "Chauffage",
+        Balcony: "Balcon",
+        Garden: "Jardin",
+        Security: "Sécurité",
+        Elevator: "Ascenseur",
+        Furnished: "Meublé",
       },
     },
     validation: {
@@ -3516,6 +3912,8 @@ const translations = {
     previous: "Ibaye",
     next: "Ubutaha",
     page: "Urupapuro",
+    success: "Byakunze!",
+    error: "Ikosa",
     statuses: {
       available: "Irahari",
       pending: "Bitegereje",
@@ -3566,20 +3964,20 @@ const translations = {
         "Kinyinya Village": "Umudugudu wa Kinyinya",
       },
       amenities: {
-        "WiFi": "WiFi",
-        "Kitchen": "Igikoni",
+        WiFi: "WiFi",
+        Kitchen: "Igikoni",
         "Washing Machine": "Mashini yo Gukaraba",
-        "TV": "TV",
-        "Pool": "Ikidandaza",
-        "Gym": "Salle ya Siporo",
-        "Parking": "Parking",
+        TV: "TV",
+        Pool: "Ikidandaza",
+        Gym: "Salle ya Siporo",
+        Parking: "Parking",
         "Air Conditioning": "Ikikuba",
-        "Heating": "Ubushyuhe",
-        "Balcony": "Baranda",
-        "Garden": "Ubushamba",
-        "Security": "Umutekano",
-        "Elevator": "Elevator",
-        "Furnished": "Ishyizwe neza",
+        Heating: "Ubushyuhe",
+        Balcony: "Baranda",
+        Garden: "Ubushamba",
+        Security: "Umutekano",
+        Elevator: "Elevator",
+        Furnished: "Ishyizwe neza",
       },
     },
     validation: {
@@ -3627,8 +4025,7 @@ const getUserEmail = (): string => {
       return user.email || "";
     }
     return "";
-  } catch (error) {
-    console.error("Error reading user email from localStorage:", error);
+  } catch {
     return "";
   }
 };
@@ -3641,8 +4038,7 @@ const getUserName = (): string => {
       return user.name || "";
     }
     return "";
-  } catch (error) {
-    console.error("Error reading user name from localStorage:", error);
+  } catch {
     return "";
   }
 };
@@ -3650,8 +4046,7 @@ const getUserName = (): string => {
 const getToken = (): string => {
   try {
     return localStorage.getItem("token") || "";
-  } catch (error) {
-    console.error("Error reading token from localStorage:", error);
+  } catch {
     return "";
   }
 };
@@ -3666,7 +4061,6 @@ const api = axios.create({
   },
 });
 
-// Add request interceptor for authentication
 api.interceptors.request.use(
   (config) => {
     const token = getToken();
@@ -3989,56 +4383,74 @@ const Icons = {
 const translateText = (
   text: string,
   lang: "en" | "fr" | "rw",
-  category: keyof typeof translations.en.staticContent
+  category: keyof typeof translations.en.staticContent,
 ): string => {
   if (!text) return text;
-  
-  const dict = translations[lang].staticContent[category] as Record<string, string>;
-  // Check if the exact text exists in the dictionary
+
+  const dict = translations[lang].staticContent[category] as Record<
+    string,
+    string
+  >;
   if (dict[text]) {
     return dict[text];
   }
-  
-  // If not found, try case-insensitive match
+
   const lowerText = text.toLowerCase();
   for (const [key, value] of Object.entries(dict)) {
     if (key.toLowerCase() === lowerText) {
       return value;
     }
   }
-  
-  // If still not found, return the original text
+
   return text;
 };
 
 // Translate property name
-const translatePropertyName = (name: string, lang: "en" | "fr" | "rw"): string => {
+const translatePropertyName = (
+  name: string,
+  lang: "en" | "fr" | "rw",
+): string => {
   return translateText(name, lang, "propertyNames");
 };
 
 // Translate description
-const translateDescription = (description: string, lang: "en" | "fr" | "rw"): string => {
+const translateDescription = (
+  description: string,
+  lang: "en" | "fr" | "rw",
+): string => {
   return translateText(description, lang, "descriptions");
 };
 
 // Translate university name
-const translateUniversity = (university: string, lang: "en" | "fr" | "rw"): string => {
+const translateUniversity = (
+  university: string,
+  lang: "en" | "fr" | "rw",
+): string => {
   return translateText(university, lang, "universities");
 };
 
 // Translate location
-const translateLocation = (location: string, lang: "en" | "fr" | "rw"): string => {
+const translateLocation = (
+  location: string,
+  lang: "en" | "fr" | "rw",
+): string => {
   return translateText(location, lang, "locations");
 };
 
 // Translate amenity
-const translateAmenity = (amenity: string, lang: "en" | "fr" | "rw"): string => {
+const translateAmenity = (
+  amenity: string,
+  lang: "en" | "fr" | "rw",
+): string => {
   return translateText(amenity, lang, "amenities");
 };
 
 // Translate all amenities in an array
-const translateAmenities = (amenities: string[], lang: "en" | "fr" | "rw"): string[] => {
-  return amenities.map(amenity => translateAmenity(amenity, lang));
+const translateAmenities = (
+  amenities: string[],
+  lang: "en" | "fr" | "rw",
+): string[] => {
+  return amenities.map((amenity) => translateAmenity(amenity, lang));
 };
 
 // Translate entire house object
@@ -4059,7 +4471,9 @@ const translateHouse = (house: House, lang: "en" | "fr" | "rw"): House => {
     amenities: translateAmenities(house.amenities, lang),
     host: {
       ...house.host,
-      name: translateText(house.host.name, lang, "propertyNames") || house.host.name,
+      name:
+        translateText(house.host.name, lang, "propertyNames") ||
+        house.host.name,
     },
   };
 };
@@ -4070,6 +4484,31 @@ export const ManagerHouseManagement: React.FC = () => {
   );
   const userEmail = getUserEmail();
   const userName = getUserName();
+
+  // Success/Error modal states
+  const [successModal, setSuccessModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    details?: string;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    details: "",
+  });
+
+  const [errorModal, setErrorModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    details?: string;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    details: "",
+  });
 
   const [houses, setHouses] = useState<House[]>([]);
   const [filteredHouses, setFilteredHouses] = useState<House[]>([]);
@@ -4142,15 +4581,26 @@ export const ManagerHouseManagement: React.FC = () => {
 
   const t = translations[lang];
 
+  const showSuccessModal = (
+    title: string,
+    message: string,
+    details?: string,
+  ) => {
+    setSuccessModal({ isOpen: true, title, message, details });
+  };
+
+  const showErrorModal = (title: string, message: string, details?: string) => {
+    setErrorModal({ isOpen: true, title, message, details });
+  };
+
   // Listen for language changes and re-translate houses
   useEffect(() => {
     const interval = setInterval(() => {
       const newLang = getLanguageFromCookies();
       if (newLang !== lang) {
         setLang(newLang);
-        // Re-translate all houses when language changes
-        setHouses(prevHouses => 
-          prevHouses.map(house => translateHouse(house, newLang))
+        setHouses((prevHouses) =>
+          prevHouses.map((house) => translateHouse(house, newLang)),
         );
       }
     }, 1000);
@@ -4162,25 +4612,23 @@ export const ManagerHouseManagement: React.FC = () => {
     try {
       setLoading(true);
       const data = await houseApi.getHouses();
-      console.log("✅ Houses loaded:", data);
       const housesWithImages = data.map((house) => ({
         ...house,
         images: house.images || [],
       }));
-      // Translate all houses with current language
-      const translatedHouses = housesWithImages.map(house => 
-        translateHouse(house, lang)
+      const translatedHouses = housesWithImages.map((house) =>
+        translateHouse(house, lang),
       );
       setHouses(translatedHouses);
       setFilteredHouses(translatedHouses);
       setCurrentPage(1);
     } catch (error) {
-      console.error("❌ Error loading houses:", error);
-      toast.error("Failed to load houses");
+      showErrorModal(t.error || "Error", "Failed to load houses");
+      console.error(error)
     } finally {
       setLoading(false);
     }
-  }, [lang]);
+  }, [lang, t]);
 
   // ✅ HOOK 2: useEffect for loadHouses
   useEffect(() => {
@@ -4222,10 +4670,6 @@ export const ManagerHouseManagement: React.FC = () => {
           : 0,
     });
   }, [houses]);
-
-  // ============================================================
-  // ALL HOOKS ABOVE - NOW WE CAN HAVE CONDITIONAL RETURNS
-  // ============================================================
 
   // Get status badge - TRANSLATED!
   const getStatusColor = (status: string): string => {
@@ -4325,42 +4769,22 @@ export const ManagerHouseManagement: React.FC = () => {
   };
 
   // ✅ FIXED: Only validate and show errors when field is touched or on submit
-  // const validateAndSetErrors = (fieldsToValidate?: string[]) => {
-  //   const errors = validateForm();
-  //   setFormErrors(errors);
-  //   return Object.keys(errors).length === 0;
-  // };
-
-  const validateAndSetErrors = (fieldsToValidate?: string[]) => {
-  const errors = validateForm();
-
-  const filteredErrors = fieldsToValidate
-    ? Object.keys(errors).reduce((acc, field) => {
-        if (fieldsToValidate.includes(field)) {
-          acc[field] = errors[field];
-        }
-        return acc;
-      }, {} as typeof errors)
-    : errors;
-
-  setFormErrors(filteredErrors);
-
-  return Object.keys(filteredErrors).length === 0;
-};
+  const validateAndSetErrors = () => {
+    const errors = validateForm();
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleFieldBlur = (field: string) => {
     setTouchedFields((prev) => ({ ...prev, [field]: true }));
-    // ✅ Only validate on blur for the specific field
     validateAndSetErrors();
   };
 
   const hasError = (field: string): boolean => {
-    // ✅ Only show error if field has been touched AND there's an error
     return touchedFields[field] && !!formErrors[field];
   };
 
   const isValidField = (field: string): boolean => {
-    // ✅ Only show valid if field has been touched AND no error
     return touchedFields[field] && !formErrors[field];
   };
 
@@ -4378,8 +4802,7 @@ export const ManagerHouseManagement: React.FC = () => {
     } else {
       setPropertyFormData((prev) => ({ ...prev, [field]: value }));
     }
-    
-    // ✅ Clear error for this field when user types
+
     setFormErrors((prev) => {
       const newErrors = { ...prev };
       const fieldName = field.includes(".") ? field.split(".")[1] : field;
@@ -4393,7 +4816,6 @@ export const ManagerHouseManagement: React.FC = () => {
       ...prev,
       location: { ...prev.location, [field]: value },
     }));
-    // ✅ Clear error for this field when user types
     setFormErrors((prev) => {
       const newErrors = { ...prev };
       delete newErrors[field];
@@ -4415,7 +4837,6 @@ export const ManagerHouseManagement: React.FC = () => {
       reader.readAsDataURL(file);
     });
 
-    // ✅ Clear image error when images are added
     setFormErrors((prev) => {
       const newErrors = { ...prev };
       delete newErrors.images;
@@ -4432,7 +4853,6 @@ export const ManagerHouseManagement: React.FC = () => {
   const createFormData = (): FormData => {
     const formData = new FormData();
 
-    // Append all fields
     formData.append("name", propertyFormData.name);
     formData.append("description", propertyFormData.description);
     formData.append("university", propertyFormData.university);
@@ -4442,22 +4862,18 @@ export const ManagerHouseManagement: React.FC = () => {
     formData.append("maxGuests", String(propertyFormData.maxGuests));
     formData.append("status", propertyFormData.status);
 
-    // Location
     Object.entries(propertyFormData.location).forEach(([key, value]) => {
       formData.append(`location[${key}]`, value);
     });
 
-    // Host
     Object.entries(propertyFormData.host).forEach(([key, value]) => {
       formData.append(`host[${key}]`, String(value));
     });
 
-    // Amenities
     propertyFormData.amenities.forEach((amenity) => {
       formData.append("amenities[]", amenity);
     });
 
-    // Images
     imageFiles.forEach((file) => {
       formData.append("images", file);
     });
@@ -4467,7 +4883,6 @@ export const ManagerHouseManagement: React.FC = () => {
 
   // ✅ FIXED: CRUD Operations - validate only on submit
   const handleCreateProperty = async () => {
-    // ✅ Touch all fields before validation
     const allFields = [
       "name",
       "description",
@@ -4491,12 +4906,11 @@ export const ManagerHouseManagement: React.FC = () => {
     });
     setTouchedFields(touched);
 
-    // ✅ Validate and set errors
     const errors = validateForm();
     setFormErrors(errors);
-    
+
     if (Object.keys(errors).length > 0) {
-      toast.error("Please fix all validation errors");
+      showErrorModal(t.error || "Error", "Please fix all validation errors");
       return;
     }
 
@@ -4504,24 +4918,24 @@ export const ManagerHouseManagement: React.FC = () => {
     try {
       const formData = createFormData();
       const newHouse = await houseApi.createHouse(formData);
-      const houseWithImages = {
-        ...newHouse,
-        images: newHouse.images || [],
-      };
+      const houseWithImages = { ...newHouse, images: newHouse.images || [] };
       const translatedHouse = translateHouse(houseWithImages, lang);
       setHouses((prev) => [translatedHouse, ...prev]);
-      toast.success(`✅ ${t.propertyCreated}`);
+      showSuccessModal(
+        t.success || "Success!",
+        t.propertyCreated || "Property created successfully!",
+        `${newHouse.name} has been added to the listings`,
+      );
       setIsCreateModalOpen(false);
       resetForm();
     } catch (error) {
-      console.error("Error creating property:", error);
       const axiosError = error as AxiosError;
       const errorMessage = axiosError.response?.data
         ? typeof axiosError.response?.data === "string"
           ? axiosError.response?.data
           : JSON.stringify(axiosError.response?.data)
         : t.createFailed;
-      toast.error(`❌ ${errorMessage}`);
+      showErrorModal(t.error || "Error", errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -4530,7 +4944,6 @@ export const ManagerHouseManagement: React.FC = () => {
   const handleUpdateProperty = async () => {
     if (!selectedHouse) return;
 
-    // ✅ Touch all fields before validation
     const allFields = [
       "name",
       "description",
@@ -4554,12 +4967,11 @@ export const ManagerHouseManagement: React.FC = () => {
     });
     setTouchedFields(touched);
 
-    // ✅ Validate and set errors
     const errors = validateForm();
     setFormErrors(errors);
-    
+
     if (Object.keys(errors).length > 0) {
-      toast.error("Please fix all validation errors");
+      showErrorModal(t.error || "Error", "Please fix all validation errors");
       return;
     }
 
@@ -4578,19 +4990,22 @@ export const ManagerHouseManagement: React.FC = () => {
       setHouses((prev) =>
         prev.map((h) => (h._id === selectedHouse._id ? translatedHouse : h)),
       );
-      toast.success(`✅ ${t.propertyUpdated}`);
+      showSuccessModal(
+        t.success || "Success!",
+        t.propertyUpdated || "Property updated successfully!",
+        `${updatedHouse.name} has been updated`,
+      );
       setIsEditModalOpen(false);
       setSelectedHouse(null);
       resetForm();
     } catch (error) {
-      console.error("Error updating property:", error);
       const axiosError = error as AxiosError;
       const errorMessage = axiosError.response?.data
         ? typeof axiosError.response?.data === "string"
           ? axiosError.response?.data
           : JSON.stringify(axiosError.response?.data)
         : t.updateFailed;
-      toast.error(`❌ ${errorMessage}`);
+      showErrorModal(t.error || "Error", errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -4603,13 +5018,22 @@ export const ManagerHouseManagement: React.FC = () => {
     try {
       await houseApi.deleteHouse(selectedHouse._id!);
       setHouses((prev) => prev.filter((h) => h._id !== selectedHouse._id));
-      toast.success(`🗑️ ${t.propertyDeleted}`);
+      showSuccessModal(
+        t.success || "Success!",
+        t.propertyDeleted || "Property deleted successfully!",
+        `${selectedHouse.name} has been removed from the listings`,
+      );
       setIsDeleteModalOpen(false);
       setSelectedHouse(null);
     } catch (error) {
-      console.error("Error deleting property:", error);
       const axiosError = error as AxiosError;
-      toast.error(`❌ ${axiosError.response?.data || t.deleteFailed}`);
+      showErrorModal(
+        t.error || "Error",
+        t.deleteFailed || "Failed to delete property",
+        axiosError.response?.data
+          ? String(axiosError.response?.data)
+          : undefined,
+      );
     } finally {
       setSubmitting(false);
     }
@@ -4673,7 +5097,6 @@ export const ManagerHouseManagement: React.FC = () => {
     });
     setImageFiles([]);
     setImagePreviews(house.images ? house.images.map((img) => img.url) : []);
-    // ✅ Reset touched fields and errors for edit modal
     setTouchedFields({});
     setFormErrors({});
     setIsEditModalOpen(true);
@@ -4799,7 +5222,6 @@ export const ManagerHouseManagement: React.FC = () => {
     exit: { opacity: 0 },
   };
 
-  // ✅ CONDITIONAL RETURN - AFTER ALL HOOKS HAVE BEEN CALLED
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -4810,7 +5232,6 @@ export const ManagerHouseManagement: React.FC = () => {
 
   // ✅ FIXED: isFormValid checks only touched fields
   const isFormValid = () => {
-    // Check if all required fields have been touched
     const requiredFields = [
       "name",
       "description",
@@ -4829,16 +5250,32 @@ export const ManagerHouseManagement: React.FC = () => {
       "images",
     ];
     const allTouched = requiredFields.every((field) => touchedFields[field]);
-    
-    // If not all touched, form is not ready for submission
+
     if (!allTouched) return false;
-    
-    // Check if there are any errors
+
     return Object.keys(formErrors).length === 0;
   };
 
   return (
     <div className="p-4 sm:p-6 md:p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+      {/* Success Modal */}
+      <SuccessModal
+        isOpen={successModal.isOpen}
+        onClose={() => setSuccessModal({ ...successModal, isOpen: false })}
+        title={successModal.title}
+        message={successModal.message}
+        details={successModal.details}
+      />
+
+      {/* Error Modal */}
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        onClose={() => setErrorModal({ ...errorModal, isOpen: false })}
+        title={errorModal.title}
+        message={errorModal.message}
+        details={errorModal.details}
+      />
+
       {/* Header */}
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -5073,7 +5510,9 @@ export const ManagerHouseManagement: React.FC = () => {
           {totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-4 border-t border-gray-200">
               <p className="text-sm text-gray-500">
-                {t.showing} {startIndex + 1} - {Math.min(endIndex, filteredHouses.length)} {t.of} {filteredHouses.length} {t.propertiesCount}
+                {t.showing} {startIndex + 1} -{" "}
+                {Math.min(endIndex, filteredHouses.length)} {t.of}{" "}
+                {filteredHouses.length} {t.propertiesCount}
               </p>
               <div className="flex items-center gap-2">
                 <motion.button
@@ -5117,7 +5556,8 @@ export const ManagerHouseManagement: React.FC = () => {
                       }
                       if (
                         (page === 2 && currentPage > 3) ||
-                        (page === totalPages - 1 && currentPage < totalPages - 2)
+                        (page === totalPages - 1 &&
+                          currentPage < totalPages - 2)
                       ) {
                         return (
                           <span
@@ -5153,7 +5593,7 @@ export const ManagerHouseManagement: React.FC = () => {
         </>
       )}
 
-      {/* View Property Modal - All text is translated */}
+      {/* View Property Modal */}
       <AnimatePresence>
         {isViewModalOpen && selectedHouse && (
           <>
@@ -5947,76 +6387,35 @@ export const ManagerHouseManagement: React.FC = () => {
       </AnimatePresence>
 
       {/* Delete Confirmation Modal */}
-      <AnimatePresence>
-        {isDeleteModalOpen && selectedHouse && (
-          <>
-            <motion.div
-              variants={overlayVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-              onClick={() => {
-                setIsDeleteModalOpen(false);
-                setSelectedHouse(null);
-              }}
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedHouse(null);
+        }}
+        onConfirm={handleDeleteProperty}
+        title={t.deleteProperty}
+        message={t.deleteConfirmation}
+        confirmText={t.delete}
+        cancelText={t.cancel}
+        isSubmitting={submitting}
+        type="danger"
+        icon={
+          <svg
+            className="w-10 h-10"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
             />
-            <motion.div
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-            >
-              <motion.div className="w-full max-w-md rounded-2xl shadow-2xl bg-white">
-                <div className="p-6 text-center">
-                  <div className="w-20 h-20 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
-                    <Icons.Delete />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    {t.deleteProperty}
-                  </h3>
-                  <p className="text-gray-500 mb-2">{t.deleteConfirmation}</p>
-                  <p className="text-sm text-gray-400">{t.actionUndone}</p>
-                  <div className="flex gap-3 mt-6">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => {
-                        setIsDeleteModalOpen(false);
-                        setSelectedHouse(null);
-                      }}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-                    >
-                      {t.cancel}
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleDeleteProperty}
-                      disabled={submitting}
-                      className={`flex-1 px-4 py-2.5 rounded-xl text-white font-medium transition-colors ${
-                        submitting
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-red-600 hover:bg-red-700"
-                      }`}
-                    >
-                      {submitting ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          {t.deleting}
-                        </span>
-                      ) : (
-                        t.delete
-                      )}
-                    </motion.button>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+          </svg>
+        }
+      />
     </div>
   );
 };

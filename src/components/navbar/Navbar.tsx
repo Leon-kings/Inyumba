@@ -1,4 +1,7 @@
-/* eslint-disable react-hooks/refs */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/immutability */
+
+// /* eslint-disable react-hooks/refs */
 // /* eslint-disable react-refresh/only-export-components */
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 // /* eslint-disable react-hooks/set-state-in-effect */
@@ -1171,6 +1174,34 @@
 //     }
 //   };
 
+//   // Add these refs inside the Navbar component
+//   const scrollContainerRef = useRef<HTMLDivElement>(null);
+//   const fieldRefs = {
+//     name: useRef<HTMLDivElement>(null),
+//     email: useRef<HTMLDivElement>(null),
+//     phone: useRef<HTMLDivElement>(null),
+//     password: useRef<HTMLDivElement>(null),
+//     confirmPassword: useRef<HTMLDivElement>(null),
+//   };
+//   const fieldKeys = ["name", "email", "phone", "password", "confirmPassword"];
+//   const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
+
+//   // Add these navigation functions inside the Navbar component
+//   const scrollToTop = () => {
+//     if (scrollContainerRef.current) {
+//       scrollContainerRef.current.scrollTo({ top: 0, behavior: "smooth" });
+//     }
+//   };
+
+//   const scrollToNextField = () => {
+//     const nextIndex = (currentFieldIndex + 1) % fieldKeys.length;
+//     setCurrentFieldIndex(nextIndex);
+//     const targetRef = fieldRefs[fieldKeys[nextIndex] as keyof typeof fieldRefs];
+//     if (targetRef?.current) {
+//       targetRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+//     }
+//   };
+
 //   // Handle click outside menus
 //   useEffect(() => {
 //     const handleClickOutside = (event: MouseEvent) => {
@@ -1398,6 +1429,8 @@
 //       navigateTo("/dashboard");
 //     } else if (userRole === "host") {
 //       navigateTo("/host/dashboard");
+//     } else if (userRole === "manager") {
+//       navigateTo("/manager/dashboard");
 //     } else {
 //       navigateTo("/user/dashboard");
 //     }
@@ -1445,6 +1478,8 @@
 //             window.location.href = "/dashboard";
 //           } else if (user.role === "host") {
 //             window.location.href = "/host/dashboard";
+//           } else if (user.role === "manager") {
+//             window.location.href = "/manager/dashboard";
 //           } else {
 //             window.location.href = "/user/dashboard";
 //           }
@@ -1747,6 +1782,7 @@
 //   const getDashboardLabel = () => {
 //     if (userRole === "admin") return t.adminDashboard;
 //     else if (userRole === "host") return t.dashboard;
+//     else if (userRole === "manager") return "Manager Dashboard";
 //     else return t.userDashboard;
 //   };
 
@@ -1755,6 +1791,8 @@
 //     if (userRole === "admin")
 //       return <AdminPanelSettingsIcon className="w-4 h-4" />;
 //     else if (userRole === "host") return <HotelIcon className="w-4 h-4" />;
+//     else if (userRole === "manager")
+//       return <DashboardIcon className="w-4 h-4" />;
 //     else return <DashboardIcon className="w-4 h-4" />;
 //   };
 
@@ -2255,7 +2293,7 @@
 //       </AnimatePresence>
 
 //       {/* Register Modal */}
-//       <AnimatePresence>
+//       {/* <AnimatePresence>
 //         {isRegisterOpen && (
 //           <>
 //             <motion.div
@@ -2672,6 +2710,473 @@
 //             </motion.div>
 //           </>
 //         )}
+//       </AnimatePresence> */}
+
+//       {/* Register Modal */}
+//       <AnimatePresence>
+//         {isRegisterOpen && (
+//           <>
+//             <motion.div
+//               variants={overlayVariants}
+//               initial="hidden"
+//               animate="visible"
+//               exit="exit"
+//               transition={{ duration: 0.3 }}
+//               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+//               onClick={() => setIsRegisterOpen(false)}
+//             />
+//             <motion.div
+//               variants={modalVariants}
+//               initial="hidden"
+//               animate="visible"
+//               exit="exit"
+//               transition={{ duration: 0.4, type: "spring", stiffness: 300 }}
+//               className="fixed inset-0 z-[101] flex items-center justify-center p-4"
+//             >
+//               <div className="w-full max-w-md max-h-[90vh] rounded-2xl shadow-2xl bg-white relative overflow-hidden">
+//                 <AnimatedBackground />
+//                 <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl relative z-10">
+//                   <div className="flex items-center gap-2">
+//                     <AutoAwesomeIcon className="text-[#FF385C] w-5 h-5" />
+//                     <h2 className="text-xl font-semibold text-gray-900">
+//                       {t.createAccount}
+//                     </h2>
+//                   </div>
+//                   <motion.button
+//                     whileHover={{ rotate: 90, scale: 1.1 }}
+//                     whileTap={{ scale: 0.9 }}
+//                     onClick={() => setIsRegisterOpen(false)}
+//                     className="p-1 rounded-full transition-colors hover:bg-gray-100 text-gray-500"
+//                   >
+//                     <CloseIcon className="w-5 h-5" />
+//                   </motion.button>
+//                 </div>
+
+//                 <motion.div
+//                   initial={{ y: 50, opacity: 0 }}
+//                   animate={{ y: 0, opacity: 1 }}
+//                   exit={{ y: 50, opacity: 0 }}
+//                   transition={{ duration: 0.4, delay: 0.1 }}
+//                   className="overflow-y-auto max-h-[calc(90vh-80px)] scroll-smooth"
+//                   ref={scrollContainerRef}
+//                 >
+//                   <form onSubmit={handleRegister} className="p-6 relative z-10">
+//                     <div className="mb-4" ref={fieldRefs.name}>
+//                       <label className="block text-sm font-medium mb-1.5 text-gray-700">
+//                         {t.fullName}
+//                       </label>
+//                       <div
+//                         className={`relative rounded-lg border ${
+//                           registerErrors.name
+//                             ? "border-red-500"
+//                             : "border-gray-300"
+//                         } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+//                       >
+//                         <PersonIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+//                         <input
+//                           type="text"
+//                           required
+//                           value={registerName}
+//                           onChange={(e) => {
+//                             setRegisterName(e.target.value);
+//                             if (registerErrors.name) {
+//                               setRegisterErrors({
+//                                 ...registerErrors,
+//                                 name: undefined,
+//                               });
+//                             }
+//                           }}
+//                           className="w-full pl-10 pr-3 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
+//                           placeholder="John Doe"
+//                         />
+//                       </div>
+//                       {registerErrors.name && (
+//                         <p className="text-xs text-red-500 mt-1">
+//                           {registerErrors.name}
+//                         </p>
+//                       )}
+//                     </div>
+//                     <div className="mb-4" ref={fieldRefs.email}>
+//                       <label className="block text-sm font-medium mb-1.5 text-gray-700">
+//                         {t.email}
+//                       </label>
+//                       <div
+//                         className={`relative rounded-lg border ${
+//                           isRegisterEmailValid === true
+//                             ? "border-green-500"
+//                             : isRegisterEmailValid === false
+//                               ? "border-red-500"
+//                               : registerErrors.email
+//                                 ? "border-red-500"
+//                                 : "border-gray-300"
+//                         } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+//                       >
+//                         <EmailIcon
+//                           className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+//                             isRegisterEmailValid === true
+//                               ? "text-green-500"
+//                               : isRegisterEmailValid === false
+//                                 ? "text-red-500"
+//                                 : "text-gray-400"
+//                           }`}
+//                         />
+//                         <input
+//                           type="email"
+//                           required
+//                           value={registerEmail}
+//                           onChange={(e) =>
+//                             handleRegisterEmailChange(e.target.value)
+//                           }
+//                           className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
+//                           placeholder="you@example.com"
+//                         />
+//                         {isRegisterEmailValid === true && (
+//                           <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+//                         )}
+//                         {isRegisterEmailValid === false && (
+//                           <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+//                         )}
+//                       </div>
+//                       {registerErrors.email && (
+//                         <p className="text-xs text-red-500 mt-1">
+//                           {registerErrors.email}
+//                         </p>
+//                       )}
+//                       {isRegisterEmailValid === true && (
+//                         <p className="text-xs text-green-500 mt-1">
+//                           ✓ Valid email address
+//                         </p>
+//                       )}
+//                     </div>
+//                     <div className="mb-4" ref={fieldRefs.phone}>
+//                       <label className="block text-sm font-medium mb-1.5 text-gray-700">
+//                         {t.phoneNumber}
+//                       </label>
+//                       <div
+//                         className={`relative rounded-lg border ${
+//                           isPhoneValid === true
+//                             ? "border-green-500"
+//                             : isPhoneValid === false
+//                               ? "border-red-500"
+//                               : registerErrors.phone
+//                                 ? "border-red-500"
+//                                 : "border-gray-300"
+//                         } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+//                       >
+//                         <PhoneIcon
+//                           className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+//                             isPhoneValid === true
+//                               ? "text-green-500"
+//                               : isPhoneValid === false
+//                                 ? "text-red-500"
+//                                 : "text-gray-400"
+//                           }`}
+//                         />
+//                         <input
+//                           type="tel"
+//                           required
+//                           value={registerPhone}
+//                           onChange={(e) => handlePhoneChange(e.target.value)}
+//                           className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
+//                           placeholder="0788123456 or +250788123456"
+//                         />
+//                         {isPhoneValid === true && (
+//                           <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+//                         )}
+//                         {isPhoneValid === false && (
+//                           <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+//                         )}
+//                       </div>
+//                       {registerErrors.phone && (
+//                         <p className="text-xs text-red-500 mt-1">
+//                           {registerErrors.phone}
+//                         </p>
+//                       )}
+//                       {isPhoneValid === true && (
+//                         <p className="text-xs text-green-500 mt-1">
+//                           ✓ Valid phone number
+//                         </p>
+//                       )}
+//                     </div>
+//                     <div className="mb-4" ref={fieldRefs.password}>
+//                       <label className="block text-sm font-medium mb-1.5 text-gray-700">
+//                         {t.password}
+//                       </label>
+//                       <div
+//                         className={`relative rounded-lg border ${
+//                           registerErrors.password
+//                             ? "border-red-500"
+//                             : "border-gray-300"
+//                         } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+//                       >
+//                         <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+//                         <input
+//                           type={showPassword ? "text" : "password"}
+//                           required
+//                           value={registerPassword}
+//                           onChange={(e) => handlePasswordChange(e.target.value)}
+//                           className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
+//                           placeholder="••••••••"
+//                           minLength={6}
+//                         />
+//                         <button
+//                           type="button"
+//                           onClick={() => setShowPassword(!showPassword)}
+//                           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+//                         >
+//                           {showPassword ? (
+//                             <VisibilityOffIcon className="w-5 h-5" />
+//                           ) : (
+//                             <VisibilityIcon className="w-5 h-5" />
+//                           )}
+//                         </button>
+//                       </div>
+//                       {registerErrors.password && (
+//                         <p className="text-xs text-red-500 mt-1">
+//                           {registerErrors.password}
+//                         </p>
+//                       )}
+//                       {passwordStrength && (
+//                         <div className="mt-2">
+//                           <div className="flex items-center gap-2">
+//                             <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+//                               <motion.div
+//                                 className="h-full rounded-full transition-all duration-500"
+//                                 style={{
+//                                   width:
+//                                     passwordStrength === "weak"
+//                                       ? "33%"
+//                                       : passwordStrength === "moderate"
+//                                         ? "66%"
+//                                         : "100%",
+//                                   backgroundColor:
+//                                     getPasswordStrengthColor(passwordStrength),
+//                                 }}
+//                                 initial={{ width: 0 }}
+//                                 animate={{
+//                                   width:
+//                                     passwordStrength === "weak"
+//                                       ? "33%"
+//                                       : passwordStrength === "moderate"
+//                                         ? "66%"
+//                                         : "100%",
+//                                 }}
+//                               />
+//                             </div>
+//                             <div
+//                               className="flex items-center gap-1 text-xs font-medium"
+//                               style={{
+//                                 color:
+//                                   getPasswordStrengthColor(passwordStrength),
+//                               }}
+//                             >
+//                               {getPasswordStrengthIcon(passwordStrength)}
+//                               <span>
+//                                 {t.passwordStrength}:{" "}
+//                                 {getPasswordStrengthLabel(passwordStrength)}
+//                               </span>
+//                             </div>
+//                           </div>
+//                           {passwordStrength === "weak" && (
+//                             <p className="text-xs text-red-500 mt-1">
+//                               ⚠️ Password is too weak. Use at least 8 characters
+//                               with uppercase, lowercase, numbers, and special
+//                               characters.
+//                             </p>
+//                           )}
+//                         </div>
+//                       )}
+//                     </div>
+//                     <div className="mb-6" ref={fieldRefs.confirmPassword}>
+//                       <label className="block text-sm font-medium mb-1.5 text-gray-700">
+//                         {t.confirmPassword}
+//                       </label>
+//                       <div
+//                         className={`relative rounded-lg border ${
+//                           registerErrors.confirmPassword
+//                             ? "border-red-500"
+//                             : registerConfirmPassword &&
+//                                 registerPassword === registerConfirmPassword &&
+//                                 registerConfirmPassword.length > 0
+//                               ? "border-green-500"
+//                               : "border-gray-300"
+//                         } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
+//                       >
+//                         <LockIcon
+//                           className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+//                             registerConfirmPassword &&
+//                             registerPassword === registerConfirmPassword &&
+//                             registerConfirmPassword.length > 0
+//                               ? "text-green-500"
+//                               : "text-gray-400"
+//                           }`}
+//                         />
+//                         <input
+//                           type={showConfirmPassword ? "text" : "password"}
+//                           required
+//                           value={registerConfirmPassword}
+//                           onChange={(e) =>
+//                             handleConfirmPasswordChange(e.target.value)
+//                           }
+//                           className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
+//                           placeholder="••••••••"
+//                           minLength={6}
+//                         />
+//                         <button
+//                           type="button"
+//                           onClick={() =>
+//                             setShowConfirmPassword(!showConfirmPassword)
+//                           }
+//                           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+//                         >
+//                           {showConfirmPassword ? (
+//                             <VisibilityOffIcon className="w-5 h-5" />
+//                           ) : (
+//                             <VisibilityIcon className="w-5 h-5" />
+//                           )}
+//                         </button>
+//                         {registerConfirmPassword &&
+//                           registerPassword === registerConfirmPassword &&
+//                           registerConfirmPassword.length > 0 && (
+//                             <CheckCircleIcon className="absolute right-12 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+//                           )}
+//                       </div>
+//                       {registerErrors.confirmPassword && (
+//                         <p className="text-xs text-red-500 mt-1">
+//                           {registerErrors.confirmPassword}
+//                         </p>
+//                       )}
+//                       {registerConfirmPassword &&
+//                         registerPassword === registerConfirmPassword &&
+//                         registerConfirmPassword.length > 0 && (
+//                           <p className="text-xs text-green-500 mt-1">
+//                             ✓ Passwords match
+//                           </p>
+//                         )}
+//                     </div>
+//                     <motion.button
+//                       whileHover={{ scale: 1.02 }}
+//                       whileTap={{ scale: 0.98 }}
+//                       type="submit"
+//                       disabled={registerLoading || !isRegisterFormValid()}
+//                       className={`w-full py-3 rounded-lg font-medium relative overflow-hidden group transition-colors ${
+//                         registerLoading || !isRegisterFormValid()
+//                           ? "bg-gray-400 cursor-not-allowed"
+//                           : "bg-[#FF385C] hover:bg-[#E31C5F]"
+//                       } text-white`}
+//                     >
+//                       <span className="relative z-10 flex items-center justify-center gap-2">
+//                         {registerLoading ? (
+//                           <>
+//                             <svg
+//                               className="animate-spin h-5 w-5 text-white"
+//                               xmlns="http://www.w3.org/2000/svg"
+//                               fill="none"
+//                               viewBox="0 0 24 24"
+//                             >
+//                               <circle
+//                                 className="opacity-25"
+//                                 cx="12"
+//                                 cy="12"
+//                                 r="10"
+//                                 stroke="currentColor"
+//                                 strokeWidth="4"
+//                               ></circle>
+//                               <path
+//                                 className="opacity-75"
+//                                 fill="currentColor"
+//                                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+//                               ></path>
+//                             </svg>
+//                             Creating account...
+//                           </>
+//                         ) : (
+//                           <>
+//                             <PersonAddIcon className="w-5 h-5" />
+//                             {t.signup}
+//                           </>
+//                         )}
+//                       </span>
+//                     </motion.button>
+//                     {!isRegisterFormValid() &&
+//                       registerPassword.length > 0 &&
+//                       passwordStrength === "weak" && (
+//                         <p className="text-center text-xs text-red-500 mt-2">
+//                           ⚠️ Please choose a stronger password to enable
+//                           registration.
+//                         </p>
+//                       )}
+//                     <p className="text-center text-sm mt-4 text-gray-500">
+//                       {t.alreadyHaveAccount}{" "}
+//                       <button
+//                         type="button"
+//                         onClick={() => {
+//                           setIsRegisterOpen(false);
+//                           setIsLoginOpen(true);
+//                         }}
+//                         className="text-[#FF385C] font-medium hover:underline"
+//                       >
+//                         {t.login}
+//                       </button>
+//                     </p>
+//                     <div className="mt-6 flex justify-center gap-4">
+//                       <FacebookIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-blue-600 text-blue-600" />
+//                       <InstagramIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-pink-600 text-pink-600" />
+//                       <TwitterIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-blue-600 text-indigo-400" />
+//                       <YouTubeIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-red-300 text-red-300" />
+//                     </div>
+//                   </form>
+//                 </motion.div>
+
+//                 {/* Navigation Buttons - positioned on the right edge */}
+//                 <div className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2">
+//                   <motion.button
+//                     whileHover={{ scale: 1.1 }}
+//                     whileTap={{ scale: 0.9 }}
+//                     onClick={scrollToTop}
+//                     className="w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center text-gray-600 hover:bg-white hover:text-[#FF385C] transition-all border border-gray-200"
+//                     title="Scroll to top"
+//                   >
+//                     <svg
+//                       className="w-4 h-4"
+//                       fill="none"
+//                       stroke="currentColor"
+//                       viewBox="0 0 24 24"
+//                     >
+//                       <path
+//                         strokeLinecap="round"
+//                         strokeLinejoin="round"
+//                         strokeWidth={2}
+//                         d="M5 15l7-7 7 7"
+//                       />
+//                     </svg>
+//                   </motion.button>
+//                   <motion.button
+//                     whileHover={{ scale: 1.1 }}
+//                     whileTap={{ scale: 0.9 }}
+//                     onClick={scrollToNextField}
+//                     className="w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center text-gray-600 hover:bg-white hover:text-[#FF385C] transition-all border border-gray-200"
+//                     title="Scroll to next field"
+//                   >
+//                     <svg
+//                       className="w-4 h-4"
+//                       fill="none"
+//                       stroke="currentColor"
+//                       viewBox="0 0 24 24"
+//                     >
+//                       <path
+//                         strokeLinecap="round"
+//                         strokeLinejoin="round"
+//                         strokeWidth={2}
+//                         d="M19 9l-7 7-7-7"
+//                       />
+//                     </svg>
+//                   </motion.button>
+//                 </div>
+//               </div>
+//             </motion.div>
+//           </>
+//         )}
 //       </AnimatePresence>
 
 //       {/* User Profile Modal */}
@@ -2884,6 +3389,7 @@
 //   );
 // };
 
+/* eslint-disable react-hooks/refs */
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
@@ -3983,6 +4489,9 @@ export const Navbar = () => {
   const [userEmail, setUserEmail] = useState("");
   const [userRole, setUserRole] = useState("user");
   const [, setUserId] = useState("");
+  const [userPhone, setUserPhone] = useState("");
+  const [userCreatedAt, setUserCreatedAt] = useState("");
+  const [, setUserData] = useState<any>(null);
 
   // Status Modal state
   const [statusModal, setStatusModal] = useState<{
@@ -4115,7 +4624,7 @@ export const Navbar = () => {
     return () => document.removeEventListener("keydown", handleEscape);
   }, []);
 
-  // Check for existing session
+  // Check for existing session and fetch full user data
   useEffect(() => {
     const token = localStorage.getItem("token");
     const user = localStorage.getItem("user");
@@ -4127,11 +4636,37 @@ export const Navbar = () => {
         setUserEmail(userData.email || "");
         setUserRole(userData.role || "user");
         setUserId(userData.id || userData._id || "");
+        setUserPhone(userData.phone || "");
+        setUserCreatedAt(userData.createdAt || userData.created_at || "");
+        setUserData(userData);
+
+        // Fetch full user data from API if needed
+        fetchUserData(userData.id || userData._id);
       } catch (error) {
         console.error("Error parsing user data:", error);
       }
     }
   }, []);
+
+  // Fetch full user data from API
+  const fetchUserData = async (id: string) => {
+    try {
+      const response = await API.get(`/users/${id}`);
+      if (response.data.success && response.data.user) {
+        const fullUserData = response.data.user;
+        setUserData(fullUserData);
+        setUserName(fullUserData.name || userName);
+        setUserEmail(fullUserData.email || userEmail);
+        setUserRole(fullUserData.role || userRole);
+        setUserPhone(fullUserData.phone || "");
+        setUserCreatedAt(
+          fullUserData.createdAt || fullUserData.created_at || "",
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
 
   // Listen for cookie changes (for other tabs/windows)
   useEffect(() => {
@@ -4337,6 +4872,9 @@ export const Navbar = () => {
         setUserEmail(user.email || "");
         setUserRole(user.role || "user");
         setUserId(user.id || user._id || "");
+        setUserPhone(user.phone || "");
+        setUserCreatedAt(user.createdAt || user.created_at || "");
+        setUserData(user);
         setIsLoginOpen(false);
 
         localStorage.setItem("token", token);
@@ -4413,7 +4951,7 @@ export const Navbar = () => {
         email: registerEmail,
         phone: registerPhone,
         password: registerPassword,
-        confirmPassword: registerConfirmPassword, // Added confirmPassword to API request
+        confirmPassword: registerConfirmPassword,
       });
 
       if (response.data.success) {
@@ -4473,6 +5011,9 @@ export const Navbar = () => {
     setUserEmail("");
     setUserRole("user");
     setUserId("");
+    setUserPhone("");
+    setUserCreatedAt("");
+    setUserData(null);
 
     setStatusModal({
       isOpen: true,
@@ -4664,7 +5205,7 @@ export const Navbar = () => {
   const getDashboardLabel = () => {
     if (userRole === "admin") return t.adminDashboard;
     else if (userRole === "host") return t.dashboard;
-    else if (userRole === "manager") return "Manager Dashboard";
+    else if (userRole === "manager") return "Dashboard";
     else return t.userDashboard;
   };
 
@@ -4676,6 +5217,21 @@ export const Navbar = () => {
     else if (userRole === "manager")
       return <DashboardIcon className="w-4 h-4" />;
     else return <DashboardIcon className="w-4 h-4" />;
+  };
+
+  // Format date
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "N/A";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch {
+      return dateString;
+    }
   };
 
   return (
@@ -4743,6 +5299,7 @@ export const Navbar = () => {
                   </button>
                 </motion.div>
               ))}
+       
             </div>
 
             {/* Mobile Navigation Menu Toggle */}
@@ -4825,21 +5382,36 @@ export const Navbar = () => {
                 </AnimatePresence>
               </div>
 
-              {/* Login / Register / Dashboard Buttons */}
+              {/* User Avatar / Login / Register Buttons */}
               {isLoggedIn ? (
                 <>
                   <motion.button
-                    whileHover={{
-                      scale: 1.05,
-                      backgroundColor: "#FF385C",
-                      color: "white",
-                    }}
+                    whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="hidden sm:block text-xs sm:text-sm font-medium px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all bg-[#FF385C] text-white hover:bg-[#E31C5F] whitespace-nowrap"
-                    onClick={handleDashboardNavigation}
+                    onClick={() => setIsUserModalOpen(true)}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FF385C]/10 hover:bg-[#FF385C]/20 transition-colors"
                   >
-                    <DashboardIcon className="w-4 h-4 inline mr-1" />
+                    <div className="w-8 h-8 rounded-full bg-[#FF385C] text-white flex items-center justify-center text-sm font-semibold">
+                      {userName.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="hidden sm:inline text-sm font-medium text-gray-700">
+                      {userName.length > 6
+                        ? userName.slice(0, 6) + "..."
+                        : userName}
+                    </span>
                   </motion.button>
+
+                         <motion.button
+                whileHover={{ x: 5 }}
+                className="w-full text-left px-4 bg-gradient-to-t from-red-400 to-red-600 py-2.5 text-sm flex items-center gap-3 text-white rounded-lg transition-colors"
+                onClick={() => {
+                  setIsUserModalOpen(false);
+                  handleDashboardNavigation();
+                }}
+              >
+                {getDashboardIcon()}
+                
+              </motion.button>
                   <motion.button
                     whileHover={{
                       scale: 1.05,
@@ -4910,18 +5482,30 @@ export const Navbar = () => {
               <>
                 <motion.button
                   whileHover={{ x: 5 }}
-                  onClick={handleDashboardNavigation}
-                  className="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-[#FF385C] hover:bg-[#FF385C]/5 transition-colors"
+                  onClick={() => {
+                    setIsUserModalOpen(true);
+                    const menu = document.getElementById("mobile-nav-menu");
+                    if (menu) menu.classList.add("hidden");
+                  }}
+                  className="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-[#FF385C] hover:bg-[#FF385C]/5 transition-colors flex items-center gap-2"
                 >
-                  <DashboardIcon className="w-4 h-4 inline mr-2" />
+                  <AccountCircleIcon className="w-4 h-4" />
+                  {t.profile}
+                </motion.button>
+                <motion.button
+                  whileHover={{ x: 5 }}
+                  onClick={handleDashboardNavigation}
+                  className="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-[#FF385C] hover:bg-[#FF385C]/5 transition-colors flex items-center gap-2"
+                >
+                  {getDashboardIcon()}
                   {getDashboardLabel()}
                 </motion.button>
                 <motion.button
                   whileHover={{ x: 5 }}
                   onClick={handleLogout}
-                  className="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                  className="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
                 >
-                  <LogoutIcon className="w-4 h-4 inline mr-2" />
+                  <LogoutIcon className="w-4 h-4" />
                   {t.logout}
                 </motion.button>
               </>
@@ -4930,17 +5514,17 @@ export const Navbar = () => {
                 <motion.button
                   whileHover={{ x: 5 }}
                   onClick={() => setIsLoginOpen(true)}
-                  className="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-[#FF385C] hover:bg-[#FF385C]/5 transition-colors"
+                  className="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-[#FF385C] hover:bg-[#FF385C]/5 transition-colors flex items-center gap-2"
                 >
-                  <LoginIcon className="w-4 h-4 inline mr-2" />
+                  <LoginIcon className="w-4 h-4" />
                   {t.login}
                 </motion.button>
                 <motion.button
                   whileHover={{ x: 5 }}
                   onClick={() => setIsRegisterOpen(true)}
-                  className="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-[#1B4E91] hover:bg-[#1B4E91]/5 transition-colors"
+                  className="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium text-[#1B4E91] hover:bg-[#1B4E91]/5 transition-colors flex items-center gap-2"
                 >
-                  <PersonAddIcon className="w-4 h-4 inline mr-2" />
+                  <PersonAddIcon className="w-4 h-4" />
                   {t.signup}
                 </motion.button>
               </>
@@ -5173,426 +5757,6 @@ export const Navbar = () => {
           </>
         )}
       </AnimatePresence>
-
-      {/* Register Modal */}
-      {/* <AnimatePresence>
-        {isRegisterOpen && (
-          <>
-            <motion.div
-              variants={overlayVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              transition={{ duration: 0.3 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-              onClick={() => setIsRegisterOpen(false)}
-            />
-            <motion.div
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              transition={{ duration: 0.4, type: "spring", stiffness: 300 }}
-              className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-            >
-              <div className="w-full max-w-md max-h-[90vh] rounded-2xl shadow-2xl bg-white relative overflow-hidden">
-                <AnimatedBackground />
-                <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl relative z-10">
-                  <div className="flex items-center gap-2">
-                    <AutoAwesomeIcon className="text-[#FF385C] w-5 h-5" />
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      {t.createAccount}
-                    </h2>
-                  </div>
-                  <motion.button
-                    whileHover={{ rotate: 90, scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setIsRegisterOpen(false)}
-                    className="p-1 rounded-full transition-colors hover:bg-gray-100 text-gray-500"
-                  >
-                    <CloseIcon className="w-5 h-5" />
-                  </motion.button>
-                </div>
-
-                <motion.div
-                  initial={{ y: 50, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: 50, opacity: 0 }}
-                  transition={{ duration: 0.4, delay: 0.1 }}
-                  className="overflow-y-auto max-h-[calc(90vh-80px)]"
-                >
-                  <form onSubmit={handleRegister} className="p-6 relative z-10">
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                        {t.fullName}
-                      </label>
-                      <div
-                        className={`relative rounded-lg border ${
-                          registerErrors.name
-                            ? "border-red-500"
-                            : "border-gray-300"
-                        } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
-                      >
-                        <PersonIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <input
-                          type="text"
-                          required
-                          value={registerName}
-                          onChange={(e) => {
-                            setRegisterName(e.target.value);
-                            if (registerErrors.name) {
-                              setRegisterErrors({
-                                ...registerErrors,
-                                name: undefined,
-                              });
-                            }
-                          }}
-                          className="w-full pl-10 pr-3 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
-                          placeholder="John Doe"
-                        />
-                      </div>
-                      {registerErrors.name && (
-                        <p className="text-xs text-red-500 mt-1">
-                          {registerErrors.name}
-                        </p>
-                      )}
-                    </div>
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                        {t.email}
-                      </label>
-                      <div
-                        className={`relative rounded-lg border ${
-                          isRegisterEmailValid === true
-                            ? "border-green-500"
-                            : isRegisterEmailValid === false
-                              ? "border-red-500"
-                              : registerErrors.email
-                                ? "border-red-500"
-                                : "border-gray-300"
-                        } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
-                      >
-                        <EmailIcon
-                          className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
-                            isRegisterEmailValid === true
-                              ? "text-green-500"
-                              : isRegisterEmailValid === false
-                                ? "text-red-500"
-                                : "text-gray-400"
-                          }`}
-                        />
-                        <input
-                          type="email"
-                          required
-                          value={registerEmail}
-                          onChange={(e) =>
-                            handleRegisterEmailChange(e.target.value)
-                          }
-                          className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
-                          placeholder="you@example.com"
-                        />
-                        {isRegisterEmailValid === true && (
-                          <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
-                        )}
-                        {isRegisterEmailValid === false && (
-                          <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
-                        )}
-                      </div>
-                      {registerErrors.email && (
-                        <p className="text-xs text-red-500 mt-1">
-                          {registerErrors.email}
-                        </p>
-                      )}
-                      {isRegisterEmailValid === true && (
-                        <p className="text-xs text-green-500 mt-1">
-                          ✓ Valid email address
-                        </p>
-                      )}
-                    </div>
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                        {t.phoneNumber}
-                      </label>
-                      <div
-                        className={`relative rounded-lg border ${
-                          isPhoneValid === true
-                            ? "border-green-500"
-                            : isPhoneValid === false
-                              ? "border-red-500"
-                              : registerErrors.phone
-                                ? "border-red-500"
-                                : "border-gray-300"
-                        } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
-                      >
-                        <PhoneIcon
-                          className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
-                            isPhoneValid === true
-                              ? "text-green-500"
-                              : isPhoneValid === false
-                                ? "text-red-500"
-                                : "text-gray-400"
-                          }`}
-                        />
-                        <input
-                          type="tel"
-                          required
-                          value={registerPhone}
-                          onChange={(e) => handlePhoneChange(e.target.value)}
-                          className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
-                          placeholder="0788123456 or +250788123456"
-                        />
-                        {isPhoneValid === true && (
-                          <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
-                        )}
-                        {isPhoneValid === false && (
-                          <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
-                        )}
-                      </div>
-                      {registerErrors.phone && (
-                        <p className="text-xs text-red-500 mt-1">
-                          {registerErrors.phone}
-                        </p>
-                      )}
-                      {isPhoneValid === true && (
-                        <p className="text-xs text-green-500 mt-1">
-                          ✓ Valid phone number
-                        </p>
-                      )}
-                    </div>
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                        {t.password}
-                      </label>
-                      <div
-                        className={`relative rounded-lg border ${
-                          registerErrors.password
-                            ? "border-red-500"
-                            : "border-gray-300"
-                        } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
-                      >
-                        <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <input
-                          type={showPassword ? "text" : "password"}
-                          required
-                          value={registerPassword}
-                          onChange={(e) => handlePasswordChange(e.target.value)}
-                          className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
-                          placeholder="••••••••"
-                          minLength={6}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                        >
-                          {showPassword ? (
-                            <VisibilityOffIcon className="w-5 h-5" />
-                          ) : (
-                            <VisibilityIcon className="w-5 h-5" />
-                          )}
-                        </button>
-                      </div>
-                      {registerErrors.password && (
-                        <p className="text-xs text-red-500 mt-1">
-                          {registerErrors.password}
-                        </p>
-                      )}
-                      {passwordStrength && (
-                        <div className="mt-2">
-                          <div className="flex items-center gap-2">
-                            <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                              <motion.div
-                                className="h-full rounded-full transition-all duration-500"
-                                style={{
-                                  width:
-                                    passwordStrength === "weak"
-                                      ? "33%"
-                                      : passwordStrength === "moderate"
-                                        ? "66%"
-                                        : "100%",
-                                  backgroundColor:
-                                    getPasswordStrengthColor(passwordStrength),
-                                }}
-                                initial={{ width: 0 }}
-                                animate={{
-                                  width:
-                                    passwordStrength === "weak"
-                                      ? "33%"
-                                      : passwordStrength === "moderate"
-                                        ? "66%"
-                                        : "100%",
-                                }}
-                              />
-                            </div>
-                            <div
-                              className="flex items-center gap-1 text-xs font-medium"
-                              style={{
-                                color:
-                                  getPasswordStrengthColor(passwordStrength),
-                              }}
-                            >
-                              {getPasswordStrengthIcon(passwordStrength)}
-                              <span>
-                                {t.passwordStrength}:{" "}
-                                {getPasswordStrengthLabel(passwordStrength)}
-                              </span>
-                            </div>
-                          </div>
-                          {passwordStrength === "weak" && (
-                            <p className="text-xs text-red-500 mt-1">
-                              ⚠️ Password is too weak. Use at least 8 characters
-                              with uppercase, lowercase, numbers, and special
-                              characters.
-                            </p>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                    <div className="mb-6">
-                      <label className="block text-sm font-medium mb-1.5 text-gray-700">
-                        {t.confirmPassword}
-                      </label>
-                      <div
-                        className={`relative rounded-lg border ${
-                          registerErrors.confirmPassword
-                            ? "border-red-500"
-                            : registerConfirmPassword &&
-                                registerPassword === registerConfirmPassword &&
-                                registerConfirmPassword.length > 0
-                              ? "border-green-500"
-                              : "border-gray-300"
-                        } bg-white focus-within:border-[#FF385C] transition-colors duration-300`}
-                      >
-                        <LockIcon
-                          className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
-                            registerConfirmPassword &&
-                            registerPassword === registerConfirmPassword &&
-                            registerConfirmPassword.length > 0
-                              ? "text-green-500"
-                              : "text-gray-400"
-                          }`}
-                        />
-                        <input
-                          type={showConfirmPassword ? "text" : "password"}
-                          required
-                          value={registerConfirmPassword}
-                          onChange={(e) =>
-                            handleConfirmPasswordChange(e.target.value)
-                          }
-                          className="w-full pl-10 pr-10 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400"
-                          placeholder="••••••••"
-                          minLength={6}
-                        />
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setShowConfirmPassword(!showConfirmPassword)
-                          }
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                        >
-                          {showConfirmPassword ? (
-                            <VisibilityOffIcon className="w-5 h-5" />
-                          ) : (
-                            <VisibilityIcon className="w-5 h-5" />
-                          )}
-                        </button>
-                        {registerConfirmPassword &&
-                          registerPassword === registerConfirmPassword &&
-                          registerConfirmPassword.length > 0 && (
-                            <CheckCircleIcon className="absolute right-12 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
-                          )}
-                      </div>
-                      {registerErrors.confirmPassword && (
-                        <p className="text-xs text-red-500 mt-1">
-                          {registerErrors.confirmPassword}
-                        </p>
-                      )}
-                      {registerConfirmPassword &&
-                        registerPassword === registerConfirmPassword &&
-                        registerConfirmPassword.length > 0 && (
-                          <p className="text-xs text-green-500 mt-1">
-                            ✓ Passwords match
-                          </p>
-                        )}
-                    </div>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      type="submit"
-                      disabled={registerLoading || !isRegisterFormValid()}
-                      className={`w-full py-3 rounded-lg font-medium relative overflow-hidden group transition-colors ${
-                        registerLoading || !isRegisterFormValid()
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-[#FF385C] hover:bg-[#E31C5F]"
-                      } text-white`}
-                    >
-                      <span className="relative z-10 flex items-center justify-center gap-2">
-                        {registerLoading ? (
-                          <>
-                            <svg
-                              className="animate-spin h-5 w-5 text-white"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
-                              <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                              ></circle>
-                              <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                              ></path>
-                            </svg>
-                            Creating account...
-                          </>
-                        ) : (
-                          <>
-                            <PersonAddIcon className="w-5 h-5" />
-                            {t.signup}
-                          </>
-                        )}
-                      </span>
-                    </motion.button>
-                    {!isRegisterFormValid() &&
-                      registerPassword.length > 0 &&
-                      passwordStrength === "weak" && (
-                        <p className="text-center text-xs text-red-500 mt-2">
-                          ⚠️ Please choose a stronger password to enable
-                          registration.
-                        </p>
-                      )}
-                    <p className="text-center text-sm mt-4 text-gray-500">
-                      {t.alreadyHaveAccount}{" "}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsRegisterOpen(false);
-                          setIsLoginOpen(true);
-                        }}
-                        className="text-[#FF385C] font-medium hover:underline"
-                      >
-                        {t.login}
-                      </button>
-                    </p>
-                    <div className="mt-6 flex justify-center gap-4">
-                      <FacebookIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-blue-600 text-blue-600" />
-                      <InstagramIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-pink-600 text-pink-600" />
-                      <TwitterIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-blue-600 text-indigo-400" />
-                      <YouTubeIcon className="w-5 h-5 cursor-pointer transition-colors hover:text-red-300 text-red-300" />
-                    </div>
-                  </form>
-                </motion.div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence> */}
 
       {/* Register Modal */}
       <AnimatePresence>
@@ -6061,7 +6225,7 @@ export const Navbar = () => {
         )}
       </AnimatePresence>
 
-      {/* User Profile Modal */}
+      {/* User Profile Modal - Shows Full User Data */}
       <AnimatePresence>
         {isUserModalOpen && (
           <>
@@ -6071,7 +6235,7 @@ export const Navbar = () => {
               animate="visible"
               exit="exit"
               transition={{ duration: 0.3 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+              className="fixed inset-0 bg-white backdrop-blur-sm z-[100]"
               onClick={() => setIsUserModalOpen(false)}
             />
             <motion.div
@@ -6082,9 +6246,10 @@ export const Navbar = () => {
               transition={{ duration: 0.4, type: "spring", stiffness: 300 }}
               className="fixed inset-0 z-[101] flex items-center justify-center p-4"
             >
-              <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white relative">
+              <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white relative flex flex-col">
                 <AnimatedBackground />
-                <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl relative z-10">
+                {/* Header - NOT sticky, stays at top of flex container */}
+                <div className="px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl relative z-10 flex-shrink-0">
                   <div className="flex items-center gap-2">
                     <AccountCircleIcon className="text-[#FF385C] w-5 h-5" />
                     <h2 className="text-xl font-semibold text-gray-900">
@@ -6100,7 +6265,10 @@ export const Navbar = () => {
                     <CloseIcon className="w-5 h-5" />
                   </motion.button>
                 </div>
-                <div className="p-6 relative z-10">
+
+                {/* Scrollable content area */}
+                <div className="p-6 relative z-10 overflow-y-auto flex-1">
+                  {/* User Avatar & Name */}
                   <div className="flex flex-col items-center mb-6">
                     <motion.div
                       className="w-24 h-24 rounded-full bg-[#FF385C] text-white flex items-center justify-center text-3xl font-bold mb-3"
@@ -6113,14 +6281,62 @@ export const Navbar = () => {
                       {userName}
                     </h3>
                     <p className="text-sm text-gray-500">{userEmail}</p>
-                    <span className="inline-block mt-2 px-3 py-1 text-xs rounded-full bg-[#FF385C]/10 text-[#FF385C] font-medium">
+                    <span
+                      className={`inline-block mt-2 px-3 py-1 text-xs rounded-full font-medium ${
+                        userRole === "admin"
+                          ? "bg-red-100 text-red-700"
+                          : userRole === "host"
+                            ? "bg-blue-100 text-blue-700"
+                            : userRole === "manager"
+                              ? "bg-purple-100 text-purple-700"
+                              : "bg-green-100 text-green-700"
+                      }`}
+                    >
                       {userRole.charAt(0).toUpperCase() + userRole.slice(1)}
                     </span>
                   </div>
-                  <div className="border-t border-gray-200 pt-4 space-y-2">
+
+                  {/* User Details Grid */}
+                  <div className="border-t border-gray-200 pt-4 space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <p className="text-xs text-gray-500">Full Name</p>
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {userName}
+                        </p>
+                      </div>
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <p className="text-xs text-gray-500">Role</p>
+                        <p className="text-sm font-medium text-gray-900 capitalize">
+                          {userRole}
+                        </p>
+                      </div>
+                      <div className="bg-gray-50 rounded-lg p-3 col-span-2">
+                        <p className="text-xs text-gray-500">Email</p>
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {userEmail}
+                        </p>
+                      </div>
+                      <div className="bg-gray-50 rounded-lg p-3 col-span-2">
+                        <p className="text-xs text-gray-500">Phone</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {userPhone || "N/A"}
+                        </p>
+                      </div>
+                      <div className="bg-gray-50 rounded-lg p-3 col-span-2">
+                        <p className="text-xs text-gray-500">Member Since</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {formatDate(userCreatedAt)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="border-t border-gray-200 mt-4 pt-4 space-y-2">
                     <motion.button
                       whileHover={{ x: 5 }}
-                      className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-gray-700 hover:bg-gray-50 rounded-lg"
+                      className="w-full text-left px-4 bg-gradient-to-t from-red-400 to-red-600 py-2.5 text-sm flex items-center gap-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
                       onClick={() => {
                         setIsUserModalOpen(false);
                         handleDashboardNavigation();
@@ -6132,7 +6348,7 @@ export const Navbar = () => {
 
                     <motion.button
                       whileHover={{ x: 5 }}
-                      className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-red-600 hover:bg-red-50 rounded-lg"
+                      className="w-full text-left px-4 py-2.5 text-sm flex items-center gap-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       onClick={() => {
                         setIsUserModalOpen(false);
                         handleLogout();

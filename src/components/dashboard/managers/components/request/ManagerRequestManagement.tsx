@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // /* eslint-disable react-hooks/set-state-in-effect */
 // import React, { useState, useEffect } from "react";
 // import { motion, AnimatePresence } from "framer-motion";
 // import { toast } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
 // import Cookies from "js-cookie";
+// import axios from "axios";
 
 // // Material-UI Icons
 // import SupportAgentIcon from "@mui/icons-material/SupportAgent";
@@ -18,6 +18,9 @@
 // import AssignmentIcon from "@mui/icons-material/Assignment";
 // import ChatIcon from "@mui/icons-material/Chat";
 // import { Close, Send } from "@mui/icons-material";
+
+// // API Configuration
+// const API_URL = "https://rene-inyumba-nodejs.onrender.com/requests";
 
 // // Types - Updated to match the request model
 // interface RequestImage {
@@ -59,7 +62,6 @@
 
 // // Extended type for UI purposes
 // interface RequestUI extends Request {
-//   // UI-specific fields
 //   response: string;
 //   respondedBy: string;
 //   statusLabel: string;
@@ -302,11 +304,8 @@
 //   return lang || "en";
 // };
 
-// // API Base URL
-// const API_URL = "https://rene-inyumba-nodejs.onrender.com/requests";
-
-// // Helper function to transform request to UI format
-// const transformRequestToUI = (request: Request): RequestUI => {
+// // Helper function to transform request to UI format with translations
+// const transformRequestToUI = (request: Request, lang: "en" | "fr" | "rw"): RequestUI => {
 //   const statusColors: Record<string, string> = {
 //     Pending: "bg-yellow-100 text-yellow-800",
 //     Approved: "bg-green-100 text-green-800",
@@ -315,10 +314,10 @@
 //   };
 
 //   const statusLabels: Record<string, string> = {
-//     Pending: "Pending",
-//     Approved: "Approved",
-//     Rejected: "Rejected",
-//     Completed: "Completed",
+//     Pending: translations[lang].statuses.Pending,
+//     Approved: translations[lang].statuses.Approved,
+//     Rejected: translations[lang].statuses.Rejected,
+//     Completed: translations[lang].statuses.Completed,
 //   };
 
 //   // Check if there's an image URL
@@ -379,15 +378,12 @@
 
 //   const t = translations[lang];
 
-//   // Fetch requests from API
+//   // Fetch requests from API using axios
 //   const fetchRequests = async () => {
 //     setIsFetching(true);
 //     try {
-//       const response = await fetch(API_URL);
-//       if (!response.ok) {
-//         throw new Error(`HTTP error! status: ${response.status}`);
-//       }
-//       const data = await response.json();
+//       const response = await axios.get(API_URL);
+//       const data = response.data;
 
 //       // Handle both array and single object responses
 //       let requestsData: Request[] = [];
@@ -411,12 +407,12 @@
 //       }
 
 //       const transformedRequests = requestsData.map((req: Request) =>
-//         transformRequestToUI(req),
+//         transformRequestToUI(req, lang),
 //       );
 //       setRequests(transformedRequests);
 //     } catch (error) {
-//       console.error("Error fetching requests:", error);
 //       toast.error(`❌ ${t.fetchError}`);
+//       console.error(error);
 //     } finally {
 //       setIsFetching(false);
 //     }
@@ -440,6 +436,18 @@
 //     fetchRequests();
 //     // eslint-disable-next-line react-hooks/exhaustive-deps
 //   }, []);
+
+//   // Re-transform requests when language changes
+//   useEffect(() => {
+//     if (requests.length > 0) {
+//       const retransformed = requests.map((req) => {
+//         const original = req as unknown as Request;
+//         return transformRequestToUI(original, lang);
+//       });
+//       setRequests(retransformed);
+//     }
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, [lang]);
 
 //   // Filter requests
 //   useEffect(() => {
@@ -525,23 +533,13 @@
 //     setIsSubmitting(true);
 
 //     try {
-//       const response = await fetch(`${API_URL}/${selectedRequest._id}`, {
-//         method: "PUT",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({
-//           adminReply: responseText,
-//           status: selectedStatus || selectedRequest.status,
-//         }),
+//       const response = await axios.put(`${API_URL}/${selectedRequest._id}`, {
+//         adminReply: responseText,
+//         status: selectedStatus || selectedRequest.status,
 //       });
 
-//       if (!response.ok) {
-//         throw new Error(`HTTP error! status: ${response.status}`);
-//       }
-
-//       const updatedRequest = await response.json();
-//       const transformedRequest = transformRequestToUI(updatedRequest);
+//       const updatedRequest = response.data;
+//       const transformedRequest = transformRequestToUI(updatedRequest, lang);
 
 //       const updatedRequests = requests.map((r) =>
 //         r._id === selectedRequest._id ? transformedRequest : r,
@@ -555,7 +553,7 @@
 //       setSelectedStatus("");
 //     } catch (error) {
 //       toast.error(`❌ ${t.responseFailed}`);
-//       console.error("Response send error:", error);
+//       console.error(error);
 //     } finally {
 //       setIsSubmitting(false);
 //     }
@@ -567,13 +565,7 @@
 //     setIsLoading(true);
 
 //     try {
-//       const response = await fetch(`${API_URL}/${selectedRequest._id}`, {
-//         method: "DELETE",
-//       });
-
-//       if (!response.ok) {
-//         throw new Error(`HTTP error! status: ${response.status}`);
-//       }
+//       await axios.delete(`${API_URL}/${selectedRequest._id}`);
 
 //       setRequests(requests.filter((r) => r._id !== selectedRequest._id));
 //       toast.success(`🗑️ ${t.requestDeleted}`);
@@ -581,7 +573,7 @@
 //       setSelectedRequest(null);
 //     } catch (error) {
 //       toast.error(`❌ ${t.deleteFailed}`);
-//       console.error("Delete request error:", error);
+//       console.error(error);
 //     } finally {
 //       setIsLoading(false);
 //     }
@@ -1291,22 +1283,12 @@
 //   );
 // };
 
-
-
-
-
-
-
-
-
-
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 // Material-UI Icons
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
@@ -1323,6 +1305,23 @@ import { Close, Send } from "@mui/icons-material";
 
 // API Configuration
 const API_URL = "https://rene-inyumba-nodejs.onrender.com/requests";
+
+// Google Translate API utility
+const translateTextAPI = async (
+  text: string,
+  targetLang: string,
+): Promise<string> => {
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+    const response = await axios.get(url);
+    if (response.data && response.data[0]) {
+      return response.data[0][0][0];
+    }
+    return text;
+  } catch {
+    return text;
+  }
+};
 
 // Types - Updated to match the request model
 interface RequestImage {
@@ -1374,6 +1373,19 @@ interface RequestUI extends Request {
     type: string;
     dataUrl: string;
   };
+}
+
+// Modal Types
+type ModalType = "success" | "confirm" | "fail" | null;
+
+interface ModalState {
+  type: ModalType;
+  isOpen: boolean;
+  title: string;
+  message: string;
+  onConfirm?: () => void;
+  confirmText?: string;
+  cancelText?: string;
 }
 
 // Translations
@@ -1435,6 +1447,14 @@ const translations = {
     updatedAt: "Updated At",
     language: "Language",
     adminReply: "Admin Reply",
+    success: "Success",
+    confirm: "Confirm",
+    fail: "Failed",
+    modal: {
+      success: "Operation Successful",
+      confirm: "Confirm Action",
+      fail: "Operation Failed",
+    },
     statuses: {
       Pending: "Pending",
       Approved: "Approved",
@@ -1509,6 +1529,14 @@ const translations = {
     updatedAt: "Mis à jour le",
     language: "Langue",
     adminReply: "Réponse Admin",
+    success: "Succès",
+    confirm: "Confirmer",
+    fail: "Échec",
+    modal: {
+      success: "Opération Réussie",
+      confirm: "Confirmer l'Action",
+      fail: "Échec de l'Opération",
+    },
     statuses: {
       Pending: "En Attente",
       Approved: "Approuvé",
@@ -1523,7 +1551,8 @@ const translations = {
       Completed: "Terminé",
     },
     managerAccess: "Accès Manager",
-    managerViewOnly: "Vous avez un accès en visualisation et réponse aux demandes",
+    managerViewOnly:
+      "Vous avez un accès en visualisation et réponse aux demandes",
   },
   rw: {
     requestManagement: "Gucunga Ibyifuzo",
@@ -1582,6 +1611,14 @@ const translations = {
     updatedAt: "Byavuguruwe",
     language: "Ururimi",
     adminReply: "Igisubizo cy'Admin",
+    success: "Byakunze",
+    confirm: "Emeza",
+    fail: "Byananiranye",
+    modal: {
+      success: "Ibikorwa Byakunze",
+      confirm: "Emeza Ibikorwa",
+      fail: "Ibikorwa Byananiranye",
+    },
     statuses: {
       Pending: "Bitegereje",
       Approved: "Byemewe",
@@ -1607,7 +1644,10 @@ const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
 };
 
 // Helper function to transform request to UI format with translations
-const transformRequestToUI = (request: Request, lang: "en" | "fr" | "rw"): RequestUI => {
+const transformRequestToUI = async (
+  request: Request,
+  lang: "en" | "fr" | "rw",
+): Promise<RequestUI> => {
   const statusColors: Record<string, string> = {
     Pending: "bg-yellow-100 text-yellow-800",
     Approved: "bg-green-100 text-green-800",
@@ -1622,6 +1662,32 @@ const transformRequestToUI = (request: Request, lang: "en" | "fr" | "rw"): Reque
     Completed: translations[lang].statuses.Completed,
   };
 
+  // Translate name, email, and message if not English
+  let translatedName = request.name;
+  let translatedEmail = request.email;
+  let translatedMessage = request.message;
+  let translatedAdminReply = request.adminReply || "";
+
+  if (lang !== "en") {
+    try {
+      [
+        translatedName,
+        translatedEmail,
+        translatedMessage,
+        translatedAdminReply,
+      ] = await Promise.all([
+        translateTextAPI(request.name, lang),
+        translateTextAPI(request.email, lang),
+        translateTextAPI(request.message, lang),
+        request.adminReply
+          ? translateTextAPI(request.adminReply, lang)
+          : Promise.resolve(""),
+      ]);
+    } catch {
+      // Fallback to original text
+    }
+  }
+
   // Check if there's an image URL
   let displayImage = undefined;
   if (request.image && request.image.url) {
@@ -1635,13 +1701,66 @@ const transformRequestToUI = (request: Request, lang: "en" | "fr" | "rw"): Reque
 
   return {
     ...request,
-    response: request.adminReply || "",
+    name: translatedName || request.name,
+    email: translatedEmail || request.email,
+    message: translatedMessage || request.message,
+    adminReply: translatedAdminReply || request.adminReply || "",
+    response: translatedAdminReply || request.adminReply || "",
     respondedBy: "Admin",
     statusLabel: statusLabels[request.status] || request.status,
     statusColor: statusColors[request.status] || "bg-gray-100 text-gray-800",
     displayImage,
   };
 };
+
+// Icons for modals
+const SuccessSVG = () => (
+  <svg
+    className="w-12 h-12"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+    />
+  </svg>
+);
+
+const WarningSVG = () => (
+  <svg
+    className="w-12 h-12"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+    />
+  </svg>
+);
+
+const ErrorSVG = () => (
+  <svg
+    className="w-12 h-12"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+    />
+  </svg>
+);
 
 export const ManagerRequestManagement: React.FC = () => {
   // Get language from cookies
@@ -1678,7 +1797,53 @@ export const ManagerRequestManagement: React.FC = () => {
     Completed: 0,
   });
 
+  // Custom Modal State
+  const [modalState, setModalState] = useState<ModalState>({
+    type: null,
+    isOpen: false,
+    title: "",
+    message: "",
+  });
+
   const t = translations[lang];
+
+  // Show custom modal
+  const showModal = (
+    type: ModalType,
+    title: string,
+    message: string,
+    onConfirm?: () => void,
+    confirmText?: string,
+    cancelText?: string,
+  ) => {
+    setModalState({
+      type,
+      isOpen: true,
+      title,
+      message,
+      onConfirm,
+      confirmText: confirmText || t.confirm,
+      cancelText: cancelText || t.cancel,
+    });
+  };
+
+  // Close custom modal
+  const closeModal = () => {
+    setModalState({
+      type: null,
+      isOpen: false,
+      title: "",
+      message: "",
+    });
+  };
+
+  // Handle modal confirm
+  const handleModalConfirm = () => {
+    if (modalState.onConfirm) {
+      modalState.onConfirm();
+    }
+    closeModal();
+  };
 
   // Fetch requests from API using axios
   const fetchRequests = async () => {
@@ -1708,12 +1873,13 @@ export const ManagerRequestManagement: React.FC = () => {
         }
       }
 
-      const transformedRequests = requestsData.map((req: Request) =>
-        transformRequestToUI(req, lang),
+      const transformedRequests = await Promise.all(
+        requestsData.map((req: Request) => transformRequestToUI(req, lang)),
       );
       setRequests(transformedRequests);
     } catch (error) {
-      toast.error(`❌ ${t.fetchError}`);
+      showModal("fail", "Error", "Failed to load requests. Please try again.");
+      console.error(error);
     } finally {
       setIsFetching(false);
     }
@@ -1741,11 +1907,16 @@ export const ManagerRequestManagement: React.FC = () => {
   // Re-transform requests when language changes
   useEffect(() => {
     if (requests.length > 0) {
-      const retransformed = requests.map((req) => {
-        const original = req as unknown as Request;
-        return transformRequestToUI(original, lang);
-      });
-      setRequests(retransformed);
+      const retransformRequests = async () => {
+        const retransformed = await Promise.all(
+          requests.map((req) => {
+            const original = req as unknown as Request;
+            return transformRequestToUI(original, lang);
+          }),
+        );
+        setRequests(retransformed);
+      };
+      retransformRequests();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
@@ -1827,7 +1998,11 @@ export const ManagerRequestManagement: React.FC = () => {
 
   const handleSendResponse = async () => {
     if (!selectedRequest || !responseText.trim()) {
-      toast.warning("⚠️ Please enter a response");
+      showModal(
+        "fail",
+        "Validation Error",
+        "Please enter a response before sending.",
+      );
       return;
     }
 
@@ -1840,20 +2015,29 @@ export const ManagerRequestManagement: React.FC = () => {
       });
 
       const updatedRequest = response.data;
-      const transformedRequest = transformRequestToUI(updatedRequest, lang);
+      const transformedRequest = await transformRequestToUI(
+        updatedRequest,
+        lang,
+      );
 
       const updatedRequests = requests.map((r) =>
         r._id === selectedRequest._id ? transformedRequest : r,
       );
       setRequests(updatedRequests);
 
-      toast.success(`✅ ${t.responseSent}`);
+      showModal("success", "Success", "Response sent successfully!");
       setIsRespondModalOpen(false);
       setSelectedRequest(null);
       setResponseText("");
       setSelectedStatus("");
     } catch (error) {
-      toast.error(`❌ ${t.responseFailed}`);
+      const axiosError = error as AxiosError;
+      const errorMessage = axiosError.response?.data
+        ? typeof axiosError.response?.data === "string"
+          ? axiosError.response?.data
+          : JSON.stringify(axiosError.response?.data)
+        : t.responseFailed;
+      showModal("fail", "Failed", `Failed to send response: ${errorMessage}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -1868,11 +2052,16 @@ export const ManagerRequestManagement: React.FC = () => {
       await axios.delete(`${API_URL}/${selectedRequest._id}`);
 
       setRequests(requests.filter((r) => r._id !== selectedRequest._id));
-      toast.success(`🗑️ ${t.requestDeleted}`);
+      showModal("success", "Success", "Request deleted successfully!");
       setIsDeleteModalOpen(false);
       setSelectedRequest(null);
     } catch (error) {
-      toast.error(`❌ ${t.deleteFailed}`);
+      const axiosError = error as AxiosError;
+      showModal(
+        "fail",
+        "Failed",
+        `Failed to delete request: ${axiosError.response?.data || t.deleteFailed}`,
+      );
     } finally {
       setIsLoading(false);
     }
@@ -1922,6 +2111,86 @@ export const ManagerRequestManagement: React.FC = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Custom Modal */}
+      <AnimatePresence>
+        {modalState.isOpen && (
+          <>
+            <motion.div
+              variants={overlayVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200]"
+              onClick={closeModal}
+            />
+            <motion.div
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="fixed inset-0 z-[201] flex items-center justify-center p-4"
+            >
+              <motion.div className="w-full max-w-md rounded-2xl shadow-2xl bg-white overflow-hidden">
+                <div className="p-6 text-center">
+                  <div
+                    className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 ${
+                      modalState.type === "success"
+                        ? "bg-green-100 text-green-600"
+                        : modalState.type === "confirm"
+                          ? "bg-yellow-100 text-yellow-600"
+                          : "bg-red-100 text-red-600"
+                    }`}
+                  >
+                    {modalState.type === "success" && <SuccessSVG />}
+                    {modalState.type === "confirm" && <WarningSVG />}
+                    {modalState.type === "fail" && <ErrorSVG />}
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    {modalState.title}
+                  </h3>
+                  <p className="text-gray-500 mb-6">{modalState.message}</p>
+                  <div className="flex gap-3">
+                    {modalState.type === "confirm" ? (
+                      <>
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={closeModal}
+                          className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                        >
+                          {modalState.cancelText}
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={handleModalConfirm}
+                          className="flex-1 px-4 py-2.5 bg-[#FF385C] rounded-xl text-white font-medium hover:bg-[#E31C5F] transition-colors"
+                        >
+                          {modalState.confirmText}
+                        </motion.button>
+                      </>
+                    ) : (
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={closeModal}
+                        className={`flex-1 px-4 py-2.5 rounded-xl text-white font-medium transition-colors ${
+                          modalState.type === "success"
+                            ? "bg-green-600 hover:bg-green-700"
+                            : "bg-[#FF385C] hover:bg-[#E31C5F]"
+                        }`}
+                      >
+                        {t.close}
+                      </motion.button>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       {/* Manager Access Notice */}
       <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center gap-3">
         <SupportAgentIcon className="text-blue-600 w-5 h-5" />
@@ -2140,7 +2409,19 @@ export const ManagerRequestManagement: React.FC = () => {
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
-                          onClick={() => openDeleteModal(request)}
+                          onClick={() => {
+                            // Show confirmation modal before delete
+                            showModal(
+                              "confirm",
+                              "Confirm Delete",
+                              t.deleteConfirmation,
+                              () => {
+                                openDeleteModal(request);
+                              },
+                              "Delete",
+                              "Cancel",
+                            );
+                          }}
                           className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           title={t.deleteRequest}
                         >

@@ -1,8 +1,10 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable react-hooks/immutability */
+
 // import React, { useState, useEffect } from "react";
 // import { motion, AnimatePresence } from "framer-motion";
 // import Cookies from 'js-cookie';
+// import axios from "axios";
 
 // // Material-UI Icons
 // import FacebookIcon from "@mui/icons-material/Facebook";
@@ -22,10 +24,221 @@
 // import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 // import CodeIcon from "@mui/icons-material/Code";
 // import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+// import SendIcon from "@mui/icons-material/Send";
+// import CancelIcon from "@mui/icons-material/Cancel";
+// import PersonIcon from "@mui/icons-material/Person";
+// import {
+//   CheckCircleOutlineRounded,
+//   ErrorOutlineOutlined,
+// } from "@mui/icons-material";
+// import InfoIcon from "@mui/icons-material/Info";
+
+// // API Configuration
+// const CONTACT_API_URL = "https://rene-inyumba-nodejs.onrender.com/contact";
+
+// const CONTACT_API = axios.create({
+//   baseURL: CONTACT_API_URL,
+//   headers: {
+//     "Content-Type": "application/json",
+//   },
+// });
 
 // // Google Maps location - Musanze, INES-Ruhengeri
 // const MAP_EMBED_URL =
 //   "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7989.457174818556!2d29.62835915!3d-1.5022738499999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dca8c8d129807f%3A0x6feccec1255c8e9d!2sINES-Ruhengeri!5e0!3m2!1sen!2srw!4v1700000000000";
+
+// // Status Modal Component
+// interface StatusModalProps {
+//   isOpen: boolean;
+//   onClose: () => void;
+//   type: "success" | "error" | "info";
+//   title: string;
+//   message: string;
+//   details?: string;
+// }
+
+// const StatusModal: React.FC<StatusModalProps> = ({
+//   isOpen,
+//   onClose,
+//   type,
+//   title,
+//   message,
+//   details,
+// }) => {
+//   const getIcon = () => {
+//     switch (type) {
+//       case "success":
+//         return (
+//           <CheckCircleOutlineRounded className="w-16 h-16 text-green-500" />
+//         );
+//       case "error":
+//         return <ErrorOutlineOutlined className="w-16 h-16 text-red-500" />;
+//       case "info":
+//         return <InfoIcon className="w-16 h-16 text-blue-500" />;
+//     }
+//   };
+
+//   const getColors = () => {
+//     switch (type) {
+//       case "success":
+//         return {
+//           bg: "bg-green-50",
+//           border: "border-green-200",
+//           text: "text-green-800",
+//           button: "bg-green-500 hover:bg-green-600",
+//         };
+//       case "error":
+//         return {
+//           bg: "bg-red-50",
+//           border: "border-red-200",
+//           text: "text-red-800",
+//           button: "bg-red-500 hover:bg-red-600",
+//         };
+//       case "info":
+//         return {
+//           bg: "bg-blue-50",
+//           border: "border-blue-200",
+//           text: "text-blue-800",
+//           button: "bg-blue-500 hover:bg-blue-600",
+//         };
+//     }
+//   };
+
+//   const colors = getColors();
+
+//   const modalVariants = {
+//     hidden: { opacity: 0, scale: 0.8, y: 30 },
+//     visible: { opacity: 1, scale: 1, y: 0 },
+//     exit: { opacity: 0, scale: 0.8, y: 30 },
+//   };
+
+//   const overlayVariants = {
+//     hidden: { opacity: 0 },
+//     visible: { opacity: 1 },
+//     exit: { opacity: 0 },
+//   };
+
+//   return (
+//     <AnimatePresence>
+//       {isOpen && (
+//         <>
+//           <motion.div
+//             variants={overlayVariants}
+//             initial="hidden"
+//             animate="visible"
+//             exit="exit"
+//             transition={{ duration: 0.3 }}
+//             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200]"
+//             onClick={onClose}
+//           />
+//           <motion.div
+//             variants={modalVariants}
+//             initial="hidden"
+//             animate="visible"
+//             exit="exit"
+//             transition={{ duration: 0.4, type: "spring", stiffness: 300 }}
+//             className="fixed inset-0 z-[201] flex items-center justify-center p-4"
+//           >
+//             <div
+//               className={`w-full max-w-md rounded-2xl shadow-2xl border ${colors.border} ${colors.bg} relative overflow-hidden`}
+//             >
+//               <svg
+//                 className="absolute inset-0 w-full h-full"
+//                 xmlns="http://www.w3.org/2000/svg"
+//               >
+//                 <defs>
+//                   <radialGradient id="modalRadial">
+//                     <stop
+//                       offset="0%"
+//                       style={{
+//                         stopColor:
+//                           type === "success"
+//                             ? "#22c55e"
+//                             : type === "error"
+//                               ? "#ef4444"
+//                               : "#3b82f6",
+//                         stopOpacity: 0.1,
+//                       }}
+//                     />
+//                     <stop offset="100%" style={{ stopOpacity: 0 }} />
+//                   </radialGradient>
+//                 </defs>
+//                 <motion.circle
+//                   cx="50%"
+//                   cy="50%"
+//                   r="40%"
+//                   fill="url(#modalRadial)"
+//                   animate={{ scale: [1, 1.2, 1] }}
+//                   transition={{ duration: 4, repeat: Infinity }}
+//                 />
+//               </svg>
+//               <div className="relative z-10 p-6">
+//                 <div className="flex flex-col items-center text-center">
+//                   <button
+//                     onClick={onClose}
+//                     className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-200/50 transition-colors"
+//                   >
+//                     <CloseIcon className="w-5 h-5 text-gray-500" />
+//                   </button>
+
+//                   <motion.div
+//                     initial={{ scale: 0, rotate: -180 }}
+//                     animate={{ scale: 1, rotate: 0 }}
+//                     transition={{ duration: 0.5, type: "spring" }}
+//                     className="mb-4"
+//                   >
+//                     {getIcon()}
+//                   </motion.div>
+
+//                   <motion.h3
+//                     initial={{ opacity: 0, y: 10 }}
+//                     animate={{ opacity: 1, y: 0 }}
+//                     transition={{ delay: 0.1 }}
+//                     className={`text-2xl font-bold ${colors.text} mb-2`}
+//                   >
+//                     {title}
+//                   </motion.h3>
+
+//                   <motion.p
+//                     initial={{ opacity: 0, y: 10 }}
+//                     animate={{ opacity: 1, y: 0 }}
+//                     transition={{ delay: 0.2 }}
+//                     className="text-gray-700 mb-4"
+//                   >
+//                     {message}
+//                   </motion.p>
+
+//                   {details && (
+//                     <motion.div
+//                       initial={{ opacity: 0, y: 10 }}
+//                       animate={{ opacity: 1, y: 0 }}
+//                       transition={{ delay: 0.3 }}
+//                       className="bg-white/50 rounded-lg p-3 mb-4 w-full text-sm text-gray-600"
+//                     >
+//                       {details}
+//                     </motion.div>
+//                   )}
+
+//                   <motion.button
+//                     initial={{ opacity: 0, y: 10 }}
+//                     animate={{ opacity: 1, y: 0 }}
+//                     transition={{ delay: 0.4 }}
+//                     whileHover={{ scale: 1.02 }}
+//                     whileTap={{ scale: 0.98 }}
+//                     onClick={onClose}
+//                     className={`px-6 py-2.5 rounded-lg text-white font-medium transition-all ${colors.button} shadow-lg`}
+//                   >
+//                     Got it
+//                   </motion.button>
+//                 </div>
+//               </div>
+//             </div>
+//           </motion.div>
+//         </>
+//       )}
+//     </AnimatePresence>
+//   );
+// };
 
 // const translations = {
 //   en: {
@@ -60,6 +273,48 @@
 //     findUs: "Find Us",
 //     visitUs: "Visit Us",
 //     backToTop: "Back to Top",
+//     contactTitle: "Contact Us",
+//     contactSubtitle: "We'd love to hear from you! Send us a message and we'll respond as soon as possible.",
+//     contactName: "Full Name",
+//     contactNamePlaceholder: "Enter your full name",
+//     contactEmail: "Email Address",
+//     contactEmailPlaceholder: "Enter your email address",
+//     contactMessage: "Message",
+//     contactMessagePlaceholder: "Write your message here...",
+//     contactSend: "Send Message",
+//     contactSending: "Sending...",
+//     contactSuccess: "Message Sent Successfully!",
+//     contactSuccessMessage: "Thank you for reaching out. We'll get back to you shortly.",
+//     contactError: "Failed to send message",
+//     contactErrorRetry: "Please try again later.",
+//     contactClose: "Close",
+//     contactNameRequired: "Name is required",
+//     contactNameMin: "Name must be at least 2 characters",
+//     contactNameMax: "Name cannot exceed 50 characters",
+//     contactEmailRequired: "Email is required",
+//     contactEmailValid: "Please enter a valid email",
+//     contactMessageRequired: "Message is required",
+//     contactMessageMin: "Message must be at least 10 characters",
+//     contactMessageMax: "Message cannot exceed 1000 characters",
+//     successModalTitle: "🎉 Message Sent!",
+//     successModalMessage: "Your message has been sent successfully. We'll get back to you soon!",
+//     successModalButton: "Got it",
+//     failModalTitle: "❌ Failed to Send",
+//     failModalMessage: "We couldn't send your message. Please check your internet connection and try again.",
+//     failModalButton: "Try Again",
+//     nameRequired: "Name is required",
+//     nameMin: "Name must be at least 2 characters",
+//     emailRequired: "Email is required",
+//     emailInvalid: "Please enter a valid email address",
+//     messageRequired: "Message is required",
+//     messageMin: "Message must be at least 10 characters",
+//     sending: "Sending...",
+//     success: "Message sent successfully! We'll get back to you soon.",
+//     successTitle: "🎉 Message Sent!",
+//     errorTitle: "❌ Failed to Send",
+//     errorMessage: "Please try again later.",
+//     fail: "Failed to send message. Please try again.",
+//     serverError: "Server error. Please try again later.",
 //   },
 //   fr: {
 //     about: "À Propos",
@@ -93,6 +348,48 @@
 //     findUs: "Trouvez-Nous",
 //     visitUs: "Visitez-Nous",
 //     backToTop: "Retour en Haut",
+//     contactTitle: "Contactez-Nous",
+//     contactSubtitle: "Nous serions ravis de vous entendre! Envoyez-nous un message et nous vous répondrons dès que possible.",
+//     contactName: "Nom Complet",
+//     contactNamePlaceholder: "Entrez votre nom complet",
+//     contactEmail: "Adresse Email",
+//     contactEmailPlaceholder: "Entrez votre adresse email",
+//     contactMessage: "Message",
+//     contactMessagePlaceholder: "Écrivez votre message ici...",
+//     contactSend: "Envoyer",
+//     contactSending: "Envoi en cours...",
+//     contactSuccess: "Message Envoyé avec Succès!",
+//     contactSuccessMessage: "Merci de nous avoir contactés. Nous vous répondrons bientôt.",
+//     contactError: "Échec de l'envoi du message",
+//     contactErrorRetry: "Veuillez réessayer plus tard.",
+//     contactClose: "Fermer",
+//     contactNameRequired: "Le nom est requis",
+//     contactNameMin: "Le nom doit comporter au moins 2 caractères",
+//     contactNameMax: "Le nom ne peut pas dépasser 50 caractères",
+//     contactEmailRequired: "L'email est requis",
+//     contactEmailValid: "Veuillez entrer un email valide",
+//     contactMessageRequired: "Le message est requis",
+//     contactMessageMin: "Le message doit comporter au moins 10 caractères",
+//     contactMessageMax: "Le message ne peut pas dépasser 1000 caractères",
+//     successModalTitle: "🎉 Message Envoyé!",
+//     successModalMessage: "Votre message a été envoyé avec succès. Nous vous répondrons bientôt!",
+//     successModalButton: "Terminé",
+//     failModalTitle: "❌ Échec de l'envoi",
+//     failModalMessage: "Nous n'avons pas pu envoyer votre message. Veuillez vérifier votre connexion internet et réessayer.",
+//     failModalButton: "Réessayer",
+//     nameRequired: "Le nom est requis",
+//     nameMin: "Le nom doit contenir au moins 2 caractères",
+//     emailRequired: "L'e-mail est requis",
+//     emailInvalid: "Veuillez entrer une adresse e-mail valide",
+//     messageRequired: "Le message est requis",
+//     messageMin: "Le message doit contenir au moins 10 caractères",
+//     sending: "Envoi en cours...",
+//     success: "Message envoyé avec succès ! Nous vous répondrons bientôt.",
+//     successTitle: "🎉 Message Envoyé!",
+//     errorTitle: "❌ Échec de l'envoi",
+//     errorMessage: "Veuillez réessayer plus tard.",
+//     fail: "Échec de l'envoi du message. Veuillez réessayer.",
+//     serverError: "Erreur du serveur. Veuillez réessayer plus tard.",
 //   },
 //   rw: {
 //     about: "Ibijyanye Na Twe",
@@ -126,6 +423,48 @@
 //     findUs: "Turebe",
 //     visitUs: "Udukerere",
 //     backToTop: "Garuka Hejuru",
+//     contactTitle: "Twandikire",
+//     contactSubtitle: "Twishimira kumva ubutumwa bwawe! Dutume ubutumwa tuzagusubiza vuba.",
+//     contactName: "Izina Risoze",
+//     contactNamePlaceholder: "Andika izina ryawe ryose",
+//     contactEmail: "Adresi ya Email",
+//     contactEmailPlaceholder: "Andika adresi ya email yawe",
+//     contactMessage: "Ubutumwa",
+//     contactMessagePlaceholder: "Andika ubutumwa bwawe hano...",
+//     contactSend: "Ohereza Ubutumwa",
+//     contactSending: "Birambura...",
+//     contactSuccess: "Ubutumwa Bwoherejwe Neza!",
+//     contactSuccessMessage: "Urakoze kudutwara. Tuzagusubiza vuba.",
+//     contactError: "Ubutumwa ntabwo bwoherejwe",
+//     contactErrorRetry: "Nyamuneka ongera ugerageze nyuma.",
+//     contactClose: "Funga",
+//     contactNameRequired: "Izina rirasabwa",
+//     contactNameMin: "Izina rigomba kugira nibura inyuguti 2",
+//     contactNameMax: "Izina ntirigomba kurenga inyuguti 50",
+//     contactEmailRequired: "Email irasabwa",
+//     contactEmailValid: "Nyamuneka andika email ikwiye",
+//     contactMessageRequired: "Ubutumwa burasabwa",
+//     contactMessageMin: "Ubutumwa bugomba kugira nibura inyuguti 10",
+//     contactMessageMax: "Ubutumwa ntibugomba kurenga inyuguti 1000",
+//     successModalTitle: "🎉 Ubutumwa Bwoherejwe!",
+//     successModalMessage: "Ubutumwa bwawe bwoherejwe neza. Tuzagusubiza vuba!",
+//     successModalButton: "Byakozwe",
+//     failModalTitle: "❌ Ntabwo Bwoherejwe",
+//     failModalMessage: "Ntabwo twashoboye kohereza ubutumwa bwawe. Nyamuneka reba isanduku ya interineti hanyuma ongera ugerageze.",
+//     failModalButton: "Ongera Ugerageze",
+//     nameRequired: "Izina rirasabwa",
+//     nameMin: "Izina rigomba kugira nibura inyuguti 2",
+//     emailRequired: "Imeri irasabwa",
+//     emailInvalid: "Injiza aderesi ya imeri ikwiye",
+//     messageRequired: "Ubutumwa burasabwa",
+//     messageMin: "Ubutumwa bugomba kugira nibura inyuguti 10",
+//     sending: "Biremereza...",
+//     success: "Ubutumwa bwoherejwe neza! Tuzagusubiza vuba.",
+//     successTitle: "🎉 Ubutumwa Bwoherejwe!",
+//     errorTitle: "❌ Ntabwo Bwoherejwe",
+//     errorMessage: "Ongera ugerageze nyuma.",
+//     fail: "Ubutumwa ntibwoherejwe. Ongera ugerageze.",
+//     serverError: "Hari ikibazo kuri seriveri. Ongera ugerageze nyuma.",
 //   },
 // };
 
@@ -397,9 +736,198 @@
 //   const [lang, setLang] = useState<'en' | 'fr' | 'rw'>(getLanguageFromCookies());
 //   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 //   const [isTermsOpen, setIsTermsOpen] = useState(false);
+//   const [isContactOpen, setIsContactOpen] = useState(false);
 //   const [showBackToTop, setShowBackToTop] = useState(false);
 
+//   // Contact form state
+//   const [formData, setFormData] = useState({
+//     name: '',
+//     email: '',
+//     message: ''
+//   });
+//   const [errors, setErrors] = useState<{
+//     name?: string;
+//     email?: string;
+//     message?: string;
+//   }>({});
+//   const [isSubmitting, setIsSubmitting] = useState(false);
+//   const [isFormValid, setIsFormValid] = useState(false);
+
+//   // Field validation states
+//   const [isNameValid, setIsNameValid] = useState<boolean | null>(null);
+//   const [isEmailValid, setIsEmailValid] = useState<boolean | null>(null);
+//   const [isMessageValid, setIsMessageValid] = useState<boolean | null>(null);
+
+//   // Status Modal state
+//   const [statusModal, setStatusModal] = useState<{
+//     isOpen: boolean;
+//     type: "success" | "error" | "info";
+//     title: string;
+//     message: string;
+//     details?: string;
+//   }>({
+//     isOpen: false,
+//     type: "success",
+//     title: "",
+//     message: "",
+//     details: "",
+//   });
+
 //   const t = translations[lang];
+
+//   // Validate form on change
+//   useEffect(() => {
+//     const nameValid = formData.name.length >= 2;
+//     const emailValid = validateEmail(formData.email);
+//     const messageValid = formData.message.length >= 10;
+
+//     setIsNameValid(formData.name.length > 0 ? nameValid : null);
+//     setIsEmailValid(formData.email.length > 0 ? emailValid : null);
+//     setIsMessageValid(formData.message.length > 0 ? messageValid : null);
+
+//     const valid = nameValid && emailValid && messageValid;
+//     setIsFormValid(valid);
+
+//     if (nameValid && errors.name) {
+//       setErrors((prev) => ({ ...prev, name: undefined }));
+//     }
+//     if (emailValid && errors.email) {
+//       setErrors((prev) => ({ ...prev, email: undefined }));
+//     }
+//     if (messageValid && errors.message) {
+//       setErrors((prev) => ({ ...prev, message: undefined }));
+//     }
+//   }, [formData, errors.name, errors.email, errors.message]);
+
+//   const validateEmail = (email: string): boolean => {
+//     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+//     return emailRegex.test(email);
+//   };
+
+//   const handleInputChange = (
+//     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+//   ) => {
+//     const { name, value } = e.target;
+//     setFormData({ ...formData, [name]: value });
+//   };
+
+//   const validateForm = (): boolean => {
+//     const newErrors: { name?: string; email?: string; message?: string } = {};
+
+//     if (!formData.name || formData.name.length < 2) {
+//       newErrors.name = t.nameMin;
+//     }
+
+//     if (!formData.email) {
+//       newErrors.email = t.emailRequired;
+//     } else if (!validateEmail(formData.email)) {
+//       newErrors.email = t.emailInvalid;
+//     }
+
+//     if (!formData.message || formData.message.length < 10) {
+//       newErrors.message = t.messageMin;
+//     }
+
+//     setErrors(newErrors);
+//     return Object.keys(newErrors).length === 0;
+//   };
+
+//   const handleSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+
+//     if (!validateForm()) {
+//       setStatusModal({
+//         isOpen: true,
+//         type: "error",
+//         title: "⚠️ Invalid Form",
+//         message: "Please fix the errors before submitting.",
+//         details: "Check all fields and try again.",
+//       });
+//       return;
+//     }
+
+//     setIsSubmitting(true);
+
+//     try {
+//       const response = await CONTACT_API.post("/", {
+//         name: formData.name,
+//         email: formData.email,
+//         message: formData.message,
+//       });
+
+//       if (response.data && response.data.success === true) {
+//         setStatusModal({
+//           isOpen: true,
+//           type: "success",
+//           title: t.successTitle,
+//           message: response.data.message || t.success,
+//           details: `Thank you, ${formData.name}! We'll get back to you soon.`,
+//         });
+
+//         setFormData({ name: "", email: "", message: "" });
+//         setIsNameValid(null);
+//         setIsEmailValid(null);
+//         setIsMessageValid(null);
+//         setIsFormValid(false);
+//         setIsContactOpen(false);
+//       } else {
+//         const errorMsg = response.data?.message || t.fail;
+//         setStatusModal({
+//           isOpen: true,
+//           type: "error",
+//           title: t.errorTitle,
+//           message: errorMsg,
+//           details: `Please check your input and try again.`,
+//         });
+//         setIsContactOpen(false);
+//       }
+//     } catch (error) {
+//       if (axios.isAxiosError(error)) {
+//         if (error.response) {
+//           const errorMessage =
+//             error.response.data?.message ||
+//             error.response.data?.error ||
+//             t.serverError;
+//           const errorDetails = `Status: ${error.response.status}`;
+
+//           setStatusModal({
+//             isOpen: true,
+//             type: "error",
+//             title: t.errorTitle,
+//             message: errorMessage,
+//             details: errorDetails,
+//           });
+//         } else if (error.request) {
+//           setStatusModal({
+//             isOpen: true,
+//             type: "error",
+//             title: t.errorTitle,
+//             message: "No response from server",
+//             details: "Please check your internet connection and try again.",
+//           });
+//         } else {
+//           setStatusModal({
+//             isOpen: true,
+//             type: "error",
+//             title: t.errorTitle,
+//             message: t.fail,
+//             details: error.message || "Please try again or contact support.",
+//           });
+//         }
+//       } else {
+//         setStatusModal({
+//           isOpen: true,
+//           type: "error",
+//           title: t.errorTitle,
+//           message: t.fail,
+//           details: "An unexpected error occurred. Please try again.",
+//         });
+//       }
+//       setIsContactOpen(false);
+//     } finally {
+//       setIsSubmitting(false);
+//     }
+//   };
 
 //   // Listen for language changes in cookies
 //   useEffect(() => {
@@ -410,7 +938,6 @@
 //       }
 //     };
 
-//     // Check for cookie changes every second (polling)
 //     const interval = setInterval(handleCookieChange, 1000);
 //     return () => clearInterval(interval);
 //   }, [lang]);
@@ -445,10 +972,39 @@
 //     setIsTermsOpen(true);
 //   };
 
+//   const handleContactClick = () => {
+//     setIsContactOpen(true);
+//     setFormData({ name: '', email: '', message: '' });
+//     setErrors({});
+//     setIsNameValid(null);
+//     setIsEmailValid(null);
+//     setIsMessageValid(null);
+//     setIsFormValid(false);
+//   };
+
+//   const handleCloseContact = () => {
+//     setIsContactOpen(false);
+//     setFormData({ name: '', email: '', message: '' });
+//     setErrors({});
+//     setIsNameValid(null);
+//     setIsEmailValid(null);
+//     setIsMessageValid(null);
+//     setIsFormValid(false);
+//   };
+
 //   const currentYear = 2026;
 
 //   return (
 //     <>
+//       <StatusModal
+//         isOpen={statusModal.isOpen}
+//         onClose={() => setStatusModal((prev) => ({ ...prev, isOpen: false }))}
+//         type={statusModal.type}
+//         title={statusModal.title}
+//         message={statusModal.message}
+//         details={statusModal.details}
+//       />
+
 //       <footer className="bg-gray-900 text-gray-300 relative">
 //         {/* Back to Top Button */}
 //         <AnimatePresence>
@@ -533,12 +1089,12 @@
 //                   </a>
 //                 </li>
 //                 <li>
-//                   <a
-//                     href="/contact"
+//                   <button
+//                     onClick={handleContactClick}
 //                     className="text-gray-400 hover:text-[#FF385C] transition-colors"
 //                   >
 //                     {t.contact}
-//                   </a>
+//                   </button>
 //                 </li>
 //               </ul>
 //             </div>
@@ -1002,9 +1558,212 @@
 //           </>
 //         )}
 //       </AnimatePresence>
+
+//       {/* Contact Modal - Styled like About page contact section */}
+//       <AnimatePresence>
+//         {isContactOpen && (
+//           <>
+//             <motion.div
+//               initial={{ opacity: 0 }}
+//               animate={{ opacity: 1 }}
+//               exit={{ opacity: 0 }}
+//               className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[500]"
+//               onClick={handleCloseContact}
+//             />
+//             <motion.div
+//               initial={{ opacity: 0, scale: 0.9, y: 20 }}
+//               animate={{ opacity: 1, scale: 1, y: 0 }}
+//               exit={{ opacity: 0, scale: 0.9, y: 20 }}
+//               className="fixed inset-2 xs:inset-4 z-[501] flex items-center justify-center"
+//             >
+//               <div className="bg-white dark:bg-gray-800 rounded-xl xs:rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl">
+//                 {/* Modal Header */}
+//                 <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 xs:p-6 flex items-center justify-between z-10">
+//                   <div className="flex items-center gap-3">
+//                     <div className="w-10 h-10 bg-[#FF385C]/10 rounded-full flex items-center justify-center text-[#FF385C]">
+//                       <EmailIcon className="w-5 h-5" />
+//                     </div>
+//                     <div>
+//                       <h3 className="text-lg xs:text-xl font-bold text-gray-900 dark:text-white">
+//                         {t.contactTitle}
+//                       </h3>
+//                       <p className="text-xs text-gray-500 dark:text-gray-400">
+//                         {t.contactSubtitle}
+//                       </p>
+//                     </div>
+//                   </div>
+//                   <button
+//                     onClick={handleCloseContact}
+//                     className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+//                   >
+//                     <CloseIcon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+//                   </button>
+//                 </div>
+
+//                 {/* Modal Content - Styled like About page contact form */}
+//                 <div className="p-4 xs:p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+//                   <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+//                     {/* Name Field */}
+//                     <div>
+//                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+//                         {t.contactName}
+//                       </label>
+//                       <div className="relative">
+//                         <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+//                           <PersonIcon className="w-5 h-5" />
+//                         </div>
+//                         <input
+//                           type="text"
+//                           name="name"
+//                           value={formData.name}
+//                           onChange={handleInputChange}
+//                           className={`w-full pl-10 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-1 transition-colors text-sm ${
+//                             isNameValid === true
+//                               ? "border-green-500 focus:border-green-500 focus:ring-green-500"
+//                               : isNameValid === false
+//                                 ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+//                                 : "border-gray-300 dark:border-gray-600 focus:border-[#FF385C] focus:ring-[#FF385C]"
+//                           } bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+//                           placeholder={t.contactNamePlaceholder}
+//                         />
+//                         {isNameValid === true && (
+//                           <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+//                         )}
+//                         {isNameValid === false && (
+//                           <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+//                         )}
+//                       </div>
+//                       {errors.name && (
+//                         <p className="text-xs text-red-500 mt-1">{errors.name}</p>
+//                       )}
+//                       {isNameValid === true && (
+//                         <p className="text-xs text-green-500 mt-1">✓ Valid name</p>
+//                       )}
+//                     </div>
+
+//                     {/* Email Field */}
+//                     <div>
+//                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+//                         {t.contactEmail}
+//                       </label>
+//                       <div className="relative">
+//                         <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+//                           <EmailIcon className="w-5 h-5" />
+//                         </div>
+//                         <input
+//                           type="email"
+//                           name="email"
+//                           value={formData.email}
+//                           onChange={handleInputChange}
+//                           className={`w-full pl-10 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-1 transition-colors text-sm ${
+//                             isEmailValid === true
+//                               ? "border-green-500 focus:border-green-500 focus:ring-green-500"
+//                               : isEmailValid === false
+//                                 ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+//                                 : "border-gray-300 dark:border-gray-600 focus:border-[#FF385C] focus:ring-[#FF385C]"
+//                           } bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+//                           placeholder={t.contactEmailPlaceholder}
+//                         />
+//                         {isEmailValid === true && (
+//                           <CheckCircleIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+//                         )}
+//                         {isEmailValid === false && (
+//                           <CancelIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+//                         )}
+//                       </div>
+//                       {errors.email && (
+//                         <p className="text-xs text-red-500 mt-1">{errors.email}</p>
+//                       )}
+//                       {isEmailValid === true && (
+//                         <p className="text-xs text-green-500 mt-1">✓ Valid email address</p>
+//                       )}
+//                     </div>
+
+//                     {/* Message Field */}
+//                     <div>
+//                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+//                         {t.contactMessage}
+//                       </label>
+//                       <div className="relative">
+//                         <textarea
+//                           name="message"
+//                           value={formData.message}
+//                           onChange={handleInputChange}
+//                           rows={4}
+//                           className={`w-full px-4 pr-10 py-2.5 border rounded-lg focus:outline-none focus:ring-1 transition-colors text-sm resize-none ${
+//                             isMessageValid === true
+//                               ? "border-green-500 focus:border-green-500 focus:ring-green-500"
+//                               : isMessageValid === false
+//                                 ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+//                                 : "border-gray-300 dark:border-gray-600 focus:border-[#FF385C] focus:ring-[#FF385C]"
+//                           } bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+//                           placeholder={t.contactMessagePlaceholder}
+//                         />
+//                         <div className="absolute right-3 top-3">
+//                           {isMessageValid === true && (
+//                             <CheckCircleIcon className="w-5 h-5 text-green-500" />
+//                           )}
+//                           {isMessageValid === false && (
+//                             <CancelIcon className="w-5 h-5 text-red-500" />
+//                           )}
+//                         </div>
+//                       </div>
+//                       {errors.message && (
+//                         <p className="text-xs text-red-500 mt-1">{errors.message}</p>
+//                       )}
+//                       {isMessageValid === true && (
+//                         <p className="text-xs text-green-500 mt-1">✓ Valid message</p>
+//                       )}
+//                       <p className="text-xs text-gray-400 mt-1">
+//                         {formData.message.length}/10 characters minimum
+//                       </p>
+//                     </div>
+
+//                     {/* Submit Button */}
+//                     <motion.button
+//                       whileHover={{ scale: isFormValid ? 1.02 : 1 }}
+//                       whileTap={{ scale: isFormValid ? 0.98 : 1 }}
+//                       type="submit"
+//                       disabled={!isFormValid || isSubmitting}
+//                       className={`w-full py-3 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+//                         isFormValid && !isSubmitting
+//                           ? "bg-[#FF385C] text-white hover:bg-[#E31C5F] shadow-lg shadow-[#FF385C]/30 cursor-pointer"
+//                           : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+//                       }`}
+//                     >
+//                       {isSubmitting ? (
+//                         <>
+//                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+//                           {t.sending}
+//                         </>
+//                       ) : (
+//                         <>
+//                           <SendIcon className="w-5 h-5" />
+//                           {t.contactSend}
+//                         </>
+//                       )}
+//                     </motion.button>
+
+//                     {!isFormValid &&
+//                       Object.keys(formData).some(
+//                         (key) =>
+//                           formData[key as keyof typeof formData].length > 0,
+//                       ) && (
+//                         <p className="text-center text-xs text-amber-500 mt-2">
+//                           Please fill in all fields correctly to enable submit
+//                         </p>
+//                       )}
+//                   </form>
+//                 </div>
+//               </div>
+//             </motion.div>
+//           </>
+//         )}
+//       </AnimatePresence>
 //     </>
 //   );
 // };
+
 
 
 
@@ -1045,15 +1804,34 @@ import {
 } from "@mui/icons-material";
 import InfoIcon from "@mui/icons-material/Info";
 
-// API Configuration
-const CONTACT_API_URL = "https://rene-inyumba-nodejs.onrender.com/contact";
+// API Configuration - Fixed
+const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
 
 const CONTACT_API = axios.create({
-  baseURL: CONTACT_API_URL,
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
+  timeout: 10000, // 10 second timeout
 });
+
+// Add request/response interceptors for error handling only (no logging)
+CONTACT_API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Silent error handling - no console logs
+    if (error.response) {
+      // Server responded with error status
+      return Promise.reject(error);
+    } else if (error.request) {
+      // Request made but no response
+      return Promise.reject(new Error("Network error - no response from server"));
+    } else {
+      // Request setup error
+      return Promise.reject(new Error("Request configuration error"));
+    }
+  }
+);
 
 // Google Maps location - Musanze, INES-Ruhengeri
 const MAP_EMBED_URL =
@@ -1844,104 +2622,196 @@ export const Footer: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
 
-    if (!validateForm()) {
+  //   if (!validateForm()) {
+  //     setStatusModal({
+  //       isOpen: true,
+  //       type: "error",
+  //       title: "⚠️ Invalid Form",
+  //       message: "Please fix the errors before submitting.",
+  //       details: "Check all fields and try again.",
+  //     });
+  //     return;
+  //   }
+
+  //   setIsSubmitting(true);
+
+  //   try {
+  //     // FIXED: Using correct endpoint path
+  //     const response = await CONTACT_API.post("/contact", {
+  //       name: formData.name.trim(),
+  //       email: formData.email.trim().toLowerCase(),
+  //       message: formData.message.trim(),
+  //     });
+
+  //     if (response.data && response.data.success === true) {
+  //       setStatusModal({
+  //         isOpen: true,
+  //         type: "success",
+  //         title: t.successTitle,
+  //         message: response.data.message || t.success,
+  //         details: `Thank you, ${formData.name}! We'll get back to you soon.`,
+  //       });
+
+  //       setFormData({ name: "", email: "", message: "" });
+  //       setIsNameValid(null);
+  //       setIsEmailValid(null);
+  //       setIsMessageValid(null);
+  //       setIsFormValid(false);
+  //       setIsContactOpen(false);
+  //     } else {
+  //       const errorMsg = response.data?.message || t.fail;
+  //       setStatusModal({
+  //         isOpen: true,
+  //         type: "error",
+  //         title: t.errorTitle,
+  //         message: errorMsg,
+  //         details: `Please check your input and try again.`,
+  //       });
+  //       setIsContactOpen(false);
+  //     }
+  //   } catch (error) {
+  //     // Silent error handling - no user data exposed
+  //     let errorMessage = t.fail;
+  //     let errorDetails = "Please try again or contact support.";
+
+  //     if (axios.isAxiosError(error)) {
+  //       if (error.response) {
+  //         // Server responded with error
+  //         errorMessage = error.response.data?.message || t.serverError;
+  //         errorDetails = "We're experiencing technical issues. Please try again later.";
+  //       } else if (error.request) {
+  //         // No response from server
+  //         errorMessage = "Connection Error";
+  //         errorDetails = "Unable to reach our servers. Please check your internet connection.";
+  //       }
+  //     }
+
+  //     setStatusModal({
+  //       isOpen: true,
+  //       type: "error",
+  //       title: t.errorTitle,
+  //       message: errorMessage,
+  //       details: errorDetails,
+  //     });
+  //     setIsContactOpen(false);
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
+  // Listen for language changes in cookies
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  if (!validateForm()) {
+    setStatusModal({
+      isOpen: true,
+      type: "error",
+      title: "⚠️ Invalid Form",
+      message: "Please fix the errors before submitting.",
+      details: "Check all fields and try again.",
+    });
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  try {
+    const response = await CONTACT_API.post("/contact", {
+      name: formData.name.trim(),
+      email: formData.email.trim().toLowerCase(),
+      message: formData.message.trim(),
+    });
+
+    console.log("📨 Contact API response:", response.data);
+
+    // Axios considers 2xx responses successful by default.
+    // So if the request reached here, the backend accepted it.
+    if (response.status >= 200 && response.status < 300) {
+      setStatusModal({
+        isOpen: true,
+        type: "success",
+        title: t.successTitle,
+        message:
+          response.data?.message ||
+          t.success ||
+          "Your message was sent successfully.",
+        details: `Thank you, ${formData.name}! We'll get back to you soon.`,
+      });
+
+      setFormData({
+        name: "",
+        email: "",
+        message: "",
+      });
+
+      setIsNameValid(null);
+      setIsEmailValid(null);
+      setIsMessageValid(null);
+      setIsFormValid(false);
+      setIsContactOpen(false);
+    } else {
       setStatusModal({
         isOpen: true,
         type: "error",
-        title: "⚠️ Invalid Form",
-        message: "Please fix the errors before submitting.",
-        details: "Check all fields and try again.",
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const response = await CONTACT_API.post("/", {
-        name: formData.name,
-        email: formData.email,
-        message: formData.message,
+        title: t.errorTitle,
+        message:
+          response.data?.message ||
+          t.fail ||
+          "Failed to send your message.",
+        details: "Please check your input and try again.",
       });
 
-      if (response.data && response.data.success === true) {
-        setStatusModal({
-          isOpen: true,
-          type: "success",
-          title: t.successTitle,
-          message: response.data.message || t.success,
-          details: `Thank you, ${formData.name}! We'll get back to you soon.`,
-        });
-
-        setFormData({ name: "", email: "", message: "" });
-        setIsNameValid(null);
-        setIsEmailValid(null);
-        setIsMessageValid(null);
-        setIsFormValid(false);
-        setIsContactOpen(false);
-      } else {
-        const errorMsg = response.data?.message || t.fail;
-        setStatusModal({
-          isOpen: true,
-          type: "error",
-          title: t.errorTitle,
-          message: errorMsg,
-          details: `Please check your input and try again.`,
-        });
-        setIsContactOpen(false);
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        if (error.response) {
-          const errorMessage =
-            error.response.data?.message ||
-            error.response.data?.error ||
-            t.serverError;
-          const errorDetails = `Status: ${error.response.status}`;
-
-          setStatusModal({
-            isOpen: true,
-            type: "error",
-            title: t.errorTitle,
-            message: errorMessage,
-            details: errorDetails,
-          });
-        } else if (error.request) {
-          setStatusModal({
-            isOpen: true,
-            type: "error",
-            title: t.errorTitle,
-            message: "No response from server",
-            details: "Please check your internet connection and try again.",
-          });
-        } else {
-          setStatusModal({
-            isOpen: true,
-            type: "error",
-            title: t.errorTitle,
-            message: t.fail,
-            details: error.message || "Please try again or contact support.",
-          });
-        }
-      } else {
-        setStatusModal({
-          isOpen: true,
-          type: "error",
-          title: t.errorTitle,
-          message: t.fail,
-          details: "An unexpected error occurred. Please try again.",
-        });
-      }
       setIsContactOpen(false);
-    } finally {
-      setIsSubmitting(false);
     }
-  };
+  } catch (error) {
+    let errorMessage = t.fail;
+    let errorDetails = "Please try again or contact support.";
 
-  // Listen for language changes in cookies
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        console.error("❌ Contact API error:", error.response.data);
+
+        errorMessage =
+          error.response.data?.message ||
+          t.serverError ||
+          "Server error.";
+
+        errorDetails =
+          "We're experiencing technical issues. Please try again later.";
+      } else if (error.request) {
+        console.error("❌ No response from contact API:", error.request);
+
+        errorMessage = "Connection Error";
+        errorDetails =
+          "Unable to reach our servers. Please check your internet connection.";
+      } else {
+        console.error("❌ Contact request error:", error.message);
+
+        errorMessage = error.message || t.fail;
+      }
+    } else {
+      console.error("❌ Unexpected contact error:", error);
+    }
+
+    setStatusModal({
+      isOpen: true,
+      type: "error",
+      title: t.errorTitle,
+      message: errorMessage,
+      details: errorDetails,
+    });
+
+    setIsContactOpen(false);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+  
   useEffect(() => {
     const handleCookieChange = () => {
       const newLang = getLanguageFromCookies();
