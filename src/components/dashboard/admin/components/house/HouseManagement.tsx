@@ -1,3 +1,4 @@
+
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 // /* eslint-disable react-hooks/set-state-in-effect */
 // import React, { useState, useEffect, useCallback, useRef } from "react";
@@ -854,6 +855,10 @@
 
 //   const t = translations[lang];
 
+//   // ============================================================
+//   // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
+//   // ============================================================
+
 //   // Listen for language changes
 //   useEffect(() => {
 //     const interval = setInterval(() => {
@@ -863,7 +868,7 @@
 //     return () => clearInterval(interval);
 //   }, [lang]);
 
-//   // ✅ CHANGED: Load houses - now fetches ALL houses without email parameter
+//   // ✅ HOOK 1: loadHouses useCallback
 //   const loadHouses = useCallback(async () => {
 //     try {
 //       setLoading(true);
@@ -884,11 +889,43 @@
 //     }
 //   }, []);
 
+//   // ✅ HOOK 2: isFormValid useCallback
+//   const isFormValid = useCallback(() => {
+//     // Only validate required fields that have been touched
+//     const requiredFields = [
+//       "name",
+//       "description",
+//       "university",
+//       "province",
+//       "district",
+//       "sector",
+//       "cell",
+//       "village",
+//       "pricePerMonth",
+//       "bedrooms",
+//       "bathrooms",
+//       "maxGuests",
+//       "hostName",
+//       "hostEmail",
+//       "images",
+//     ];
+
+//     // Check if all required fields have been touched
+//     const allTouched = requiredFields.every((field) => touchedFields[field]);
+
+//     // If not all touched, the form is considered invalid (not ready for submission)
+//     if (!allTouched) return false;
+
+//     // Check if there are any errors
+//     return Object.keys(formErrors).length === 0;
+//   }, [touchedFields, formErrors]);
+
+//   // ✅ HOOK 3: useEffect for loadHouses
 //   useEffect(() => {
 //     loadHouses();
 //   }, [loadHouses]);
 
-//   // Filter houses
+//   // ✅ HOOK 4: Filter houses
 //   useEffect(() => {
 //     let filtered = [...houses];
 //     if (searchTerm) {
@@ -907,7 +944,7 @@
 //     setFilteredHouses(filtered);
 //   }, [houses, searchTerm, filterStatus]);
 
-//   // Update statistics
+//   // ✅ HOOK 5: Update statistics
 //   useEffect(() => {
 //     setStats({
 //       total: houses.length,
@@ -922,6 +959,10 @@
 //           : 0,
 //     });
 //   }, [houses]);
+
+//   // ============================================================
+//   // ALL HOOKS ABOVE - NOW WE CAN HAVE CONDITIONAL RETURNS
+//   // ============================================================
 
 //   // Get status badge
 //   const getStatusColor = (status: string): string => {
@@ -1022,6 +1063,8 @@
 
 //   const handleFieldBlur = (field: string) => {
 //     setTouchedFields((prev) => ({ ...prev, [field]: true }));
+//     // Validate on blur
+//     validateForm();
 //   };
 
 //   const hasError = (field: string): boolean => {
@@ -1051,6 +1094,8 @@
 //       delete newErrors[field];
 //       return newErrors;
 //     });
+//     // Validate the specific field on change
+//     validateForm();
 //   };
 
 //   const handleLocationChange = (field: string, value: string) => {
@@ -1063,6 +1108,8 @@
 //       delete newErrors[field];
 //       return newErrors;
 //     });
+//     // Validate the specific field on change
+//     validateForm();
 //   };
 
 //   // Image handling
@@ -1084,11 +1131,15 @@
 //       delete newErrors.images;
 //       return newErrors;
 //     });
+//     // Re-validate images
+//     validateForm();
 //   };
 
 //   const removeImage = (index: number) => {
 //     setImageFiles((prev) => prev.filter((_, i) => i !== index));
 //     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+//     // Re-validate images
+//     validateForm();
 //   };
 
 //   // Create FormData for API - REMOVED availability fields
@@ -1130,6 +1181,30 @@
 
 //   // CRUD Operations
 //   const handleCreateProperty = async () => {
+//     // Touch all fields before validation
+//     const allFields = [
+//       "name",
+//       "description",
+//       "university",
+//       "province",
+//       "district",
+//       "sector",
+//       "cell",
+//       "village",
+//       "pricePerMonth",
+//       "bedrooms",
+//       "bathrooms",
+//       "maxGuests",
+//       "hostName",
+//       "hostEmail",
+//       "images",
+//     ];
+//     const touched: Record<string, boolean> = {};
+//     allFields.forEach((field) => {
+//       touched[field] = true;
+//     });
+//     setTouchedFields(touched);
+
 //     if (!validateForm()) {
 //       toast.error("Please fix all validation errors");
 //       return;
@@ -1163,6 +1238,31 @@
 
 //   const handleUpdateProperty = async () => {
 //     if (!selectedHouse) return;
+
+//     // Touch all fields before validation
+//     const allFields = [
+//       "name",
+//       "description",
+//       "university",
+//       "province",
+//       "district",
+//       "sector",
+//       "cell",
+//       "village",
+//       "pricePerMonth",
+//       "bedrooms",
+//       "bathrooms",
+//       "maxGuests",
+//       "hostName",
+//       "hostEmail",
+//       "images",
+//     ];
+//     const touched: Record<string, boolean> = {};
+//     allFields.forEach((field) => {
+//       touched[field] = true;
+//     });
+//     setTouchedFields(touched);
+
 //     if (!validateForm()) {
 //       toast.error("Please fix all validation errors");
 //       return;
@@ -1277,6 +1377,9 @@
 //     });
 //     setImageFiles([]);
 //     setImagePreviews(house.images ? house.images.map((img) => img.url) : []);
+//     // Reset touched fields for edit modal
+//     setTouchedFields({});
+//     setFormErrors({});
 //     setIsEditModalOpen(true);
 //   };
 
@@ -1387,6 +1490,7 @@
 //     exit: { opacity: 0 },
 //   };
 
+//   // ✅ CONDITIONAL RETURN - AFTER ALL HOOKS HAVE BEEN CALLED
 //   if (loading) {
 //     return (
 //       <div className="flex justify-center items-center min-h-[400px]">
@@ -1394,16 +1498,6 @@
 //       </div>
 //     );
 //   }
-
-//   // Use optional chaining to safely access selectedHouse.images.length
-//   const isFormValid =
-//     Object.keys(formErrors).length === 0 &&
-//     (imageFiles.length > 0 ||
-//       (selectedHouse &&
-//         selectedHouse.images &&
-//         selectedHouse.images.length > 0)) &&
-//     propertyFormData.name.trim().length >= 3 &&
-//     propertyFormData.description.trim().length >= 20;
 
 //   return (
 //     <div className="p-4 sm:p-6 md:p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
@@ -2390,9 +2484,9 @@
 //                           ? handleUpdateProperty
 //                           : handleCreateProperty
 //                       }
-//                       disabled={submitting || !isFormValid}
+//                       disabled={submitting || !isFormValid()}
 //                       className={`flex-1 px-6 py-3 rounded-xl text-white font-medium transition-all flex items-center justify-center gap-2 ${
-//                         submitting || !isFormValid
+//                         submitting || !isFormValid()
 //                           ? "bg-gray-400 cursor-not-allowed"
 //                           : "bg-gradient-to-r from-[#FF385C] to-[#E31C5F] hover:shadow-lg"
 //                       }`}
@@ -2507,19 +2601,228 @@
 
 
 
-
-
-
-
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 import axios, { AxiosError } from "axios";
+
+// ============================================================
+// MODAL COMPONENTS
+// ============================================================
+
+// Success Modal
+interface SuccessModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  message: string;
+  details?: string;
+}
+
+const SuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose, title, message, details }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 to-green-600" />
+        <div className="p-6">
+          <div className="flex items-center justify-center mb-4">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center relative">
+              <div className="absolute inset-0 rounded-full border-4 border-green-200 animate-ping opacity-75" />
+              <svg className="w-10 h-10 text-green-600 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">{title}</h3>
+          <p className="text-gray-600 text-center mb-2">{message}</p>
+          {details && <p className="text-sm text-gray-400 text-center mb-6">{details}</p>}
+          <button
+            onClick={onClose}
+            className="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+          >
+            Got it!
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Error Modal
+interface ErrorModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  message: string;
+  details?: string;
+}
+
+const ErrorModal: React.FC<ErrorModalProps> = ({ isOpen, onClose, title, message, details }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-400 to-red-600" />
+        <div className="p-6">
+          <div className="flex items-center justify-center mb-4">
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center relative">
+              <div className="absolute inset-0 rounded-full border-4 border-red-200 animate-ping opacity-75" />
+              <svg className="w-10 h-10 text-red-600 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">{title}</h3>
+          <p className="text-gray-600 text-center mb-2">{message}</p>
+          {details && <p className="text-sm text-gray-400 text-center mb-6">{details}</p>}
+          <button
+            onClick={onClose}
+            className="w-full px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Confirm Modal
+interface ConfirmModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  icon?: React.ReactNode;
+  isSubmitting?: boolean;
+  type?: "danger" | "warning" | "info" | "success";
+}
+
+const ConfirmModal: React.FC<ConfirmModalProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmText = "Confirm",
+  cancelText = "Cancel",
+  icon,
+  isSubmitting = false,
+  type = "warning",
+}) => {
+  if (!isOpen) return null;
+
+  const getColors = () => {
+    switch (type) {
+      case "danger":
+        return {
+          iconBg: "bg-red-100",
+          iconColor: "text-red-600",
+          iconBorder: "border-red-200",
+          buttonBg: "bg-gradient-to-r from-red-500 to-red-600",
+          buttonHover: "hover:shadow-lg",
+        };
+      case "warning":
+        return {
+          iconBg: "bg-yellow-100",
+          iconColor: "text-yellow-600",
+          iconBorder: "border-yellow-200",
+          buttonBg: "bg-gradient-to-r from-yellow-500 to-yellow-600",
+          buttonHover: "hover:shadow-lg",
+        };
+      case "success":
+        return {
+          iconBg: "bg-green-100",
+          iconColor: "text-green-600",
+          iconBorder: "border-green-200",
+          buttonBg: "bg-gradient-to-r from-green-500 to-green-600",
+          buttonHover: "hover:shadow-lg",
+        };
+      default:
+        return {
+          iconBg: "bg-blue-100",
+          iconColor: "text-blue-600",
+          iconBorder: "border-blue-200",
+          buttonBg: "bg-gradient-to-r from-blue-500 to-blue-600",
+          buttonHover: "hover:shadow-lg",
+        };
+    }
+  };
+
+  const colors = getColors();
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div className={`absolute top-0 left-0 right-0 h-1 ${colors.buttonBg}`} />
+        <div className="p-6">
+          <div className="flex items-center justify-center mb-4">
+            <div className={`w-20 h-20 ${colors.iconBg} rounded-full flex items-center justify-center relative`}>
+              <div className={`absolute inset-0 rounded-full border-4 ${colors.iconBorder} animate-ping opacity-75`} />
+              <div className={`${colors.iconColor} relative z-10`}>
+                {icon || (
+                  type === "danger" ? (
+                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  ) :
+                  type === "warning" ? (
+                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  ) :
+                  type === "success" ? (
+                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                  )
+                )}
+              </div>
+            </div>
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">{title}</h3>
+          <p className="text-gray-600 text-center mb-6">{message}</p>
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              disabled={isSubmitting}
+              className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+            >
+              {cancelText}
+            </button>
+            <button
+              onClick={onConfirm}
+              disabled={isSubmitting}
+              className={`flex-1 px-4 py-2.5 ${colors.buttonBg} text-white rounded-xl font-medium ${colors.buttonHover} transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2`}
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                confirmText
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // API Base URL
 const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
@@ -2677,6 +2980,8 @@ const translations = {
     noImage: "No image",
     selectFiles: "Select Files",
     dragDrop: "Drag & drop images here",
+    success: "Success!",
+    error: "Error",
     validation: {
       nameRequired: "Property name is required",
       nameMinLength: "Name must be at least 3 characters",
@@ -2799,15 +3104,15 @@ const translations = {
     noImage: "Pas d'image",
     selectFiles: "Sélectionner des Fichiers",
     dragDrop: "Glissez-déposez les images ici",
+    success: "Succès !",
+    error: "Erreur",
     validation: {
       nameRequired: "Le nom de la propriété est requis",
       nameMinLength: "Le nom doit contenir au moins 3 caractères",
       nameMaxLength: "Le nom ne peut pas dépasser 100 caractères",
       descriptionRequired: "La description est requise",
-      descriptionMinLength:
-        "La description doit contenir au moins 20 caractères",
-      descriptionMaxLength:
-        "La description ne peut pas dépasser 2000 caractères",
+      descriptionMinLength: "La description doit contenir au moins 20 caractères",
+      descriptionMaxLength: "La description ne peut pas dépasser 2000 caractères",
       provinceRequired: "La province est requise",
       districtRequired: "Le district est requis",
       sectorRequired: "Le secteur est requis",
@@ -2923,6 +3228,8 @@ const translations = {
     noImage: "Nta shusho",
     selectFiles: "Hitamo Amashusho",
     dragDrop: "Kurura no gushyira amashusho hano",
+    success: "Byakunze!",
+    error: "Ikosa",
     validation: {
       nameRequired: "Izina ry'inzu rirasabwa",
       nameMinLength: "Izina rigomba kugira byibura inyuguti 3",
@@ -2953,7 +3260,7 @@ const translations = {
 };
 
 // ============================================================
-// HELPER FUNCTIONS - UPDATED to use localStorage
+// HELPER FUNCTIONS
 // ============================================================
 const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
   const lang = Cookies.get("language") as "en" | "fr" | "rw";
@@ -2968,8 +3275,7 @@ const getUserEmail = (): string => {
       return user.email || "";
     }
     return "";
-  } catch (error) {
-    console.error("Error reading user email from localStorage:", error);
+  } catch {
     return "";
   }
 };
@@ -2982,8 +3288,7 @@ const getUserName = (): string => {
       return user.name || "";
     }
     return "";
-  } catch (error) {
-    console.error("Error reading user name from localStorage:", error);
+  } catch {
     return "";
   }
 };
@@ -2991,14 +3296,13 @@ const getUserName = (): string => {
 const getToken = (): string => {
   try {
     return localStorage.getItem("token") || "";
-  } catch (error) {
-    console.error("Error reading token from localStorage:", error);
+  } catch {
     return "";
   }
 };
 
 // ============================================================
-// API SERVICE - UPDATED with token interceptor
+// API SERVICE
 // ============================================================
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -3007,7 +3311,6 @@ const api = axios.create({
   },
 });
 
-// Add request interceptor for authentication
 api.interceptors.request.use(
   (config) => {
     const token = getToken();
@@ -3021,12 +3324,9 @@ api.interceptors.request.use(
   },
 );
 
-// House API functions
 const houseApi = {
-  // ✅ CHANGED: Now fetches ALL houses without email filter
   getHouses: async (): Promise<House[]> => {
     const response = await api.get(`/houses`);
-    // The API returns { success: true, total: 1, data: [...] }
     return response.data.data || [];
   },
 
@@ -3056,248 +3356,86 @@ const houseApi = {
 // Icons
 const Icons = {
   Home: () => (
-    <svg
-      className="w-6 h-6"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-      />
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
     </svg>
   ),
   Plus: () => (
-    <svg
-      className="w-5 h-5"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M12 4v16m8-8H4"
-      />
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
     </svg>
   ),
   Edit: () => (
-    <svg
-      className="w-4 h-4"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-      />
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
     </svg>
   ),
   Delete: () => (
-    <svg
-      className="w-4 h-4"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-      />
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
     </svg>
   ),
   View: () => (
-    <svg
-      className="w-4 h-4"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-      />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-      />
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
     </svg>
   ),
   Search: () => (
-    <svg
-      className="w-5 h-5"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-      />
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
     </svg>
   ),
   Filter: () => (
-    <svg
-      className="w-5 h-5"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-      />
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
     </svg>
   ),
   Close: () => (
-    <svg
-      className="w-5 h-5"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M6 18L18 6M6 6l12 12"
-      />
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
     </svg>
   ),
   Check: () => (
-    <svg
-      className="w-4 h-4"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M5 13l4 4L19 7"
-      />
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
     </svg>
   ),
   Upload: () => (
-    <svg
-      className="w-8 h-8"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-      />
+    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
     </svg>
   ),
   Bed: () => (
-    <svg
-      className="w-4 h-4"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M4 8h16M4 16h16M4 12h16M4 20h16"
-      />
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8h16M4 16h16M4 12h16M4 20h16" />
     </svg>
   ),
   Bath: () => (
-    <svg
-      className="w-4 h-4"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M5 5h14M5 5v14M5 5h14M5 19h14M5 19v-4M5 19H3M19 19v-4"
-      />
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5h14M5 5v14M5 5h14M5 19h14M5 19v-4M5 19H3M19 19v-4" />
     </svg>
   ),
   User: () => (
-    <svg
-      className="w-4 h-4"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-      />
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
     </svg>
   ),
   Location: () => (
-    <svg
-      className="w-4 h-4"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-      />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-      />
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
   ),
   University: () => (
-    <svg
-      className="w-4 h-4"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2M12 3v4m4-2h.01M4 7h.01M8 7h.01M16 7h.01M4 11h16M4 15h16M4 19h16"
-      />
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2M12 3v4m4-2h.01M4 7h.01M8 7h.01M16 7h.01M4 11h16M4 15h16M4 19h16" />
     </svg>
   ),
 };
 
 export const HouseManagement: React.FC = () => {
-  const [lang, setLang] = useState<"en" | "fr" | "rw">(
-    getLanguageFromCookies(),
-  );
+  const [lang, setLang] = useState<"en" | "fr" | "rw">(getLanguageFromCookies());
   const userEmail = getUserEmail();
   const userName = getUserName();
 
@@ -3315,18 +3453,41 @@ export const HouseManagement: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedHouse, setSelectedHouse] = useState<House | null>(null);
 
+  // Success/Error modal states
+  const [successModal, setSuccessModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    details?: string;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    details: "",
+  });
+
+  const [errorModal, setErrorModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    details?: string;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    details: "",
+  });
+
   // Form validation states
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>(
-    {},
-  );
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
 
   // Image upload states
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Property form state - REMOVED availability fields
+  // Property form state
   const [propertyFormData, setPropertyFormData] = useState({
     name: "",
     description: "",
@@ -3368,9 +3529,13 @@ export const HouseManagement: React.FC = () => {
 
   const t = translations[lang];
 
-  // ============================================================
-  // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
-  // ============================================================
+  const showSuccessModal = (title: string, message: string, details?: string) => {
+    setSuccessModal({ isOpen: true, title, message, details });
+  };
+
+  const showErrorModal = (title: string, message: string, details?: string) => {
+    setErrorModal({ isOpen: true, title, message, details });
+  };
 
   // Listen for language changes
   useEffect(() => {
@@ -3381,13 +3546,10 @@ export const HouseManagement: React.FC = () => {
     return () => clearInterval(interval);
   }, [lang]);
 
-  // ✅ HOOK 1: loadHouses useCallback
   const loadHouses = useCallback(async () => {
     try {
       setLoading(true);
       const data = await houseApi.getHouses();
-      console.log("✅ All houses loaded:", data);
-      // Ensure each house has an images array
       const housesWithImages = data.map((house) => ({
         ...house,
         images: house.images || [],
@@ -3395,50 +3557,33 @@ export const HouseManagement: React.FC = () => {
       setHouses(housesWithImages);
       setFilteredHouses(housesWithImages);
     } catch (error) {
-      console.error("❌ Error loading houses:", error);
-      toast.error("Failed to load houses");
+      showErrorModal(
+        t.error || "Error",
+        "Failed to load houses",
+        error instanceof Error ? error.message : undefined
+      );
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
-  // ✅ HOOK 2: isFormValid useCallback
   const isFormValid = useCallback(() => {
-    // Only validate required fields that have been touched
     const requiredFields = [
-      "name",
-      "description",
-      "university",
-      "province",
-      "district",
-      "sector",
-      "cell",
-      "village",
-      "pricePerMonth",
-      "bedrooms",
-      "bathrooms",
-      "maxGuests",
-      "hostName",
-      "hostEmail",
-      "images",
+      "name", "description", "university", "province", "district",
+      "sector", "cell", "village", "pricePerMonth", "bedrooms",
+      "bathrooms", "maxGuests", "hostName", "hostEmail", "images"
     ];
 
-    // Check if all required fields have been touched
     const allTouched = requiredFields.every((field) => touchedFields[field]);
-
-    // If not all touched, the form is considered invalid (not ready for submission)
     if (!allTouched) return false;
-
-    // Check if there are any errors
     return Object.keys(formErrors).length === 0;
   }, [touchedFields, formErrors]);
 
-  // ✅ HOOK 3: useEffect for loadHouses
   useEffect(() => {
     loadHouses();
   }, [loadHouses]);
 
-  // ✅ HOOK 4: Filter houses
+  // Filter houses
   useEffect(() => {
     let filtered = [...houses];
     if (searchTerm) {
@@ -3457,7 +3602,7 @@ export const HouseManagement: React.FC = () => {
     setFilteredHouses(filtered);
   }, [houses, searchTerm, filterStatus]);
 
-  // ✅ HOOK 5: Update statistics
+  // Update statistics
   useEffect(() => {
     setStats({
       total: houses.length,
@@ -3466,16 +3611,11 @@ export const HouseManagement: React.FC = () => {
       unavailable: houses.filter((h) => h.status === "unavailable").length,
       maintenance: houses.filter((h) => h.status === "maintenance").length,
       totalReviews: houses.reduce((sum, h) => sum + h.totalReviews, 0),
-      averageRating:
-        houses.length > 0
-          ? houses.reduce((sum, h) => sum + h.rating, 0) / houses.length
-          : 0,
+      averageRating: houses.length > 0
+        ? houses.reduce((sum, h) => sum + h.rating, 0) / houses.length
+        : 0,
     });
   }, [houses]);
-
-  // ============================================================
-  // ALL HOOKS ABOVE - NOW WE CAN HAVE CONDITIONAL RETURNS
-  // ============================================================
 
   // Get status badge
   const getStatusColor = (status: string): string => {
@@ -3504,10 +3644,7 @@ export const HouseManagement: React.FC = () => {
 
   // Amenity functions
   const addAmenity = () => {
-    if (
-      amenityInput.trim() &&
-      !propertyFormData.amenities.includes(amenityInput.trim())
-    ) {
+    if (amenityInput.trim() && !propertyFormData.amenities.includes(amenityInput.trim())) {
       setPropertyFormData((prev) => ({
         ...prev,
         amenities: [...prev.amenities, amenityInput.trim()],
@@ -3519,13 +3656,11 @@ export const HouseManagement: React.FC = () => {
   const removeAmenity = (amenityToRemove: string) => {
     setPropertyFormData((prev) => ({
       ...prev,
-      amenities: prev.amenities.filter(
-        (amenity) => amenity !== amenityToRemove,
-      ),
+      amenities: prev.amenities.filter((amenity) => amenity !== amenityToRemove),
     }));
   };
 
-  // Validate form - REMOVED availability validation
+  // Validate form
   const validateForm = () => {
     const errors: Record<string, string> = {};
     const v = t.validation;
@@ -3534,25 +3669,17 @@ export const HouseManagement: React.FC = () => {
     else if (propertyFormData.name.length < 3) errors.name = v.nameMinLength;
     else if (propertyFormData.name.length > 100) errors.name = v.nameMaxLength;
 
-    if (!propertyFormData.description.trim())
-      errors.description = v.descriptionRequired;
-    else if (propertyFormData.description.length < 20)
-      errors.description = v.descriptionMinLength;
-    else if (propertyFormData.description.length > 2000)
-      errors.description = v.descriptionMaxLength;
+    if (!propertyFormData.description.trim()) errors.description = v.descriptionRequired;
+    else if (propertyFormData.description.length < 20) errors.description = v.descriptionMinLength;
+    else if (propertyFormData.description.length > 2000) errors.description = v.descriptionMaxLength;
 
-    if (!propertyFormData.location.province)
-      errors.province = v.provinceRequired;
-    if (!propertyFormData.location.district.trim())
-      errors.district = v.districtRequired;
-    if (!propertyFormData.location.sector.trim())
-      errors.sector = v.sectorRequired;
+    if (!propertyFormData.location.province) errors.province = v.provinceRequired;
+    if (!propertyFormData.location.district.trim()) errors.district = v.districtRequired;
+    if (!propertyFormData.location.sector.trim()) errors.sector = v.sectorRequired;
     if (!propertyFormData.location.cell.trim()) errors.cell = v.cellRequired;
-    if (!propertyFormData.location.village.trim())
-      errors.village = v.villageRequired;
+    if (!propertyFormData.location.village.trim()) errors.village = v.villageRequired;
 
-    if (!propertyFormData.university.trim())
-      errors.university = v.universityRequired;
+    if (!propertyFormData.university.trim()) errors.university = v.universityRequired;
 
     if (propertyFormData.pricePerMonth <= 0) errors.pricePerMonth = v.priceMin;
 
@@ -3560,15 +3687,11 @@ export const HouseManagement: React.FC = () => {
     if (propertyFormData.bathrooms < 0) errors.bathrooms = v.bathroomsMin;
     if (propertyFormData.maxGuests < 1) errors.maxGuests = v.maxGuestsMin;
 
-    if (!propertyFormData.host.name.trim())
-      errors.hostName = v.hostNameRequired;
-    if (!propertyFormData.host.email.trim())
-      errors.hostEmail = v.hostEmailRequired;
-    else if (!/\S+@\S+\.\S+/.test(propertyFormData.host.email))
-      errors.hostEmail = v.hostEmailInvalid;
+    if (!propertyFormData.host.name.trim()) errors.hostName = v.hostNameRequired;
+    if (!propertyFormData.host.email.trim()) errors.hostEmail = v.hostEmailRequired;
+    else if (!/\S+@\S+\.\S+/.test(propertyFormData.host.email)) errors.hostEmail = v.hostEmailInvalid;
 
-    if (imageFiles.length === 0 && !selectedHouse)
-      errors.images = v.imagesRequired;
+    if (imageFiles.length === 0 && !selectedHouse) errors.images = v.imagesRequired;
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -3576,7 +3699,6 @@ export const HouseManagement: React.FC = () => {
 
   const handleFieldBlur = (field: string) => {
     setTouchedFields((prev) => ({ ...prev, [field]: true }));
-    // Validate on blur
     validateForm();
   };
 
@@ -3607,7 +3729,6 @@ export const HouseManagement: React.FC = () => {
       delete newErrors[field];
       return newErrors;
     });
-    // Validate the specific field on change
     validateForm();
   };
 
@@ -3621,7 +3742,6 @@ export const HouseManagement: React.FC = () => {
       delete newErrors[field];
       return newErrors;
     });
-    // Validate the specific field on change
     validateForm();
   };
 
@@ -3644,22 +3764,19 @@ export const HouseManagement: React.FC = () => {
       delete newErrors.images;
       return newErrors;
     });
-    // Re-validate images
     validateForm();
   };
 
   const removeImage = (index: number) => {
     setImageFiles((prev) => prev.filter((_, i) => i !== index));
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
-    // Re-validate images
     validateForm();
   };
 
-  // Create FormData for API - REMOVED availability fields
+  // Create FormData for API
   const createFormData = (): FormData => {
     const formData = new FormData();
 
-    // Append all fields
     formData.append("name", propertyFormData.name);
     formData.append("description", propertyFormData.description);
     formData.append("university", propertyFormData.university);
@@ -3669,22 +3786,18 @@ export const HouseManagement: React.FC = () => {
     formData.append("maxGuests", String(propertyFormData.maxGuests));
     formData.append("status", propertyFormData.status);
 
-    // Location
     Object.entries(propertyFormData.location).forEach(([key, value]) => {
       formData.append(`location[${key}]`, value);
     });
 
-    // Host
     Object.entries(propertyFormData.host).forEach(([key, value]) => {
       formData.append(`host[${key}]`, String(value));
     });
 
-    // Amenities
     propertyFormData.amenities.forEach((amenity) => {
       formData.append("amenities[]", amenity);
     });
 
-    // Images
     imageFiles.forEach((file) => {
       formData.append("images", file);
     });
@@ -3694,32 +3807,17 @@ export const HouseManagement: React.FC = () => {
 
   // CRUD Operations
   const handleCreateProperty = async () => {
-    // Touch all fields before validation
     const allFields = [
-      "name",
-      "description",
-      "university",
-      "province",
-      "district",
-      "sector",
-      "cell",
-      "village",
-      "pricePerMonth",
-      "bedrooms",
-      "bathrooms",
-      "maxGuests",
-      "hostName",
-      "hostEmail",
-      "images",
+      "name", "description", "university", "province", "district",
+      "sector", "cell", "village", "pricePerMonth", "bedrooms",
+      "bathrooms", "maxGuests", "hostName", "hostEmail", "images"
     ];
     const touched: Record<string, boolean> = {};
-    allFields.forEach((field) => {
-      touched[field] = true;
-    });
+    allFields.forEach((field) => { touched[field] = true; });
     setTouchedFields(touched);
 
     if (!validateForm()) {
-      toast.error("Please fix all validation errors");
+      showErrorModal(t.error || "Error", "Please fix all validation errors");
       return;
     }
 
@@ -3727,23 +3825,23 @@ export const HouseManagement: React.FC = () => {
     try {
       const formData = createFormData();
       const newHouse = await houseApi.createHouse(formData);
-      const houseWithImages = {
-        ...newHouse,
-        images: newHouse.images || [],
-      };
+      const houseWithImages = { ...newHouse, images: newHouse.images || [] };
       setHouses((prev) => [houseWithImages, ...prev]);
-      toast.success(`✅ ${t.propertyCreated}`);
+      showSuccessModal(
+        t.success || "Success!",
+        t.propertyCreated || "Property created successfully!",
+        `${newHouse.name} has been added to your listings`
+      );
       setIsCreateModalOpen(false);
       resetForm();
     } catch (error) {
-      console.error("Error creating property:", error);
       const axiosError = error as AxiosError;
       const errorMessage = axiosError.response?.data
         ? typeof axiosError.response?.data === "string"
           ? axiosError.response?.data
           : JSON.stringify(axiosError.response?.data)
         : t.createFailed;
-      toast.error(`❌ ${errorMessage}`);
+      showErrorModal(t.error || "Error", errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -3752,62 +3850,42 @@ export const HouseManagement: React.FC = () => {
   const handleUpdateProperty = async () => {
     if (!selectedHouse) return;
 
-    // Touch all fields before validation
     const allFields = [
-      "name",
-      "description",
-      "university",
-      "province",
-      "district",
-      "sector",
-      "cell",
-      "village",
-      "pricePerMonth",
-      "bedrooms",
-      "bathrooms",
-      "maxGuests",
-      "hostName",
-      "hostEmail",
-      "images",
+      "name", "description", "university", "province", "district",
+      "sector", "cell", "village", "pricePerMonth", "bedrooms",
+      "bathrooms", "maxGuests", "hostName", "hostEmail", "images"
     ];
     const touched: Record<string, boolean> = {};
-    allFields.forEach((field) => {
-      touched[field] = true;
-    });
+    allFields.forEach((field) => { touched[field] = true; });
     setTouchedFields(touched);
 
     if (!validateForm()) {
-      toast.error("Please fix all validation errors");
+      showErrorModal(t.error || "Error", "Please fix all validation errors");
       return;
     }
 
     setSubmitting(true);
     try {
       const formData = createFormData();
-      const updatedHouse = await houseApi.updateHouse(
-        selectedHouse._id!,
-        formData,
+      const updatedHouse = await houseApi.updateHouse(selectedHouse._id!, formData);
+      const houseWithImages = { ...updatedHouse, images: updatedHouse.images || [] };
+      setHouses((prev) => prev.map((h) => (h._id === selectedHouse._id ? houseWithImages : h)));
+      showSuccessModal(
+        t.success || "Success!",
+        t.propertyUpdated || "Property updated successfully!",
+        `${updatedHouse.name} has been updated`
       );
-      const houseWithImages = {
-        ...updatedHouse,
-        images: updatedHouse.images || [],
-      };
-      setHouses((prev) =>
-        prev.map((h) => (h._id === selectedHouse._id ? houseWithImages : h)),
-      );
-      toast.success(`✅ ${t.propertyUpdated}`);
       setIsEditModalOpen(false);
       setSelectedHouse(null);
       resetForm();
     } catch (error) {
-      console.error("Error updating property:", error);
       const axiosError = error as AxiosError;
       const errorMessage = axiosError.response?.data
         ? typeof axiosError.response?.data === "string"
           ? axiosError.response?.data
           : JSON.stringify(axiosError.response?.data)
         : t.updateFailed;
-      toast.error(`❌ ${errorMessage}`);
+      showErrorModal(t.error || "Error", errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -3820,19 +3898,26 @@ export const HouseManagement: React.FC = () => {
     try {
       await houseApi.deleteHouse(selectedHouse._id!);
       setHouses((prev) => prev.filter((h) => h._id !== selectedHouse._id));
-      toast.success(`🗑️ ${t.propertyDeleted}`);
+      showSuccessModal(
+        t.success || "Success!",
+        t.propertyDeleted || "Property deleted successfully!",
+        `${selectedHouse.name} has been removed from your listings`
+      );
       setIsDeleteModalOpen(false);
       setSelectedHouse(null);
     } catch (error) {
-      console.error("Error deleting property:", error);
       const axiosError = error as AxiosError;
-      toast.error(`❌ ${axiosError.response?.data || t.deleteFailed}`);
+      showErrorModal(
+        t.error || "Error",
+        t.deleteFailed || "Failed to delete property",
+        axiosError.response?.data ? String(axiosError.response?.data) : undefined
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Reset form - REMOVED availability fields
+  // Reset form
   const resetForm = () => {
     setPropertyFormData({
       name: "",
@@ -3890,7 +3975,6 @@ export const HouseManagement: React.FC = () => {
     });
     setImageFiles([]);
     setImagePreviews(house.images ? house.images.map((img) => img.url) : []);
-    // Reset touched fields for edit modal
     setTouchedFields({});
     setFormErrors({});
     setIsEditModalOpen(true);
@@ -3914,11 +3998,7 @@ export const HouseManagement: React.FC = () => {
     placeholder: string = "",
     required: boolean = true,
     value?: string | number,
-    onChange?: (
-      e: React.ChangeEvent<
-        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-      >,
-    ) => void,
+    onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void,
   ) => {
     const fieldName = field.includes(".") ? field.split(".")[1] : field;
     const error = formErrors[fieldName];
@@ -3937,11 +4017,8 @@ export const HouseManagement: React.FC = () => {
             onBlur={() => handleFieldBlur(fieldName)}
             rows={3}
             className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all resize-none ${
-              hasError(fieldName)
-                ? "border-red-500 bg-red-50"
-                : isValid
-                  ? "border-green-500 bg-green-50"
-                  : "border-gray-300"
+              hasError(fieldName) ? "border-red-500 bg-red-50" :
+              isValid ? "border-green-500 bg-green-50" : "border-gray-300"
             }`}
             placeholder={placeholder}
           />
@@ -3951,11 +4028,8 @@ export const HouseManagement: React.FC = () => {
             onChange={onChange}
             onBlur={() => handleFieldBlur(fieldName)}
             className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white transition-all ${
-              hasError(fieldName)
-                ? "border-red-500 bg-red-50"
-                : isValid
-                  ? "border-green-500 bg-green-50"
-                  : "border-gray-300"
+              hasError(fieldName) ? "border-red-500 bg-red-50" :
+              isValid ? "border-green-500 bg-green-50" : "border-gray-300"
             }`}
           >
             {placeholder && <option value="">{placeholder}</option>}
@@ -3968,11 +4042,8 @@ export const HouseManagement: React.FC = () => {
             onChange={onChange}
             onBlur={() => handleFieldBlur(fieldName)}
             className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
-              hasError(fieldName)
-                ? "border-red-500 bg-red-50"
-                : isValid
-                  ? "border-green-500 bg-green-50"
-                  : "border-gray-300"
+              hasError(fieldName) ? "border-red-500 bg-red-50" :
+              isValid ? "border-green-500 bg-green-50" : "border-gray-300"
             }`}
             placeholder={placeholder}
             min={type === "number" ? 0 : undefined}
@@ -4003,7 +4074,6 @@ export const HouseManagement: React.FC = () => {
     exit: { opacity: 0 },
   };
 
-  // ✅ CONDITIONAL RETURN - AFTER ALL HOOKS HAVE BEEN CALLED
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -4014,6 +4084,24 @@ export const HouseManagement: React.FC = () => {
 
   return (
     <div className="p-4 sm:p-6 md:p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+      {/* Success Modal */}
+      <SuccessModal
+        isOpen={successModal.isOpen}
+        onClose={() => setSuccessModal({ ...successModal, isOpen: false })}
+        title={successModal.title}
+        message={successModal.message}
+        details={successModal.details}
+      />
+
+      {/* Error Modal */}
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        onClose={() => setErrorModal({ ...errorModal, isOpen: false })}
+        title={errorModal.title}
+        message={errorModal.message}
+        details={errorModal.details}
+      />
+
       {/* Header */}
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -4024,9 +4112,7 @@ export const HouseManagement: React.FC = () => {
               </span>
               {t.hostManagement}
             </h1>
-            <p className="text-sm text-gray-500 mt-1 ml-2">
-              {t.manageHostProfile}
-            </p>
+            <p className="text-sm text-gray-500 mt-1 ml-2">{t.manageHostProfile}</p>
           </div>
           <motion.button
             whileHover={{ scale: 1.02 }}
@@ -4043,41 +4129,13 @@ export const HouseManagement: React.FC = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 mb-8">
         {[
-          {
-            label: t.totalProperties,
-            value: stats.total,
-            color: "bg-gradient-to-br from-blue-500 to-blue-600",
-          },
-          {
-            label: t.availableProperties,
-            value: stats.available,
-            color: "bg-gradient-to-br from-green-500 to-green-600",
-          },
-          {
-            label: t.pendingProperties,
-            value: stats.pending,
-            color: "bg-gradient-to-br from-yellow-500 to-yellow-600",
-          },
-          {
-            label: t.unavailableProperties,
-            value: stats.unavailable,
-            color: "bg-gradient-to-br from-gray-500 to-gray-600",
-          },
-          {
-            label: t.maintenanceProperties,
-            value: stats.maintenance,
-            color: "bg-gradient-to-br from-red-500 to-red-600",
-          },
-          {
-            label: t.totalReviews,
-            value: stats.totalReviews,
-            color: "bg-gradient-to-br from-purple-500 to-purple-600",
-          },
-          {
-            label: t.rating,
-            value: stats.averageRating.toFixed(1),
-            color: "bg-gradient-to-br from-orange-500 to-orange-600",
-          },
+          { label: t.totalProperties, value: stats.total, color: "bg-gradient-to-br from-blue-500 to-blue-600" },
+          { label: t.availableProperties, value: stats.available, color: "bg-gradient-to-br from-green-500 to-green-600" },
+          { label: t.pendingProperties, value: stats.pending, color: "bg-gradient-to-br from-yellow-500 to-yellow-600" },
+          { label: t.unavailableProperties, value: stats.unavailable, color: "bg-gradient-to-br from-gray-500 to-gray-600" },
+          { label: t.maintenanceProperties, value: stats.maintenance, color: "bg-gradient-to-br from-red-500 to-red-600" },
+          { label: t.totalReviews, value: stats.totalReviews, color: "bg-gradient-to-br from-purple-500 to-purple-600" },
+          { label: t.rating, value: stats.averageRating.toFixed(1), color: "bg-gradient-to-br from-orange-500 to-orange-600" },
         ].map((stat, index) => (
           <motion.div
             key={index}
@@ -4136,9 +4194,7 @@ export const HouseManagement: React.FC = () => {
           <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
             <Icons.Home />
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            {t.noProperties}
-          </h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">{t.noProperties}</h3>
           <p className="text-gray-500">{t.adjustFilters}</p>
           <button
             onClick={openCreateModal}
@@ -4159,18 +4215,12 @@ export const HouseManagement: React.FC = () => {
             >
               <div className="relative h-48 overflow-hidden">
                 <img
-                  src={
-                    house.images && house.images.length > 0
-                      ? house.images[0].url
-                      : "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop"
-                  }
+                  src={house.images && house.images.length > 0 ? house.images[0].url : "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop"}
                   alt={house.name}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute top-3 right-3">
-                  <span
-                    className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(house.status)}`}
-                  >
+                  <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(house.status)}`}>
                     {getStatusLabel(house.status)}
                   </span>
                 </div>
@@ -4181,9 +4231,7 @@ export const HouseManagement: React.FC = () => {
                 )}
               </div>
               <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-900 truncate">
-                  {house.name}
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900 truncate">{house.name}</h3>
                 <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
                   <Icons.Location />
                   {house.location.village}, {house.location.district}
@@ -4203,9 +4251,7 @@ export const HouseManagement: React.FC = () => {
                 </div>
                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
                   <div>
-                    <p className="text-sm font-bold text-[#FF385C]">
-                      {formatCurrency(house.pricePerMonth)}
-                    </p>
+                    <p className="text-sm font-bold text-[#FF385C]">{formatCurrency(house.pricePerMonth)}</p>
                     <p className="text-xs text-gray-500">per month</p>
                   </div>
                   <div className="flex gap-1">
@@ -4291,93 +4337,55 @@ export const HouseManagement: React.FC = () => {
                       <p className="text-gray-500">No images available</p>
                     </div>
                   )}
-                  <h3 className="text-2xl font-bold text-gray-900">
-                    {selectedHouse.name}
-                  </h3>
+                  <h3 className="text-2xl font-bold text-gray-900">{selectedHouse.name}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm font-medium text-gray-500">
-                        {t.status}
-                      </p>
-                      <span
-                        className={`px-2.5 py-1 text-sm font-medium rounded-full ${getStatusColor(selectedHouse.status)}`}
-                      >
+                      <p className="text-sm font-medium text-gray-500">{t.status}</p>
+                      <span className={`px-2.5 py-1 text-sm font-medium rounded-full ${getStatusColor(selectedHouse.status)}`}>
                         {getStatusLabel(selectedHouse.status)}
                       </span>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">
-                        {t.pricePerMonth}
-                      </p>
-                      <p className="text-lg font-bold text-[#FF385C]">
-                        {formatCurrency(selectedHouse.pricePerMonth)}
-                      </p>
+                      <p className="text-sm font-medium text-gray-500">{t.pricePerMonth}</p>
+                      <p className="text-lg font-bold text-[#FF385C]">{formatCurrency(selectedHouse.pricePerMonth)}</p>
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">
-                      {t.description}
-                    </p>
-                    <p className="text-sm text-gray-700 mt-1">
-                      {selectedHouse.description}
-                    </p>
+                    <p className="text-sm font-medium text-gray-500">{t.description}</p>
+                    <p className="text-sm text-gray-700 mt-1">{selectedHouse.description}</p>
                   </div>
                   <div className="grid grid-cols-3 gap-4">
                     <div>
-                      <p className="text-sm font-medium text-gray-500">
-                        {t.bedrooms}
-                      </p>
-                      <p className="text-lg font-semibold">
-                        {selectedHouse.bedrooms}
-                      </p>
+                      <p className="text-sm font-medium text-gray-500">{t.bedrooms}</p>
+                      <p className="text-lg font-semibold">{selectedHouse.bedrooms}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">
-                        {t.bathrooms}
-                      </p>
-                      <p className="text-lg font-semibold">
-                        {selectedHouse.bathrooms}
-                      </p>
+                      <p className="text-sm font-medium text-gray-500">{t.bathrooms}</p>
+                      <p className="text-lg font-semibold">{selectedHouse.bathrooms}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500">
-                        {t.maxGuests}
-                      </p>
-                      <p className="text-lg font-semibold">
-                        {selectedHouse.maxGuests}
-                      </p>
+                      <p className="text-sm font-medium text-gray-500">{t.maxGuests}</p>
+                      <p className="text-lg font-semibold">{selectedHouse.maxGuests}</p>
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">
-                      {t.location}
-                    </p>
+                    <p className="text-sm font-medium text-gray-500">{t.location}</p>
                     <p className="text-sm text-gray-700">
-                      {selectedHouse.location.village},{" "}
-                      {selectedHouse.location.sector},<br />
-                      {selectedHouse.location.district},{" "}
-                      {selectedHouse.location.province}
+                      {selectedHouse.location.village}, {selectedHouse.location.sector},<br />
+                      {selectedHouse.location.district}, {selectedHouse.location.province}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">
-                      {t.amenities}
-                    </p>
+                    <p className="text-sm font-medium text-gray-500">{t.amenities}</p>
                     <div className="flex flex-wrap gap-1 mt-1">
-                      {selectedHouse.amenities &&
-                      selectedHouse.amenities.length > 0 ? (
+                      {selectedHouse.amenities && selectedHouse.amenities.length > 0 ? (
                         selectedHouse.amenities.map((amenity) => (
-                          <span
-                            key={amenity}
-                            className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
-                          >
+                          <span key={amenity} className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
                             {amenity}
                           </span>
                         ))
                       ) : (
-                        <span className="text-sm text-gray-400">
-                          No amenities
-                        </span>
+                        <span className="text-sm text-gray-400">No amenities</span>
                       )}
                     </div>
                   </div>
@@ -4470,11 +4478,7 @@ export const HouseManagement: React.FC = () => {
                     t.enterName,
                     true,
                     propertyFormData.name,
-                    (e) =>
-                      handleInputChange(
-                        "name",
-                        (e.target as HTMLInputElement).value,
-                      ),
+                    (e) => handleInputChange("name", (e.target as HTMLInputElement).value),
                   )}
                   {renderInput(
                     t.description,
@@ -4483,11 +4487,7 @@ export const HouseManagement: React.FC = () => {
                     t.enterDescription,
                     true,
                     propertyFormData.description,
-                    (e) =>
-                      handleInputChange(
-                        "description",
-                        (e.target as HTMLTextAreaElement).value,
-                      ),
+                    (e) => handleInputChange("description", (e.target as HTMLTextAreaElement).value),
                   )}
                   {renderInput(
                     t.university,
@@ -4496,11 +4496,7 @@ export const HouseManagement: React.FC = () => {
                     "Enter university name",
                     true,
                     propertyFormData.university,
-                    (e) =>
-                      handleInputChange(
-                        "university",
-                        (e.target as HTMLInputElement).value,
-                      ),
+                    (e) => handleInputChange("university", (e.target as HTMLInputElement).value),
                   )}
 
                   {/* Location */}
@@ -4515,16 +4511,11 @@ export const HouseManagement: React.FC = () => {
                         </label>
                         <select
                           value={propertyFormData.location.province}
-                          onChange={(e) =>
-                            handleLocationChange("province", e.target.value)
-                          }
+                          onChange={(e) => handleLocationChange("province", e.target.value)}
                           onBlur={() => handleFieldBlur("province")}
                           className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white transition-all ${
-                            hasError("province")
-                              ? "border-red-500 bg-red-50"
-                              : isValidField("province")
-                                ? "border-green-500 bg-green-50"
-                                : "border-gray-300"
+                            hasError("province") ? "border-red-500 bg-red-50" :
+                            isValidField("province") ? "border-green-500 bg-green-50" : "border-gray-300"
                           }`}
                         >
                           <option value="">{t.provincePlaceholder}</option>
@@ -4534,15 +4525,9 @@ export const HouseManagement: React.FC = () => {
                           <option value="Eastern">Eastern</option>
                           <option value="Western">Western</option>
                         </select>
-                        {hasError("province") && (
-                          <p className="mt-1 text-sm text-red-500">
-                            {formErrors.province}
-                          </p>
-                        )}
+                        {hasError("province") && <p className="mt-1 text-sm text-red-500">{formErrors.province}</p>}
                         {isValidField("province") && (
-                          <p className="mt-1 text-sm text-green-500 flex items-center gap-1">
-                            <Icons.Check /> Valid
-                          </p>
+                          <p className="mt-1 text-sm text-green-500 flex items-center gap-1"><Icons.Check /> Valid</p>
                         )}
                       </div>
                       <div>
@@ -4552,28 +4537,17 @@ export const HouseManagement: React.FC = () => {
                         <input
                           type="text"
                           value={propertyFormData.location.district}
-                          onChange={(e) =>
-                            handleLocationChange("district", e.target.value)
-                          }
+                          onChange={(e) => handleLocationChange("district", e.target.value)}
                           onBlur={() => handleFieldBlur("district")}
                           placeholder={t.districtPlaceholder}
                           className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
-                            hasError("district")
-                              ? "border-red-500 bg-red-50"
-                              : isValidField("district")
-                                ? "border-green-500 bg-green-50"
-                                : "border-gray-300"
+                            hasError("district") ? "border-red-500 bg-red-50" :
+                            isValidField("district") ? "border-green-500 bg-green-50" : "border-gray-300"
                           }`}
                         />
-                        {hasError("district") && (
-                          <p className="mt-1 text-sm text-red-500">
-                            {formErrors.district}
-                          </p>
-                        )}
+                        {hasError("district") && <p className="mt-1 text-sm text-red-500">{formErrors.district}</p>}
                         {isValidField("district") && (
-                          <p className="mt-1 text-sm text-green-500 flex items-center gap-1">
-                            <Icons.Check /> Valid
-                          </p>
+                          <p className="mt-1 text-sm text-green-500 flex items-center gap-1"><Icons.Check /> Valid</p>
                         )}
                       </div>
                     </div>
@@ -4585,28 +4559,17 @@ export const HouseManagement: React.FC = () => {
                         <input
                           type="text"
                           value={propertyFormData.location.sector}
-                          onChange={(e) =>
-                            handleLocationChange("sector", e.target.value)
-                          }
+                          onChange={(e) => handleLocationChange("sector", e.target.value)}
                           onBlur={() => handleFieldBlur("sector")}
                           placeholder={t.sectorPlaceholder}
                           className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
-                            hasError("sector")
-                              ? "border-red-500 bg-red-50"
-                              : isValidField("sector")
-                                ? "border-green-500 bg-green-50"
-                                : "border-gray-300"
+                            hasError("sector") ? "border-red-500 bg-red-50" :
+                            isValidField("sector") ? "border-green-500 bg-green-50" : "border-gray-300"
                           }`}
                         />
-                        {hasError("sector") && (
-                          <p className="mt-1 text-sm text-red-500">
-                            {formErrors.sector}
-                          </p>
-                        )}
+                        {hasError("sector") && <p className="mt-1 text-sm text-red-500">{formErrors.sector}</p>}
                         {isValidField("sector") && (
-                          <p className="mt-1 text-sm text-green-500 flex items-center gap-1">
-                            <Icons.Check /> Valid
-                          </p>
+                          <p className="mt-1 text-sm text-green-500 flex items-center gap-1"><Icons.Check /> Valid</p>
                         )}
                       </div>
                       <div>
@@ -4616,28 +4579,17 @@ export const HouseManagement: React.FC = () => {
                         <input
                           type="text"
                           value={propertyFormData.location.cell}
-                          onChange={(e) =>
-                            handleLocationChange("cell", e.target.value)
-                          }
+                          onChange={(e) => handleLocationChange("cell", e.target.value)}
                           onBlur={() => handleFieldBlur("cell")}
                           placeholder={t.cellPlaceholder}
                           className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
-                            hasError("cell")
-                              ? "border-red-500 bg-red-50"
-                              : isValidField("cell")
-                                ? "border-green-500 bg-green-50"
-                                : "border-gray-300"
+                            hasError("cell") ? "border-red-500 bg-red-50" :
+                            isValidField("cell") ? "border-green-500 bg-green-50" : "border-gray-300"
                           }`}
                         />
-                        {hasError("cell") && (
-                          <p className="mt-1 text-sm text-red-500">
-                            {formErrors.cell}
-                          </p>
-                        )}
+                        {hasError("cell") && <p className="mt-1 text-sm text-red-500">{formErrors.cell}</p>}
                         {isValidField("cell") && (
-                          <p className="mt-1 text-sm text-green-500 flex items-center gap-1">
-                            <Icons.Check /> Valid
-                          </p>
+                          <p className="mt-1 text-sm text-green-500 flex items-center gap-1"><Icons.Check /> Valid</p>
                         )}
                       </div>
                     </div>
@@ -4648,28 +4600,17 @@ export const HouseManagement: React.FC = () => {
                       <input
                         type="text"
                         value={propertyFormData.location.village}
-                        onChange={(e) =>
-                          handleLocationChange("village", e.target.value)
-                        }
+                        onChange={(e) => handleLocationChange("village", e.target.value)}
                         onBlur={() => handleFieldBlur("village")}
                         placeholder={t.villagePlaceholder}
                         className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
-                          hasError("village")
-                            ? "border-red-500 bg-red-50"
-                            : isValidField("village")
-                              ? "border-green-500 bg-green-50"
-                              : "border-gray-300"
+                          hasError("village") ? "border-red-500 bg-red-50" :
+                          isValidField("village") ? "border-green-500 bg-green-50" : "border-gray-300"
                         }`}
                       />
-                      {hasError("village") && (
-                        <p className="mt-1 text-sm text-red-500">
-                          {formErrors.village}
-                        </p>
-                      )}
+                      {hasError("village") && <p className="mt-1 text-sm text-red-500">{formErrors.village}</p>}
                       {isValidField("village") && (
-                        <p className="mt-1 text-sm text-green-500 flex items-center gap-1">
-                          <Icons.Check /> Valid
-                        </p>
+                        <p className="mt-1 text-sm text-green-500 flex items-center gap-1"><Icons.Check /> Valid</p>
                       )}
                     </div>
                   </div>
@@ -4677,18 +4618,8 @@ export const HouseManagement: React.FC = () => {
                   {/* Pricing and Details */}
                   <div className="border-t border-gray-200 pt-4">
                     <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v1m0 3V9m0 6V15m0 6v-3"
-                        />
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v1m0 3V9m0 6V15m0 6v-3" />
                       </svg>
                       Pricing & Details
                     </h3>
@@ -4700,12 +4631,7 @@ export const HouseManagement: React.FC = () => {
                         t.enterPrice,
                         true,
                         propertyFormData.pricePerMonth,
-                        (e) =>
-                          handleInputChange(
-                            "pricePerMonth",
-                            parseFloat((e.target as HTMLInputElement).value) ||
-                              0,
-                          ),
+                        (e) => handleInputChange("pricePerMonth", parseFloat((e.target as HTMLInputElement).value) || 0),
                       )}
                       {renderInput(
                         t.bedrooms,
@@ -4714,11 +4640,7 @@ export const HouseManagement: React.FC = () => {
                         t.enterBedrooms,
                         true,
                         propertyFormData.bedrooms,
-                        (e) =>
-                          handleInputChange(
-                            "bedrooms",
-                            parseInt((e.target as HTMLInputElement).value) || 0,
-                          ),
+                        (e) => handleInputChange("bedrooms", parseInt((e.target as HTMLInputElement).value) || 0),
                       )}
                       {renderInput(
                         t.bathrooms,
@@ -4727,11 +4649,7 @@ export const HouseManagement: React.FC = () => {
                         t.enterBathrooms,
                         true,
                         propertyFormData.bathrooms,
-                        (e) =>
-                          handleInputChange(
-                            "bathrooms",
-                            parseInt((e.target as HTMLInputElement).value) || 0,
-                          ),
+                        (e) => handleInputChange("bathrooms", parseInt((e.target as HTMLInputElement).value) || 0),
                       )}
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
@@ -4742,11 +4660,7 @@ export const HouseManagement: React.FC = () => {
                         t.enterMaxGuests,
                         true,
                         propertyFormData.maxGuests,
-                        (e) =>
-                          handleInputChange(
-                            "maxGuests",
-                            parseInt((e.target as HTMLInputElement).value) || 0,
-                          ),
+                        (e) => handleInputChange("maxGuests", parseInt((e.target as HTMLInputElement).value) || 0),
                       )}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -4754,9 +4668,7 @@ export const HouseManagement: React.FC = () => {
                         </label>
                         <select
                           value={propertyFormData.status}
-                          onChange={(e) =>
-                            handleInputChange("status", e.target.value)
-                          }
+                          onChange={(e) => handleInputChange("status", e.target.value)}
                           className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
                         >
                           <option value="pending">{t.pending}</option>
@@ -4781,11 +4693,7 @@ export const HouseManagement: React.FC = () => {
                         "Enter host name",
                         true,
                         propertyFormData.host.name,
-                        (e) =>
-                          handleInputChange(
-                            "host.name",
-                            (e.target as HTMLInputElement).value,
-                          ),
+                        (e) => handleInputChange("host.name", (e.target as HTMLInputElement).value),
                       )}
                       {renderInput(
                         t.hostEmail,
@@ -4794,11 +4702,7 @@ export const HouseManagement: React.FC = () => {
                         "Enter host email",
                         true,
                         propertyFormData.host.email,
-                        (e) =>
-                          handleInputChange(
-                            "host.email",
-                            (e.target as HTMLInputElement).value,
-                          ),
+                        (e) => handleInputChange("host.email", (e.target as HTMLInputElement).value),
                       )}
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
@@ -4809,11 +4713,7 @@ export const HouseManagement: React.FC = () => {
                         "Enter host phone",
                         false,
                         propertyFormData.host.phone,
-                        (e) =>
-                          handleInputChange(
-                            "host.phone",
-                            (e.target as HTMLInputElement).value,
-                          ),
+                        (e) => handleInputChange("host.phone", (e.target as HTMLInputElement).value),
                       )}
                       {renderInput(
                         t.responseRate,
@@ -4822,12 +4722,7 @@ export const HouseManagement: React.FC = () => {
                         "0-100",
                         false,
                         propertyFormData.host.responseRate,
-                        (e) =>
-                          handleInputChange(
-                            "host.responseRate",
-                            parseFloat((e.target as HTMLInputElement).value) ||
-                              0,
-                          ),
+                        (e) => handleInputChange("host.responseRate", parseFloat((e.target as HTMLInputElement).value) || 0),
                       )}
                     </div>
                   </div>
@@ -4835,18 +4730,8 @@ export const HouseManagement: React.FC = () => {
                   {/* Amenities */}
                   <div className="border-t border-gray-200 pt-4">
                     <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M5 13l4 4L19 7"
-                        />
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                       </svg>
                       {t.amenities}
                     </h3>
@@ -4868,27 +4753,11 @@ export const HouseManagement: React.FC = () => {
                     </div>
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {propertyFormData.amenities.map((amenity) => (
-                        <span
-                          key={amenity}
-                          className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs flex items-center gap-1.5 border border-blue-200"
-                        >
+                        <span key={amenity} className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs flex items-center gap-1.5 border border-blue-200">
                           {amenity}
-                          <button
-                            onClick={() => removeAmenity(amenity)}
-                            className="hover:text-red-500"
-                          >
-                            <svg
-                              className="w-3 h-3"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M6 18L18 6M6 6l12 12"
-                              />
+                          <button onClick={() => removeAmenity(amenity)} className="hover:text-red-500">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                           </button>
                         </span>
@@ -4899,16 +4768,13 @@ export const HouseManagement: React.FC = () => {
                   {/* Image Upload */}
                   <div className="border-t border-gray-200 pt-4">
                     <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
-                      <Icons.Upload /> {t.uploadImages}{" "}
-                      <span className="text-red-500">*</span>
+                      <Icons.Upload /> {t.uploadImages} <span className="text-red-500">*</span>
                     </h3>
                     <div
                       className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
-                        hasError("images")
-                          ? "border-red-500 bg-red-50"
-                          : imageFiles.length > 0 || imagePreviews.length > 0
-                            ? "border-green-500 bg-green-50"
-                            : "border-gray-300 hover:border-[#FF385C] hover:bg-gray-50"
+                        hasError("images") ? "border-red-500 bg-red-50" :
+                        imageFiles.length > 0 || imagePreviews.length > 0 ? "border-green-500 bg-green-50" :
+                        "border-gray-300 hover:border-[#FF385C] hover:bg-gray-50"
                       }`}
                       onClick={() => fileInputRef.current?.click()}
                       onDrop={(e) => {
@@ -4927,81 +4793,42 @@ export const HouseManagement: React.FC = () => {
                       />
                       <Icons.Upload />
                       <p className="mt-2 text-sm text-gray-600">{t.dragDrop}</p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        PNG, JPG, JPEG up to 5MB
-                      </p>
+                      <p className="text-xs text-gray-400 mt-1">PNG, JPG, JPEG up to 5MB</p>
                     </div>
-                    {(imagePreviews.length > 0 ||
-                      (selectedHouse &&
-                        selectedHouse.images &&
-                        selectedHouse.images.length > 0)) && (
+                    {(imagePreviews.length > 0 || (selectedHouse && selectedHouse.images && selectedHouse.images.length > 0)) && (
                       <div className="mt-3 grid grid-cols-4 gap-2">
                         {imagePreviews.map((preview, index) => (
                           <div key={index} className="relative group">
-                            <img
-                              src={preview}
-                              alt={`Preview ${index}`}
-                              className="w-full h-20 object-cover rounded-xl"
-                            />
+                            <img src={preview} alt={`Preview ${index}`} className="w-full h-20 object-cover rounded-xl" />
                             <button
                               onClick={() => removeImage(index)}
                               className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
                             >
-                              <svg
-                                className="w-3.5 h-3.5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  d="M6 18L18 6M6 6l12 12"
-                                />
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                               </svg>
                             </button>
                           </div>
                         ))}
-                        {selectedHouse &&
-                          selectedHouse.images &&
-                          selectedHouse.images.map((img, index) => (
-                            <div
-                              key={`existing-${index}`}
-                              className="relative group"
-                            >
-                              <img
-                                src={img.url}
-                                alt={`Existing ${index}`}
-                                className="w-full h-20 object-cover rounded-xl"
-                              />
-                            </div>
-                          ))}
+                        {selectedHouse && selectedHouse.images && selectedHouse.images.map((img, index) => (
+                          <div key={`existing-${index}`} className="relative group">
+                            <img src={img.url} alt={`Existing ${index}`} className="w-full h-20 object-cover rounded-xl" />
+                          </div>
+                        ))}
                       </div>
                     )}
-                    {hasError("images") && (
-                      <p className="mt-1 text-sm text-red-500">
-                        {formErrors.images}
-                      </p>
-                    )}
+                    {hasError("images") && <p className="mt-1 text-sm text-red-500">{formErrors.images}</p>}
                   </div>
-
-                  {/* REMOVED: Availability section - Start Date and End Date fields are no longer needed */}
 
                   <div className="flex gap-3 pt-4 border-t border-gray-200">
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={
-                        isEditModalOpen
-                          ? handleUpdateProperty
-                          : handleCreateProperty
-                      }
+                      onClick={isEditModalOpen ? handleUpdateProperty : handleCreateProperty}
                       disabled={submitting || !isFormValid()}
                       className={`flex-1 px-6 py-3 rounded-xl text-white font-medium transition-all flex items-center justify-center gap-2 ${
-                        submitting || !isFormValid()
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-gradient-to-r from-[#FF385C] to-[#E31C5F] hover:shadow-lg"
+                        submitting || !isFormValid() ? "bg-gray-400 cursor-not-allowed" :
+                        "bg-gradient-to-r from-[#FF385C] to-[#E31C5F] hover:shadow-lg"
                       }`}
                     >
                       {submitting ? (
@@ -5037,76 +4864,25 @@ export const HouseManagement: React.FC = () => {
       </AnimatePresence>
 
       {/* Delete Confirmation Modal */}
-      <AnimatePresence>
-        {isDeleteModalOpen && selectedHouse && (
-          <>
-            <motion.div
-              variants={overlayVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-              onClick={() => {
-                setIsDeleteModalOpen(false);
-                setSelectedHouse(null);
-              }}
-            />
-            <motion.div
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-            >
-              <motion.div className="w-full max-w-md rounded-2xl shadow-2xl bg-white">
-                <div className="p-6 text-center">
-                  <div className="w-20 h-20 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
-                    <Icons.Delete />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    {t.deleteProperty}
-                  </h3>
-                  <p className="text-gray-500 mb-2">{t.deleteConfirmation}</p>
-                  <p className="text-sm text-gray-400">{t.actionUndone}</p>
-                  <div className="flex gap-3 mt-6">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => {
-                        setIsDeleteModalOpen(false);
-                        setSelectedHouse(null);
-                      }}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-                    >
-                      {t.cancel}
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleDeleteProperty}
-                      disabled={submitting}
-                      className={`flex-1 px-4 py-2.5 rounded-xl text-white font-medium transition-colors ${
-                        submitting
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-red-600 hover:bg-red-700"
-                      }`}
-                    >
-                      {submitting ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          {t.deleting}
-                        </span>
-                      ) : (
-                        t.delete
-                      )}
-                    </motion.button>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedHouse(null);
+        }}
+        onConfirm={handleDeleteProperty}
+        title={t.deleteProperty}
+        message={t.deleteConfirmation}
+        confirmText={t.delete}
+        cancelText={t.cancel}
+        isSubmitting={submitting}
+        type="danger"
+        icon={
+          <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        }
+      />
     </div>
   );
 };

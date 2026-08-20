@@ -24,12 +24,14 @@
 // import HomeIcon from "@mui/icons-material/Home";
 // import PaymentIcon from "@mui/icons-material/Payment";
 // import Close from "@mui/icons-material/Close";
-// import Send from "@mui/icons-material/Send";
 // import PhoneIcon from "@mui/icons-material/Phone";
 // import EmailIcon from "@mui/icons-material/Email";
 // import PersonIcon from "@mui/icons-material/Person";
 // import VerifiedIcon from "@mui/icons-material/Verified";
-// import ErrorIcon from "@mui/icons-material/Error";
+// import { Send } from "@mui/icons-material";
+// import LockIcon from "@mui/icons-material/Lock";
+// import ContactPhoneIcon from "@mui/icons-material/ContactPhone";
+
 
 // // Types based on the Booking model
 // interface PaymentScreenshot {
@@ -84,35 +86,6 @@
 //   formattedCheckIn: string;
 //   formattedCheckOut: string;
 //   formattedTotal: string;
-// }
-
-// // Form validation errors interface
-// interface FormErrors {
-//   fullName?: string;
-//   email?: string;
-//   phone?: string;
-//   idNumber?: string;
-//   university?: string;
-//   studentId?: string;
-//   purpose?: string;
-//   houseId?: string;
-//   houseName?: string;
-//   houseType?: string;
-//   district?: string;
-//   sector?: string;
-//   cell?: string;
-//   village?: string;
-//   ownerName?: string;
-//   ownerContact?: string;
-//   ownerEmail?: string;
-//   checkIn?: string;
-//   checkOut?: string;
-//   months?: string;
-//   guests?: string;
-//   monthlyRent?: string;
-//   serviceFee?: string;
-//   paymentMethod?: string;
-//   momoNumber?: string;
 // }
 
 // // Translations
@@ -213,7 +186,6 @@
 //       cancelled: "Cancelled",
 //       completed: "Completed",
 //     },
-//     createBooking: "Create New Booking",
 //     required: "This field is required",
 //     invalidEmail: "Please enter a valid email address",
 //     invalidPhone: "Please enter a valid phone number",
@@ -229,6 +201,12 @@
 //     paymentVerificationFailed: "Failed to verify payment",
 //     cancelBookingConfirmation: "Are you sure you want to cancel this booking?",
 //     noUserEmail: "No user email found. Please login again.",
+//     ownerContactLocked: "Owner contact information is locked until payment is verified",
+//     viewOwnerContact: "View Owner Contact",
+//     ownerContactInfo: "Owner Contact Information",
+//     ownerName: "Owner Name",
+//     ownerContact: "Owner Contact",
+//     ownerEmail: "Owner Email",
 //   },
 //   fr: {
 //     bookingManagement: "Gestion des Réservations",
@@ -326,7 +304,6 @@
 //       cancelled: "Annulé",
 //       completed: "Terminé",
 //     },
-//     createBooking: "Créer une Nouvelle Réservation",
 //     required: "Ce champ est requis",
 //     invalidEmail: "Veuillez entrer une adresse email valide",
 //     invalidPhone: "Veuillez entrer un numéro de téléphone valide",
@@ -342,6 +319,12 @@
 //     paymentVerificationFailed: "Échec de la vérification du paiement",
 //     cancelBookingConfirmation: "Êtes-vous sûr de vouloir annuler cette réservation ?",
 //     noUserEmail: "Aucun email utilisateur trouvé. Veuillez vous reconnecter.",
+//     ownerContactLocked: "Les informations de contact du propriétaire sont verrouillées jusqu'à ce que le paiement soit vérifié",
+//     viewOwnerContact: "Voir le Contact du Propriétaire",
+//     ownerContactInfo: "Informations de Contact du Propriétaire",
+//     ownerName: "Nom du Propriétaire",
+//     ownerContact: "Contact du Propriétaire",
+//     ownerEmail: "Email du Propriétaire",
 //   },
 //   rw: {
 //     bookingManagement: "Gucunga Ibyanditswe",
@@ -439,7 +422,6 @@
 //       cancelled: "Byahagaritswe",
 //       completed: "Byarangiye",
 //     },
-//     createBooking: "Kurema Icyanditswe Gishya",
 //     required: "Iki gikurikira kirakenewe",
 //     invalidEmail: "Tanga imeri ikoreshwa neza",
 //     invalidPhone: "Tanga numero ya telefone ikoreshwa neza",
@@ -455,6 +437,12 @@
 //     paymentVerificationFailed: "Kwemeza amahoro byananiranye",
 //     cancelBookingConfirmation: "Uri kwizera ko ushaka guhagarika iki cyanditswe?",
 //     noUserEmail: "Nta imeri y'umukoresha yabonetse. Nyamuneka winjire undi munsi.",
+//     ownerContactLocked: "Amakuru yo guhuza nyir'inzu arafunze kugeza igihe amahoro yemejwe",
+//     viewOwnerContact: "Reba Amakuru yo Guhuza nyir'inzu",
+//     ownerContactInfo: "Amakuru yo Guhuza nyir'inzu",
+//     ownerName: "Izina ry'Nyir'inzu",
+//     ownerContact: "Kuvugana na Nyir'inzu",
+//     ownerEmail: "Imeri ya Nyir'inzu",
 //   },
 // };
 
@@ -466,7 +454,20 @@
 
 // // Helper function to get user email from localStorage
 // const getUserEmailFromStorage = (): string => {
-//   // Try multiple possible keys
+//   // First try to get from user object (set during login)
+//   try {
+//     const userStr = localStorage.getItem("user");
+//     if (userStr) {
+//       const user = JSON.parse(userStr);
+//       if (user.email) {
+//         return user.email;
+//       }
+//     }
+//   } catch (e) {
+//     console.error("Error parsing user from localStorage:", e);
+//   }
+  
+//   // Try individual keys as fallback
 //   const keys = ["userEmail", "email"];
 //   for (const key of keys) {
 //     const value = localStorage.getItem(key);
@@ -474,6 +475,7 @@
 //       return value;
 //     }
 //   }
+  
 //   return "";
 // };
 
@@ -548,17 +550,6 @@
 //   };
 // };
 
-// // Validation functions
-// const validateEmail = (email: string): boolean => {
-//   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//   return re.test(email);
-// };
-
-// const validatePhone = (phone: string): boolean => {
-//   const re = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/;
-//   return re.test(phone);
-// };
-
 // export const UserBookingManagement: React.FC = () => {
 //   // Get language from cookies
 //   const [lang, setLang] = useState<"en" | "fr" | "rw">(
@@ -578,7 +569,7 @@
 //   const [isCompletedModalOpen, setIsCompletedModalOpen] = useState(false);
 //   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 //   const [isVerifyPaymentModalOpen, setIsVerifyPaymentModalOpen] = useState(false);
-//   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+//   const [isOwnerContactModalOpen, setIsOwnerContactModalOpen] = useState(false);
 //   const [selectedBooking, setSelectedBooking] = useState<BookingUI | null>(null);
   
 //   // Edit form state
@@ -587,44 +578,6 @@
 //     paymentStatus: "pending",
 //     notes: "",
 //   });
-
-//   // Create form state
-//   const [createFormData, setCreateFormData] = useState<Partial<Booking>>({
-//     fullName: "",
-//     email: "",
-//     phone: "",
-//     idNumber: "",
-//     university: "",
-//     studentId: "",
-//     purpose: "",
-//     houseId: "",
-//     houseName: "",
-//     houseType: "",
-//     district: "",
-//     sector: "",
-//     cell: "",
-//     village: "",
-//     ownerName: "",
-//     ownerContact: "",
-//     ownerEmail: "",
-//     checkIn: "",
-//     checkOut: "",
-//     months: 1,
-//     guests: 1,
-//     specialRequests: "",
-//     monthlyRent: 0,
-//     serviceFee: 0,
-//     totalAmount: 0,
-//     paymentMethod: "momo",
-//     momoNumber: "",
-//     paymentStatus: "pending",
-//     status: "pending",
-//     notes: "",
-//   });
-
-//   const [formErrors, setFormErrors] = useState<FormErrors>({});
-//   const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
-//   const [isFormValid, setIsFormValid] = useState(false);
 
 //   // Loading states
 //   const [isLoading, setIsLoading] = useState(false);
@@ -690,261 +643,6 @@
 //     } finally {
 //       setIsFetching(false);
 //     }
-//   };
-
-//   // Validate create form
-//   const validateCreateForm = (): boolean => {
-//     const errors: FormErrors = {};
-//     let isValid = true;
-
-//     // Full Name validation
-//     if (!createFormData.fullName || createFormData.fullName.trim().length < 2) {
-//       errors.fullName = t.required;
-//       isValid = false;
-//     }
-
-//     // Email validation
-//     if (!createFormData.email) {
-//       errors.email = t.required;
-//       isValid = false;
-//     } else if (!validateEmail(createFormData.email)) {
-//       errors.email = t.invalidEmail;
-//       isValid = false;
-//     }
-
-//     // Phone validation
-//     if (!createFormData.phone) {
-//       errors.phone = t.required;
-//       isValid = false;
-//     } else if (!validatePhone(createFormData.phone)) {
-//       errors.phone = t.invalidPhone;
-//       isValid = false;
-//     }
-
-//     // ID Number validation
-//     if (!createFormData.idNumber || createFormData.idNumber.trim().length < 3) {
-//       errors.idNumber = t.required;
-//       isValid = false;
-//     }
-
-//     // University validation
-//     if (!createFormData.university || createFormData.university.trim().length < 2) {
-//       errors.university = t.required;
-//       isValid = false;
-//     }
-
-//     // Student ID validation
-//     if (!createFormData.studentId || createFormData.studentId.trim().length < 2) {
-//       errors.studentId = t.required;
-//       isValid = false;
-//     }
-
-//     // Purpose validation
-//     if (!createFormData.purpose || createFormData.purpose.trim().length < 2) {
-//       errors.purpose = t.required;
-//       isValid = false;
-//     }
-
-//     // House Name validation
-//     if (!createFormData.houseName || createFormData.houseName.trim().length < 2) {
-//       errors.houseName = t.required;
-//       isValid = false;
-//     }
-
-//     // House Type validation
-//     if (!createFormData.houseType || createFormData.houseType.trim().length < 2) {
-//       errors.houseType = t.required;
-//       isValid = false;
-//     }
-
-//     // Location validations
-//     if (!createFormData.district || createFormData.district.trim().length < 2) {
-//       errors.district = t.required;
-//       isValid = false;
-//     }
-//     if (!createFormData.sector || createFormData.sector.trim().length < 2) {
-//       errors.sector = t.required;
-//       isValid = false;
-//     }
-//     if (!createFormData.cell || createFormData.cell.trim().length < 2) {
-//       errors.cell = t.required;
-//       isValid = false;
-//     }
-//     if (!createFormData.village || createFormData.village.trim().length < 2) {
-//       errors.village = t.required;
-//       isValid = false;
-//     }
-
-//     // Owner validations
-//     if (!createFormData.ownerName || createFormData.ownerName.trim().length < 2) {
-//       errors.ownerName = t.required;
-//       isValid = false;
-//     }
-//     if (!createFormData.ownerContact || createFormData.ownerContact.trim().length < 5) {
-//       errors.ownerContact = t.required;
-//       isValid = false;
-//     }
-//     if (!createFormData.ownerEmail) {
-//       errors.ownerEmail = t.required;
-//       isValid = false;
-//     } else if (!validateEmail(createFormData.ownerEmail)) {
-//       errors.ownerEmail = t.invalidEmail;
-//       isValid = false;
-//     }
-
-//     // Check In validation
-//     if (!createFormData.checkIn) {
-//       errors.checkIn = t.required;
-//       isValid = false;
-//     }
-
-//     // Check Out validation
-//     if (!createFormData.checkOut) {
-//       errors.checkOut = t.required;
-//       isValid = false;
-//     } else if (createFormData.checkIn && createFormData.checkOut) {
-//       const checkInDate = new Date(createFormData.checkIn);
-//       const checkOutDate = new Date(createFormData.checkOut);
-//       if (checkOutDate <= checkInDate) {
-//         errors.checkOut = "Check out must be after check in";
-//         isValid = false;
-//       }
-//     }
-
-//     // Months validation
-//     if (!createFormData.months || createFormData.months < 1) {
-//       errors.months = t.required;
-//       isValid = false;
-//     }
-
-//     // Guests validation
-//     if (!createFormData.guests || createFormData.guests < 1) {
-//       errors.guests = t.required;
-//       isValid = false;
-//     }
-
-//     // Monthly Rent validation
-//     if (!createFormData.monthlyRent || createFormData.monthlyRent <= 0) {
-//       errors.monthlyRent = t.required;
-//       isValid = false;
-//     }
-
-//     // Service Fee validation
-//     if (createFormData.serviceFee === undefined || createFormData.serviceFee < 0) {
-//       errors.serviceFee = t.required;
-//       isValid = false;
-//     }
-
-//     // Payment Method validation
-//     if (!createFormData.paymentMethod) {
-//       errors.paymentMethod = t.required;
-//       isValid = false;
-//     }
-
-//     // MoMo Number validation (required if payment method is momo)
-//     if (createFormData.paymentMethod === "momo" && (!createFormData.momoNumber || createFormData.momoNumber.trim().length < 5)) {
-//       errors.momoNumber = t.required;
-//       isValid = false;
-//     }
-
-//     setFormErrors(errors);
-//     setIsFormValid(isValid);
-//     return isValid;
-//   };
-
-//   // Handle create form field changes
-//   const handleCreateFormChange = (field: keyof Booking, value: any) => {
-//     setCreateFormData((prev) => ({
-//       ...prev,
-//       [field]: value,
-//     }));
-
-//     // Mark field as touched
-//     setTouchedFields((prev) => new Set(prev).add(field));
-
-//     // Auto-calculate total amount
-//     if (field === "monthlyRent" || field === "serviceFee" || field === "months") {
-//       const monthlyRent = field === "monthlyRent" ? value : createFormData.monthlyRent || 0;
-//       const serviceFee = field === "serviceFee" ? value : createFormData.serviceFee || 0;
-//       const months = field === "months" ? value : createFormData.months || 1;
-//       const totalAmount = (monthlyRent * months) + serviceFee;
-//       setCreateFormData((prev) => ({
-//         ...prev,
-//         totalAmount,
-//       }));
-//     }
-//   };
-
-//   // Handle create form blur
-//   const handleCreateFormBlur = (field: string) => {
-//     setTouchedFields((prev) => new Set(prev).add(field));
-//     validateCreateForm();
-//   };
-
-//   // Create booking using axios
-//   const handleCreateBooking = async () => {
-//     if (!validateCreateForm()) {
-//       toast.error(`❌ ${t.validationError}`);
-//       return;
-//     }
-
-//     setIsSubmitting(true);
-
-//     try {
-//       const response = await apiClient.post("/bookings", createFormData);
-
-//       const newBooking = response.data;
-//       const transformedBooking = transformBookingToUI(newBooking);
-//       setBookings((prev) => [transformedBooking, ...prev]);
-
-//       toast.success(`✅ Booking created successfully!`);
-//       setIsCreateModalOpen(false);
-//       resetCreateForm();
-//     } catch (error) {
-//       toast.error(`❌ Failed to create booking`);
-//       console.error("Create booking error:", error);
-//     } finally {
-//       setIsSubmitting(false);
-//     }
-//   };
-
-//   // Reset create form
-//   const resetCreateForm = () => {
-//     setCreateFormData({
-//       fullName: "",
-//       email: "",
-//       phone: "",
-//       idNumber: "",
-//       university: "",
-//       studentId: "",
-//       purpose: "",
-//       houseId: "",
-//       houseName: "",
-//       houseType: "",
-//       district: "",
-//       sector: "",
-//       cell: "",
-//       village: "",
-//       ownerName: "",
-//       ownerContact: "",
-//       ownerEmail: "",
-//       checkIn: "",
-//       checkOut: "",
-//       months: 1,
-//       guests: 1,
-//       specialRequests: "",
-//       monthlyRent: 0,
-//       serviceFee: 0,
-//       totalAmount: 0,
-//       paymentMethod: "momo",
-//       momoNumber: "",
-//       paymentStatus: "pending",
-//       status: "pending",
-//       notes: "",
-//     });
-//     setFormErrors({});
-//     setTouchedFields(new Set());
-//     setIsFormValid(false);
 //   };
 
 //   // Listen for language changes in cookies
@@ -1244,39 +942,15 @@
 //     setIsViewModalOpen(true);
 //   };
 
-//   const openEditModal = (booking: BookingUI) => {
-//     setSelectedBooking(booking);
-//     setEditFormData({
-//       status: booking.status,
-//       paymentStatus: booking.paymentStatus,
-//       notes: booking.notes || "",
-//     });
-//     setIsEditModalOpen(true);
-//   };
 
 //   const openDeleteModal = (booking: BookingUI) => {
 //     setSelectedBooking(booking);
 //     setIsDeleteModalOpen(true);
 //   };
 
-//   const openConfirmModal = (booking: BookingUI) => {
+//   const openOwnerContactModal = (booking: BookingUI) => {
 //     setSelectedBooking(booking);
-//     setIsConfirmModalOpen(true);
-//   };
-
-//   const openCancelModal = (booking: BookingUI) => {
-//     setSelectedBooking(booking);
-//     setIsCancelModalOpen(true);
-//   };
-
-//   const openCompletedModal = (booking: BookingUI) => {
-//     setSelectedBooking(booking);
-//     setIsCompletedModalOpen(true);
-//   };
-
-//   const openVerifyPaymentModal = (booking: BookingUI) => {
-//     setSelectedBooking(booking);
-//     setIsVerifyPaymentModalOpen(true);
+//     setIsOwnerContactModalOpen(true);
 //   };
 
 //   // Modal variants
@@ -1524,60 +1198,8 @@
 //                         >
 //                           <VisibilityIcon className="w-4 h-4" />
 //                         </motion.button>
-//                         <motion.button
-//                           whileHover={{ scale: 1.1 }}
-//                           whileTap={{ scale: 0.9 }}
-//                           onClick={() => openEditModal(booking)}
-//                           className="p-1 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-//                           title={t.editBooking}
-//                         >
-//                           <EditIcon className="w-4 h-4" />
-//                         </motion.button>
-//                         {booking.status === "pending" && (
-//                           <motion.button
-//                             whileHover={{ scale: 1.1 }}
-//                             whileTap={{ scale: 0.9 }}
-//                             onClick={() => openConfirmModal(booking)}
-//                             className="p-1 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-//                             title={t.confirmBooking}
-//                           >
-//                             <CheckCircleIcon className="w-4 h-4" />
-//                           </motion.button>
-//                         )}
-//                         {booking.paymentStatus === "pending" && (
-//                           <motion.button
-//                             whileHover={{ scale: 1.1 }}
-//                             whileTap={{ scale: 0.9 }}
-//                             onClick={() => openVerifyPaymentModal(booking)}
-//                             className="p-1 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-//                             title={t.verifyPayment}
-//                           >
-//                             <VerifiedIcon className="w-4 h-4" />
-//                           </motion.button>
-//                         )}
-//                         {booking.status === "pending" && (
-//                           <motion.button
-//                             whileHover={{ scale: 1.1 }}
-//                             whileTap={{ scale: 0.9 }}
-//                             onClick={() => openCancelModal(booking)}
-//                             className="p-1 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-//                             title={t.cancelBooking}
-//                           >
-//                             <CancelIcon className="w-4 h-4" />
-//                           </motion.button>
-//                         )}
-//                         {booking.status === "confirmed" && (
-//                           <motion.button
-//                             whileHover={{ scale: 1.1 }}
-//                             whileTap={{ scale: 0.9 }}
-//                             onClick={() => openCompletedModal(booking)}
-//                             className="p-1 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-//                             title={t.completedBooking}
-//                           >
-//                             <AssignmentIcon className="w-4 h-4" />
-//                           </motion.button>
-//                         )}
-//                         <motion.button
+             
+//                                  <motion.button
 //                           whileHover={{ scale: 1.1 }}
 //                           whileTap={{ scale: 0.9 }}
 //                           onClick={() => openDeleteModal(booking)}
@@ -1601,814 +1223,6 @@
 //           </p>
 //         </div>
 //       </div>
-
-//       {/* Create Booking Modal - Same as before */}
-//       <AnimatePresence>
-//         {isCreateModalOpen && (
-//           <>
-//             <motion.div
-//               variants={overlayVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-//               onClick={() => setIsCreateModalOpen(false)}
-//             />
-//             <motion.div
-//               variants={modalVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-//             >
-//               <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white relative">
-//                 <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl z-10">
-//                   <div className="flex items-center gap-2">
-//                     <CalendarTodayIcon className="text-[#FF385C] w-5 h-5" />
-//                     <h2 className="text-xl font-semibold text-gray-900">
-//                       {t.createBooking}
-//                     </h2>
-//                     {isFormValid && touchedFields.size > 0 && (
-//                       <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full flex items-center gap-1">
-//                         <VerifiedIcon className="w-3 h-3" />
-//                         {t.allFieldsVerified}
-//                       </span>
-//                     )}
-//                   </div>
-//                   <motion.button
-//                     whileHover={{ rotate: 90, scale: 1.1 }}
-//                     whileTap={{ scale: 0.9 }}
-//                     onClick={() => setIsCreateModalOpen(false)}
-//                     className="p-1 rounded-full transition-colors hover:bg-gray-100 text-gray-500"
-//                   >
-//                     <CloseIcon className="w-5 h-5" />
-//                   </motion.button>
-//                 </div>
-
-//                 <div className="p-6 space-y-6">
-//                   {/* Guest Information */}
-//                   <div>
-//                     <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-//                       <PersonIcon className="w-4 h-4 text-[#FF385C]" />
-//                       {t.guestInformation}
-//                     </h3>
-//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           Full Name <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="text"
-//                             value={createFormData.fullName || ""}
-//                             onChange={(e) => handleCreateFormChange("fullName", e.target.value)}
-//                             onBlur={() => handleCreateFormBlur("fullName")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.fullName && touchedFields.has("fullName") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Enter guest full name"
-//                           />
-//                           {touchedFields.has("fullName") && !formErrors.fullName && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.fullName && touchedFields.has("fullName") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.fullName}
-//                           </p>
-//                         )}
-//                       </div>
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           {t.email} <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="email"
-//                             value={createFormData.email || ""}
-//                             onChange={(e) => handleCreateFormChange("email", e.target.value)}
-//                             onBlur={() => handleCreateFormBlur("email")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.email && touchedFields.has("email") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Enter guest email"
-//                           />
-//                           {touchedFields.has("email") && !formErrors.email && createFormData.email && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.email && touchedFields.has("email") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.email}
-//                           </p>
-//                         )}
-//                       </div>
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           {t.phone} <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="tel"
-//                             value={createFormData.phone || ""}
-//                             onChange={(e) => handleCreateFormChange("phone", e.target.value)}
-//                             onBlur={() => handleCreateFormBlur("phone")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.phone && touchedFields.has("phone") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Enter guest phone number"
-//                           />
-//                           {touchedFields.has("phone") && !formErrors.phone && createFormData.phone && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.phone && touchedFields.has("phone") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.phone}
-//                           </p>
-//                         )}
-//                       </div>
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           {t.idNumber} <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="text"
-//                             value={createFormData.idNumber || ""}
-//                             onChange={(e) => handleCreateFormChange("idNumber", e.target.value)}
-//                             onBlur={() => handleCreateFormBlur("idNumber")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.idNumber && touchedFields.has("idNumber") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Enter ID number"
-//                           />
-//                           {touchedFields.has("idNumber") && !formErrors.idNumber && createFormData.idNumber && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.idNumber && touchedFields.has("idNumber") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.idNumber}
-//                           </p>
-//                         )}
-//                       </div>
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           {t.university} <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="text"
-//                             value={createFormData.university || ""}
-//                             onChange={(e) => handleCreateFormChange("university", e.target.value)}
-//                             onBlur={() => handleCreateFormBlur("university")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.university && touchedFields.has("university") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Enter university name"
-//                           />
-//                           {touchedFields.has("university") && !formErrors.university && createFormData.university && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.university && touchedFields.has("university") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.university}
-//                           </p>
-//                         )}
-//                       </div>
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           {t.studentId} <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="text"
-//                             value={createFormData.studentId || ""}
-//                             onChange={(e) => handleCreateFormChange("studentId", e.target.value)}
-//                             onBlur={() => handleCreateFormBlur("studentId")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.studentId && touchedFields.has("studentId") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Enter student ID"
-//                           />
-//                           {touchedFields.has("studentId") && !formErrors.studentId && createFormData.studentId && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.studentId && touchedFields.has("studentId") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.studentId}
-//                           </p>
-//                         )}
-//                       </div>
-//                       <div className="md:col-span-2">
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           {t.purpose} <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="text"
-//                             value={createFormData.purpose || ""}
-//                             onChange={(e) => handleCreateFormChange("purpose", e.target.value)}
-//                             onBlur={() => handleCreateFormBlur("purpose")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.purpose && touchedFields.has("purpose") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Enter purpose of booking"
-//                           />
-//                           {touchedFields.has("purpose") && !formErrors.purpose && createFormData.purpose && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.purpose && touchedFields.has("purpose") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.purpose}
-//                           </p>
-//                         )}
-//                       </div>
-//                     </div>
-//                   </div>
-
-//                   {/* House Information */}
-//                   <div>
-//                     <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-//                       <HomeIcon className="w-4 h-4 text-[#FF385C]" />
-//                       {t.houseInformation}
-//                     </h3>
-//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           {t.houseName} <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="text"
-//                             value={createFormData.houseName || ""}
-//                             onChange={(e) => handleCreateFormChange("houseName", e.target.value)}
-//                             onBlur={() => handleCreateFormBlur("houseName")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.houseName && touchedFields.has("houseName") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Enter house name"
-//                           />
-//                           {touchedFields.has("houseName") && !formErrors.houseName && createFormData.houseName && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.houseName && touchedFields.has("houseName") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.houseName}
-//                           </p>
-//                         )}
-//                       </div>
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           {t.houseType} <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="text"
-//                             value={createFormData.houseType || ""}
-//                             onChange={(e) => handleCreateFormChange("houseType", e.target.value)}
-//                             onBlur={() => handleCreateFormBlur("houseType")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.houseType && touchedFields.has("houseType") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Enter house type (e.g., Apartment, Villa)"
-//                           />
-//                           {touchedFields.has("houseType") && !formErrors.houseType && createFormData.houseType && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.houseType && touchedFields.has("houseType") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.houseType}
-//                           </p>
-//                         )}
-//                       </div>
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           District <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="text"
-//                             value={createFormData.district || ""}
-//                             onChange={(e) => handleCreateFormChange("district", e.target.value)}
-//                             onBlur={() => handleCreateFormBlur("district")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.district && touchedFields.has("district") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Enter district"
-//                           />
-//                           {touchedFields.has("district") && !formErrors.district && createFormData.district && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.district && touchedFields.has("district") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.district}
-//                           </p>
-//                         )}
-//                       </div>
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           Sector <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="text"
-//                             value={createFormData.sector || ""}
-//                             onChange={(e) => handleCreateFormChange("sector", e.target.value)}
-//                             onBlur={() => handleCreateFormBlur("sector")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.sector && touchedFields.has("sector") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Enter sector"
-//                           />
-//                           {touchedFields.has("sector") && !formErrors.sector && createFormData.sector && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.sector && touchedFields.has("sector") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.sector}
-//                           </p>
-//                         )}
-//                       </div>
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           Cell <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="text"
-//                             value={createFormData.cell || ""}
-//                             onChange={(e) => handleCreateFormChange("cell", e.target.value)}
-//                             onBlur={() => handleCreateFormBlur("cell")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.cell && touchedFields.has("cell") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Enter cell"
-//                           />
-//                           {touchedFields.has("cell") && !formErrors.cell && createFormData.cell && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.cell && touchedFields.has("cell") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.cell}
-//                           </p>
-//                         )}
-//                       </div>
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           Village <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="text"
-//                             value={createFormData.village || ""}
-//                             onChange={(e) => handleCreateFormChange("village", e.target.value)}
-//                             onBlur={() => handleCreateFormBlur("village")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.village && touchedFields.has("village") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Enter village"
-//                           />
-//                           {touchedFields.has("village") && !formErrors.village && createFormData.village && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.village && touchedFields.has("village") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.village}
-//                           </p>
-//                         )}
-//                       </div>
-//                     </div>
-//                   </div>
-
-//                   {/* Owner Information */}
-//                   <div>
-//                     <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-//                       <PersonIcon className="w-4 h-4 text-[#FF385C]" />
-//                       {t.owner}
-//                     </h3>
-//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           Owner Name <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="text"
-//                             value={createFormData.ownerName || ""}
-//                             onChange={(e) => handleCreateFormChange("ownerName", e.target.value)}
-//                             onBlur={() => handleCreateFormBlur("ownerName")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.ownerName && touchedFields.has("ownerName") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Enter owner name"
-//                           />
-//                           {touchedFields.has("ownerName") && !formErrors.ownerName && createFormData.ownerName && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.ownerName && touchedFields.has("ownerName") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.ownerName}
-//                           </p>
-//                         )}
-//                       </div>
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           Owner Contact <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="text"
-//                             value={createFormData.ownerContact || ""}
-//                             onChange={(e) => handleCreateFormChange("ownerContact", e.target.value)}
-//                             onBlur={() => handleCreateFormBlur("ownerContact")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.ownerContact && touchedFields.has("ownerContact") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Enter owner contact"
-//                           />
-//                           {touchedFields.has("ownerContact") && !formErrors.ownerContact && createFormData.ownerContact && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.ownerContact && touchedFields.has("ownerContact") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.ownerContact}
-//                           </p>
-//                         )}
-//                       </div>
-//                       <div className="md:col-span-2">
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           Owner Email <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="email"
-//                             value={createFormData.ownerEmail || ""}
-//                             onChange={(e) => handleCreateFormChange("ownerEmail", e.target.value)}
-//                             onBlur={() => handleCreateFormBlur("ownerEmail")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.ownerEmail && touchedFields.has("ownerEmail") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Enter owner email"
-//                           />
-//                           {touchedFields.has("ownerEmail") && !formErrors.ownerEmail && createFormData.ownerEmail && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.ownerEmail && touchedFields.has("ownerEmail") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.ownerEmail}
-//                           </p>
-//                         )}
-//                       </div>
-//                     </div>
-//                   </div>
-
-//                   {/* Booking Details */}
-//                   <div>
-//                     <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-//                       <AssignmentIcon className="w-4 h-4 text-[#FF385C]" />
-//                       {t.bookingInformation}
-//                     </h3>
-//                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           {t.checkIn} <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="date"
-//                             value={createFormData.checkIn || ""}
-//                             onChange={(e) => handleCreateFormChange("checkIn", e.target.value)}
-//                             onBlur={() => handleCreateFormBlur("checkIn")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.checkIn && touchedFields.has("checkIn") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                           />
-//                           {touchedFields.has("checkIn") && !formErrors.checkIn && createFormData.checkIn && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.checkIn && touchedFields.has("checkIn") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.checkIn}
-//                           </p>
-//                         )}
-//                       </div>
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           {t.checkOut} <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="date"
-//                             value={createFormData.checkOut || ""}
-//                             onChange={(e) => handleCreateFormChange("checkOut", e.target.value)}
-//                             onBlur={() => handleCreateFormBlur("checkOut")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.checkOut && touchedFields.has("checkOut") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                           />
-//                           {touchedFields.has("checkOut") && !formErrors.checkOut && createFormData.checkOut && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.checkOut && touchedFields.has("checkOut") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.checkOut}
-//                           </p>
-//                         )}
-//                       </div>
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           {t.months} <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="number"
-//                             min="1"
-//                             max="24"
-//                             value={createFormData.months || ""}
-//                             onChange={(e) => handleCreateFormChange("months", parseInt(e.target.value) || 0)}
-//                             onBlur={() => handleCreateFormBlur("months")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.months && touchedFields.has("months") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Number of months"
-//                           />
-//                           {touchedFields.has("months") && !formErrors.months && createFormData.months && createFormData.months > 0 && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.months && touchedFields.has("months") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.months}
-//                           </p>
-//                         )}
-//                       </div>
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           {t.guests} <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="number"
-//                             min="1"
-//                             max="20"
-//                             value={createFormData.guests || ""}
-//                             onChange={(e) => handleCreateFormChange("guests", parseInt(e.target.value) || 0)}
-//                             onBlur={() => handleCreateFormBlur("guests")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.guests && touchedFields.has("guests") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Number of guests"
-//                           />
-//                           {touchedFields.has("guests") && !formErrors.guests && createFormData.guests && createFormData.guests > 0 && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.guests && touchedFields.has("guests") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.guests}
-//                           </p>
-//                         )}
-//                       </div>
-//                       <div className="md:col-span-3">
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           {t.specialRequests}
-//                         </label>
-//                         <textarea
-//                           value={createFormData.specialRequests || ""}
-//                           onChange={(e) => handleCreateFormChange("specialRequests", e.target.value)}
-//                           rows={2}
-//                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm resize-none"
-//                           placeholder="Any special requests?"
-//                         />
-//                       </div>
-//                     </div>
-//                   </div>
-
-//                   {/* Payment Information */}
-//                   <div>
-//                     <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-//                       <PaymentIcon className="w-4 h-4 text-[#FF385C]" />
-//                       {t.paymentInformation}
-//                     </h3>
-//                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           {t.monthlyRent} <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="number"
-//                             min="0"
-//                             step="1000"
-//                             value={createFormData.monthlyRent || ""}
-//                             onChange={(e) => handleCreateFormChange("monthlyRent", parseFloat(e.target.value) || 0)}
-//                             onBlur={() => handleCreateFormBlur("monthlyRent")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.monthlyRent && touchedFields.has("monthlyRent") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Monthly rent amount"
-//                           />
-//                           {touchedFields.has("monthlyRent") && !formErrors.monthlyRent && createFormData.monthlyRent && createFormData.monthlyRent > 0 && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.monthlyRent && touchedFields.has("monthlyRent") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.monthlyRent}
-//                           </p>
-//                         )}
-//                       </div>
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           {t.serviceFee} <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="number"
-//                             min="0"
-//                             step="100"
-//                             value={createFormData.serviceFee || ""}
-//                             onChange={(e) => handleCreateFormChange("serviceFee", parseFloat(e.target.value) || 0)}
-//                             onBlur={() => handleCreateFormBlur("serviceFee")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                               formErrors.serviceFee && touchedFields.has("serviceFee") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                             placeholder="Service fee amount"
-//                           />
-//                           {touchedFields.has("serviceFee") && !formErrors.serviceFee && createFormData.serviceFee !== undefined && createFormData.serviceFee >= 0 && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.serviceFee && touchedFields.has("serviceFee") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.serviceFee}
-//                           </p>
-//                         )}
-//                       </div>
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           {t.totalAmount}
-//                         </label>
-//                         <div className="relative">
-//                           <input
-//                             type="number"
-//                             value={createFormData.totalAmount || 0}
-//                             readOnly
-//                             className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-sm font-medium text-gray-900"
-//                           />
-//                         </div>
-//                       </div>
-//                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           {t.paymentMethod} <span className="text-red-500">*</span>
-//                         </label>
-//                         <div className="relative">
-//                           <select
-//                             value={createFormData.paymentMethod || "momo"}
-//                             onChange={(e) => handleCreateFormChange("paymentMethod", e.target.value)}
-//                             onBlur={() => handleCreateFormBlur("paymentMethod")}
-//                             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white ${
-//                               formErrors.paymentMethod && touchedFields.has("paymentMethod") ? "border-red-500" : "border-gray-300"
-//                             }`}
-//                           >
-//                             <option value="momo">MoMo</option>
-//                             <option value="bank">Bank</option>
-//                             <option value="cash">Cash</option>
-//                           </select>
-//                           {touchedFields.has("paymentMethod") && !formErrors.paymentMethod && createFormData.paymentMethod && (
-//                             <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                           )}
-//                         </div>
-//                         {formErrors.paymentMethod && touchedFields.has("paymentMethod") && (
-//                           <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                             <ErrorIcon className="w-3 h-3" />
-//                             {formErrors.paymentMethod}
-//                           </p>
-//                         )}
-//                       </div>
-//                       {createFormData.paymentMethod === "momo" && (
-//                         <div>
-//                           <label className="block text-sm font-medium text-gray-700 mb-1">
-//                             {t.momoNumber} <span className="text-red-500">*</span>
-//                           </label>
-//                           <div className="relative">
-//                             <input
-//                               type="text"
-//                               value={createFormData.momoNumber || ""}
-//                               onChange={(e) => handleCreateFormChange("momoNumber", e.target.value)}
-//                               onBlur={() => handleCreateFormBlur("momoNumber")}
-//                               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                                 formErrors.momoNumber && touchedFields.has("momoNumber") ? "border-red-500" : "border-gray-300"
-//                               }`}
-//                               placeholder="Enter MoMo number"
-//                             />
-//                             {touchedFields.has("momoNumber") && !formErrors.momoNumber && createFormData.momoNumber && (
-//                               <VerifiedIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500 w-4 h-4" />
-//                             )}
-//                           </div>
-//                           {formErrors.momoNumber && touchedFields.has("momoNumber") && (
-//                             <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-//                               <ErrorIcon className="w-3 h-3" />
-//                               {formErrors.momoNumber}
-//                             </p>
-//                           )}
-//                         </div>
-//                       )}
-//                       <div className="md:col-span-3">
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           {t.notes}
-//                         </label>
-//                         <textarea
-//                           value={createFormData.notes || ""}
-//                           onChange={(e) => handleCreateFormChange("notes", e.target.value)}
-//                           rows={2}
-//                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm resize-none"
-//                           placeholder="Additional notes..."
-//                         />
-//                       </div>
-//                     </div>
-//                   </div>
-
-//                   <div className="flex gap-3 pt-4 border-t border-gray-200">
-//                     <motion.button
-//                       whileHover={{ scale: 1.02 }}
-//                       whileTap={{ scale: 0.98 }}
-//                       onClick={handleCreateBooking}
-//                       disabled={isSubmitting || !isFormValid}
-//                       className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors flex items-center justify-center gap-2 ${
-//                         isSubmitting || !isFormValid
-//                           ? "bg-gray-400 cursor-not-allowed"
-//                           : "bg-[#FF385C] hover:bg-[#E31C5F]"
-//                       }`}
-//                     >
-//                       {isSubmitting ? (
-//                         <>
-//                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-//                           {t.loading}
-//                         </>
-//                       ) : (
-//                         <>
-//                           <Send className="w-4 h-4" />
-//                           {t.createBooking}
-//                         </>
-//                       )}
-//                     </motion.button>
-//                     <motion.button
-//                       whileHover={{ scale: 1.02 }}
-//                       whileTap={{ scale: 0.98 }}
-//                       onClick={() => {
-//                         setIsCreateModalOpen(false);
-//                         resetCreateForm();
-//                       }}
-//                       className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-//                     >
-//                       {t.cancel}
-//                     </motion.button>
-//                   </div>
-//                 </div>
-//               </div>
-//             </motion.div>
-//           </>
-//         )}
-//       </AnimatePresence>
 
 //       {/* View Booking Modal */}
 //       <AnimatePresence>
@@ -2520,9 +1334,28 @@
 //                         <label className="text-xs font-medium text-gray-500">{t.owner}</label>
 //                         <p className="text-sm text-gray-900">{selectedBooking.ownerName || "N/A"}</p>
 //                       </div>
+//                       {/* Owner Contact - Locked until payment verified */}
 //                       <div>
 //                         <label className="text-xs font-medium text-gray-500">Owner Contact</label>
-//                         <p className="text-sm text-gray-900">{selectedBooking.ownerContact || "N/A"}</p>
+//                         {selectedBooking.paymentStatus === "verified" ? (
+//                           <p className="text-sm text-gray-900">{selectedBooking.ownerContact || "N/A"}</p>
+//                         ) : (
+//                           <div className="flex items-center gap-2">
+//                             <p className="text-sm text-gray-400 flex items-center gap-1">
+//                               <LockIcon className="w-3 h-3" />
+//                               Locked
+//                             </p>
+//                             <motion.button
+//                               whileHover={{ scale: 1.05 }}
+//                               whileTap={{ scale: 0.95 }}
+//                               onClick={() => openOwnerContactModal(selectedBooking)}
+//                               className="text-xs text-[#FF385C] font-medium hover:underline flex items-center gap-1"
+//                             >
+//                               <ContactPhoneIcon className="w-3 h-3" />
+//                               {t.viewOwnerContact}
+//                             </motion.button>
+//                           </div>
+//                         )}
 //                       </div>
 //                     </div>
 //                   </div>
@@ -2642,6 +1475,97 @@
 //                       whileHover={{ scale: 1.02 }}
 //                       whileTap={{ scale: 0.98 }}
 //                       onClick={() => setIsViewModalOpen(false)}
+//                       className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+//                     >
+//                       {t.close}
+//                     </motion.button>
+//                   </div>
+//                 </div>
+//               </div>
+//             </motion.div>
+//           </>
+//         )}
+//       </AnimatePresence>
+
+//       {/* Owner Contact Modal - Only shown when payment is verified */}
+//       <AnimatePresence>
+//         {isOwnerContactModalOpen && selectedBooking && selectedBooking.paymentStatus === "verified" && (
+//           <>
+//             <motion.div
+//               variants={overlayVariants}
+//               initial="hidden"
+//               animate="visible"
+//               exit="exit"
+//               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+//               onClick={() => {
+//                 setIsOwnerContactModalOpen(false);
+//                 setSelectedBooking(null);
+//               }}
+//             />
+//             <motion.div
+//               variants={modalVariants}
+//               initial="hidden"
+//               animate="visible"
+//               exit="exit"
+//               className="fixed inset-0 z-[101] flex items-center justify-center p-4"
+//             >
+//               <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative">
+//                 <div className="p-6">
+//                   <div className="flex items-center justify-between mb-4">
+//                     <div className="flex items-center gap-2">
+//                       <ContactPhoneIcon className="w-6 h-6 text-[#FF385C]" />
+//                       <h3 className="text-xl font-semibold text-gray-900">
+//                         {t.ownerContactInfo}
+//                       </h3>
+//                     </div>
+//                     <motion.button
+//                       whileHover={{ rotate: 90, scale: 1.1 }}
+//                       whileTap={{ scale: 0.9 }}
+//                       onClick={() => {
+//                         setIsOwnerContactModalOpen(false);
+//                         setSelectedBooking(null);
+//                       }}
+//                       className="p-1 rounded-full transition-colors hover:bg-gray-100 text-gray-500"
+//                     >
+//                       <CloseIcon className="w-5 h-5" />
+//                     </motion.button>
+//                   </div>
+                  
+//                   <div className="space-y-4 bg-gray-50 rounded-lg p-4">
+//                     <div>
+//                       <label className="text-xs font-medium text-gray-500">{t.ownerName}</label>
+//                       <p className="text-sm font-medium text-gray-900">{selectedBooking.ownerName || "N/A"}</p>
+//                     </div>
+//                     <div>
+//                       <label className="text-xs font-medium text-gray-500">{t.ownerContact}</label>
+//                       <p className="text-sm text-gray-900 flex items-center gap-1">
+//                         <PhoneIcon className="w-3 h-3 text-gray-400" />
+//                         {selectedBooking.ownerContact || "N/A"}
+//                       </p>
+//                     </div>
+//                     <div>
+//                       <label className="text-xs font-medium text-gray-500">{t.ownerEmail}</label>
+//                       <p className="text-sm text-gray-900 flex items-center gap-1">
+//                         <EmailIcon className="w-3 h-3 text-gray-400" />
+//                         {selectedBooking.ownerEmail || "N/A"}
+//                       </p>
+//                     </div>
+//                     <div className="pt-3 border-t border-gray-200">
+//                       <p className="text-xs text-green-600 flex items-center gap-1">
+//                         <VerifiedIcon className="w-3 h-3" />
+//                         Payment verified - Contact information unlocked
+//                       </p>
+//                     </div>
+//                   </div>
+
+//                   <div className="flex gap-3 mt-4">
+//                     <motion.button
+//                       whileHover={{ scale: 1.02 }}
+//                       whileTap={{ scale: 0.98 }}
+//                       onClick={() => {
+//                         setIsOwnerContactModalOpen(false);
+//                         setSelectedBooking(null);
+//                       }}
 //                       className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
 //                     >
 //                       {t.close}
@@ -3237,11 +2161,10 @@
 
 
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 import axios, { AxiosError } from "axios";
@@ -3257,7 +2180,6 @@ import ClearIcon from "@mui/icons-material/Clear";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
-import EditIcon from "@mui/icons-material/Edit";
 import PeopleIcon from "@mui/icons-material/People";
 import HomeIcon from "@mui/icons-material/Home";
 import PaymentIcon from "@mui/icons-material/Payment";
@@ -3266,8 +2188,206 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
 import PersonIcon from "@mui/icons-material/Person";
 import VerifiedIcon from "@mui/icons-material/Verified";
-import { Send } from "@mui/icons-material";
+import LockIcon from "@mui/icons-material/Lock";
+import ContactPhoneIcon from "@mui/icons-material/ContactPhone";
 
+// ============================================================
+// MODAL COMPONENTS
+// ============================================================
+
+// Success Modal
+interface SuccessModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  message: string;
+  details?: string;
+}
+
+const SuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose, title, message, details }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 to-green-600" />
+        <div className="p-6">
+          <div className="flex items-center justify-center mb-4">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center relative">
+              <div className="absolute inset-0 rounded-full border-4 border-green-200 animate-ping opacity-75" />
+              <CheckCircleIcon className="w-10 h-10 text-green-600 relative z-10" />
+            </div>
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">{title}</h3>
+          <p className="text-gray-600 text-center mb-2">{message}</p>
+          {details && <p className="text-sm text-gray-400 text-center mb-6">{details}</p>}
+          <button
+            onClick={onClose}
+            className="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+          >
+            Got it!
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Error Modal
+interface ErrorModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  message: string;
+  details?: string;
+}
+
+const ErrorModal: React.FC<ErrorModalProps> = ({ isOpen, onClose, title, message, details }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-400 to-red-600" />
+        <div className="p-6">
+          <div className="flex items-center justify-center mb-4">
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center relative">
+              <div className="absolute inset-0 rounded-full border-4 border-red-200 animate-ping opacity-75" />
+              <svg className="w-10 h-10 text-red-600 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">{title}</h3>
+          <p className="text-gray-600 text-center mb-2">{message}</p>
+          {details && <p className="text-sm text-gray-400 text-center mb-6">{details}</p>}
+          <button
+            onClick={onClose}
+            className="w-full px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Confirm Modal
+interface ConfirmModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  icon?: React.ReactNode;
+  isSubmitting?: boolean;
+  type?: "danger" | "warning" | "info" | "success";
+}
+
+const ConfirmModal: React.FC<ConfirmModalProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmText = "Confirm",
+  cancelText = "Cancel",
+  icon,
+  isSubmitting = false,
+  type = "warning",
+}) => {
+  if (!isOpen) return null;
+
+  const getColors = () => {
+    switch (type) {
+      case "danger":
+        return {
+          iconBg: "bg-red-100",
+          iconColor: "text-red-600",
+          iconBorder: "border-red-200",
+          buttonBg: "bg-gradient-to-r from-red-500 to-red-600",
+          buttonHover: "hover:shadow-lg",
+        };
+      case "warning":
+        return {
+          iconBg: "bg-yellow-100",
+          iconColor: "text-yellow-600",
+          iconBorder: "border-yellow-200",
+          buttonBg: "bg-gradient-to-r from-yellow-500 to-yellow-600",
+          buttonHover: "hover:shadow-lg",
+        };
+      case "success":
+        return {
+          iconBg: "bg-green-100",
+          iconColor: "text-green-600",
+          iconBorder: "border-green-200",
+          buttonBg: "bg-gradient-to-r from-green-500 to-green-600",
+          buttonHover: "hover:shadow-lg",
+        };
+      default:
+        return {
+          iconBg: "bg-blue-100",
+          iconColor: "text-blue-600",
+          iconBorder: "border-blue-200",
+          buttonBg: "bg-gradient-to-r from-blue-500 to-blue-600",
+          buttonHover: "hover:shadow-lg",
+        };
+    }
+  };
+
+  const colors = getColors();
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div className={`absolute top-0 left-0 right-0 h-1 ${colors.buttonBg}`} />
+        <div className="p-6">
+          <div className="flex items-center justify-center mb-4">
+            <div className={`w-20 h-20 ${colors.iconBg} rounded-full flex items-center justify-center relative`}>
+              <div className={`absolute inset-0 rounded-full border-4 ${colors.iconBorder} animate-ping opacity-75`} />
+              <div className={`${colors.iconColor} relative z-10`}>
+                {icon || (
+                  type === "danger" ? <DeleteIcon className="w-10 h-10" /> :
+                  type === "warning" ? <CancelIcon className="w-10 h-10" /> :
+                  type === "success" ? <CheckCircleIcon className="w-10 h-10" /> :
+                  <CalendarTodayIcon className="w-10 h-10" />
+                )}
+              </div>
+            </div>
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">{title}</h3>
+          <p className="text-gray-600 text-center mb-6">{message}</p>
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              disabled={isSubmitting}
+              className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+            >
+              {cancelText}
+            </button>
+            <button
+              onClick={onConfirm}
+              disabled={isSubmitting}
+              className={`flex-1 px-4 py-2.5 ${colors.buttonBg} text-white rounded-xl font-medium ${colors.buttonHover} transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2`}
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                confirmText
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Types based on the Booking model
 interface PaymentScreenshot {
@@ -3351,7 +2471,6 @@ const translations = {
     of: "of",
     bookings: "bookings",
     viewBooking: "View Booking",
-    editBooking: "Edit Booking",
     deleteBooking: "Delete Booking",
     deleteConfirmation: "Are you sure you want to delete this booking?",
     actionUndone: "This action cannot be undone.",
@@ -3360,25 +2479,14 @@ const translations = {
     deleting: "Deleting...",
     bookingDeleted: "Booking deleted successfully!",
     deleteFailed: "Failed to delete booking",
-    statusUpdated: "Booking status updated successfully!",
-    statusUpdateFailed: "Failed to update booking status",
     bookingDetails: "Booking Details",
     guestInformation: "Guest Information",
     houseInformation: "House Information",
     bookingInformation: "Booking Information",
     paymentInformation: "Payment Information",
-    updateStatus: "Update Status",
-    selectStatus: "Select Status",
-    selectPaymentStatus: "Select Payment Status",
     close: "Close",
     loading: "Loading...",
     fetchError: "Failed to load bookings",
-    confirmBooking: "Confirm Booking",
-    confirmConfirmation: "Are you sure you want to confirm this booking?",
-    cancelBooking: "Cancel Booking",
-    cancelConfirmation: "Are you sure you want to cancel this booking?",
-    completedBooking: "Mark as Completed",
-    completedConfirmation: "Are you sure you want to mark this booking as completed?",
     verified: "Verified",
     failed: "Failed",
     paymentStatus: "Payment Status",
@@ -3422,21 +2530,21 @@ const translations = {
       cancelled: "Cancelled",
       completed: "Completed",
     },
-    required: "This field is required",
-    invalidEmail: "Please enter a valid email address",
-    invalidPhone: "Please enter a valid phone number",
-    invalidNumber: "Please enter a valid number",
-    invalidDate: "Please enter a valid date",
-    minValue: "Value must be at least {min}",
-    maxValue: "Value must not exceed {max}",
-    validationError: "Please fix all validation errors",
-    allFieldsVerified: "All fields verified",
     verifyPayment: "Verify Payment",
     verifyPaymentConfirmation: "Are you sure you want to verify this payment?",
     paymentVerified: "Payment verified successfully!",
     paymentVerificationFailed: "Failed to verify payment",
     cancelBookingConfirmation: "Are you sure you want to cancel this booking?",
     noUserEmail: "No user email found. Please login again.",
+    ownerContactLocked: "Owner contact information is locked until payment is verified",
+    viewOwnerContact: "View Owner Contact",
+    ownerContactInfo: "Owner Contact Information",
+    ownerName: "Owner Name",
+    ownerContact: "Owner Contact",
+    ownerEmail: "Owner Email",
+    success: "Success!",
+    error: "Error",
+    confirm: "Confirm",
   },
   fr: {
     bookingManagement: "Gestion des Réservations",
@@ -3463,7 +2571,6 @@ const translations = {
     of: "de",
     bookings: "réservations",
     viewBooking: "Voir la Réservation",
-    editBooking: "Modifier la Réservation",
     deleteBooking: "Supprimer la Réservation",
     deleteConfirmation: "Êtes-vous sûr de vouloir supprimer cette réservation ?",
     actionUndone: "Cette action est irréversible.",
@@ -3472,25 +2579,14 @@ const translations = {
     deleting: "Suppression...",
     bookingDeleted: "Réservation supprimée avec succès !",
     deleteFailed: "Échec de la suppression de la réservation",
-    statusUpdated: "Statut de la réservation mis à jour avec succès !",
-    statusUpdateFailed: "Échec de la mise à jour du statut",
     bookingDetails: "Détails de la Réservation",
     guestInformation: "Informations de l'Invité",
     houseInformation: "Informations du Logement",
     bookingInformation: "Informations de Réservation",
     paymentInformation: "Informations de Paiement",
-    updateStatus: "Mettre à Jour le Statut",
-    selectStatus: "Sélectionner le Statut",
-    selectPaymentStatus: "Sélectionner le Statut de Paiement",
     close: "Fermer",
     loading: "Chargement...",
     fetchError: "Échec du chargement des réservations",
-    confirmBooking: "Confirmer la Réservation",
-    confirmConfirmation: "Êtes-vous sûr de vouloir confirmer cette réservation ?",
-    cancelBooking: "Annuler la Réservation",
-    cancelConfirmation: "Êtes-vous sûr de vouloir annuler cette réservation ?",
-    completedBooking: "Marquer comme Terminé",
-    completedConfirmation: "Êtes-vous sûr de vouloir marquer cette réservation comme terminée ?",
     verified: "Vérifié",
     failed: "Échoué",
     paymentStatus: "Statut de Paiement",
@@ -3534,21 +2630,21 @@ const translations = {
       cancelled: "Annulé",
       completed: "Terminé",
     },
-    required: "Ce champ est requis",
-    invalidEmail: "Veuillez entrer une adresse email valide",
-    invalidPhone: "Veuillez entrer un numéro de téléphone valide",
-    invalidNumber: "Veuillez entrer un nombre valide",
-    invalidDate: "Veuillez entrer une date valide",
-    minValue: "La valeur doit être au moins {min}",
-    maxValue: "La valeur ne doit pas dépasser {max}",
-    validationError: "Veuillez corriger toutes les erreurs de validation",
-    allFieldsVerified: "Tous les champs sont vérifiés",
     verifyPayment: "Vérifier le Paiement",
     verifyPaymentConfirmation: "Êtes-vous sûr de vouloir vérifier ce paiement ?",
     paymentVerified: "Paiement vérifié avec succès !",
     paymentVerificationFailed: "Échec de la vérification du paiement",
     cancelBookingConfirmation: "Êtes-vous sûr de vouloir annuler cette réservation ?",
     noUserEmail: "Aucun email utilisateur trouvé. Veuillez vous reconnecter.",
+    ownerContactLocked: "Les informations de contact du propriétaire sont verrouillées jusqu'à ce que le paiement soit vérifié",
+    viewOwnerContact: "Voir le Contact du Propriétaire",
+    ownerContactInfo: "Informations de Contact du Propriétaire",
+    ownerName: "Nom du Propriétaire",
+    ownerContact: "Contact du Propriétaire",
+    ownerEmail: "Email du Propriétaire",
+    success: "Succès !",
+    error: "Erreur",
+    confirm: "Confirmer",
   },
   rw: {
     bookingManagement: "Gucunga Ibyanditswe",
@@ -3575,7 +2671,6 @@ const translations = {
     of: "muri",
     bookings: "ibyanditswe",
     viewBooking: "Reba Icyanditswe",
-    editBooking: "Hindura Icyanditswe",
     deleteBooking: "Kuraho Icyanditswe",
     deleteConfirmation: "Uri kwizera ko ushaka gukuraho iki cyanditswe?",
     actionUndone: "Iki gikorwa ntikishobora guhindurwa.",
@@ -3584,25 +2679,14 @@ const translations = {
     deleting: "Birakurwaho...",
     bookingDeleted: "Icyanditswe cyakuweho neza!",
     deleteFailed: "Kuraho icyanditswe birananiranye",
-    statusUpdated: "Ihagaze ry'icyanditswe ryavuguruwe neza!",
-    statusUpdateFailed: "Kuvugurura ihagaze birananiranye",
     bookingDetails: "Ibisobanuro by'Icyanditswe",
     guestInformation: "Amakuru y'Umushyitsi",
     houseInformation: "Amakuru y'Inzu",
     bookingInformation: "Amakuru y'Icyanditswe",
     paymentInformation: "Amakuru y'Amahoro",
-    updateStatus: "Vugurura Ihagaze",
-    selectStatus: "Hitamo Ihagaze",
-    selectPaymentStatus: "Hitamo Ihagaze ry'Amahoro",
     close: "Funga",
     loading: "Birakoreshwa...",
     fetchError: "Kubura ibyanditswe birananiranye",
-    confirmBooking: "Emeza Icyanditswe",
-    confirmConfirmation: "Uri kwizera ko ushaka kwemeza iki cyanditswe?",
-    cancelBooking: "Hagarika Icyanditswe",
-    cancelConfirmation: "Uri kwizera ko ushaka guhagarika iki cyanditswe?",
-    completedBooking: "Shyira ku Rangiye",
-    completedConfirmation: "Uri kwizera ko ushaka gushyira iki cyanditswe ku rangiye?",
     verified: "Byagenzuwe",
     failed: "Byananiwe",
     paymentStatus: "Ihagaze ry'Amahoro",
@@ -3646,21 +2730,21 @@ const translations = {
       cancelled: "Byahagaritswe",
       completed: "Byarangiye",
     },
-    required: "Iki gikurikira kirakenewe",
-    invalidEmail: "Tanga imeri ikoreshwa neza",
-    invalidPhone: "Tanga numero ya telefone ikoreshwa neza",
-    invalidNumber: "Tanga numero ikoreshwa neza",
-    invalidDate: "Tanga itariki ikoreshwa neza",
-    minValue: "Agaciro kagombye kuba byibuze {min}",
-    maxValue: "Agaciro ntikagombye kurenza {max}",
-    validationError: "Kosora amakosa yose yo kwemeza",
-    allFieldsVerified: "Amakosa yose yemejwe",
     verifyPayment: "Kemeza Amahoro",
     verifyPaymentConfirmation: "Uri kwizera ko ushaka kwemeza aya mahoro?",
     paymentVerified: "Amahoro yemejwe neza!",
     paymentVerificationFailed: "Kwemeza amahoro byananiranye",
     cancelBookingConfirmation: "Uri kwizera ko ushaka guhagarika iki cyanditswe?",
     noUserEmail: "Nta imeri y'umukoresha yabonetse. Nyamuneka winjire undi munsi.",
+    ownerContactLocked: "Amakuru yo guhuza nyir'inzu arafunze kugeza igihe amahoro yemejwe",
+    viewOwnerContact: "Reba Amakuru yo Guhuza nyir'inzu",
+    ownerContactInfo: "Amakuru yo Guhuza nyir'inzu",
+    ownerName: "Izina ry'Nyir'inzu",
+    ownerContact: "Kuvugana na Nyir'inzu",
+    ownerEmail: "Imeri ya Nyir'inzu",
+    success: "Byakunze!",
+    error: "Ikosa",
+    confirm: "Emeza",
   },
 };
 
@@ -3672,7 +2756,6 @@ const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
 
 // Helper function to get user email from localStorage
 const getUserEmailFromStorage = (): string => {
-  // First try to get from user object (set during login)
   try {
     const userStr = localStorage.getItem("user");
     if (userStr) {
@@ -3681,11 +2764,10 @@ const getUserEmailFromStorage = (): string => {
         return user.email;
       }
     }
-  } catch (e) {
-    console.error("Error parsing user from localStorage:", e);
+  } catch {
+    // Silently handle error
   }
-  
-  // Try individual keys as fallback
+
   const keys = ["userEmail", "email"];
   for (const key of keys) {
     const value = localStorage.getItem(key);
@@ -3693,7 +2775,7 @@ const getUserEmailFromStorage = (): string => {
       return value;
     }
   }
-  
+
   return "";
 };
 
@@ -3764,15 +2846,39 @@ const transformBookingToUI = (booking: Booking): BookingUI => {
     paymentStatusColor: paymentStatusColors[booking.paymentStatus] || "bg-gray-100 text-gray-800",
     formattedCheckIn: formatDate(booking.checkIn),
     formattedCheckOut: formatDate(booking.checkOut),
-    formattedTotal: `$${booking.totalAmount.toFixed(2)}`,
+    formattedTotal: `RWF ${(booking.totalAmount || 0).toLocaleString()}`,
   };
 };
 
 export const UserBookingManagement: React.FC = () => {
   // Get language from cookies
-  const [lang, setLang] = useState<"en" | "fr" | "rw">(
-    getLanguageFromCookies(),
-  );
+  const [lang, setLang] = useState<"en" | "fr" | "rw">(getLanguageFromCookies());
+
+  // Success/Error modal states
+  const [successModal, setSuccessModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    details?: string;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    details: "",
+  });
+
+  const [errorModal, setErrorModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    details?: string;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    details: "",
+  });
+
   const [bookings, setBookings] = useState<BookingUI[]>([]);
   const [filteredBookings, setFilteredBookings] = useState<BookingUI[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -3780,25 +2886,32 @@ export const UserBookingManagement: React.FC = () => {
 
   // Modal states
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
-  const [isCompletedModalOpen, setIsCompletedModalOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-  const [isVerifyPaymentModalOpen, setIsVerifyPaymentModalOpen] = useState(false);
+  const [isOwnerContactModalOpen, setIsOwnerContactModalOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<BookingUI | null>(null);
-  
-  // Edit form state
-  const [editFormData, setEditFormData] = useState<Partial<Booking>>({
-    status: "pending",
-    paymentStatus: "pending",
-    notes: "",
+
+  // Confirm Modal state
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    confirmText?: string;
+    cancelText?: string;
+    type?: "danger" | "warning" | "info" | "success";
+    icon?: React.ReactNode;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: () => {},
+    confirmText: "Confirm",
+    cancelText: "Cancel",
+    type: "warning",
   });
 
   // Loading states
   const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
 
   // Statistics
@@ -3815,22 +2928,55 @@ export const UserBookingManagement: React.FC = () => {
   // Get user email from localStorage
   const userEmail = getUserEmailFromStorage();
 
+  const showSuccessModal = (title: string, message: string, details?: string) => {
+    setSuccessModal({ isOpen: true, title, message, details });
+  };
+
+  const showErrorModal = (title: string, message: string, details?: string) => {
+    setErrorModal({ isOpen: true, title, message, details });
+  };
+
+  const showConfirmModal = (
+    title: string,
+    message: string,
+    onConfirm: () => void,
+    confirmText?: string,
+    cancelText?: string,
+    type?: "danger" | "warning" | "info" | "success",
+    icon?: React.ReactNode,
+  ) => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      onConfirm,
+      confirmText: confirmText || t.confirm || "Confirm",
+      cancelText: cancelText || t.cancel || "Cancel",
+      type: type || "warning",
+      icon,
+    });
+  };
+
+  const closeConfirmModal = () => {
+    setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+  };
+
   // Fetch bookings by user email - GET /bookings/:email using axios
   const fetchBookings = async () => {
     setIsFetching(true);
     try {
       const currentEmail = getUserEmailFromStorage();
-      
+
       if (!currentEmail) {
-        toast.error(`❌ ${t.noUserEmail}`);
+        showErrorModal(t.error || "Error", t.noUserEmail || "No user email found. Please login again.");
         setIsFetching(false);
         return;
       }
 
       const response = await apiClient.get(`/bookings/email/${encodeURIComponent(currentEmail)}`);
-      
+
       let bookingsData: Booking[] = [];
-      
+
       if (response.data.success && Array.isArray(response.data.data)) {
         bookingsData = response.data.data;
       } else if (Array.isArray(response.data)) {
@@ -3842,20 +2988,19 @@ export const UserBookingManagement: React.FC = () => {
       } else if (response.data.booking) {
         bookingsData = [response.data.booking];
       }
-      
+
       const transformedBookings = bookingsData.map((booking: Booking) => transformBookingToUI(booking));
       setBookings(transformedBookings);
     } catch (error) {
-      console.error("Error fetching bookings:", error);
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError;
         if (axiosError.response?.status === 404) {
-          toast.error(`❌ ${t.noUserEmail}`);
+          showErrorModal(t.error || "Error", t.noUserEmail || "No user email found. Please login again.");
         } else {
-          toast.error(`❌ ${t.fetchError}`);
+          showErrorModal(t.error || "Error", t.fetchError || "Failed to load bookings");
         }
       } else {
-        toast.error(`❌ ${t.fetchError}`);
+        showErrorModal(t.error || "Error", t.fetchError || "Failed to load bookings");
       }
     } finally {
       setIsFetching(false);
@@ -3987,38 +3132,10 @@ export const UserBookingManagement: React.FC = () => {
 
   // Format currency
   const formatCurrency = (amount: number): string => {
-    return `$${amount.toFixed(2)}`;
+    return `RWF ${(amount || 0).toLocaleString()}`;
   };
 
-  // CRUD Operations using axios
-  const handleUpdateBooking = async () => {
-    if (!selectedBooking) return;
-
-    setIsSubmitting(true);
-
-    try {
-      const response = await apiClient.put(`/bookings/${selectedBooking._id}`, editFormData);
-
-      const updatedBooking = response.data;
-      const transformedBooking = transformBookingToUI(updatedBooking);
-
-      const updatedBookings = bookings.map((b) =>
-        b._id === selectedBooking._id ? transformedBooking : b
-      );
-      setBookings(updatedBookings);
-
-      toast.success(`✅ ${t.statusUpdated}`);
-      setIsEditModalOpen(false);
-      setSelectedBooking(null);
-      setEditFormData({ status: "pending", paymentStatus: "pending", notes: "" });
-    } catch (error) {
-      toast.error(`❌ ${t.statusUpdateFailed}`);
-      console.error("Update booking error:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
+  // Delete booking
   const handleDeleteBooking = async () => {
     if (!selectedBooking) return;
 
@@ -4028,128 +3145,17 @@ export const UserBookingManagement: React.FC = () => {
       await apiClient.delete(`/bookings/${selectedBooking._id}`);
 
       setBookings(bookings.filter((b) => b._id !== selectedBooking._id));
-      toast.success(`🗑️ ${t.bookingDeleted}`);
-      setIsDeleteModalOpen(false);
+      showSuccessModal(
+        t.success || "Success!",
+        t.bookingDeleted || "Booking deleted successfully!",
+        `Booking ${selectedBooking.bookingId} has been removed`
+      );
+      closeConfirmModal();
       setSelectedBooking(null);
-    } catch (error) {
-      toast.error(`❌ ${t.deleteFailed}`);
-      console.error("Delete booking error:", error);
+    } catch {
+      showErrorModal(t.error || "Error", t.deleteFailed || "Failed to delete booking");
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleConfirmBooking = async () => {
-    if (!selectedBooking) return;
-
-    setIsSubmitting(true);
-
-    try {
-      const response = await apiClient.put(`/bookings/${selectedBooking._id}/status`, {
-        status: "confirmed"
-      });
-
-      const updatedBooking = response.data;
-      const transformedBooking = transformBookingToUI(updatedBooking);
-
-      const updatedBookings = bookings.map((b) =>
-        b._id === selectedBooking._id ? transformedBooking : b
-      );
-      setBookings(updatedBookings);
-
-      toast.success(`✅ Booking confirmed successfully!`);
-      setIsConfirmModalOpen(false);
-      setSelectedBooking(null);
-    } catch (error) {
-      toast.error(`❌ Failed to confirm booking`);
-      console.error("Confirm booking error:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleCancelBooking = async () => {
-    if (!selectedBooking) return;
-
-    setIsSubmitting(true);
-
-    try {
-      const response = await apiClient.put(`/bookings/${selectedBooking._id}/cancel`);
-
-      const updatedBooking = response.data;
-      const transformedBooking = transformBookingToUI(updatedBooking);
-
-      const updatedBookings = bookings.map((b) =>
-        b._id === selectedBooking._id ? transformedBooking : b
-      );
-      setBookings(updatedBookings);
-
-      toast.success(`✅ Booking cancelled successfully!`);
-      setIsCancelModalOpen(false);
-      setSelectedBooking(null);
-    } catch (error) {
-      toast.error(`❌ Failed to cancel booking`);
-      console.error("Cancel booking error:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleCompleteBooking = async () => {
-    if (!selectedBooking) return;
-
-    setIsSubmitting(true);
-
-    try {
-      const response = await apiClient.put(`/bookings/${selectedBooking._id}/status`, {
-        status: "completed"
-      });
-
-      const updatedBooking = response.data;
-      const transformedBooking = transformBookingToUI(updatedBooking);
-
-      const updatedBookings = bookings.map((b) =>
-        b._id === selectedBooking._id ? transformedBooking : b
-      );
-      setBookings(updatedBookings);
-
-      toast.success(`✅ Booking marked as completed!`);
-      setIsCompletedModalOpen(false);
-      setSelectedBooking(null);
-    } catch (error) {
-      toast.error(`❌ Failed to complete booking`);
-      console.error("Complete booking error:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleVerifyPayment = async () => {
-    if (!selectedBooking) return;
-
-    setIsSubmitting(true);
-
-    try {
-      const response = await apiClient.put(`/bookings/${selectedBooking._id}/verify-payment`, {
-        paymentStatus: "verified"
-      });
-
-      const updatedBooking = response.data;
-      const transformedBooking = transformBookingToUI(updatedBooking);
-
-      const updatedBookings = bookings.map((b) =>
-        b._id === selectedBooking._id ? transformedBooking : b
-      );
-      setBookings(updatedBookings);
-
-      toast.success(`✅ ${t.paymentVerified}`);
-      setIsVerifyPaymentModalOpen(false);
-      setSelectedBooking(null);
-    } catch (error) {
-      toast.error(`❌ ${t.paymentVerificationFailed}`);
-      console.error("Verify payment error:", error);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -4159,39 +3165,22 @@ export const UserBookingManagement: React.FC = () => {
     setIsViewModalOpen(true);
   };
 
-  const openEditModal = (booking: BookingUI) => {
-    setSelectedBooking(booking);
-    setEditFormData({
-      status: booking.status,
-      paymentStatus: booking.paymentStatus,
-      notes: booking.notes || "",
-    });
-    setIsEditModalOpen(true);
-  };
-
   const openDeleteModal = (booking: BookingUI) => {
     setSelectedBooking(booking);
-    setIsDeleteModalOpen(true);
+    showConfirmModal(
+      "⚠️ " + t.deleteBooking || "Delete Booking",
+      `${t.deleteConfirmation || "Are you sure you want to delete this booking?"} ${t.actionUndone || "This action cannot be undone."}`,
+      handleDeleteBooking,
+      t.delete || "Delete",
+      t.cancel || "Cancel",
+      "danger",
+      <DeleteIcon className="w-10 h-10" />,
+    );
   };
 
-  const openConfirmModal = (booking: BookingUI) => {
+  const openOwnerContactModal = (booking: BookingUI) => {
     setSelectedBooking(booking);
-    setIsConfirmModalOpen(true);
-  };
-
-  const openCancelModal = (booking: BookingUI) => {
-    setSelectedBooking(booking);
-    setIsCancelModalOpen(true);
-  };
-
-  const openCompletedModal = (booking: BookingUI) => {
-    setSelectedBooking(booking);
-    setIsCompletedModalOpen(true);
-  };
-
-  const openVerifyPaymentModal = (booking: BookingUI) => {
-    setSelectedBooking(booking);
-    setIsVerifyPaymentModalOpen(true);
+    setIsOwnerContactModalOpen(true);
   };
 
   // Modal variants
@@ -4220,6 +3209,38 @@ export const UserBookingManagement: React.FC = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Success Modal */}
+      <SuccessModal
+        isOpen={successModal.isOpen}
+        onClose={() => setSuccessModal({ ...successModal, isOpen: false })}
+        title={successModal.title}
+        message={successModal.message}
+        details={successModal.details}
+      />
+
+      {/* Error Modal */}
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        onClose={() => setErrorModal({ ...errorModal, isOpen: false })}
+        title={errorModal.title}
+        message={errorModal.message}
+        details={errorModal.details}
+      />
+
+      {/* Confirm Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={closeConfirmModal}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText={confirmModal.confirmText}
+        cancelText={confirmModal.cancelText}
+        isSubmitting={isLoading}
+        type={confirmModal.type}
+        icon={confirmModal.icon}
+      />
+
       {/* Header */}
       <div className="mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -4249,38 +3270,23 @@ export const UserBookingManagement: React.FC = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
-        <motion.div
-          whileHover={{ y: -2 }}
-          className="bg-white rounded-xl p-4 shadow-sm border border-gray-200"
-        >
+        <motion.div whileHover={{ y: -2 }} className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
           <p className="text-xs text-gray-500">{t.total}</p>
           <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
         </motion.div>
-        <motion.div
-          whileHover={{ y: -2 }}
-          className="bg-yellow-50 rounded-xl p-4 shadow-sm border border-yellow-200"
-        >
+        <motion.div whileHover={{ y: -2 }} className="bg-yellow-50 rounded-xl p-4 shadow-sm border border-yellow-200">
           <p className="text-xs text-yellow-600">{t.pending}</p>
           <p className="text-2xl font-bold text-yellow-700">{stats.pending}</p>
         </motion.div>
-        <motion.div
-          whileHover={{ y: -2 }}
-          className="bg-green-50 rounded-xl p-4 shadow-sm border border-green-200"
-        >
+        <motion.div whileHover={{ y: -2 }} className="bg-green-50 rounded-xl p-4 shadow-sm border border-green-200">
           <p className="text-xs text-green-600">{t.confirmed}</p>
           <p className="text-2xl font-bold text-green-700">{stats.confirmed}</p>
         </motion.div>
-        <motion.div
-          whileHover={{ y: -2 }}
-          className="bg-red-50 rounded-xl p-4 shadow-sm border border-red-200"
-        >
+        <motion.div whileHover={{ y: -2 }} className="bg-red-50 rounded-xl p-4 shadow-sm border border-red-200">
           <p className="text-xs text-red-600">{t.cancelled}</p>
           <p className="text-2xl font-bold text-red-700">{stats.cancelled}</p>
         </motion.div>
-        <motion.div
-          whileHover={{ y: -2 }}
-          className="bg-blue-50 rounded-xl p-4 shadow-sm border border-blue-200"
-        >
+        <motion.div whileHover={{ y: -2 }} className="bg-blue-50 rounded-xl p-4 shadow-sm border border-blue-200">
           <p className="text-xs text-blue-600">{t.completed}</p>
           <p className="text-2xl font-bold text-blue-700">{stats.completed}</p>
         </motion.div>
@@ -4324,7 +3330,7 @@ export const UserBookingManagement: React.FC = () => {
         </div>
       </div>
 
-      {/* Bookings Table */}
+      {/* Bookings Table - ONLY View and Delete buttons */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -4402,21 +3408,13 @@ export const UserBookingManagement: React.FC = () => {
                       </p>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <span
-                        className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
-                          booking.status,
-                        )}`}
-                      >
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(booking.status)}`}>
                         {getStatusLabel(booking.status)}
                       </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex flex-col gap-0.5">
-                        <span
-                          className={`px-2 py-0.5 text-xs font-medium rounded-full ${getPaymentStatusColor(
-                            booking.paymentStatus,
-                          )}`}
-                        >
+                        <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getPaymentStatusColor(booking.paymentStatus)}`}>
                           {getPaymentStatusLabel(booking.paymentStatus)}
                         </span>
                         <span className="text-xs font-medium text-gray-900">
@@ -4429,7 +3427,7 @@ export const UserBookingManagement: React.FC = () => {
                       <p className="text-xs text-gray-400">{booking.formattedCheckOut}</p>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center justify-center gap-0.5 flex-nowrap">
+                      <div className="flex items-center justify-center gap-1 flex-nowrap">
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
@@ -4439,59 +3437,6 @@ export const UserBookingManagement: React.FC = () => {
                         >
                           <VisibilityIcon className="w-4 h-4" />
                         </motion.button>
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => openEditModal(booking)}
-                          className="p-1 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                          title={t.editBooking}
-                        >
-                          <EditIcon className="w-4 h-4" />
-                        </motion.button>
-                        {booking.status === "pending" && (
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => openConfirmModal(booking)}
-                            className="p-1 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                            title={t.confirmBooking}
-                          >
-                            <CheckCircleIcon className="w-4 h-4" />
-                          </motion.button>
-                        )}
-                        {booking.paymentStatus === "pending" && (
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => openVerifyPaymentModal(booking)}
-                            className="p-1 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-                            title={t.verifyPayment}
-                          >
-                            <VerifiedIcon className="w-4 h-4" />
-                          </motion.button>
-                        )}
-                        {booking.status === "pending" && (
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => openCancelModal(booking)}
-                            className="p-1 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-                            title={t.cancelBooking}
-                          >
-                            <CancelIcon className="w-4 h-4" />
-                          </motion.button>
-                        )}
-                        {booking.status === "confirmed" && (
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => openCompletedModal(booking)}
-                            className="p-1 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-                            title={t.completedBooking}
-                          >
-                            <AssignmentIcon className="w-4 h-4" />
-                          </motion.button>
-                        )}
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
@@ -4511,8 +3456,7 @@ export const UserBookingManagement: React.FC = () => {
         </div>
         <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
           <p className="text-sm text-gray-500">
-            {t.showing} {filteredBookings.length} {t.of} {bookings.length}{" "}
-            {t.bookings}
+            {t.showing} {filteredBookings.length} {t.of} {bookings.length} {t.bookings}
           </p>
         </div>
       </div>
@@ -4540,9 +3484,7 @@ export const UserBookingManagement: React.FC = () => {
                 <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl z-10">
                   <div className="flex items-center gap-2">
                     <CalendarTodayIcon className="text-[#FF385C] w-5 h-5" />
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      {t.bookingDetails}
-                    </h2>
+                    <h2 className="text-xl font-semibold text-gray-900">{t.bookingDetails}</h2>
                     <span className="ml-2 text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
                       {selectedBooking.bookingId}
                     </span>
@@ -4627,9 +3569,28 @@ export const UserBookingManagement: React.FC = () => {
                         <label className="text-xs font-medium text-gray-500">{t.owner}</label>
                         <p className="text-sm text-gray-900">{selectedBooking.ownerName || "N/A"}</p>
                       </div>
+                      {/* Owner Contact - Locked until payment verified */}
                       <div>
                         <label className="text-xs font-medium text-gray-500">Owner Contact</label>
-                        <p className="text-sm text-gray-900">{selectedBooking.ownerContact || "N/A"}</p>
+                        {selectedBooking.paymentStatus === "verified" ? (
+                          <p className="text-sm text-gray-900">{selectedBooking.ownerContact || "N/A"}</p>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm text-gray-400 flex items-center gap-1">
+                              <LockIcon className="w-3 h-3" />
+                              Locked
+                            </p>
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => openOwnerContactModal(selectedBooking)}
+                              className="text-xs text-[#FF385C] font-medium hover:underline flex items-center gap-1"
+                            >
+                              <ContactPhoneIcon className="w-3 h-3" />
+                              {t.viewOwnerContact}
+                            </motion.button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -4761,131 +3722,9 @@ export const UserBookingManagement: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Edit Modal */}
+      {/* Owner Contact Modal - Only shown when payment is verified */}
       <AnimatePresence>
-        {isEditModalOpen && selectedBooking && (
-          <>
-            <motion.div
-              variants={overlayVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-              onClick={() => setIsEditModalOpen(false)}
-            />
-            <motion.div
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-            >
-              <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white relative">
-                <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl z-10">
-                  <div className="flex items-center gap-2">
-                    <EditIcon className="text-[#FF385C] w-5 h-5" />
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      {t.editBooking} - {selectedBooking.bookingId}
-                    </h2>
-                  </div>
-                  <motion.button
-                    whileHover={{ rotate: 90, scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setIsEditModalOpen(false)}
-                    className="p-1 rounded-full transition-colors hover:bg-gray-100 text-gray-500"
-                  >
-                    <CloseIcon className="w-5 h-5" />
-                  </motion.button>
-                </div>
-
-                <div className="p-6 space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      {t.status}
-                    </label>
-                    <select
-                      value={editFormData.status || "pending"}
-                      onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value as any })}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
-                    >
-                      <option value="pending">{t.statuses.pending}</option>
-                      <option value="confirmed">{t.statuses.confirmed}</option>
-                      <option value="cancelled">{t.statuses.cancelled}</option>
-                      <option value="completed">{t.statuses.completed}</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      {t.paymentStatus}
-                    </label>
-                    <select
-                      value={editFormData.paymentStatus || "pending"}
-                      onChange={(e) => setEditFormData({ ...editFormData, paymentStatus: e.target.value as any })}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
-                    >
-                      <option value="pending">{t.paymentStatuses.pending}</option>
-                      <option value="verified">{t.paymentStatuses.verified}</option>
-                      <option value="failed">{t.paymentStatuses.failed}</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      {t.notes}
-                    </label>
-                    <textarea
-                      value={editFormData.notes || ""}
-                      onChange={(e) => setEditFormData({ ...editFormData, notes: e.target.value })}
-                      rows={4}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm resize-none"
-                      placeholder="Add notes about this booking..."
-                    />
-                  </div>
-
-                  <div className="flex gap-3 pt-4 border-t border-gray-200">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleUpdateBooking}
-                      disabled={isSubmitting}
-                      className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors flex items-center justify-center gap-2 ${
-                        isSubmitting
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-[#FF385C] hover:bg-[#E31C5F]"
-                      }`}
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          {t.loading}
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-4 h-4" />
-                          {t.updateStatus}
-                        </>
-                      )}
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => setIsEditModalOpen(false)}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-                    >
-                      {t.cancel}
-                    </motion.button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Confirm Modal */}
-      <AnimatePresence>
-        {isConfirmModalOpen && selectedBooking && (
+        {isOwnerContactModalOpen && selectedBooking && selectedBooking.paymentStatus === "verified" && (
           <>
             <motion.div
               variants={overlayVariants}
@@ -4894,7 +3733,7 @@ export const UserBookingManagement: React.FC = () => {
               exit="exit"
               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
               onClick={() => {
-                setIsConfirmModalOpen(false);
+                setIsOwnerContactModalOpen(false);
                 setSelectedBooking(null);
               }}
             />
@@ -4907,376 +3746,64 @@ export const UserBookingManagement: React.FC = () => {
             >
               <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative">
                 <div className="p-6">
-                  <div className="flex items-center justify-center mb-4">
-                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                      <CheckCircleIcon className="w-8 h-8 text-green-600" />
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <ContactPhoneIcon className="w-6 h-6 text-[#FF385C]" />
+                      <h3 className="text-xl font-semibold text-gray-900">
+                        {t.ownerContactInfo}
+                      </h3>
                     </div>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">
-                    {t.confirmBooking}
-                  </h3>
-                  <p className="text-gray-500 text-center mb-6">
-                    {t.confirmConfirmation}
-                    <br />
-                    <span className="text-sm text-gray-400">
-                      Booking: {selectedBooking.bookingId}
-                    </span>
-                  </p>
-                  <div className="flex gap-3">
                     <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                      whileHover={{ rotate: 90, scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
                       onClick={() => {
-                        setIsConfirmModalOpen(false);
+                        setIsOwnerContactModalOpen(false);
                         setSelectedBooking(null);
                       }}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                      className="p-1 rounded-full transition-colors hover:bg-gray-100 text-gray-500"
                     >
-                      {t.cancel}
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleConfirmBooking}
-                      disabled={isSubmitting}
-                      className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors ${
-                        isSubmitting
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-green-600 hover:bg-green-700"
-                      }`}
-                    >
-                      {isSubmitting ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          {t.loading}
-                        </span>
-                      ) : (
-                        t.confirmBooking
-                      )}
+                      <CloseIcon className="w-5 h-5" />
                     </motion.button>
                   </div>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
 
-      {/* Verify Payment Modal */}
-      <AnimatePresence>
-        {isVerifyPaymentModalOpen && selectedBooking && (
-          <>
-            <motion.div
-              variants={overlayVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-              onClick={() => {
-                setIsVerifyPaymentModalOpen(false);
-                setSelectedBooking(null);
-              }}
-            />
-            <motion.div
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-            >
-              <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative">
-                <div className="p-6">
-                  <div className="flex items-center justify-center mb-4">
-                    <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
-                      <VerifiedIcon className="w-8 h-8 text-purple-600" />
+                  <div className="space-y-4 bg-gray-50 rounded-lg p-4">
+                    <div>
+                      <label className="text-xs font-medium text-gray-500">{t.ownerName}</label>
+                      <p className="text-sm font-medium text-gray-900">{selectedBooking.ownerName || "N/A"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-500">{t.ownerContact}</label>
+                      <p className="text-sm text-gray-900 flex items-center gap-1">
+                        <PhoneIcon className="w-3 h-3 text-gray-400" />
+                        {selectedBooking.ownerContact || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-500">{t.ownerEmail}</label>
+                      <p className="text-sm text-gray-900 flex items-center gap-1">
+                        <EmailIcon className="w-3 h-3 text-gray-400" />
+                        {selectedBooking.ownerEmail || "N/A"}
+                      </p>
+                    </div>
+                    <div className="pt-3 border-t border-gray-200">
+                      <p className="text-xs text-green-600 flex items-center gap-1">
+                        <VerifiedIcon className="w-3 h-3" />
+                        Payment verified - Contact information unlocked
+                      </p>
                     </div>
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">
-                    {t.verifyPayment}
-                  </h3>
-                  <p className="text-gray-500 text-center mb-6">
-                    {t.verifyPaymentConfirmation}
-                    <br />
-                    <span className="text-sm text-gray-400">
-                      Booking: {selectedBooking.bookingId}
-                    </span>
-                    <br />
-                    <span className="text-sm text-gray-400">
-                      Amount: {selectedBooking.formattedTotal}
-                    </span>
-                  </p>
-                  <div className="flex gap-3">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => {
-                        setIsVerifyPaymentModalOpen(false);
-                        setSelectedBooking(null);
-                      }}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-                    >
-                      {t.cancel}
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleVerifyPayment}
-                      disabled={isSubmitting}
-                      className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors ${
-                        isSubmitting
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-purple-600 hover:bg-purple-700"
-                      }`}
-                    >
-                      {isSubmitting ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          {t.loading}
-                        </span>
-                      ) : (
-                        t.verifyPayment
-                      )}
-                    </motion.button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
 
-      {/* Cancel Modal */}
-      <AnimatePresence>
-        {isCancelModalOpen && selectedBooking && (
-          <>
-            <motion.div
-              variants={overlayVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-              onClick={() => {
-                setIsCancelModalOpen(false);
-                setSelectedBooking(null);
-              }}
-            />
-            <motion.div
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-            >
-              <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative">
-                <div className="p-6">
-                  <div className="flex items-center justify-center mb-4">
-                    <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center">
-                      <CancelIcon className="w-8 h-8 text-orange-600" />
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">
-                    {t.cancelBooking}
-                  </h3>
-                  <p className="text-gray-500 text-center mb-6">
-                    {t.cancelConfirmation}
-                    <br />
-                    <span className="text-sm text-gray-400">
-                      Booking: {selectedBooking.bookingId}
-                    </span>
-                  </p>
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 mt-4">
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => {
-                        setIsCancelModalOpen(false);
+                        setIsOwnerContactModalOpen(false);
                         setSelectedBooking(null);
                       }}
                       className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
                     >
-                      {t.cancel}
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleCancelBooking}
-                      disabled={isSubmitting}
-                      className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors ${
-                        isSubmitting
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-orange-600 hover:bg-orange-700"
-                      }`}
-                    >
-                      {isSubmitting ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          {t.loading}
-                        </span>
-                      ) : (
-                        t.cancelBooking
-                      )}
-                    </motion.button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Complete Modal */}
-      <AnimatePresence>
-        {isCompletedModalOpen && selectedBooking && (
-          <>
-            <motion.div
-              variants={overlayVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-              onClick={() => {
-                setIsCompletedModalOpen(false);
-                setSelectedBooking(null);
-              }}
-            />
-            <motion.div
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-            >
-              <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative">
-                <div className="p-6">
-                  <div className="flex items-center justify-center mb-4">
-                    <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
-                      <AssignmentIcon className="w-8 h-8 text-purple-600" />
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">
-                    {t.completedBooking}
-                  </h3>
-                  <p className="text-gray-500 text-center mb-6">
-                    {t.completedConfirmation}
-                    <br />
-                    <span className="text-sm text-gray-400">
-                      Booking: {selectedBooking.bookingId}
-                    </span>
-                  </p>
-                  <div className="flex gap-3">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => {
-                        setIsCompletedModalOpen(false);
-                        setSelectedBooking(null);
-                      }}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-                    >
-                      {t.cancel}
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleCompleteBooking}
-                      disabled={isSubmitting}
-                      className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors ${
-                        isSubmitting
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-purple-600 hover:bg-purple-700"
-                      }`}
-                    >
-                      {isSubmitting ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          {t.loading}
-                        </span>
-                      ) : (
-                        t.completedBooking
-                      )}
-                    </motion.button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Delete Confirmation Modal */}
-      <AnimatePresence>
-        {isDeleteModalOpen && selectedBooking && (
-          <>
-            <motion.div
-              variants={overlayVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-              onClick={() => {
-                setIsDeleteModalOpen(false);
-                setSelectedBooking(null);
-              }}
-            />
-            <motion.div
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-            >
-              <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative">
-                <div className="p-6">
-                  <div className="flex items-center justify-center mb-4">
-                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                      <DeleteIcon className="w-8 h-8 text-red-600" />
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">
-                    {t.deleteBooking}
-                  </h3>
-                  <p className="text-gray-500 text-center mb-6">
-                    {t.deleteConfirmation}
-                    <br />
-                    <span className="text-sm text-gray-400">
-                      {t.actionUndone}
-                    </span>
-                    <br />
-                    <span className="text-sm text-gray-400">
-                      Booking: {selectedBooking.bookingId}
-                    </span>
-                  </p>
-                  <div className="flex gap-3">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => {
-                        setIsDeleteModalOpen(false);
-                        setSelectedBooking(null);
-                      }}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-                    >
-                      {t.cancel}
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleDeleteBooking}
-                      disabled={isLoading}
-                      className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors ${
-                        isLoading
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-red-600 hover:bg-red-700"
-                      }`}
-                    >
-                      {isLoading ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          {t.deleting}
-                        </span>
-                      ) : (
-                        t.delete
-                      )}
+                      {t.close}
                     </motion.button>
                   </div>
                 </div>

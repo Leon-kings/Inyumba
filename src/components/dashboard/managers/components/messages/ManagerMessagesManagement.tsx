@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+// /* eslint-disable @typescript-eslint/no-unused-vars */
 // /* eslint-disable react-hooks/exhaustive-deps */
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 // /* eslint-disable react-hooks/set-state-in-effect */
@@ -7,6 +7,7 @@
 // import { toast } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
 // import Cookies from "js-cookie";
+// import axios from "axios";
 
 // // Material-UI Icons
 // import MessageIcon from "@mui/icons-material/Message";
@@ -25,6 +26,8 @@
 // import UnarchiveIcon from "@mui/icons-material/Unarchive";
 // import SendIcon from "@mui/icons-material/Send";
 
+// // API Configuration
+// const API_URL = "https://rene-inyumba-nodejs.onrender.com/contact";
 
 // // Types - Updated to match the contact model
 // interface Contact {
@@ -367,9 +370,6 @@
 //   return lang || "en";
 // };
 
-// // API Base URL
-// const API_URL = "https://rene-inyumba-nodejs.onrender.com/contact";
-
 // // Helper function to transform contact to message
 // const transformContactToMessage = (contact: Contact): Message => {
 //   const messageText = contact.message || "";
@@ -523,15 +523,12 @@
 
 //   const t = translations[lang];
 
-//   // Fetch messages from API
+//   // Fetch messages from API using axios
 //   const fetchMessages = async () => {
 //     setIsFetching(true);
 //     try {
-//       const response = await fetch(API_URL);
-//       if (!response.ok) {
-//         throw new Error(`HTTP error! status: ${response.status}`);
-//       }
-//       const data = await response.json();
+//       const response = await axios.get(API_URL);
+//       const data = response.data;
 
 //       let contacts: Contact[] = [];
 //       if (Array.isArray(data)) {
@@ -558,7 +555,6 @@
 //       );
 //       setMessages(transformedMessages);
 //     } catch (error) {
-//       console.error("Error fetching messages:", error);
 //       toast.error(`❌ ${t.fetchError}`);
 //     } finally {
 //       setIsFetching(false);
@@ -707,20 +703,14 @@
 //     });
 //   };
 
-//   // CRUD Operations
+//   // CRUD Operations with axios
 //   const handleDeleteMessage = async () => {
 //     if (!selectedMessage) return;
 
 //     setIsLoading(true);
 
 //     try {
-//       const response = await fetch(`${API_URL}/${selectedMessage._id}`, {
-//         method: "DELETE",
-//       });
-
-//       if (!response.ok) {
-//         throw new Error(`HTTP error! status: ${response.status}`);
-//       }
+//       await axios.delete(`${API_URL}/${selectedMessage._id}`);
 
 //       const updatedMessages = messages.filter(
 //         (m) => m._id !== selectedMessage._id,
@@ -732,7 +722,6 @@
 //       setSelectedMessage(null);
 //     } catch (error) {
 //       toast.error(`❌ ${t.deleteFailed}`);
-//       console.error("Delete message error:", error);
 //     } finally {
 //       setIsLoading(false);
 //     }
@@ -747,22 +736,12 @@
 //     setIsSubmitting(true);
 
 //     try {
-//       const response = await fetch(`${API_URL}/${selectedMessage._id}/reply`, {
-//         method: "PUT",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({
-//           replyMessage: replyContent,
-//           status: selectedStatus || "replied",
-//         }),
+//       const response = await axios.put(`${API_URL}/${selectedMessage._id}/reply`, {
+//         replyMessage: replyContent,
+//         status: selectedStatus || "replied",
 //       });
 
-//       if (!response.ok) {
-//         throw new Error(`HTTP error! status: ${response.status}`);
-//       }
-
-//       const updatedContact = await response.json();
+//       const updatedContact = response.data;
 //       const updatedMessage = transformContactToMessage(updatedContact);
 
 //       const updatedMessages = messages.map((m) =>
@@ -776,7 +755,6 @@
 //       setReplyContent("");
 //     } catch (error) {
 //       toast.error(`❌ ${t.replyFailed}`);
-//       console.error("Reply error:", error);
 //     } finally {
 //       setIsSubmitting(false);
 //     }
@@ -787,19 +765,11 @@
 //     newStatus: Message["status"],
 //   ) => {
 //     try {
-//       const response = await fetch(`${API_URL}/${messageId}/status`, {
-//         method: "PUT",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({ status: newStatus }),
+//       const response = await axios.put(`${API_URL}/${messageId}/status`, {
+//         status: newStatus,
 //       });
 
-//       if (!response.ok) {
-//         throw new Error(`HTTP error! status: ${response.status}`);
-//       }
-
-//       const updatedContact = await response.json();
+//       const updatedContact = response.data;
 //       const updatedMessage = transformContactToMessage(updatedContact);
 
 //       const updatedMessages = messages.map((m) =>
@@ -810,7 +780,6 @@
 //       toast.success(`✅ ${t.statusUpdated}`);
 //     } catch (error) {
 //       toast.error(`❌ ${t.statusUpdateFailed}`);
-//       console.error("Status update error:", error);
 //     }
 //   };
 
@@ -836,15 +805,9 @@
 
 //   const handleMarkAsRead = async (messageId: string) => {
 //     try {
-//       const response = await fetch(`${API_URL}/${messageId}/read`, {
-//         method: "PUT",
-//       });
+//       const response = await axios.put(`${API_URL}/${messageId}/read`);
 
-//       if (!response.ok) {
-//         throw new Error(`HTTP error! status: ${response.status}`);
-//       }
-
-//       const updatedContact = await response.json();
+//       const updatedContact = response.data;
 //       const updatedMessage = transformContactToMessage(updatedContact);
 
 //       const updatedMessages = messages.map((m) =>
@@ -852,7 +815,7 @@
 //       );
 //       setMessages(updatedMessages);
 //     } catch (error) {
-//       console.error("Mark as read error:", error);
+//       // Silent fail for mark as read
 //     }
 //   };
 
@@ -1717,26 +1680,12 @@
 // };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "react-toastify";
+
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 import axios from "axios";
@@ -1757,6 +1706,284 @@ import ReplyIcon from "@mui/icons-material/Reply";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import UnarchiveIcon from "@mui/icons-material/Unarchive";
 import SendIcon from "@mui/icons-material/Send";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorIcon from "@mui/icons-material/Error";
+
+// ============================================================
+// MODAL COMPONENTS
+// ============================================================
+
+// Success Modal
+interface SuccessModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  message: string;
+  details?: string;
+}
+
+const SuccessModal: React.FC<SuccessModalProps> = ({
+  isOpen,
+  onClose,
+  title,
+  message,
+  details,
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 to-green-600" />
+        <div className="p-6">
+          <div className="flex items-center justify-center mb-4">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center relative">
+              <div className="absolute inset-0 rounded-full border-4 border-green-200 animate-ping opacity-75" />
+              <CheckCircleIcon className="w-10 h-10 text-green-600 relative z-10" />
+            </div>
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+            {title}
+          </h3>
+          <p className="text-gray-600 text-center mb-2">{message}</p>
+          {details && (
+            <p className="text-sm text-gray-400 text-center mb-6">{details}</p>
+          )}
+          <button
+            onClick={onClose}
+            className="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+          >
+            Got it!
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Error Modal
+interface ErrorModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  message: string;
+  details?: string;
+}
+
+const ErrorModal: React.FC<ErrorModalProps> = ({
+  isOpen,
+  onClose,
+  title,
+  message,
+  details,
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-400 to-red-600" />
+        <div className="p-6">
+          <div className="flex items-center justify-center mb-4">
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center relative">
+              <div className="absolute inset-0 rounded-full border-4 border-red-200 animate-ping opacity-75" />
+              <ErrorIcon className="w-10 h-10 text-red-600 relative z-10" />
+            </div>
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+            {title}
+          </h3>
+          <p className="text-gray-600 text-center mb-2">{message}</p>
+          {details && (
+            <p className="text-sm text-gray-400 text-center mb-6">{details}</p>
+          )}
+          <button
+            onClick={onClose}
+            className="w-full px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Info Modal
+interface InfoModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  message: string;
+  details?: string;
+}
+
+const InfoModal: React.FC<InfoModalProps> = ({
+  isOpen,
+  onClose,
+  title,
+  message,
+  details,
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 to-blue-600" />
+        <div className="p-6">
+          <div className="flex items-center justify-center mb-4">
+            <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center relative">
+              <div className="absolute inset-0 rounded-full border-4 border-blue-200 animate-ping opacity-75" />
+              <MessageIcon className="w-10 h-10 text-blue-600 relative z-10" />
+            </div>
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+            {title}
+          </h3>
+          <p className="text-gray-600 text-center mb-2">{message}</p>
+          {details && (
+            <p className="text-sm text-gray-400 text-center mb-6">{details}</p>
+          )}
+          <button
+            onClick={onClose}
+            className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+          >
+            Got it!
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Confirm Modal
+interface ConfirmModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  icon?: React.ReactNode;
+  isSubmitting?: boolean;
+  type?: "danger" | "warning" | "info" | "success";
+}
+
+const ConfirmModal: React.FC<ConfirmModalProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmText = "Confirm",
+  cancelText = "Cancel",
+  icon,
+  isSubmitting = false,
+  type = "warning",
+}) => {
+  if (!isOpen) return null;
+
+  const getColors = () => {
+    switch (type) {
+      case "danger":
+        return {
+          iconBg: "bg-red-100",
+          iconColor: "text-red-600",
+          iconBorder: "border-red-200",
+          buttonBg: "bg-gradient-to-r from-red-500 to-red-600",
+          buttonHover: "hover:shadow-lg",
+        };
+      case "warning":
+        return {
+          iconBg: "bg-yellow-100",
+          iconColor: "text-yellow-600",
+          iconBorder: "border-yellow-200",
+          buttonBg: "bg-gradient-to-r from-yellow-500 to-yellow-600",
+          buttonHover: "hover:shadow-lg",
+        };
+      case "success":
+        return {
+          iconBg: "bg-green-100",
+          iconColor: "text-green-600",
+          iconBorder: "border-green-200",
+          buttonBg: "bg-gradient-to-r from-green-500 to-green-600",
+          buttonHover: "hover:shadow-lg",
+        };
+      default:
+        return {
+          iconBg: "bg-blue-100",
+          iconColor: "text-blue-600",
+          iconBorder: "border-blue-200",
+          buttonBg: "bg-gradient-to-r from-blue-500 to-blue-600",
+          buttonHover: "hover:shadow-lg",
+        };
+    }
+  };
+
+  const colors = getColors();
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div
+          className={`absolute top-0 left-0 right-0 h-1 ${colors.buttonBg}`}
+        />
+        <div className="p-6">
+          <div className="flex items-center justify-center mb-4">
+            <div
+              className={`w-20 h-20 ${colors.iconBg} rounded-full flex items-center justify-center relative`}
+            >
+              <div
+                className={`absolute inset-0 rounded-full border-4 ${colors.iconBorder} animate-ping opacity-75`}
+              />
+              <div className={`${colors.iconColor} relative z-10`}>
+                {icon ||
+                  (type === "danger" ? (
+                    <DeleteIcon className="w-10 h-10" />
+                  ) : type === "warning" ? (
+                    <ErrorIcon className="w-10 h-10" />
+                  ) : type === "success" ? (
+                    <CheckCircleIcon className="w-10 h-10" />
+                  ) : (
+                    <MessageIcon className="w-10 h-10" />
+                  ))}
+              </div>
+            </div>
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+            {title}
+          </h3>
+          <p className="text-gray-600 text-center mb-6">{message}</p>
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              disabled={isSubmitting}
+              className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+            >
+              {cancelText}
+            </button>
+            <button
+              onClick={onConfirm}
+              disabled={isSubmitting}
+              className={`flex-1 px-4 py-2.5 ${colors.buttonBg} text-white rounded-xl font-medium ${colors.buttonHover} transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2`}
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                confirmText
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // API Configuration
 const API_URL = "https://rene-inyumba-nodejs.onrender.com/contact";
@@ -1904,6 +2131,9 @@ const translations = {
     pleaseFixErrors: "Please fix the errors above",
     managerAccess: "Manager Access",
     managerViewOnly: "You have view and reply access to messages",
+    success: "Success!",
+    error: "Error",
+    confirm: "Confirm",
   },
   fr: {
     messageManagement: "Gestion des Messages",
@@ -1997,7 +2227,11 @@ const translations = {
     allFieldsValid: "Tous les champs sont valides !",
     pleaseFixErrors: "Veuillez corriger les erreurs ci-dessus",
     managerAccess: "Accès Manager",
-    managerViewOnly: "Vous avez un accès en visualisation et réponse aux messages",
+    managerViewOnly:
+      "Vous avez un accès en visualisation et réponse aux messages",
+    success: "Succès !",
+    error: "Erreur",
+    confirm: "Confirmer",
   },
   rw: {
     messageManagement: "Gucunga Ubutumwa",
@@ -2093,6 +2327,9 @@ const translations = {
     pleaseFixErrors: "Kosora amakosa hejuru",
     managerAccess: "Uburenganzira bwa Manager",
     managerViewOnly: "Ufite uburenganzira bwo kureba no gusubiza ubutumwa",
+    success: "Byakunze!",
+    error: "Ikosa",
+    confirm: "Emeza",
   },
 };
 
@@ -2222,6 +2459,44 @@ export const ManagerMessageManagement: React.FC = () => {
   const [lang, setLang] = useState<"en" | "fr" | "rw">(
     getLanguageFromCookies(),
   );
+
+  // Success/Error/Info modal states
+  const [successModal, setSuccessModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    details?: string;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    details: "",
+  });
+
+  const [errorModal, setErrorModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    details?: string;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    details: "",
+  });
+
+  const [infoModal, setInfoModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    details?: string;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    details: "",
+  });
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [filteredMessages, setFilteredMessages] = useState<Message[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -2232,10 +2507,30 @@ export const ManagerMessageManagement: React.FC = () => {
   // Modal states
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [, setIsDeleteModalOpen] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [replyContent, setReplyContent] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
+
+  // Confirm Modal state
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    confirmText?: string;
+    cancelText?: string;
+    type?: "danger" | "warning" | "info" | "success";
+    icon?: React.ReactNode;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: () => {},
+    confirmText: "Confirm",
+    cancelText: "Cancel",
+    type: "warning",
+  });
 
   // Loading states
   const [isLoading, setIsLoading] = useState(false);
@@ -2254,6 +2549,44 @@ export const ManagerMessageManagement: React.FC = () => {
   });
 
   const t = translations[lang];
+
+  const showSuccessModal = (
+    title: string,
+    message: string,
+    details?: string,
+  ) => {
+    setSuccessModal({ isOpen: true, title, message, details });
+  };
+
+  const showErrorModal = (title: string, message: string, details?: string) => {
+    setErrorModal({ isOpen: true, title, message, details });
+  };
+
+
+  const showConfirmModal = (
+    title: string,
+    message: string,
+    onConfirm: () => void,
+    confirmText?: string,
+    cancelText?: string,
+    type?: "danger" | "warning" | "info" | "success",
+    icon?: React.ReactNode,
+  ) => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      onConfirm,
+      confirmText: confirmText || t.confirm || "Confirm",
+      cancelText: cancelText || t.cancel || "Cancel",
+      type: type || "warning",
+      icon,
+    });
+  };
+
+  const closeConfirmModal = () => {
+    setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+  };
 
   // Fetch messages from API using axios
   const fetchMessages = async () => {
@@ -2286,8 +2619,11 @@ export const ManagerMessageManagement: React.FC = () => {
         transformContactToMessage(contact),
       );
       setMessages(transformedMessages);
-    } catch (error) {
-      toast.error(`❌ ${t.fetchError}`);
+    } catch {
+      showErrorModal(
+        t.error || "Error",
+        t.fetchError || "Failed to load messages",
+      );
     } finally {
       setIsFetching(false);
     }
@@ -2449,11 +2785,19 @@ export const ManagerMessageManagement: React.FC = () => {
       );
       setMessages(updatedMessages);
 
-      toast.success(`✅ ${t.messageDeleted}`);
+      showSuccessModal(
+        t.success || "Success!",
+        t.messageDeleted || "Message deleted successfully!",
+        `Message from ${selectedMessage.senderName} has been removed`,
+      );
       setIsDeleteModalOpen(false);
       setSelectedMessage(null);
-    } catch (error) {
-      toast.error(`❌ ${t.deleteFailed}`);
+      closeConfirmModal();
+    } catch {
+      showErrorModal(
+        t.error || "Error",
+        t.deleteFailed || "Failed to delete message",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -2461,17 +2805,20 @@ export const ManagerMessageManagement: React.FC = () => {
 
   const handleSendReply = async () => {
     if (!selectedMessage || !replyContent.trim()) {
-      toast.warning("⚠️ Please enter a reply");
+      showErrorModal(t.error || "Error", "Please enter a reply");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const response = await axios.put(`${API_URL}/${selectedMessage._id}/reply`, {
-        replyMessage: replyContent,
-        status: selectedStatus || "replied",
-      });
+      const response = await axios.put(
+        `${API_URL}/${selectedMessage._id}/reply`,
+        {
+          replyMessage: replyContent,
+          status: selectedStatus || "replied",
+        },
+      );
 
       const updatedContact = response.data;
       const updatedMessage = transformContactToMessage(updatedContact);
@@ -2481,12 +2828,19 @@ export const ManagerMessageManagement: React.FC = () => {
       );
       setMessages(updatedMessages);
 
-      toast.success(`✅ ${t.replySent}`);
+      showSuccessModal(
+        t.success || "Success!",
+        t.replySent || "Reply sent successfully!",
+        `Reply sent to ${selectedMessage.senderName}`,
+      );
       setIsReplyModalOpen(false);
       setSelectedMessage(null);
       setReplyContent("");
-    } catch (error) {
-      toast.error(`❌ ${t.replyFailed}`);
+    } catch {
+      showErrorModal(
+        t.error || "Error",
+        t.replyFailed || "Failed to send reply",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -2509,9 +2863,15 @@ export const ManagerMessageManagement: React.FC = () => {
       );
       setMessages(updatedMessages);
 
-      toast.success(`✅ ${t.statusUpdated}`);
-    } catch (error) {
-      toast.error(`❌ ${t.statusUpdateFailed}`);
+      showSuccessModal(
+        t.success || "Success!",
+        t.statusUpdated || "Message status updated successfully!",
+      );
+    } catch {
+      showErrorModal(
+        t.error || "Error",
+        t.statusUpdateFailed || "Failed to update message status",
+      );
     }
   };
 
@@ -2546,7 +2906,7 @@ export const ManagerMessageManagement: React.FC = () => {
         m._id === messageId ? updatedMessage : m,
       );
       setMessages(updatedMessages);
-    } catch (error) {
+    } catch {
       // Silent fail for mark as read
     }
   };
@@ -2569,7 +2929,15 @@ export const ManagerMessageManagement: React.FC = () => {
 
   const openDeleteModal = (message: Message) => {
     setSelectedMessage(message);
-    setIsDeleteModalOpen(true);
+    showConfirmModal(
+      "⚠️ " + t.deleteMessage || "Delete Message",
+      `${t.deleteConfirmation || "Are you sure you want to delete this message?"} ${t.actionUndone || "This action cannot be undone."}`,
+      handleDeleteMessage,
+      t.delete || "Delete",
+      t.cancel || "Cancel",
+      "danger",
+      <DeleteIcon className="w-10 h-10" />,
+    );
   };
 
   // Modal variants
@@ -2598,6 +2966,47 @@ export const ManagerMessageManagement: React.FC = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Success Modal */}
+      <SuccessModal
+        isOpen={successModal.isOpen}
+        onClose={() => setSuccessModal({ ...successModal, isOpen: false })}
+        title={successModal.title}
+        message={successModal.message}
+        details={successModal.details}
+      />
+
+      {/* Error Modal */}
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        onClose={() => setErrorModal({ ...errorModal, isOpen: false })}
+        title={errorModal.title}
+        message={errorModal.message}
+        details={errorModal.details}
+      />
+
+      {/* Info Modal */}
+      <InfoModal
+        isOpen={infoModal.isOpen}
+        onClose={() => setInfoModal({ ...infoModal, isOpen: false })}
+        title={infoModal.title}
+        message={infoModal.message}
+        details={infoModal.details}
+      />
+
+      {/* Confirm Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={closeConfirmModal}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText={confirmModal.confirmText}
+        cancelText={confirmModal.cancelText}
+        isSubmitting={isLoading}
+        type={confirmModal.type}
+        icon={confirmModal.icon}
+      />
+
       {/* Manager Access Notice */}
       <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center gap-3">
         <MessageIcon className="text-blue-600 w-5 h-5" />
@@ -2890,7 +3299,7 @@ export const ManagerMessageManagement: React.FC = () => {
                             e.stopPropagation();
                             handleToggleStar(message._id);
                           }}
-                          className="p-1.5 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
+                          className={`p-1.5 rounded-lg transition-colors ${message.isStarred ? "text-yellow-400 hover:bg-yellow-50" : "text-gray-400 hover:bg-yellow-50"}`}
                           title={t.toggleStar}
                         >
                           {message.isStarred ? (
@@ -2906,7 +3315,7 @@ export const ManagerMessageManagement: React.FC = () => {
                             e.stopPropagation();
                             handleToggleFlag(message._id);
                           }}
-                          className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className={`p-1.5 rounded-lg transition-colors ${message.isFlagged ? "text-red-400 hover:bg-red-50" : "text-gray-400 hover:bg-red-50"}`}
                           title={t.toggleFlag}
                         >
                           {message.isFlagged ? (
@@ -3320,85 +3729,6 @@ export const ManagerMessageManagement: React.FC = () => {
                       className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
                     >
                       {t.cancel}
-                    </motion.button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Delete Confirmation Modal */}
-      <AnimatePresence>
-        {isDeleteModalOpen && selectedMessage && (
-          <>
-            <motion.div
-              variants={overlayVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-              onClick={() => {
-                setIsDeleteModalOpen(false);
-                setSelectedMessage(null);
-              }}
-            />
-            <motion.div
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-            >
-              <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative">
-                <div className="p-6">
-                  <div className="flex items-center justify-center mb-4">
-                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                      <DeleteIcon className="w-8 h-8 text-red-600" />
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">
-                    {t.deleteMessage}
-                  </h3>
-                  <p className="text-gray-500 text-center mb-6">
-                    {t.deleteConfirmation}
-                    <br />
-                    <span className="text-sm text-gray-400">
-                      {t.actionUndone}
-                    </span>
-                  </p>
-                  <div className="flex gap-3">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => {
-                        setIsDeleteModalOpen(false);
-                        setSelectedMessage(null);
-                      }}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-                    >
-                      {t.cancel}
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleDeleteMessage}
-                      disabled={isLoading}
-                      className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors ${
-                        isLoading
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-red-600 hover:bg-red-700"
-                      }`}
-                    >
-                      {isLoading ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          {t.deleting}
-                        </span>
-                      ) : (
-                        t.delete
-                      )}
                     </motion.button>
                   </div>
                 </div>
