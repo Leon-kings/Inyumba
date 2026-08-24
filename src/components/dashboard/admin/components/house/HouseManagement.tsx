@@ -3,10 +3,224 @@
 // /* eslint-disable react-hooks/set-state-in-effect */
 // import React, { useState, useEffect, useCallback, useRef } from "react";
 // import { motion, AnimatePresence } from "framer-motion";
-// import { toast } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
 // import Cookies from "js-cookie";
 // import axios, { AxiosError } from "axios";
+
+// // ============================================================
+// // MODAL COMPONENTS
+// // ============================================================
+
+// // Success Modal
+// interface SuccessModalProps {
+//   isOpen: boolean;
+//   onClose: () => void;
+//   title: string;
+//   message: string;
+//   details?: string;
+// }
+
+// const SuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose, title, message, details }) => {
+//   if (!isOpen) return null;
+
+//   return (
+//     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+//       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+//         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 to-green-600" />
+//         <div className="p-6">
+//           <div className="flex items-center justify-center mb-4">
+//             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center relative">
+//               <div className="absolute inset-0 rounded-full border-4 border-green-200 animate-ping opacity-75" />
+//               <svg className="w-10 h-10 text-green-600 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+//               </svg>
+//             </div>
+//           </div>
+//           <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">{title}</h3>
+//           <p className="text-gray-600 text-center mb-2">{message}</p>
+//           {details && <p className="text-sm text-gray-400 text-center mb-6">{details}</p>}
+//           <button
+//             onClick={onClose}
+//             className="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+//           >
+//             Got it!
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// // Error Modal
+// interface ErrorModalProps {
+//   isOpen: boolean;
+//   onClose: () => void;
+//   title: string;
+//   message: string;
+//   details?: string;
+// }
+
+// const ErrorModal: React.FC<ErrorModalProps> = ({ isOpen, onClose, title, message, details }) => {
+//   if (!isOpen) return null;
+
+//   return (
+//     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+//       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+//         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-400 to-red-600" />
+//         <div className="p-6">
+//           <div className="flex items-center justify-center mb-4">
+//             <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center relative">
+//               <div className="absolute inset-0 rounded-full border-4 border-red-200 animate-ping opacity-75" />
+//               <svg className="w-10 h-10 text-red-600 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+//               </svg>
+//             </div>
+//           </div>
+//           <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">{title}</h3>
+//           <p className="text-gray-600 text-center mb-2">{message}</p>
+//           {details && <p className="text-sm text-gray-400 text-center mb-6">{details}</p>}
+//           <button
+//             onClick={onClose}
+//             className="w-full px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+//           >
+//             Try Again
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// // Confirm Modal
+// interface ConfirmModalProps {
+//   isOpen: boolean;
+//   onClose: () => void;
+//   onConfirm: () => void;
+//   title: string;
+//   message: string;
+//   confirmText?: string;
+//   cancelText?: string;
+//   icon?: React.ReactNode;
+//   isSubmitting?: boolean;
+//   type?: "danger" | "warning" | "info" | "success";
+// }
+
+// const ConfirmModal: React.FC<ConfirmModalProps> = ({
+//   isOpen,
+//   onClose,
+//   onConfirm,
+//   title,
+//   message,
+//   confirmText = "Confirm",
+//   cancelText = "Cancel",
+//   icon,
+//   isSubmitting = false,
+//   type = "warning",
+// }) => {
+//   if (!isOpen) return null;
+
+//   const getColors = () => {
+//     switch (type) {
+//       case "danger":
+//         return {
+//           iconBg: "bg-red-100",
+//           iconColor: "text-red-600",
+//           iconBorder: "border-red-200",
+//           buttonBg: "bg-gradient-to-r from-red-500 to-red-600",
+//           buttonHover: "hover:shadow-lg",
+//         };
+//       case "warning":
+//         return {
+//           iconBg: "bg-yellow-100",
+//           iconColor: "text-yellow-600",
+//           iconBorder: "border-yellow-200",
+//           buttonBg: "bg-gradient-to-r from-yellow-500 to-yellow-600",
+//           buttonHover: "hover:shadow-lg",
+//         };
+//       case "success":
+//         return {
+//           iconBg: "bg-green-100",
+//           iconColor: "text-green-600",
+//           iconBorder: "border-green-200",
+//           buttonBg: "bg-gradient-to-r from-green-500 to-green-600",
+//           buttonHover: "hover:shadow-lg",
+//         };
+//       default:
+//         return {
+//           iconBg: "bg-blue-100",
+//           iconColor: "text-blue-600",
+//           iconBorder: "border-blue-200",
+//           buttonBg: "bg-gradient-to-r from-blue-500 to-blue-600",
+//           buttonHover: "hover:shadow-lg",
+//         };
+//     }
+//   };
+
+//   const colors = getColors();
+
+//   return (
+//     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+//       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+//         <div className={`absolute top-0 left-0 right-0 h-1 ${colors.buttonBg}`} />
+//         <div className="p-6">
+//           <div className="flex items-center justify-center mb-4">
+//             <div className={`w-20 h-20 ${colors.iconBg} rounded-full flex items-center justify-center relative`}>
+//               <div className={`absolute inset-0 rounded-full border-4 ${colors.iconBorder} animate-ping opacity-75`} />
+//               <div className={`${colors.iconColor} relative z-10`}>
+//                 {icon || (
+//                   type === "danger" ? (
+//                     <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+//                     </svg>
+//                   ) :
+//                   type === "warning" ? (
+//                     <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+//                     </svg>
+//                   ) :
+//                   type === "success" ? (
+//                     <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+//                     </svg>
+//                   ) : (
+//                     <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+//                     </svg>
+//                   )
+//                 )}
+//               </div>
+//             </div>
+//           </div>
+//           <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">{title}</h3>
+//           <p className="text-gray-600 text-center mb-6">{message}</p>
+//           <div className="flex gap-3">
+//             <button
+//               onClick={onClose}
+//               disabled={isSubmitting}
+//               className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+//             >
+//               {cancelText}
+//             </button>
+//             <button
+//               onClick={onConfirm}
+//               disabled={isSubmitting}
+//               className={`flex-1 px-4 py-2.5 ${colors.buttonBg} text-white rounded-xl font-medium ${colors.buttonHover} transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2`}
+//             >
+//               {isSubmitting ? (
+//                 <>
+//                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+//                   Loading...
+//                 </>
+//               ) : (
+//                 confirmText
+//               )}
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
 
 // // API Base URL
 // const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
@@ -39,10 +253,7 @@
 //   file?: File;
 // }
 
-// interface Availability {
-//   startDate: string;
-//   endDate: string;
-// }
+
 
 // interface House {
 //   _id?: string;
@@ -57,11 +268,10 @@
 //   bathrooms: number;
 //   maxGuests: number;
 //   amenities: string[];
-//   status: "available" | "pending" | "unavailable" | "maintenance";
+//   status: "available" | "pending" | "booked" | "unavailable" | "maintenance" | "inactive";
 //   rating: number;
 //   totalReviews: number;
 //   host: Host;
-//   availability: Availability;
 //   isActive: boolean;
 //   createdAt?: string;
 //   updatedAt?: string;
@@ -90,8 +300,10 @@
 //     totalProperties: "Total Properties",
 //     availableProperties: "Available",
 //     pendingProperties: "Pending",
+//     bookedProperties: "Booked",
 //     unavailableProperties: "Unavailable",
 //     maintenanceProperties: "Maintenance",
+//     inactiveProperties: "Inactive",
 //     totalReviews: "Total Reviews",
 //     rating: "Rating",
 //     searchProperties: "Search properties...",
@@ -132,8 +344,10 @@
 //     email: "Email",
 //     phone: "Phone",
 //     available: "Available",
+//     booked: "Booked",
 //     unavailable: "Unavailable",
 //     maintenance: "Maintenance",
+//     inactive: "Inactive",
 //     pending: "Pending",
 //     all: "All",
 //     selectStatus: "Select Status",
@@ -164,6 +378,8 @@
 //     noImage: "No image",
 //     selectFiles: "Select Files",
 //     dragDrop: "Drag & drop images here",
+//     success: "Success!",
+//     error: "Error",
 //     validation: {
 //       nameRequired: "Property name is required",
 //       nameMinLength: "Name must be at least 3 characters",
@@ -212,8 +428,10 @@
 //     totalProperties: "Total des Propriétés",
 //     availableProperties: "Disponible",
 //     pendingProperties: "En Attente",
+//     bookedProperties: "Réservé",
 //     unavailableProperties: "Indisponible",
 //     maintenanceProperties: "Maintenance",
+//     inactiveProperties: "Inactif",
 //     totalReviews: "Total des Avis",
 //     rating: "Évaluation",
 //     searchProperties: "Rechercher des propriétés...",
@@ -254,8 +472,10 @@
 //     email: "Email",
 //     phone: "Téléphone",
 //     available: "Disponible",
+//     booked: "Réservé",
 //     unavailable: "Indisponible",
 //     maintenance: "Maintenance",
+//     inactive: "Inactif",
 //     pending: "En Attente",
 //     all: "Tous",
 //     selectStatus: "Sélectionner le Statut",
@@ -286,15 +506,15 @@
 //     noImage: "Pas d'image",
 //     selectFiles: "Sélectionner des Fichiers",
 //     dragDrop: "Glissez-déposez les images ici",
+//     success: "Succès !",
+//     error: "Erreur",
 //     validation: {
 //       nameRequired: "Le nom de la propriété est requis",
 //       nameMinLength: "Le nom doit contenir au moins 3 caractères",
 //       nameMaxLength: "Le nom ne peut pas dépasser 100 caractères",
 //       descriptionRequired: "La description est requise",
-//       descriptionMinLength:
-//         "La description doit contenir au moins 20 caractères",
-//       descriptionMaxLength:
-//         "La description ne peut pas dépasser 2000 caractères",
+//       descriptionMinLength: "La description doit contenir au moins 20 caractères",
+//       descriptionMaxLength: "La description ne peut pas dépasser 2000 caractères",
 //       provinceRequired: "La province est requise",
 //       districtRequired: "Le district est requis",
 //       sectorRequired: "Le secteur est requis",
@@ -336,8 +556,10 @@
 //     totalProperties: "Amazu Yose",
 //     availableProperties: "Irahari",
 //     pendingProperties: "Bitegereje",
+//     bookedProperties: "Byaritswe",
 //     unavailableProperties: "Ntaho",
 //     maintenanceProperties: "Muri Maintenance",
+//     inactiveProperties: "Ntigikora",
 //     totalReviews: "Ibitekerezo Byose",
 //     rating: "Amanota",
 //     searchProperties: "Shakisha amazu...",
@@ -378,8 +600,10 @@
 //     email: "Imeri",
 //     phone: "Telefone",
 //     available: "Irahari",
+//     booked: "Byaritswe",
 //     unavailable: "Ntaho",
 //     maintenance: "Muri Maintenance",
+//     inactive: "Ntigikora",
 //     pending: "Bitegereje",
 //     all: "Byose",
 //     selectStatus: "Hitamo Ihagaze",
@@ -410,6 +634,8 @@
 //     noImage: "Nta shusho",
 //     selectFiles: "Hitamo Amashusho",
 //     dragDrop: "Kurura no gushyira amashusho hano",
+//     success: "Byakunze!",
+//     error: "Ikosa",
 //     validation: {
 //       nameRequired: "Izina ry'inzu rirasabwa",
 //       nameMinLength: "Izina rigomba kugira byibura inyuguti 3",
@@ -440,7 +666,7 @@
 // };
 
 // // ============================================================
-// // HELPER FUNCTIONS - UPDATED to use localStorage
+// // HELPER FUNCTIONS
 // // ============================================================
 // const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
 //   const lang = Cookies.get("language") as "en" | "fr" | "rw";
@@ -455,8 +681,7 @@
 //       return user.email || "";
 //     }
 //     return "";
-//   } catch (error) {
-//     console.error("Error reading user email from localStorage:", error);
+//   } catch {
 //     return "";
 //   }
 // };
@@ -469,8 +694,7 @@
 //       return user.name || "";
 //     }
 //     return "";
-//   } catch (error) {
-//     console.error("Error reading user name from localStorage:", error);
+//   } catch {
 //     return "";
 //   }
 // };
@@ -478,14 +702,36 @@
 // const getToken = (): string => {
 //   try {
 //     return localStorage.getItem("token") || "";
-//   } catch (error) {
-//     console.error("Error reading token from localStorage:", error);
+//   } catch {
 //     return "";
 //   }
 // };
 
+// // Helper function to safely get location display
+// const getLocationDisplay = (house: House): string => {
+//   if (!house.location) {
+//     return "Location not specified";
+//   }
+//   const { village, district } = house.location;
+//   if (!village && !district) {
+//     return "Location not specified";
+//   }
+//   return `${village || "N/A"}, ${district || "N/A"}`;
+// };
+
+// const getFullLocationDisplay = (house: House): string => {
+//   if (!house.location) {
+//     return "Location not specified";
+//   }
+//   const { village, sector, district, province } = house.location;
+//   if (!village && !sector && !district && !province) {
+//     return "Location not specified";
+//   }
+//   return `${village || "N/A"}, ${sector || "N/A"}, ${district || "N/A"}, ${province || "N/A"}`;
+// };
+
 // // ============================================================
-// // API SERVICE - UPDATED with token interceptor
+// // API SERVICE
 // // ============================================================
 // const api = axios.create({
 //   baseURL: API_BASE_URL,
@@ -494,7 +740,6 @@
 //   },
 // });
 
-// // Add request interceptor for authentication
 // api.interceptors.request.use(
 //   (config) => {
 //     const token = getToken();
@@ -508,12 +753,9 @@
 //   },
 // );
 
-// // House API functions
 // const houseApi = {
-//   // ✅ CHANGED: Now fetches ALL houses without email filter
 //   getHouses: async (): Promise<House[]> => {
 //     const response = await api.get(`/houses`);
-//     // The API returns { success: true, total: 1, data: [...] }
 //     return response.data.data || [];
 //   },
 
@@ -538,253 +780,106 @@
 //   deleteHouse: async (id: string): Promise<void> => {
 //     await api.delete(`/houses/${id}`);
 //   },
+
+// //   updateHouseStatus: async (id: string, status: string): Promise<House> => {
+// //   const response = await api.put(`/houses/${id}/status`, { status });
+// //   return response.data.data || response.data;
+// // },
+
+// updateHouseStatus: async (id: string, status: string): Promise<House> => {
+//   const response = await api.put(`/houses/${id}/status`, { status });
+//   return response.data.data || response.data;
+// },
 // };
 
 // // Icons
 // const Icons = {
 //   Home: () => (
-//     <svg
-//       className="w-6 h-6"
-//       fill="none"
-//       stroke="currentColor"
-//       viewBox="0 0 24 24"
-//     >
-//       <path
-//         strokeLinecap="round"
-//         strokeLinejoin="round"
-//         strokeWidth="2"
-//         d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-//       />
+//     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
 //     </svg>
 //   ),
 //   Plus: () => (
-//     <svg
-//       className="w-5 h-5"
-//       fill="none"
-//       stroke="currentColor"
-//       viewBox="0 0 24 24"
-//     >
-//       <path
-//         strokeLinecap="round"
-//         strokeLinejoin="round"
-//         strokeWidth="2"
-//         d="M12 4v16m8-8H4"
-//       />
+//     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
 //     </svg>
 //   ),
 //   Edit: () => (
-//     <svg
-//       className="w-4 h-4"
-//       fill="none"
-//       stroke="currentColor"
-//       viewBox="0 0 24 24"
-//     >
-//       <path
-//         strokeLinecap="round"
-//         strokeLinejoin="round"
-//         strokeWidth="2"
-//         d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-//       />
+//     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
 //     </svg>
 //   ),
 //   Delete: () => (
-//     <svg
-//       className="w-4 h-4"
-//       fill="none"
-//       stroke="currentColor"
-//       viewBox="0 0 24 24"
-//     >
-//       <path
-//         strokeLinecap="round"
-//         strokeLinejoin="round"
-//         strokeWidth="2"
-//         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-//       />
+//     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
 //     </svg>
 //   ),
 //   View: () => (
-//     <svg
-//       className="w-4 h-4"
-//       fill="none"
-//       stroke="currentColor"
-//       viewBox="0 0 24 24"
-//     >
-//       <path
-//         strokeLinecap="round"
-//         strokeLinejoin="round"
-//         strokeWidth="2"
-//         d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-//       />
-//       <path
-//         strokeLinecap="round"
-//         strokeLinejoin="round"
-//         strokeWidth="2"
-//         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-//       />
+//     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
 //     </svg>
 //   ),
 //   Search: () => (
-//     <svg
-//       className="w-5 h-5"
-//       fill="none"
-//       stroke="currentColor"
-//       viewBox="0 0 24 24"
-//     >
-//       <path
-//         strokeLinecap="round"
-//         strokeLinejoin="round"
-//         strokeWidth="2"
-//         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-//       />
+//     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
 //     </svg>
 //   ),
 //   Filter: () => (
-//     <svg
-//       className="w-5 h-5"
-//       fill="none"
-//       stroke="currentColor"
-//       viewBox="0 0 24 24"
-//     >
-//       <path
-//         strokeLinecap="round"
-//         strokeLinejoin="round"
-//         strokeWidth="2"
-//         d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-//       />
+//     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
 //     </svg>
 //   ),
 //   Close: () => (
-//     <svg
-//       className="w-5 h-5"
-//       fill="none"
-//       stroke="currentColor"
-//       viewBox="0 0 24 24"
-//     >
-//       <path
-//         strokeLinecap="round"
-//         strokeLinejoin="round"
-//         strokeWidth="2"
-//         d="M6 18L18 6M6 6l12 12"
-//       />
+//     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
 //     </svg>
 //   ),
 //   Check: () => (
-//     <svg
-//       className="w-4 h-4"
-//       fill="none"
-//       stroke="currentColor"
-//       viewBox="0 0 24 24"
-//     >
-//       <path
-//         strokeLinecap="round"
-//         strokeLinejoin="round"
-//         strokeWidth="2"
-//         d="M5 13l4 4L19 7"
-//       />
+//     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
 //     </svg>
 //   ),
 //   Upload: () => (
-//     <svg
-//       className="w-8 h-8"
-//       fill="none"
-//       stroke="currentColor"
-//       viewBox="0 0 24 24"
-//     >
-//       <path
-//         strokeLinecap="round"
-//         strokeLinejoin="round"
-//         strokeWidth="2"
-//         d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-//       />
+//     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
 //     </svg>
 //   ),
 //   Bed: () => (
-//     <svg
-//       className="w-4 h-4"
-//       fill="none"
-//       stroke="currentColor"
-//       viewBox="0 0 24 24"
-//     >
-//       <path
-//         strokeLinecap="round"
-//         strokeLinejoin="round"
-//         strokeWidth="2"
-//         d="M4 8h16M4 16h16M4 12h16M4 20h16"
-//       />
+//     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8h16M4 16h16M4 12h16M4 20h16" />
 //     </svg>
 //   ),
 //   Bath: () => (
-//     <svg
-//       className="w-4 h-4"
-//       fill="none"
-//       stroke="currentColor"
-//       viewBox="0 0 24 24"
-//     >
-//       <path
-//         strokeLinecap="round"
-//         strokeLinejoin="round"
-//         strokeWidth="2"
-//         d="M5 5h14M5 5v14M5 5h14M5 19h14M5 19v-4M5 19H3M19 19v-4"
-//       />
+//     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5h14M5 5v14M5 5h14M5 19h14M5 19v-4M5 19H3M19 19v-4" />
 //     </svg>
 //   ),
 //   User: () => (
-//     <svg
-//       className="w-4 h-4"
-//       fill="none"
-//       stroke="currentColor"
-//       viewBox="0 0 24 24"
-//     >
-//       <path
-//         strokeLinecap="round"
-//         strokeLinejoin="round"
-//         strokeWidth="2"
-//         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-//       />
+//     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
 //     </svg>
 //   ),
 //   Location: () => (
-//     <svg
-//       className="w-4 h-4"
-//       fill="none"
-//       stroke="currentColor"
-//       viewBox="0 0 24 24"
-//     >
-//       <path
-//         strokeLinecap="round"
-//         strokeLinejoin="round"
-//         strokeWidth="2"
-//         d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-//       />
-//       <path
-//         strokeLinecap="round"
-//         strokeLinejoin="round"
-//         strokeWidth="2"
-//         d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-//       />
+//     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
 //     </svg>
 //   ),
 //   University: () => (
-//     <svg
-//       className="w-4 h-4"
-//       fill="none"
-//       stroke="currentColor"
-//       viewBox="0 0 24 24"
-//     >
-//       <path
-//         strokeLinecap="round"
-//         strokeLinejoin="round"
-//         strokeWidth="2"
-//         d="M19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2M12 3v4m4-2h.01M4 7h.01M8 7h.01M16 7h.01M4 11h16M4 15h16M4 19h16"
-//       />
+//     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2M12 3v4m4-2h.01M4 7h.01M8 7h.01M16 7h.01M4 11h16M4 15h16M4 19h16" />
+//     </svg>
+//   ),
+//   Status: () => (
+//     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
 //     </svg>
 //   ),
 // };
 
 // export const HouseManagement: React.FC = () => {
-//   const [lang, setLang] = useState<"en" | "fr" | "rw">(
-//     getLanguageFromCookies(),
-//   );
+//   const [lang, setLang] = useState<"en" | "fr" | "rw">(getLanguageFromCookies());
 //   const userEmail = getUserEmail();
 //   const userName = getUserName();
 
@@ -800,20 +895,45 @@
 //   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 //   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 //   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+//   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
 //   const [selectedHouse, setSelectedHouse] = useState<House | null>(null);
+//   const [newStatus, setNewStatus] = useState<House["status"]>("available");
+
+//   // Success/Error modal states
+//   const [successModal, setSuccessModal] = useState<{
+//     isOpen: boolean;
+//     title: string;
+//     message: string;
+//     details?: string;
+//   }>({
+//     isOpen: false,
+//     title: "",
+//     message: "",
+//     details: "",
+//   });
+
+//   const [errorModal, setErrorModal] = useState<{
+//     isOpen: boolean;
+//     title: string;
+//     message: string;
+//     details?: string;
+//   }>({
+//     isOpen: false,
+//     title: "",
+//     message: "",
+//     details: "",
+//   });
 
 //   // Form validation states
 //   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-//   const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>(
-//     {},
-//   );
+//   const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
 
 //   // Image upload states
 //   const [imageFiles, setImageFiles] = useState<File[]>([]);
 //   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 //   const fileInputRef = useRef<HTMLInputElement>(null);
 
-//   // Property form state - REMOVED availability fields
+//   // Property form state
 //   const [propertyFormData, setPropertyFormData] = useState({
 //     name: "",
 //     description: "",
@@ -835,7 +955,7 @@
 //       name: userName || "",
 //       email: userEmail || "",
 //       phone: "",
-//       responseRate: 0,
+//       responseRate: 100,
 //       responseTime: "24 hours",
 //     },
 //   });
@@ -847,17 +967,23 @@
 //     total: 0,
 //     available: 0,
 //     pending: 0,
+//     booked: 0,
 //     unavailable: 0,
 //     maintenance: 0,
+//     inactive: 0,
 //     totalReviews: 0,
 //     averageRating: 0,
 //   });
 
 //   const t = translations[lang];
 
-//   // ============================================================
-//   // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
-//   // ============================================================
+//   const showSuccessModal = (title: string, message: string, details?: string) => {
+//     setSuccessModal({ isOpen: true, title, message, details });
+//   };
+
+//   const showErrorModal = (title: string, message: string, details?: string) => {
+//     setErrorModal({ isOpen: true, title, message, details });
+//   };
 
 //   // Listen for language changes
 //   useEffect(() => {
@@ -868,74 +994,61 @@
 //     return () => clearInterval(interval);
 //   }, [lang]);
 
-//   // ✅ HOOK 1: loadHouses useCallback
 //   const loadHouses = useCallback(async () => {
 //     try {
 //       setLoading(true);
 //       const data = await houseApi.getHouses();
-//       console.log("✅ All houses loaded:", data);
-//       // Ensure each house has an images array
 //       const housesWithImages = data.map((house) => ({
 //         ...house,
 //         images: house.images || [],
+//         location: house.location || {
+//           province: "",
+//           district: "",
+//           sector: "",
+//           cell: "",
+//           village: "",
+//         },
 //       }));
 //       setHouses(housesWithImages);
 //       setFilteredHouses(housesWithImages);
 //     } catch (error) {
-//       console.error("❌ Error loading houses:", error);
-//       toast.error("Failed to load houses");
+//       showErrorModal(
+//         t.error || "Error",
+//         "Failed to load houses",
+//         error instanceof Error ? error.message : undefined
+//       );
 //     } finally {
 //       setLoading(false);
 //     }
-//   }, []);
+//   }, [t]);
 
-//   // ✅ HOOK 2: isFormValid useCallback
 //   const isFormValid = useCallback(() => {
-//     // Only validate required fields that have been touched
 //     const requiredFields = [
-//       "name",
-//       "description",
-//       "university",
-//       "province",
-//       "district",
-//       "sector",
-//       "cell",
-//       "village",
-//       "pricePerMonth",
-//       "bedrooms",
-//       "bathrooms",
-//       "maxGuests",
-//       "hostName",
-//       "hostEmail",
-//       "images",
+//       "name", "description", "university", "province", "district",
+//       "sector", "cell", "village", "pricePerMonth", "bedrooms",
+//       "bathrooms", "maxGuests", "hostName", "hostEmail", "images"
 //     ];
 
-//     // Check if all required fields have been touched
 //     const allTouched = requiredFields.every((field) => touchedFields[field]);
-
-//     // If not all touched, the form is considered invalid (not ready for submission)
 //     if (!allTouched) return false;
-
-//     // Check if there are any errors
 //     return Object.keys(formErrors).length === 0;
 //   }, [touchedFields, formErrors]);
 
-//   // ✅ HOOK 3: useEffect for loadHouses
 //   useEffect(() => {
 //     loadHouses();
 //   }, [loadHouses]);
 
-//   // ✅ HOOK 4: Filter houses
+//   // Filter houses
 //   useEffect(() => {
 //     let filtered = [...houses];
 //     if (searchTerm) {
 //       const term = searchTerm.toLowerCase();
 //       filtered = filtered.filter(
 //         (h) =>
-//           h.name.toLowerCase().includes(term) ||
-//           h.university.toLowerCase().includes(term) ||
-//           h.location.district.toLowerCase().includes(term) ||
-//           h.location.village.toLowerCase().includes(term),
+//           h.name?.toLowerCase().includes(term) ||
+//           h.university?.toLowerCase().includes(term) ||
+//           h.location?.district?.toLowerCase().includes(term) ||
+//           h.location?.village?.toLowerCase().includes(term),
 //       );
 //     }
 //     if (filterStatus !== "all") {
@@ -944,33 +1057,32 @@
 //     setFilteredHouses(filtered);
 //   }, [houses, searchTerm, filterStatus]);
 
-//   // ✅ HOOK 5: Update statistics
+//   // Update statistics
 //   useEffect(() => {
 //     setStats({
 //       total: houses.length,
 //       available: houses.filter((h) => h.status === "available").length,
 //       pending: houses.filter((h) => h.status === "pending").length,
+//       booked: houses.filter((h) => h.status === "booked").length,
 //       unavailable: houses.filter((h) => h.status === "unavailable").length,
 //       maintenance: houses.filter((h) => h.status === "maintenance").length,
-//       totalReviews: houses.reduce((sum, h) => sum + h.totalReviews, 0),
-//       averageRating:
-//         houses.length > 0
-//           ? houses.reduce((sum, h) => sum + h.rating, 0) / houses.length
-//           : 0,
+//       inactive: houses.filter((h) => h.status === "inactive").length,
+//       totalReviews: houses.reduce((sum, h) => sum + (h.totalReviews || 0), 0),
+//       averageRating: houses.length > 0
+//         ? houses.reduce((sum, h) => sum + (h.rating || 0), 0) / houses.length
+//         : 0,
 //     });
 //   }, [houses]);
-
-//   // ============================================================
-//   // ALL HOOKS ABOVE - NOW WE CAN HAVE CONDITIONAL RETURNS
-//   // ============================================================
 
 //   // Get status badge
 //   const getStatusColor = (status: string): string => {
 //     const colors = {
 //       available: "bg-green-100 text-green-800 border-green-200",
 //       pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
+//       booked: "bg-blue-100 text-blue-800 border-blue-200",
 //       unavailable: "bg-gray-100 text-gray-800 border-gray-200",
 //       maintenance: "bg-red-100 text-red-800 border-red-200",
+//       inactive: "bg-gray-300 text-gray-600 border-gray-300",
 //     };
 //     return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800";
 //   };
@@ -979,22 +1091,21 @@
 //     const labels = {
 //       available: t.available,
 //       pending: t.pending,
+//       booked: t.booked,
 //       unavailable: t.unavailable,
 //       maintenance: t.maintenance,
+//       inactive: t.inactive,
 //     };
 //     return labels[status as keyof typeof labels] || status;
 //   };
 
 //   const formatCurrency = (amount: number): string => {
-//     return `RWF ${amount.toLocaleString()}`;
+//     return `RWF ${amount?.toLocaleString() || 0}`;
 //   };
 
 //   // Amenity functions
 //   const addAmenity = () => {
-//     if (
-//       amenityInput.trim() &&
-//       !propertyFormData.amenities.includes(amenityInput.trim())
-//     ) {
+//     if (amenityInput.trim() && !propertyFormData.amenities.includes(amenityInput.trim())) {
 //       setPropertyFormData((prev) => ({
 //         ...prev,
 //         amenities: [...prev.amenities, amenityInput.trim()],
@@ -1006,40 +1117,30 @@
 //   const removeAmenity = (amenityToRemove: string) => {
 //     setPropertyFormData((prev) => ({
 //       ...prev,
-//       amenities: prev.amenities.filter(
-//         (amenity) => amenity !== amenityToRemove,
-//       ),
+//       amenities: prev.amenities.filter((amenity) => amenity !== amenityToRemove),
 //     }));
 //   };
 
-//   // Validate form - REMOVED availability validation
+//   // Validate form
 //   const validateForm = () => {
 //     const errors: Record<string, string> = {};
 //     const v = t.validation;
 
-//     if (!propertyFormData.name.trim()) errors.name = v.nameRequired;
+//     if (!propertyFormData.name?.trim()) errors.name = v.nameRequired;
 //     else if (propertyFormData.name.length < 3) errors.name = v.nameMinLength;
 //     else if (propertyFormData.name.length > 100) errors.name = v.nameMaxLength;
 
-//     if (!propertyFormData.description.trim())
-//       errors.description = v.descriptionRequired;
-//     else if (propertyFormData.description.length < 20)
-//       errors.description = v.descriptionMinLength;
-//     else if (propertyFormData.description.length > 2000)
-//       errors.description = v.descriptionMaxLength;
+//     if (!propertyFormData.description?.trim()) errors.description = v.descriptionRequired;
+//     else if (propertyFormData.description.length < 20) errors.description = v.descriptionMinLength;
+//     else if (propertyFormData.description.length > 2000) errors.description = v.descriptionMaxLength;
 
-//     if (!propertyFormData.location.province)
-//       errors.province = v.provinceRequired;
-//     if (!propertyFormData.location.district.trim())
-//       errors.district = v.districtRequired;
-//     if (!propertyFormData.location.sector.trim())
-//       errors.sector = v.sectorRequired;
-//     if (!propertyFormData.location.cell.trim()) errors.cell = v.cellRequired;
-//     if (!propertyFormData.location.village.trim())
-//       errors.village = v.villageRequired;
+//     if (!propertyFormData.location.province) errors.province = v.provinceRequired;
+//     if (!propertyFormData.location.district?.trim()) errors.district = v.districtRequired;
+//     if (!propertyFormData.location.sector?.trim()) errors.sector = v.sectorRequired;
+//     if (!propertyFormData.location.cell?.trim()) errors.cell = v.cellRequired;
+//     if (!propertyFormData.location.village?.trim()) errors.village = v.villageRequired;
 
-//     if (!propertyFormData.university.trim())
-//       errors.university = v.universityRequired;
+//     if (!propertyFormData.university?.trim()) errors.university = v.universityRequired;
 
 //     if (propertyFormData.pricePerMonth <= 0) errors.pricePerMonth = v.priceMin;
 
@@ -1047,15 +1148,11 @@
 //     if (propertyFormData.bathrooms < 0) errors.bathrooms = v.bathroomsMin;
 //     if (propertyFormData.maxGuests < 1) errors.maxGuests = v.maxGuestsMin;
 
-//     if (!propertyFormData.host.name.trim())
-//       errors.hostName = v.hostNameRequired;
-//     if (!propertyFormData.host.email.trim())
-//       errors.hostEmail = v.hostEmailRequired;
-//     else if (!/\S+@\S+\.\S+/.test(propertyFormData.host.email))
-//       errors.hostEmail = v.hostEmailInvalid;
+//     if (!propertyFormData.host.name?.trim()) errors.hostName = v.hostNameRequired;
+//     if (!propertyFormData.host.email?.trim()) errors.hostEmail = v.hostEmailRequired;
+//     else if (!/\S+@\S+\.\S+/.test(propertyFormData.host.email)) errors.hostEmail = v.hostEmailInvalid;
 
-//     if (imageFiles.length === 0 && !selectedHouse)
-//       errors.images = v.imagesRequired;
+//     if (imageFiles.length === 0 && !selectedHouse) errors.images = v.imagesRequired;
 
 //     setFormErrors(errors);
 //     return Object.keys(errors).length === 0;
@@ -1063,7 +1160,6 @@
 
 //   const handleFieldBlur = (field: string) => {
 //     setTouchedFields((prev) => ({ ...prev, [field]: true }));
-//     // Validate on blur
 //     validateForm();
 //   };
 
@@ -1094,7 +1190,6 @@
 //       delete newErrors[field];
 //       return newErrors;
 //     });
-//     // Validate the specific field on change
 //     validateForm();
 //   };
 
@@ -1108,7 +1203,6 @@
 //       delete newErrors[field];
 //       return newErrors;
 //     });
-//     // Validate the specific field on change
 //     validateForm();
 //   };
 
@@ -1131,47 +1225,58 @@
 //       delete newErrors.images;
 //       return newErrors;
 //     });
-//     // Re-validate images
 //     validateForm();
 //   };
 
 //   const removeImage = (index: number) => {
 //     setImageFiles((prev) => prev.filter((_, i) => i !== index));
 //     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
-//     // Re-validate images
 //     validateForm();
 //   };
 
-//   // Create FormData for API - REMOVED availability fields
+//   // Create FormData for API
 //   const createFormData = (): FormData => {
 //     const formData = new FormData();
 
-//     // Append all fields
-//     formData.append("name", propertyFormData.name);
-//     formData.append("description", propertyFormData.description);
-//     formData.append("university", propertyFormData.university);
-//     formData.append("pricePerMonth", String(propertyFormData.pricePerMonth));
-//     formData.append("bedrooms", String(propertyFormData.bedrooms));
-//     formData.append("bathrooms", String(propertyFormData.bathrooms));
-//     formData.append("maxGuests", String(propertyFormData.maxGuests));
-//     formData.append("status", propertyFormData.status);
+//     formData.append("name", propertyFormData.name || "");
+//     formData.append("description", propertyFormData.description || "");
+//     formData.append("university", propertyFormData.university || "");
+//     formData.append("pricePerMonth", String(propertyFormData.pricePerMonth || 0));
+//     formData.append("bedrooms", String(propertyFormData.bedrooms || 0));
+//     formData.append("bathrooms", String(propertyFormData.bathrooms || 0));
+//     formData.append("maxGuests", String(propertyFormData.maxGuests || 1));
+//     formData.append("status", propertyFormData.status || "pending");
 
-//     // Location
-//     Object.entries(propertyFormData.location).forEach(([key, value]) => {
+//     // Ensure location has values
+//     const location = {
+//       province: propertyFormData.location.province || "",
+//       district: propertyFormData.location.district || "",
+//       sector: propertyFormData.location.sector || "",
+//       cell: propertyFormData.location.cell || "",
+//       village: propertyFormData.location.village || "",
+//     };
+
+//     Object.entries(location).forEach(([key, value]) => {
 //       formData.append(`location[${key}]`, value);
 //     });
 
-//     // Host
-//     Object.entries(propertyFormData.host).forEach(([key, value]) => {
+//     // Host data
+//     const host = {
+//       name: propertyFormData.host.name || "",
+//       email: propertyFormData.host.email || "",
+//       phone: propertyFormData.host.phone || "",
+//       responseRate: propertyFormData.host.responseRate || 0,
+//       responseTime: propertyFormData.host.responseTime || "24 hours",
+//     };
+
+//     Object.entries(host).forEach(([key, value]) => {
 //       formData.append(`host[${key}]`, String(value));
 //     });
 
-//     // Amenities
 //     propertyFormData.amenities.forEach((amenity) => {
 //       formData.append("amenities[]", amenity);
 //     });
 
-//     // Images
 //     imageFiles.forEach((file) => {
 //       formData.append("images", file);
 //     });
@@ -1181,32 +1286,17 @@
 
 //   // CRUD Operations
 //   const handleCreateProperty = async () => {
-//     // Touch all fields before validation
 //     const allFields = [
-//       "name",
-//       "description",
-//       "university",
-//       "province",
-//       "district",
-//       "sector",
-//       "cell",
-//       "village",
-//       "pricePerMonth",
-//       "bedrooms",
-//       "bathrooms",
-//       "maxGuests",
-//       "hostName",
-//       "hostEmail",
-//       "images",
+//       "name", "description", "university", "province", "district",
+//       "sector", "cell", "village", "pricePerMonth", "bedrooms",
+//       "bathrooms", "maxGuests", "hostName", "hostEmail", "images"
 //     ];
 //     const touched: Record<string, boolean> = {};
-//     allFields.forEach((field) => {
-//       touched[field] = true;
-//     });
+//     allFields.forEach((field) => { touched[field] = true; });
 //     setTouchedFields(touched);
 
 //     if (!validateForm()) {
-//       toast.error("Please fix all validation errors");
+//       showErrorModal(t.error || "Error", "Please fix all validation errors");
 //       return;
 //     }
 
@@ -1214,23 +1304,33 @@
 //     try {
 //       const formData = createFormData();
 //       const newHouse = await houseApi.createHouse(formData);
-//       const houseWithImages = {
-//         ...newHouse,
+//       const houseWithImages = { 
+//         ...newHouse, 
 //         images: newHouse.images || [],
+//         location: newHouse.location || {
+//           province: "",
+//           district: "",
+//           sector: "",
+//           cell: "",
+//           village: "",
+//         },
 //       };
 //       setHouses((prev) => [houseWithImages, ...prev]);
-//       toast.success(`✅ ${t.propertyCreated}`);
+//       showSuccessModal(
+//         t.success || "Success!",
+//         t.propertyCreated || "Property created successfully!",
+//         `${newHouse.name} has been added to your listings`
+//       );
 //       setIsCreateModalOpen(false);
 //       resetForm();
 //     } catch (error) {
-//       console.error("Error creating property:", error);
 //       const axiosError = error as AxiosError;
 //       const errorMessage = axiosError.response?.data
 //         ? typeof axiosError.response?.data === "string"
 //           ? axiosError.response?.data
 //           : JSON.stringify(axiosError.response?.data)
 //         : t.createFailed;
-//       toast.error(`❌ ${errorMessage}`);
+//       showErrorModal(t.error || "Error", errorMessage);
 //     } finally {
 //       setSubmitting(false);
 //     }
@@ -1239,62 +1339,52 @@
 //   const handleUpdateProperty = async () => {
 //     if (!selectedHouse) return;
 
-//     // Touch all fields before validation
 //     const allFields = [
-//       "name",
-//       "description",
-//       "university",
-//       "province",
-//       "district",
-//       "sector",
-//       "cell",
-//       "village",
-//       "pricePerMonth",
-//       "bedrooms",
-//       "bathrooms",
-//       "maxGuests",
-//       "hostName",
-//       "hostEmail",
-//       "images",
+//       "name", "description", "university", "province", "district",
+//       "sector", "cell", "village", "pricePerMonth", "bedrooms",
+//       "bathrooms", "maxGuests", "hostName", "hostEmail", "images"
 //     ];
 //     const touched: Record<string, boolean> = {};
-//     allFields.forEach((field) => {
-//       touched[field] = true;
-//     });
+//     allFields.forEach((field) => { touched[field] = true; });
 //     setTouchedFields(touched);
 
 //     if (!validateForm()) {
-//       toast.error("Please fix all validation errors");
+//       showErrorModal(t.error || "Error", "Please fix all validation errors");
 //       return;
 //     }
 
 //     setSubmitting(true);
 //     try {
 //       const formData = createFormData();
-//       const updatedHouse = await houseApi.updateHouse(
-//         selectedHouse._id!,
-//         formData,
-//       );
-//       const houseWithImages = {
-//         ...updatedHouse,
+//       const updatedHouse = await houseApi.updateHouse(selectedHouse._id!, formData);
+//       const houseWithImages = { 
+//         ...updatedHouse, 
 //         images: updatedHouse.images || [],
+//         location: updatedHouse.location || {
+//           province: "",
+//           district: "",
+//           sector: "",
+//           cell: "",
+//           village: "",
+//         },
 //       };
-//       setHouses((prev) =>
-//         prev.map((h) => (h._id === selectedHouse._id ? houseWithImages : h)),
+//       setHouses((prev) => prev.map((h) => (h._id === selectedHouse._id ? houseWithImages : h)));
+//       showSuccessModal(
+//         t.success || "Success!",
+//         t.propertyUpdated || "Property updated successfully!",
+//         `${updatedHouse.name} has been updated`
 //       );
-//       toast.success(`✅ ${t.propertyUpdated}`);
 //       setIsEditModalOpen(false);
 //       setSelectedHouse(null);
 //       resetForm();
 //     } catch (error) {
-//       console.error("Error updating property:", error);
 //       const axiosError = error as AxiosError;
 //       const errorMessage = axiosError.response?.data
 //         ? typeof axiosError.response?.data === "string"
 //           ? axiosError.response?.data
 //           : JSON.stringify(axiosError.response?.data)
 //         : t.updateFailed;
-//       toast.error(`❌ ${errorMessage}`);
+//       showErrorModal(t.error || "Error", errorMessage);
 //     } finally {
 //       setSubmitting(false);
 //     }
@@ -1307,19 +1397,79 @@
 //     try {
 //       await houseApi.deleteHouse(selectedHouse._id!);
 //       setHouses((prev) => prev.filter((h) => h._id !== selectedHouse._id));
-//       toast.success(`🗑️ ${t.propertyDeleted}`);
+//       showSuccessModal(
+//         t.success || "Success!",
+//         t.propertyDeleted || "Property deleted successfully!",
+//         `${selectedHouse.name} has been removed from your listings`
+//       );
 //       setIsDeleteModalOpen(false);
 //       setSelectedHouse(null);
 //     } catch (error) {
-//       console.error("Error deleting property:", error);
 //       const axiosError = error as AxiosError;
-//       toast.error(`❌ ${axiosError.response?.data || t.deleteFailed}`);
+//       showErrorModal(
+//         t.error || "Error",
+//         t.deleteFailed || "Failed to delete property",
+//         axiosError.response?.data ? String(axiosError.response?.data) : undefined
+//       );
 //     } finally {
 //       setSubmitting(false);
 //     }
 //   };
 
-//   // Reset form - REMOVED availability fields
+//   // Handle status update using the model
+
+//   const handleStatusUpdate = async () => {
+//   if (!selectedHouse || !newStatus) return;
+
+//   setSubmitting(true);
+//   try {
+//     const updatedHouse = await houseApi.updateHouseStatus(
+//       selectedHouse._id!,
+//       newStatus
+//     );
+
+//     const houseWithImages = {
+//       ...updatedHouse,
+//       images: updatedHouse.images || [],
+//       location: updatedHouse.location || {
+//         province: "",
+//         district: "",
+//         sector: "",
+//         cell: "",
+//         village: "",
+//       },
+//     };
+
+//     setHouses((prev) =>
+//       prev.map((h) =>
+//         h._id === selectedHouse._id ? houseWithImages : h
+//       )
+//     );
+
+//     showSuccessModal(
+//       t.success || "Success!",
+//       "Status updated successfully!",
+//       `${selectedHouse.name} is now ${getStatusLabel(newStatus)}`
+//     );
+
+//     setIsStatusModalOpen(false);
+//     setSelectedHouse(null);
+//   } catch (error) {
+//     const axiosError = error as AxiosError;
+
+//     showErrorModal(
+//       t.error || "Error",
+//       "Failed to update status",
+//       axiosError.response?.data
+//         ? String(axiosError.response?.data)
+//         : undefined
+//     );
+//   } finally {
+//     setSubmitting(false);
+//   }
+// };
+
+//   // Reset form
 //   const resetForm = () => {
 //     setPropertyFormData({
 //       name: "",
@@ -1342,7 +1492,7 @@
 //         name: userName || "",
 //         email: userEmail || "",
 //         phone: "",
-//         responseRate: 0,
+//         responseRate: 100,
 //         responseTime: "24 hours",
 //       },
 //     });
@@ -1363,21 +1513,32 @@
 //   const openEditModal = (house: House) => {
 //     setSelectedHouse(house);
 //     setPropertyFormData({
-//       name: house.name,
-//       description: house.description,
-//       university: house.university,
-//       location: house.location,
-//       pricePerMonth: house.pricePerMonth,
-//       bedrooms: house.bedrooms,
-//       bathrooms: house.bathrooms,
-//       maxGuests: house.maxGuests,
+//       name: house.name || "",
+//       description: house.description || "",
+//       university: house.university || "",
+//       location: house.location || {
+//         province: "",
+//         district: "",
+//         sector: "",
+//         cell: "",
+//         village: "",
+//       },
+//       pricePerMonth: house.pricePerMonth || 0,
+//       bedrooms: house.bedrooms || 1,
+//       bathrooms: house.bathrooms || 1,
+//       maxGuests: house.maxGuests || 2,
 //       amenities: house.amenities || [],
-//       status: house.status,
-//       host: house.host,
+//       status: house.status || "pending",
+//       host: house.host || {
+//         name: "",
+//         email: "",
+//         phone: "",
+//         responseRate: 100,
+//         responseTime: "24 hours",
+//       },
 //     });
 //     setImageFiles([]);
 //     setImagePreviews(house.images ? house.images.map((img) => img.url) : []);
-//     // Reset touched fields for edit modal
 //     setTouchedFields({});
 //     setFormErrors({});
 //     setIsEditModalOpen(true);
@@ -1393,6 +1554,31 @@
 //     setIsCreateModalOpen(true);
 //   };
 
+//   const openStatusModal = (house: House) => {
+//     setSelectedHouse(house);
+//     setNewStatus(house.status || "available");
+//     setIsStatusModalOpen(true);
+//   };
+
+//   // Get status options based on current status
+//   // const getStatusOptions = (currentStatus: string): House["status"][] => {
+//   //   const allStatuses: House["status"][] = ["available", "pending", "booked", "unavailable", "maintenance", "inactive"];
+//   //   return allStatuses.filter(status => status !== currentStatus);
+//   // };
+
+//   const getStatusOptions = (currentStatus: string): House["status"][] => {
+//   const allStatuses: House["status"][] = [
+//     "available",
+//     "pending",
+//     "booked",
+//     "unavailable",
+//     "maintenance",
+//     "inactive",
+//   ];
+
+//   return allStatuses.filter(status => status !== currentStatus);
+// };
+
 //   // Render input with validation
 //   const renderInput = (
 //     label: string,
@@ -1401,11 +1587,7 @@
 //     placeholder: string = "",
 //     required: boolean = true,
 //     value?: string | number,
-//     onChange?: (
-//       e: React.ChangeEvent<
-//         HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-//       >,
-//     ) => void,
+//     onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void,
 //   ) => {
 //     const fieldName = field.includes(".") ? field.split(".")[1] : field;
 //     const error = formErrors[fieldName];
@@ -1424,11 +1606,8 @@
 //             onBlur={() => handleFieldBlur(fieldName)}
 //             rows={3}
 //             className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all resize-none ${
-//               hasError(fieldName)
-//                 ? "border-red-500 bg-red-50"
-//                 : isValid
-//                   ? "border-green-500 bg-green-50"
-//                   : "border-gray-300"
+//               hasError(fieldName) ? "border-red-500 bg-red-50" :
+//               isValid ? "border-green-500 bg-green-50" : "border-gray-300"
 //             }`}
 //             placeholder={placeholder}
 //           />
@@ -1438,11 +1617,8 @@
 //             onChange={onChange}
 //             onBlur={() => handleFieldBlur(fieldName)}
 //             className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white transition-all ${
-//               hasError(fieldName)
-//                 ? "border-red-500 bg-red-50"
-//                 : isValid
-//                   ? "border-green-500 bg-green-50"
-//                   : "border-gray-300"
+//               hasError(fieldName) ? "border-red-500 bg-red-50" :
+//               isValid ? "border-green-500 bg-green-50" : "border-gray-300"
 //             }`}
 //           >
 //             {placeholder && <option value="">{placeholder}</option>}
@@ -1455,11 +1631,8 @@
 //             onChange={onChange}
 //             onBlur={() => handleFieldBlur(fieldName)}
 //             className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
-//               hasError(fieldName)
-//                 ? "border-red-500 bg-red-50"
-//                 : isValid
-//                   ? "border-green-500 bg-green-50"
-//                   : "border-gray-300"
+//               hasError(fieldName) ? "border-red-500 bg-red-50" :
+//               isValid ? "border-green-500 bg-green-50" : "border-gray-300"
 //             }`}
 //             placeholder={placeholder}
 //             min={type === "number" ? 0 : undefined}
@@ -1490,7 +1663,6 @@
 //     exit: { opacity: 0 },
 //   };
 
-//   // ✅ CONDITIONAL RETURN - AFTER ALL HOOKS HAVE BEEN CALLED
 //   if (loading) {
 //     return (
 //       <div className="flex justify-center items-center min-h-[400px]">
@@ -1501,6 +1673,24 @@
 
 //   return (
 //     <div className="p-4 sm:p-6 md:p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+//       {/* Success Modal */}
+//       <SuccessModal
+//         isOpen={successModal.isOpen}
+//         onClose={() => setSuccessModal({ ...successModal, isOpen: false })}
+//         title={successModal.title}
+//         message={successModal.message}
+//         details={successModal.details}
+//       />
+
+//       {/* Error Modal */}
+//       <ErrorModal
+//         isOpen={errorModal.isOpen}
+//         onClose={() => setErrorModal({ ...errorModal, isOpen: false })}
+//         title={errorModal.title}
+//         message={errorModal.message}
+//         details={errorModal.details}
+//       />
+
 //       {/* Header */}
 //       <div className="mb-8">
 //         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -1511,9 +1701,7 @@
 //               </span>
 //               {t.hostManagement}
 //             </h1>
-//             <p className="text-sm text-gray-500 mt-1 ml-2">
-//               {t.manageHostProfile}
-//             </p>
+//             <p className="text-sm text-gray-500 mt-1 ml-2">{t.manageHostProfile}</p>
 //           </div>
 //           <motion.button
 //             whileHover={{ scale: 1.02 }}
@@ -1528,43 +1716,16 @@
 //       </div>
 
 //       {/* Stats Cards */}
-//       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 mb-8">
+//       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-3 mb-8">
 //         {[
-//           {
-//             label: t.totalProperties,
-//             value: stats.total,
-//             color: "bg-gradient-to-br from-blue-500 to-blue-600",
-//           },
-//           {
-//             label: t.availableProperties,
-//             value: stats.available,
-//             color: "bg-gradient-to-br from-green-500 to-green-600",
-//           },
-//           {
-//             label: t.pendingProperties,
-//             value: stats.pending,
-//             color: "bg-gradient-to-br from-yellow-500 to-yellow-600",
-//           },
-//           {
-//             label: t.unavailableProperties,
-//             value: stats.unavailable,
-//             color: "bg-gradient-to-br from-gray-500 to-gray-600",
-//           },
-//           {
-//             label: t.maintenanceProperties,
-//             value: stats.maintenance,
-//             color: "bg-gradient-to-br from-red-500 to-red-600",
-//           },
-//           {
-//             label: t.totalReviews,
-//             value: stats.totalReviews,
-//             color: "bg-gradient-to-br from-purple-500 to-purple-600",
-//           },
-//           {
-//             label: t.rating,
-//             value: stats.averageRating.toFixed(1),
-//             color: "bg-gradient-to-br from-orange-500 to-orange-600",
-//           },
+//           { label: t.totalProperties, value: stats.total, color: "bg-gradient-to-br from-blue-500 to-blue-600" },
+//           { label: t.availableProperties, value: stats.available, color: "bg-gradient-to-br from-green-500 to-green-600" },
+//           { label: t.pendingProperties, value: stats.pending, color: "bg-gradient-to-br from-yellow-500 to-yellow-600" },
+//           { label: t.bookedProperties, value: stats.booked, color: "bg-gradient-to-br from-purple-500 to-purple-600" },
+//           { label: t.unavailableProperties, value: stats.unavailable, color: "bg-gradient-to-br from-gray-500 to-gray-600" },
+//           { label: t.maintenanceProperties, value: stats.maintenance, color: "bg-gradient-to-br from-red-500 to-red-600" },
+//           { label: t.inactiveProperties, value: stats.inactive, color: "bg-gradient-to-br from-gray-400 to-gray-500" },
+//           { label: t.totalReviews, value: stats.totalReviews, color: "bg-gradient-to-br from-orange-500 to-orange-600" },
 //         ].map((stat, index) => (
 //           <motion.div
 //             key={index}
@@ -1601,8 +1762,10 @@
 //               <option value="all">{t.allStatus}</option>
 //               <option value="available">{t.available}</option>
 //               <option value="pending">{t.pending}</option>
+//               <option value="booked">{t.booked}</option>
 //               <option value="unavailable">{t.unavailable}</option>
 //               <option value="maintenance">{t.maintenance}</option>
+//               <option value="inactive">{t.inactive}</option>
 //             </select>
 //             <button
 //               onClick={() => {
@@ -1623,9 +1786,7 @@
 //           <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
 //             <Icons.Home />
 //           </div>
-//           <h3 className="text-xl font-semibold text-gray-900 mb-2">
-//             {t.noProperties}
-//           </h3>
+//           <h3 className="text-xl font-semibold text-gray-900 mb-2">{t.noProperties}</h3>
 //           <p className="text-gray-500">{t.adjustFilters}</p>
 //           <button
 //             onClick={openCreateModal}
@@ -1646,18 +1807,12 @@
 //             >
 //               <div className="relative h-48 overflow-hidden">
 //                 <img
-//                   src={
-//                     house.images && house.images.length > 0
-//                       ? house.images[0].url
-//                       : "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop"
-//                   }
-//                   alt={house.name}
+//                   src={house.images && house.images.length > 0 ? house.images[0].url : "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop"}
+//                   alt={house.name || "Property"}
 //                   className="w-full h-full object-cover"
 //                 />
 //                 <div className="absolute top-3 right-3">
-//                   <span
-//                     className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(house.status)}`}
-//                   >
+//                   <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(house.status)}`}>
 //                     {getStatusLabel(house.status)}
 //                   </span>
 //                 </div>
@@ -1668,31 +1823,27 @@
 //                 )}
 //               </div>
 //               <div className="p-4">
-//                 <h3 className="text-lg font-semibold text-gray-900 truncate">
-//                   {house.name}
-//                 </h3>
+//                 <h3 className="text-lg font-semibold text-gray-900 truncate">{house.name || "Unnamed Property"}</h3>
 //                 <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
 //                   <Icons.Location />
-//                   {house.location.village}, {house.location.district}
+//                   {getLocationDisplay(house)}
 //                 </p>
 //                 <div className="flex items-center gap-2 mt-2 text-sm">
 //                   <span className="flex items-center gap-1 text-gray-600">
-//                     <Icons.Bed /> {house.bedrooms}
+//                     <Icons.Bed /> {house.bedrooms || 0}
 //                   </span>
 //                   <span className="text-gray-300">|</span>
 //                   <span className="flex items-center gap-1 text-gray-600">
-//                     <Icons.Bath /> {house.bathrooms}
+//                     <Icons.Bath /> {house.bathrooms || 0}
 //                   </span>
 //                   <span className="text-gray-300">|</span>
 //                   <span className="flex items-center gap-1 text-gray-600">
-//                     <Icons.User /> {house.maxGuests}
+//                     <Icons.User /> {house.maxGuests || 0}
 //                   </span>
 //                 </div>
 //                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
 //                   <div>
-//                     <p className="text-sm font-bold text-[#FF385C]">
-//                       {formatCurrency(house.pricePerMonth)}
-//                     </p>
+//                     <p className="text-sm font-bold text-[#FF385C]">{formatCurrency(house.pricePerMonth)}</p>
 //                     <p className="text-xs text-gray-500">per month</p>
 //                   </div>
 //                   <div className="flex gap-1">
@@ -1701,6 +1852,7 @@
 //                       whileTap={{ scale: 0.9 }}
 //                       onClick={() => openViewModal(house)}
 //                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+//                       title="View Property"
 //                     >
 //                       <Icons.View />
 //                     </motion.button>
@@ -1709,14 +1861,25 @@
 //                       whileTap={{ scale: 0.9 }}
 //                       onClick={() => openEditModal(house)}
 //                       className="p-2 text-green-600 hover:bg-green-50 rounded-xl transition-all"
+//                       title="Edit Property"
 //                     >
 //                       <Icons.Edit />
 //                     </motion.button>
 //                     <motion.button
 //                       whileHover={{ scale: 1.1 }}
 //                       whileTap={{ scale: 0.9 }}
+//                       onClick={() => openStatusModal(house)}
+//                       className="p-2 text-purple-600 hover:bg-purple-50 rounded-xl transition-all"
+//                       title="Change Status"
+//                     >
+//                       <Icons.Status />
+//                     </motion.button>
+//                     <motion.button
+//                       whileHover={{ scale: 1.1 }}
+//                       whileTap={{ scale: 0.9 }}
 //                       onClick={() => openDeleteModal(house)}
 //                       className="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-all"
+//                       title="Delete Property"
 //                     >
 //                       <Icons.Delete />
 //                     </motion.button>
@@ -1727,6 +1890,110 @@
 //           ))}
 //         </div>
 //       )}
+
+//       {/* Status Update Modal */}
+//       <AnimatePresence>
+//         {isStatusModalOpen && selectedHouse && (
+//           <>
+//             <motion.div
+//               variants={overlayVariants}
+//               initial="hidden"
+//               animate="visible"
+//               exit="exit"
+//               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+//               onClick={() => setIsStatusModalOpen(false)}
+//             />
+//             <motion.div
+//               variants={modalVariants}
+//               initial="hidden"
+//               animate="visible"
+//               exit="exit"
+//               className="fixed inset-0 z-[101] flex items-center justify-center p-4"
+//             >
+//               <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative">
+//                 <div className="px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl">
+//                   <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+//                     <Icons.Status />
+//                     Change Status
+//                   </h2>
+//                   <motion.button
+//                     whileHover={{ rotate: 90 }}
+//                     onClick={() => {
+//                       setIsStatusModalOpen(false);
+//                       setSelectedHouse(null);
+//                     }}
+//                     className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500"
+//                   >
+//                     <Icons.Close />
+//                   </motion.button>
+//                 </div>
+//                 <div className="p-6 space-y-4">
+//                   <div>
+//                     <p className="text-sm text-gray-500">Property</p>
+//                     <p className="text-lg font-semibold text-gray-900">{selectedHouse.name || "Unnamed Property"}</p>
+//                   </div>
+//                   <div>
+//                     <p className="text-sm text-gray-500">Current Status</p>
+//                     <span className={`px-3 py-1.5 text-sm font-medium rounded-full ${getStatusColor(selectedHouse.status)}`}>
+//                       {getStatusLabel(selectedHouse.status)}
+//                     </span>
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
+//                       New Status
+//                     </label>
+//                     <select
+//                       value={newStatus}
+//                       onChange={(e) => setNewStatus(e.target.value as House["status"])}
+//                       className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
+//                     >
+//                       {getStatusOptions(selectedHouse.status).map((status) => (
+//                         <option key={status} value={status}>
+//                           {getStatusLabel(status)}
+//                         </option>
+//                       ))}
+//                     </select>
+//                   </div>
+//                   <div className="flex gap-3 pt-4 border-t border-gray-200">
+//                     <motion.button
+//                       whileHover={{ scale: 1.02 }}
+//                       whileTap={{ scale: 0.98 }}
+//                       onClick={handleStatusUpdate}
+//                       disabled={submitting}
+//                       className={`flex-1 px-6 py-3 rounded-xl text-white font-medium transition-all flex items-center justify-center gap-2 ${
+//                         submitting ? "bg-gray-400 cursor-not-allowed" :
+//                         "bg-gradient-to-r from-[#FF385C] to-[#E31C5F] hover:shadow-lg"
+//                       }`}
+//                     >
+//                       {submitting ? (
+//                         <>
+//                           <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+//                           Updating...
+//                         </>
+//                       ) : (
+//                         <>
+//                           <Icons.Status /> Update Status
+//                         </>
+//                       )}
+//                     </motion.button>
+//                     <motion.button
+//                       whileHover={{ scale: 1.02 }}
+//                       whileTap={{ scale: 0.98 }}
+//                       onClick={() => {
+//                         setIsStatusModalOpen(false);
+//                         setSelectedHouse(null);
+//                       }}
+//                       className="flex-1 px-6 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+//                     >
+//                       {t.cancel}
+//                     </motion.button>
+//                   </div>
+//                 </div>
+//               </div>
+//             </motion.div>
+//           </>
+//         )}
+//       </AnimatePresence>
 
 //       {/* View Property Modal */}
 //       <AnimatePresence>
@@ -1768,7 +2035,7 @@
 //                         <img
 //                           key={index}
 //                           src={img.url}
-//                           alt={selectedHouse.name}
+//                           alt={selectedHouse.name || "Property"}
 //                           className={`rounded-xl object-cover h-48 ${index === 0 ? "col-span-2" : ""}`}
 //                         />
 //                       ))}
@@ -1778,97 +2045,59 @@
 //                       <p className="text-gray-500">No images available</p>
 //                     </div>
 //                   )}
-//                   <h3 className="text-2xl font-bold text-gray-900">
-//                     {selectedHouse.name}
-//                   </h3>
+//                   <div className="flex items-center justify-between">
+//                     <h3 className="text-2xl font-bold text-gray-900">{selectedHouse.name || "Unnamed Property"}</h3>
+//                     <span className={`px-3 py-1.5 text-sm font-medium rounded-full ${getStatusColor(selectedHouse.status)}`}>
+//                       {getStatusLabel(selectedHouse.status)}
+//                     </span>
+//                   </div>
 //                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 //                     <div>
-//                       <p className="text-sm font-medium text-gray-500">
-//                         {t.status}
-//                       </p>
-//                       <span
-//                         className={`px-2.5 py-1 text-sm font-medium rounded-full ${getStatusColor(selectedHouse.status)}`}
-//                       >
-//                         {getStatusLabel(selectedHouse.status)}
-//                       </span>
+//                       <p className="text-sm font-medium text-gray-500">{t.pricePerMonth}</p>
+//                       <p className="text-lg font-bold text-[#FF385C]">{formatCurrency(selectedHouse.pricePerMonth)}</p>
 //                     </div>
 //                     <div>
-//                       <p className="text-sm font-medium text-gray-500">
-//                         {t.pricePerMonth}
-//                       </p>
-//                       <p className="text-lg font-bold text-[#FF385C]">
-//                         {formatCurrency(selectedHouse.pricePerMonth)}
-//                       </p>
+//                       <p className="text-sm font-medium text-gray-500">{t.university}</p>
+//                       <p className="text-sm text-gray-700">{selectedHouse.university || "N/A"}</p>
 //                     </div>
 //                   </div>
 //                   <div>
-//                     <p className="text-sm font-medium text-gray-500">
-//                       {t.description}
-//                     </p>
-//                     <p className="text-sm text-gray-700 mt-1">
-//                       {selectedHouse.description}
-//                     </p>
+//                     <p className="text-sm font-medium text-gray-500">{t.description}</p>
+//                     <p className="text-sm text-gray-700 mt-1">{selectedHouse.description || "No description available"}</p>
 //                   </div>
 //                   <div className="grid grid-cols-3 gap-4">
 //                     <div>
-//                       <p className="text-sm font-medium text-gray-500">
-//                         {t.bedrooms}
-//                       </p>
-//                       <p className="text-lg font-semibold">
-//                         {selectedHouse.bedrooms}
-//                       </p>
+//                       <p className="text-sm font-medium text-gray-500">{t.bedrooms}</p>
+//                       <p className="text-lg font-semibold">{selectedHouse.bedrooms || 0}</p>
 //                     </div>
 //                     <div>
-//                       <p className="text-sm font-medium text-gray-500">
-//                         {t.bathrooms}
-//                       </p>
-//                       <p className="text-lg font-semibold">
-//                         {selectedHouse.bathrooms}
-//                       </p>
+//                       <p className="text-sm font-medium text-gray-500">{t.bathrooms}</p>
+//                       <p className="text-lg font-semibold">{selectedHouse.bathrooms || 0}</p>
 //                     </div>
 //                     <div>
-//                       <p className="text-sm font-medium text-gray-500">
-//                         {t.maxGuests}
-//                       </p>
-//                       <p className="text-lg font-semibold">
-//                         {selectedHouse.maxGuests}
-//                       </p>
+//                       <p className="text-sm font-medium text-gray-500">{t.maxGuests}</p>
+//                       <p className="text-lg font-semibold">{selectedHouse.maxGuests || 0}</p>
 //                     </div>
 //                   </div>
 //                   <div>
-//                     <p className="text-sm font-medium text-gray-500">
-//                       {t.location}
-//                     </p>
-//                     <p className="text-sm text-gray-700">
-//                       {selectedHouse.location.village},{" "}
-//                       {selectedHouse.location.sector},<br />
-//                       {selectedHouse.location.district},{" "}
-//                       {selectedHouse.location.province}
-//                     </p>
+//                     <p className="text-sm font-medium text-gray-500">{t.location}</p>
+//                     <p className="text-sm text-gray-700">{getFullLocationDisplay(selectedHouse)}</p>
 //                   </div>
 //                   <div>
-//                     <p className="text-sm font-medium text-gray-500">
-//                       {t.amenities}
-//                     </p>
+//                     <p className="text-sm font-medium text-gray-500">{t.amenities}</p>
 //                     <div className="flex flex-wrap gap-1 mt-1">
-//                       {selectedHouse.amenities &&
-//                       selectedHouse.amenities.length > 0 ? (
+//                       {selectedHouse.amenities && selectedHouse.amenities.length > 0 ? (
 //                         selectedHouse.amenities.map((amenity) => (
-//                           <span
-//                             key={amenity}
-//                             className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
-//                           >
+//                           <span key={amenity} className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
 //                             {amenity}
 //                           </span>
 //                         ))
 //                       ) : (
-//                         <span className="text-sm text-gray-400">
-//                           No amenities
-//                         </span>
+//                         <span className="text-sm text-gray-400">No amenities</span>
 //                       )}
 //                     </div>
 //                   </div>
-//                   <div className="flex gap-3 pt-4 border-t border-gray-200">
+//                   <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
 //                     <motion.button
 //                       whileHover={{ scale: 1.02 }}
 //                       whileTap={{ scale: 0.98 }}
@@ -1879,6 +2108,17 @@
 //                       className="px-4 py-2.5 bg-[#FF385C] text-white rounded-xl hover:bg-[#E31C5F] transition-colors flex items-center gap-2"
 //                     >
 //                       <Icons.Edit /> {t.editProperty}
+//                     </motion.button>
+//                     <motion.button
+//                       whileHover={{ scale: 1.02 }}
+//                       whileTap={{ scale: 0.98 }}
+//                       onClick={() => {
+//                         setIsViewModalOpen(false);
+//                         openStatusModal(selectedHouse);
+//                       }}
+//                       className="px-4 py-2.5 bg-purple-500 text-white rounded-xl hover:bg-purple-600 transition-colors flex items-center gap-2"
+//                     >
+//                       <Icons.Status /> Change Status
 //                     </motion.button>
 //                     <motion.button
 //                       whileHover={{ scale: 1.02 }}
@@ -1957,11 +2197,7 @@
 //                     t.enterName,
 //                     true,
 //                     propertyFormData.name,
-//                     (e) =>
-//                       handleInputChange(
-//                         "name",
-//                         (e.target as HTMLInputElement).value,
-//                       ),
+//                     (e) => handleInputChange("name", (e.target as HTMLInputElement).value),
 //                   )}
 //                   {renderInput(
 //                     t.description,
@@ -1970,11 +2206,7 @@
 //                     t.enterDescription,
 //                     true,
 //                     propertyFormData.description,
-//                     (e) =>
-//                       handleInputChange(
-//                         "description",
-//                         (e.target as HTMLTextAreaElement).value,
-//                       ),
+//                     (e) => handleInputChange("description", (e.target as HTMLTextAreaElement).value),
 //                   )}
 //                   {renderInput(
 //                     t.university,
@@ -1983,11 +2215,7 @@
 //                     "Enter university name",
 //                     true,
 //                     propertyFormData.university,
-//                     (e) =>
-//                       handleInputChange(
-//                         "university",
-//                         (e.target as HTMLInputElement).value,
-//                       ),
+//                     (e) => handleInputChange("university", (e.target as HTMLInputElement).value),
 //                   )}
 
 //                   {/* Location */}
@@ -2002,16 +2230,11 @@
 //                         </label>
 //                         <select
 //                           value={propertyFormData.location.province}
-//                           onChange={(e) =>
-//                             handleLocationChange("province", e.target.value)
-//                           }
+//                           onChange={(e) => handleLocationChange("province", e.target.value)}
 //                           onBlur={() => handleFieldBlur("province")}
 //                           className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white transition-all ${
-//                             hasError("province")
-//                               ? "border-red-500 bg-red-50"
-//                               : isValidField("province")
-//                                 ? "border-green-500 bg-green-50"
-//                                 : "border-gray-300"
+//                             hasError("province") ? "border-red-500 bg-red-50" :
+//                             isValidField("province") ? "border-green-500 bg-green-50" : "border-gray-300"
 //                           }`}
 //                         >
 //                           <option value="">{t.provincePlaceholder}</option>
@@ -2021,15 +2244,9 @@
 //                           <option value="Eastern">Eastern</option>
 //                           <option value="Western">Western</option>
 //                         </select>
-//                         {hasError("province") && (
-//                           <p className="mt-1 text-sm text-red-500">
-//                             {formErrors.province}
-//                           </p>
-//                         )}
+//                         {hasError("province") && <p className="mt-1 text-sm text-red-500">{formErrors.province}</p>}
 //                         {isValidField("province") && (
-//                           <p className="mt-1 text-sm text-green-500 flex items-center gap-1">
-//                             <Icons.Check /> Valid
-//                           </p>
+//                           <p className="mt-1 text-sm text-green-500 flex items-center gap-1"><Icons.Check /> Valid</p>
 //                         )}
 //                       </div>
 //                       <div>
@@ -2039,28 +2256,17 @@
 //                         <input
 //                           type="text"
 //                           value={propertyFormData.location.district}
-//                           onChange={(e) =>
-//                             handleLocationChange("district", e.target.value)
-//                           }
+//                           onChange={(e) => handleLocationChange("district", e.target.value)}
 //                           onBlur={() => handleFieldBlur("district")}
 //                           placeholder={t.districtPlaceholder}
 //                           className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
-//                             hasError("district")
-//                               ? "border-red-500 bg-red-50"
-//                               : isValidField("district")
-//                                 ? "border-green-500 bg-green-50"
-//                                 : "border-gray-300"
+//                             hasError("district") ? "border-red-500 bg-red-50" :
+//                             isValidField("district") ? "border-green-500 bg-green-50" : "border-gray-300"
 //                           }`}
 //                         />
-//                         {hasError("district") && (
-//                           <p className="mt-1 text-sm text-red-500">
-//                             {formErrors.district}
-//                           </p>
-//                         )}
+//                         {hasError("district") && <p className="mt-1 text-sm text-red-500">{formErrors.district}</p>}
 //                         {isValidField("district") && (
-//                           <p className="mt-1 text-sm text-green-500 flex items-center gap-1">
-//                             <Icons.Check /> Valid
-//                           </p>
+//                           <p className="mt-1 text-sm text-green-500 flex items-center gap-1"><Icons.Check /> Valid</p>
 //                         )}
 //                       </div>
 //                     </div>
@@ -2072,28 +2278,17 @@
 //                         <input
 //                           type="text"
 //                           value={propertyFormData.location.sector}
-//                           onChange={(e) =>
-//                             handleLocationChange("sector", e.target.value)
-//                           }
+//                           onChange={(e) => handleLocationChange("sector", e.target.value)}
 //                           onBlur={() => handleFieldBlur("sector")}
 //                           placeholder={t.sectorPlaceholder}
 //                           className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
-//                             hasError("sector")
-//                               ? "border-red-500 bg-red-50"
-//                               : isValidField("sector")
-//                                 ? "border-green-500 bg-green-50"
-//                                 : "border-gray-300"
+//                             hasError("sector") ? "border-red-500 bg-red-50" :
+//                             isValidField("sector") ? "border-green-500 bg-green-50" : "border-gray-300"
 //                           }`}
 //                         />
-//                         {hasError("sector") && (
-//                           <p className="mt-1 text-sm text-red-500">
-//                             {formErrors.sector}
-//                           </p>
-//                         )}
+//                         {hasError("sector") && <p className="mt-1 text-sm text-red-500">{formErrors.sector}</p>}
 //                         {isValidField("sector") && (
-//                           <p className="mt-1 text-sm text-green-500 flex items-center gap-1">
-//                             <Icons.Check /> Valid
-//                           </p>
+//                           <p className="mt-1 text-sm text-green-500 flex items-center gap-1"><Icons.Check /> Valid</p>
 //                         )}
 //                       </div>
 //                       <div>
@@ -2103,28 +2298,17 @@
 //                         <input
 //                           type="text"
 //                           value={propertyFormData.location.cell}
-//                           onChange={(e) =>
-//                             handleLocationChange("cell", e.target.value)
-//                           }
+//                           onChange={(e) => handleLocationChange("cell", e.target.value)}
 //                           onBlur={() => handleFieldBlur("cell")}
 //                           placeholder={t.cellPlaceholder}
 //                           className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
-//                             hasError("cell")
-//                               ? "border-red-500 bg-red-50"
-//                               : isValidField("cell")
-//                                 ? "border-green-500 bg-green-50"
-//                                 : "border-gray-300"
+//                             hasError("cell") ? "border-red-500 bg-red-50" :
+//                             isValidField("cell") ? "border-green-500 bg-green-50" : "border-gray-300"
 //                           }`}
 //                         />
-//                         {hasError("cell") && (
-//                           <p className="mt-1 text-sm text-red-500">
-//                             {formErrors.cell}
-//                           </p>
-//                         )}
+//                         {hasError("cell") && <p className="mt-1 text-sm text-red-500">{formErrors.cell}</p>}
 //                         {isValidField("cell") && (
-//                           <p className="mt-1 text-sm text-green-500 flex items-center gap-1">
-//                             <Icons.Check /> Valid
-//                           </p>
+//                           <p className="mt-1 text-sm text-green-500 flex items-center gap-1"><Icons.Check /> Valid</p>
 //                         )}
 //                       </div>
 //                     </div>
@@ -2135,28 +2319,17 @@
 //                       <input
 //                         type="text"
 //                         value={propertyFormData.location.village}
-//                         onChange={(e) =>
-//                           handleLocationChange("village", e.target.value)
-//                         }
+//                         onChange={(e) => handleLocationChange("village", e.target.value)}
 //                         onBlur={() => handleFieldBlur("village")}
 //                         placeholder={t.villagePlaceholder}
 //                         className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
-//                           hasError("village")
-//                             ? "border-red-500 bg-red-50"
-//                             : isValidField("village")
-//                               ? "border-green-500 bg-green-50"
-//                               : "border-gray-300"
+//                           hasError("village") ? "border-red-500 bg-red-50" :
+//                           isValidField("village") ? "border-green-500 bg-green-50" : "border-gray-300"
 //                         }`}
 //                       />
-//                       {hasError("village") && (
-//                         <p className="mt-1 text-sm text-red-500">
-//                           {formErrors.village}
-//                         </p>
-//                       )}
+//                       {hasError("village") && <p className="mt-1 text-sm text-red-500">{formErrors.village}</p>}
 //                       {isValidField("village") && (
-//                         <p className="mt-1 text-sm text-green-500 flex items-center gap-1">
-//                           <Icons.Check /> Valid
-//                         </p>
+//                         <p className="mt-1 text-sm text-green-500 flex items-center gap-1"><Icons.Check /> Valid</p>
 //                       )}
 //                     </div>
 //                   </div>
@@ -2164,18 +2337,8 @@
 //                   {/* Pricing and Details */}
 //                   <div className="border-t border-gray-200 pt-4">
 //                     <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
-//                       <svg
-//                         className="w-4 h-4"
-//                         fill="none"
-//                         stroke="currentColor"
-//                         viewBox="0 0 24 24"
-//                       >
-//                         <path
-//                           strokeLinecap="round"
-//                           strokeLinejoin="round"
-//                           strokeWidth="2"
-//                           d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v1m0 3V9m0 6V15m0 6v-3"
-//                         />
+//                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v1m0 3V9m0 6V15m0 6v-3" />
 //                       </svg>
 //                       Pricing & Details
 //                     </h3>
@@ -2187,12 +2350,7 @@
 //                         t.enterPrice,
 //                         true,
 //                         propertyFormData.pricePerMonth,
-//                         (e) =>
-//                           handleInputChange(
-//                             "pricePerMonth",
-//                             parseFloat((e.target as HTMLInputElement).value) ||
-//                               0,
-//                           ),
+//                         (e) => handleInputChange("pricePerMonth", parseFloat((e.target as HTMLInputElement).value) || 0),
 //                       )}
 //                       {renderInput(
 //                         t.bedrooms,
@@ -2201,11 +2359,7 @@
 //                         t.enterBedrooms,
 //                         true,
 //                         propertyFormData.bedrooms,
-//                         (e) =>
-//                           handleInputChange(
-//                             "bedrooms",
-//                             parseInt((e.target as HTMLInputElement).value) || 0,
-//                           ),
+//                         (e) => handleInputChange("bedrooms", parseInt((e.target as HTMLInputElement).value) || 0),
 //                       )}
 //                       {renderInput(
 //                         t.bathrooms,
@@ -2214,11 +2368,7 @@
 //                         t.enterBathrooms,
 //                         true,
 //                         propertyFormData.bathrooms,
-//                         (e) =>
-//                           handleInputChange(
-//                             "bathrooms",
-//                             parseInt((e.target as HTMLInputElement).value) || 0,
-//                           ),
+//                         (e) => handleInputChange("bathrooms", parseInt((e.target as HTMLInputElement).value) || 0),
 //                       )}
 //                     </div>
 //                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
@@ -2229,11 +2379,7 @@
 //                         t.enterMaxGuests,
 //                         true,
 //                         propertyFormData.maxGuests,
-//                         (e) =>
-//                           handleInputChange(
-//                             "maxGuests",
-//                             parseInt((e.target as HTMLInputElement).value) || 0,
-//                           ),
+//                         (e) => handleInputChange("maxGuests", parseInt((e.target as HTMLInputElement).value) || 0),
 //                       )}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -2241,15 +2387,15 @@
 //                         </label>
 //                         <select
 //                           value={propertyFormData.status}
-//                           onChange={(e) =>
-//                             handleInputChange("status", e.target.value)
-//                           }
+//                           onChange={(e) => handleInputChange("status", e.target.value)}
 //                           className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
 //                         >
-//                           <option value="pending">{t.pending}</option>
 //                           <option value="available">{t.available}</option>
+//                           <option value="pending">{t.pending}</option>
+//                           <option value="booked">{t.booked}</option>
 //                           <option value="unavailable">{t.unavailable}</option>
 //                           <option value="maintenance">{t.maintenance}</option>
+//                           <option value="inactive">{t.inactive}</option>
 //                         </select>
 //                       </div>
 //                     </div>
@@ -2268,11 +2414,7 @@
 //                         "Enter host name",
 //                         true,
 //                         propertyFormData.host.name,
-//                         (e) =>
-//                           handleInputChange(
-//                             "host.name",
-//                             (e.target as HTMLInputElement).value,
-//                           ),
+//                         (e) => handleInputChange("host.name", (e.target as HTMLInputElement).value),
 //                       )}
 //                       {renderInput(
 //                         t.hostEmail,
@@ -2281,11 +2423,7 @@
 //                         "Enter host email",
 //                         true,
 //                         propertyFormData.host.email,
-//                         (e) =>
-//                           handleInputChange(
-//                             "host.email",
-//                             (e.target as HTMLInputElement).value,
-//                           ),
+//                         (e) => handleInputChange("host.email", (e.target as HTMLInputElement).value),
 //                       )}
 //                     </div>
 //                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
@@ -2296,11 +2434,7 @@
 //                         "Enter host phone",
 //                         false,
 //                         propertyFormData.host.phone,
-//                         (e) =>
-//                           handleInputChange(
-//                             "host.phone",
-//                             (e.target as HTMLInputElement).value,
-//                           ),
+//                         (e) => handleInputChange("host.phone", (e.target as HTMLInputElement).value),
 //                       )}
 //                       {renderInput(
 //                         t.responseRate,
@@ -2309,12 +2443,7 @@
 //                         "0-100",
 //                         false,
 //                         propertyFormData.host.responseRate,
-//                         (e) =>
-//                           handleInputChange(
-//                             "host.responseRate",
-//                             parseFloat((e.target as HTMLInputElement).value) ||
-//                               0,
-//                           ),
+//                         (e) => handleInputChange("host.responseRate", parseFloat((e.target as HTMLInputElement).value) || 0),
 //                       )}
 //                     </div>
 //                   </div>
@@ -2322,18 +2451,8 @@
 //                   {/* Amenities */}
 //                   <div className="border-t border-gray-200 pt-4">
 //                     <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
-//                       <svg
-//                         className="w-4 h-4"
-//                         fill="none"
-//                         stroke="currentColor"
-//                         viewBox="0 0 24 24"
-//                       >
-//                         <path
-//                           strokeLinecap="round"
-//                           strokeLinejoin="round"
-//                           strokeWidth="2"
-//                           d="M5 13l4 4L19 7"
-//                         />
+//                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
 //                       </svg>
 //                       {t.amenities}
 //                     </h3>
@@ -2355,27 +2474,11 @@
 //                     </div>
 //                     <div className="mt-2 flex flex-wrap gap-1.5">
 //                       {propertyFormData.amenities.map((amenity) => (
-//                         <span
-//                           key={amenity}
-//                           className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs flex items-center gap-1.5 border border-blue-200"
-//                         >
+//                         <span key={amenity} className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs flex items-center gap-1.5 border border-blue-200">
 //                           {amenity}
-//                           <button
-//                             onClick={() => removeAmenity(amenity)}
-//                             className="hover:text-red-500"
-//                           >
-//                             <svg
-//                               className="w-3 h-3"
-//                               fill="none"
-//                               stroke="currentColor"
-//                               viewBox="0 0 24 24"
-//                             >
-//                               <path
-//                                 strokeLinecap="round"
-//                                 strokeLinejoin="round"
-//                                 strokeWidth="2"
-//                                 d="M6 18L18 6M6 6l12 12"
-//                               />
+//                           <button onClick={() => removeAmenity(amenity)} className="hover:text-red-500">
+//                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
 //                             </svg>
 //                           </button>
 //                         </span>
@@ -2386,16 +2489,13 @@
 //                   {/* Image Upload */}
 //                   <div className="border-t border-gray-200 pt-4">
 //                     <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
-//                       <Icons.Upload /> {t.uploadImages}{" "}
-//                       <span className="text-red-500">*</span>
+//                       <Icons.Upload /> {t.uploadImages} <span className="text-red-500">*</span>
 //                     </h3>
 //                     <div
 //                       className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
-//                         hasError("images")
-//                           ? "border-red-500 bg-red-50"
-//                           : imageFiles.length > 0 || imagePreviews.length > 0
-//                             ? "border-green-500 bg-green-50"
-//                             : "border-gray-300 hover:border-[#FF385C] hover:bg-gray-50"
+//                         hasError("images") ? "border-red-500 bg-red-50" :
+//                         imageFiles.length > 0 || imagePreviews.length > 0 ? "border-green-500 bg-green-50" :
+//                         "border-gray-300 hover:border-[#FF385C] hover:bg-gray-50"
 //                       }`}
 //                       onClick={() => fileInputRef.current?.click()}
 //                       onDrop={(e) => {
@@ -2414,81 +2514,42 @@
 //                       />
 //                       <Icons.Upload />
 //                       <p className="mt-2 text-sm text-gray-600">{t.dragDrop}</p>
-//                       <p className="text-xs text-gray-400 mt-1">
-//                         PNG, JPG, JPEG up to 5MB
-//                       </p>
+//                       <p className="text-xs text-gray-400 mt-1">PNG, JPG, JPEG up to 5MB</p>
 //                     </div>
-//                     {(imagePreviews.length > 0 ||
-//                       (selectedHouse &&
-//                         selectedHouse.images &&
-//                         selectedHouse.images.length > 0)) && (
+//                     {(imagePreviews.length > 0 || (selectedHouse && selectedHouse.images && selectedHouse.images.length > 0)) && (
 //                       <div className="mt-3 grid grid-cols-4 gap-2">
 //                         {imagePreviews.map((preview, index) => (
 //                           <div key={index} className="relative group">
-//                             <img
-//                               src={preview}
-//                               alt={`Preview ${index}`}
-//                               className="w-full h-20 object-cover rounded-xl"
-//                             />
+//                             <img src={preview} alt={`Preview ${index}`} className="w-full h-20 object-cover rounded-xl" />
 //                             <button
 //                               onClick={() => removeImage(index)}
 //                               className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
 //                             >
-//                               <svg
-//                                 className="w-3.5 h-3.5"
-//                                 fill="none"
-//                                 stroke="currentColor"
-//                                 viewBox="0 0 24 24"
-//                               >
-//                                 <path
-//                                   strokeLinecap="round"
-//                                   strokeLinejoin="round"
-//                                   strokeWidth="2"
-//                                   d="M6 18L18 6M6 6l12 12"
-//                                 />
+//                               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
 //                               </svg>
 //                             </button>
 //                           </div>
 //                         ))}
-//                         {selectedHouse &&
-//                           selectedHouse.images &&
-//                           selectedHouse.images.map((img, index) => (
-//                             <div
-//                               key={`existing-${index}`}
-//                               className="relative group"
-//                             >
-//                               <img
-//                                 src={img.url}
-//                                 alt={`Existing ${index}`}
-//                                 className="w-full h-20 object-cover rounded-xl"
-//                               />
-//                             </div>
-//                           ))}
+//                         {selectedHouse && selectedHouse.images && selectedHouse.images.map((img, index) => (
+//                           <div key={`existing-${index}`} className="relative group">
+//                             <img src={img.url} alt={`Existing ${index}`} className="w-full h-20 object-cover rounded-xl" />
+//                           </div>
+//                         ))}
 //                       </div>
 //                     )}
-//                     {hasError("images") && (
-//                       <p className="mt-1 text-sm text-red-500">
-//                         {formErrors.images}
-//                       </p>
-//                     )}
+//                     {hasError("images") && <p className="mt-1 text-sm text-red-500">{formErrors.images}</p>}
 //                   </div>
-
-//                   {/* REMOVED: Availability section - Start Date and End Date fields are no longer needed */}
 
 //                   <div className="flex gap-3 pt-4 border-t border-gray-200">
 //                     <motion.button
 //                       whileHover={{ scale: 1.02 }}
 //                       whileTap={{ scale: 0.98 }}
-//                       onClick={
-//                         isEditModalOpen
-//                           ? handleUpdateProperty
-//                           : handleCreateProperty
-//                       }
+//                       onClick={isEditModalOpen ? handleUpdateProperty : handleCreateProperty}
 //                       disabled={submitting || !isFormValid()}
 //                       className={`flex-1 px-6 py-3 rounded-xl text-white font-medium transition-all flex items-center justify-center gap-2 ${
-//                         submitting || !isFormValid()
-//                           ? "bg-gray-400 cursor-not-allowed"
-//                           : "bg-gradient-to-r from-[#FF385C] to-[#E31C5F] hover:shadow-lg"
+//                         submitting || !isFormValid() ? "bg-gray-400 cursor-not-allowed" :
+//                         "bg-gradient-to-r from-[#FF385C] to-[#E31C5F] hover:shadow-lg"
 //                       }`}
 //                     >
 //                       {submitting ? (
@@ -2524,79 +2585,40 @@
 //       </AnimatePresence>
 
 //       {/* Delete Confirmation Modal */}
-//       <AnimatePresence>
-//         {isDeleteModalOpen && selectedHouse && (
-//           <>
-//             <motion.div
-//               variants={overlayVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-//               onClick={() => {
-//                 setIsDeleteModalOpen(false);
-//                 setSelectedHouse(null);
-//               }}
-//             />
-//             <motion.div
-//               variants={modalVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-//             >
-//               <motion.div className="w-full max-w-md rounded-2xl shadow-2xl bg-white">
-//                 <div className="p-6 text-center">
-//                   <div className="w-20 h-20 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
-//                     <Icons.Delete />
-//                   </div>
-//                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
-//                     {t.deleteProperty}
-//                   </h3>
-//                   <p className="text-gray-500 mb-2">{t.deleteConfirmation}</p>
-//                   <p className="text-sm text-gray-400">{t.actionUndone}</p>
-//                   <div className="flex gap-3 mt-6">
-//                     <motion.button
-//                       whileHover={{ scale: 1.02 }}
-//                       whileTap={{ scale: 0.98 }}
-//                       onClick={() => {
-//                         setIsDeleteModalOpen(false);
-//                         setSelectedHouse(null);
-//                       }}
-//                       className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-//                     >
-//                       {t.cancel}
-//                     </motion.button>
-//                     <motion.button
-//                       whileHover={{ scale: 1.02 }}
-//                       whileTap={{ scale: 0.98 }}
-//                       onClick={handleDeleteProperty}
-//                       disabled={submitting}
-//                       className={`flex-1 px-4 py-2.5 rounded-xl text-white font-medium transition-colors ${
-//                         submitting
-//                           ? "bg-gray-400 cursor-not-allowed"
-//                           : "bg-red-600 hover:bg-red-700"
-//                       }`}
-//                     >
-//                       {submitting ? (
-//                         <span className="flex items-center justify-center gap-2">
-//                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-//                           {t.deleting}
-//                         </span>
-//                       ) : (
-//                         t.delete
-//                       )}
-//                     </motion.button>
-//                   </div>
-//                 </div>
-//               </motion.div>
-//             </motion.div>
-//           </>
-//         )}
-//       </AnimatePresence>
+//       <ConfirmModal
+//         isOpen={isDeleteModalOpen}
+//         onClose={() => {
+//           setIsDeleteModalOpen(false);
+//           setSelectedHouse(null);
+//         }}
+//         onConfirm={handleDeleteProperty}
+//         title={t.deleteProperty}
+//         message={t.deleteConfirmation}
+//         confirmText={t.delete}
+//         cancelText={t.cancel}
+//         isSubmitting={submitting}
+//         type="danger"
+//         icon={
+//           <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+//           </svg>
+//         }
+//       />
 //     </div>
 //   );
 // };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2827,21 +2849,16 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 // API Base URL
 const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
 
-// Types based on the House model
-interface Host {
-  name: string;
-  email: string;
-  phone: string;
-  responseRate: number;
-  responseTime: string;
-}
-
+// Types based on the House model - matches backend schema exactly
 interface Location {
   province: string;
   district: string;
   sector: string;
   cell: string;
   village: string;
+  address?: string;
+  latitude?: number | null;
+  longitude?: number | null;
   coordinates?: {
     lat: number;
     lng: number;
@@ -2852,18 +2869,19 @@ interface Image {
   public_id: string;
   url: string;
   secure_url: string;
-  file?: File;
+  original_filename?: string;
 }
 
 interface Availability {
-  startDate: string;
-  endDate: string;
+  startDate: Date;
+  endDate: Date;
 }
 
 interface House {
   _id?: string;
   houseId: string;
   name: string;
+  houseType: string;
   description: string;
   images: Image[];
   location: Location;
@@ -2871,14 +2889,19 @@ interface House {
   pricePerMonth: number;
   bedrooms: number;
   bathrooms: number;
-  maxGuests: number;
+  guests: number; // Backend uses "guests" in the response
   amenities: string[];
-  status: "available" | "pending" | "unavailable" | "maintenance";
+  status: "available" | "pending" | "booked" | "unavailable" | "maintenance" | "inactive";
   rating: number;
   totalReviews: number;
-  host: Host;
-  availability: Availability;
+  ownerName: string;
+  ownerEmail: string;
+  ownerContact: string;
   isActive: boolean;
+  isFeatured?: boolean;
+  availability?: Availability;
+  createdBy?: string;
+  createdByEmail?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -2906,8 +2929,10 @@ const translations = {
     totalProperties: "Total Properties",
     availableProperties: "Available",
     pendingProperties: "Pending",
+    bookedProperties: "Booked",
     unavailableProperties: "Unavailable",
     maintenanceProperties: "Maintenance",
+    inactiveProperties: "Inactive",
     totalReviews: "Total Reviews",
     rating: "Rating",
     searchProperties: "Search properties...",
@@ -2925,6 +2950,7 @@ const translations = {
     viewProperty: "View Property",
     propertyDetails: "Property Details",
     propertyName: "Property Name",
+    houseType: "House Type",
     description: "Description",
     bedrooms: "Bedrooms",
     bathrooms: "Bathrooms",
@@ -2948,12 +2974,15 @@ const translations = {
     email: "Email",
     phone: "Phone",
     available: "Available",
+    booked: "Booked",
     unavailable: "Unavailable",
     maintenance: "Maintenance",
+    inactive: "Inactive",
     pending: "Pending",
     all: "All",
     selectStatus: "Select Status",
     enterName: "Enter property name",
+    enterHouseType: "Enter house type (apartment, villa, etc.)",
     enterDescription: "Enter property description",
     enterPrice: "Enter price per month",
     enterBedrooms: "Enter number of bedrooms",
@@ -2968,24 +2997,23 @@ const translations = {
     sectorPlaceholder: "Enter sector",
     cellPlaceholder: "Enter cell",
     villagePlaceholder: "Enter village",
-    hostName: "Host Name",
-    hostEmail: "Host Email",
-    hostPhone: "Host Phone",
-    responseRate: "Response Rate %",
-    responseTime: "Response Time",
-    uploadImages: "Upload Images",
-    dropImages: "Drop images here or click to upload",
+    ownerName: "Owner Name",
+    ownerEmail: "Owner Email",
+    ownerContact: "Owner Contact",
+    uploadImages: "Upload Images (2-10 images)",
+    dropImages: "Drop images here or click to upload (2-10 images)",
     imagePreview: "Image Preview",
     addImage: "Add Image",
     noImage: "No image",
     selectFiles: "Select Files",
-    dragDrop: "Drag & drop images here",
+    dragDrop: "Drag & drop images here (2-10 images)",
     success: "Success!",
     error: "Error",
     validation: {
       nameRequired: "Property name is required",
       nameMinLength: "Name must be at least 3 characters",
       nameMaxLength: "Name cannot exceed 100 characters",
+      houseTypeRequired: "House type is required",
       descriptionRequired: "Description is required",
       descriptionMinLength: "Description must be at least 20 characters",
       descriptionMaxLength: "Description cannot exceed 2000 characters",
@@ -3003,10 +3031,11 @@ const translations = {
       bathroomsMin: "Bathrooms must be at least 0",
       maxGuestsRequired: "Max guests is required",
       maxGuestsMin: "Max guests must be at least 1",
-      hostNameRequired: "Host name is required",
-      hostEmailRequired: "Host email is required",
-      hostEmailInvalid: "Please enter a valid email",
-      imagesRequired: "At least one image is required",
+      ownerNameRequired: "Owner name is required",
+      ownerEmailRequired: "Owner email is required",
+      ownerEmailInvalid: "Please enter a valid email",
+      imagesMin: "Please upload at least 2 images",
+      imagesMax: "Maximum 10 images allowed",
     },
   },
   fr: {
@@ -3030,8 +3059,10 @@ const translations = {
     totalProperties: "Total des Propriétés",
     availableProperties: "Disponible",
     pendingProperties: "En Attente",
+    bookedProperties: "Réservé",
     unavailableProperties: "Indisponible",
     maintenanceProperties: "Maintenance",
+    inactiveProperties: "Inactif",
     totalReviews: "Total des Avis",
     rating: "Évaluation",
     searchProperties: "Rechercher des propriétés...",
@@ -3049,6 +3080,7 @@ const translations = {
     viewProperty: "Voir la Propriété",
     propertyDetails: "Détails de la Propriété",
     propertyName: "Nom de la Propriété",
+    houseType: "Type de Maison",
     description: "Description",
     bedrooms: "Chambres",
     bathrooms: "Salles de Bain",
@@ -3072,12 +3104,15 @@ const translations = {
     email: "Email",
     phone: "Téléphone",
     available: "Disponible",
+    booked: "Réservé",
     unavailable: "Indisponible",
     maintenance: "Maintenance",
+    inactive: "Inactif",
     pending: "En Attente",
     all: "Tous",
     selectStatus: "Sélectionner le Statut",
     enterName: "Entrez le nom de la propriété",
+    enterHouseType: "Entrez le type de maison (appartement, villa, etc.)",
     enterDescription: "Entrez la description de la propriété",
     enterPrice: "Entrez le prix par mois",
     enterBedrooms: "Entrez le nombre de chambres",
@@ -3092,24 +3127,23 @@ const translations = {
     sectorPlaceholder: "Entrez le secteur",
     cellPlaceholder: "Entrez la cellule",
     villagePlaceholder: "Entrez le village",
-    hostName: "Nom de l'Hôte",
-    hostEmail: "Email de l'Hôte",
-    hostPhone: "Téléphone de l'Hôte",
-    responseRate: "Taux de Réponse %",
-    responseTime: "Temps de Réponse",
-    uploadImages: "Télécharger des Images",
-    dropImages: "Déposez les images ici ou cliquez pour télécharger",
+    ownerName: "Nom du Propriétaire",
+    ownerEmail: "Email du Propriétaire",
+    ownerContact: "Contact du Propriétaire",
+    uploadImages: "Télécharger des Images (2-10 images)",
+    dropImages: "Déposez les images ici ou cliquez pour télécharger (2-10 images)",
     imagePreview: "Aperçu de l'Image",
     addImage: "Ajouter une Image",
     noImage: "Pas d'image",
     selectFiles: "Sélectionner des Fichiers",
-    dragDrop: "Glissez-déposez les images ici",
+    dragDrop: "Glissez-déposez les images ici (2-10 images)",
     success: "Succès !",
     error: "Erreur",
     validation: {
       nameRequired: "Le nom de la propriété est requis",
       nameMinLength: "Le nom doit contenir au moins 3 caractères",
       nameMaxLength: "Le nom ne peut pas dépasser 100 caractères",
+      houseTypeRequired: "Le type de maison est requis",
       descriptionRequired: "La description est requise",
       descriptionMinLength: "La description doit contenir au moins 20 caractères",
       descriptionMaxLength: "La description ne peut pas dépasser 2000 caractères",
@@ -3127,10 +3161,11 @@ const translations = {
       bathroomsMin: "Les salles de bain doivent être au moins 0",
       maxGuestsRequired: "Le nombre max d'invités est requis",
       maxGuestsMin: "Le nombre max d'invités doit être au moins 1",
-      hostNameRequired: "Le nom de l'hôte est requis",
-      hostEmailRequired: "L'email de l'hôte est requis",
-      hostEmailInvalid: "Veuillez entrer un email valide",
-      imagesRequired: "Au moins une image est requise",
+      ownerNameRequired: "Le nom du propriétaire est requis",
+      ownerEmailRequired: "L'email du propriétaire est requis",
+      ownerEmailInvalid: "Veuillez entrer un email valide",
+      imagesMin: "Veuillez télécharger au moins 2 images",
+      imagesMax: "Maximum 10 images autorisées",
     },
   },
   rw: {
@@ -3154,8 +3189,10 @@ const translations = {
     totalProperties: "Amazu Yose",
     availableProperties: "Irahari",
     pendingProperties: "Bitegereje",
+    bookedProperties: "Byaritswe",
     unavailableProperties: "Ntaho",
     maintenanceProperties: "Muri Maintenance",
+    inactiveProperties: "Ntigikora",
     totalReviews: "Ibitekerezo Byose",
     rating: "Amanota",
     searchProperties: "Shakisha amazu...",
@@ -3173,6 +3210,7 @@ const translations = {
     viewProperty: "Reba Inzu",
     propertyDetails: "Ibisobanuro by'Inzu",
     propertyName: "Izina ry'Inzu",
+    houseType: "Ubwoko bw'Inzu",
     description: "Ibisobanuro",
     bedrooms: "Ibyumba",
     bathrooms: "Amazu y'isuku",
@@ -3196,12 +3234,15 @@ const translations = {
     email: "Imeri",
     phone: "Telefone",
     available: "Irahari",
+    booked: "Byaritswe",
     unavailable: "Ntaho",
     maintenance: "Muri Maintenance",
+    inactive: "Ntigikora",
     pending: "Bitegereje",
     all: "Byose",
     selectStatus: "Hitamo Ihagaze",
     enterName: "Andika izina ry'inzu",
+    enterHouseType: "Andika ubwoko bw'inzu (apartment, villa, nk.)",
     enterDescription: "Andika ibisobanuro by'inzu",
     enterPrice: "Andika igiciro ku kwezi",
     enterBedrooms: "Andika umubare w'ibyumba",
@@ -3216,24 +3257,23 @@ const translations = {
     sectorPlaceholder: "Andika Umurenge",
     cellPlaceholder: "Andika Akagari",
     villagePlaceholder: "Andika Umudugudu",
-    hostName: "Izina ry'Umutambyi",
-    hostEmail: "Imeri y'Umutambyi",
-    hostPhone: "Telefone y'Umutambyi",
-    responseRate: "Ugusubiza %",
-    responseTime: "Igihe cyo Gusubiza",
-    uploadImages: "Ongeraho Amashusho",
-    dropImages: "Shyira amashusho hano cyangwa kanda guterura",
+    ownerName: "Izina ry'Umutambyi",
+    ownerEmail: "Imeri y'Umutambyi",
+    ownerContact: "Telefone y'Umutambyi",
+    uploadImages: "Ongeraho Amashusho (2-10 amashusho)",
+    dropImages: "Shyira amashusho hano cyangwa kanda guterura (2-10 amashusho)",
     imagePreview: "Reba Ishusho",
     addImage: "Ongeraho Ishusho",
     noImage: "Nta shusho",
     selectFiles: "Hitamo Amashusho",
-    dragDrop: "Kurura no gushyira amashusho hano",
+    dragDrop: "Kurura no gushyira amashusho hano (2-10 amashusho)",
     success: "Byakunze!",
     error: "Ikosa",
     validation: {
       nameRequired: "Izina ry'inzu rirasabwa",
       nameMinLength: "Izina rigomba kugira byibura inyuguti 3",
       nameMaxLength: "Izina ntirigomba kurenga inyuguti 100",
+      houseTypeRequired: "Ubwoko bw'inzu burakenewe",
       descriptionRequired: "Ibisobanuro birakenewe",
       descriptionMinLength: "Ibisobanuro bigomba kugira byibura inyuguti 20",
       descriptionMaxLength: "Ibisobanuro ntibigomba kurenga inyuguti 2000",
@@ -3251,10 +3291,11 @@ const translations = {
       bathroomsMin: "Amazu y'isuku agomba kuba byibura 0",
       maxGuestsRequired: "Abashyitsi benshi barakenewe",
       maxGuestsMin: "Abashyitsi benshi bagomba kuba byibura 1",
-      hostNameRequired: "Izina ry'umutambyi rirakenewe",
-      hostEmailRequired: "Imeri y'umutambyi irakenewe",
-      hostEmailInvalid: "Andika imeri ikwiye",
-      imagesRequired: "Byibura ishusho imwe irakenewe",
+      ownerNameRequired: "Izina ry'umutambyi rirakenewe",
+      ownerEmailRequired: "Imeri y'umutambyi irakenewe",
+      ownerEmailInvalid: "Andika imeri ikwiye",
+      imagesMin: "Ongeraho byibura amashusho 2",
+      imagesMax: "Amashusho ntarengwa ni 10",
     },
   },
 };
@@ -3299,6 +3340,29 @@ const getToken = (): string => {
   } catch {
     return "";
   }
+};
+
+// Helper function to safely get location display
+const getLocationDisplay = (house: House): string => {
+  if (!house.location) {
+    return "Location not specified";
+  }
+  const { village, district } = house.location;
+  if (!village && !district) {
+    return "Location not specified";
+  }
+  return `${village || "N/A"}, ${district || "N/A"}`;
+};
+
+const getFullLocationDisplay = (house: House): string => {
+  if (!house.location) {
+    return "Location not specified";
+  }
+  const { village, sector, district, province } = house.location;
+  if (!village && !sector && !district && !province) {
+    return "Location not specified";
+  }
+  return `${village || "N/A"}, ${sector || "N/A"}, ${district || "N/A"}, ${province || "N/A"}`;
 };
 
 // ============================================================
@@ -3350,6 +3414,11 @@ const houseApi = {
 
   deleteHouse: async (id: string): Promise<void> => {
     await api.delete(`/houses/${id}`);
+  },
+
+  updateHouseStatus: async (id: string, status: string): Promise<House> => {
+    const response = await api.put(`/houses/${id}/status`, { status });
+    return response.data.data || response.data;
   },
 };
 
@@ -3432,6 +3501,11 @@ const Icons = {
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2M12 3v4m4-2h.01M4 7h.01M8 7h.01M16 7h.01M4 11h16M4 15h16M4 19h16" />
     </svg>
   ),
+  Status: () => (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ),
 };
 
 export const HouseManagement: React.FC = () => {
@@ -3451,7 +3525,9 @@ export const HouseManagement: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [selectedHouse, setSelectedHouse] = useState<House | null>(null);
+  const [newStatus, setNewStatus] = useState<House["status"]>("available");
 
   // Success/Error modal states
   const [successModal, setSuccessModal] = useState<{
@@ -3487,9 +3563,10 @@ export const HouseManagement: React.FC = () => {
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Property form state
+  // Property form state - uses maxGuests for form, guests for API response
   const [propertyFormData, setPropertyFormData] = useState({
     name: "",
+    houseType: "",
     description: "",
     university: "",
     location: {
@@ -3502,16 +3579,12 @@ export const HouseManagement: React.FC = () => {
     pricePerMonth: 0,
     bedrooms: 1,
     bathrooms: 1,
-    maxGuests: 2,
+    maxGuests: 2, // Using maxGuests in form to match backend validation
     amenities: [] as string[],
     status: "pending" as House["status"],
-    host: {
-      name: userName || "",
-      email: userEmail || "",
-      phone: "",
-      responseRate: 0,
-      responseTime: "24 hours",
-    },
+    ownerName: userName || "",
+    ownerEmail: userEmail || "",
+    ownerContact: "",
   });
 
   const [amenityInput, setAmenityInput] = useState("");
@@ -3521,8 +3594,10 @@ export const HouseManagement: React.FC = () => {
     total: 0,
     available: 0,
     pending: 0,
+    booked: 0,
     unavailable: 0,
     maintenance: 0,
+    inactive: 0,
     totalReviews: 0,
     averageRating: 0,
   });
@@ -3553,6 +3628,14 @@ export const HouseManagement: React.FC = () => {
       const housesWithImages = data.map((house) => ({
         ...house,
         images: house.images || [],
+        location: house.location || {
+          province: "",
+          district: "",
+          sector: "",
+          cell: "",
+          village: "",
+        },
+        guests: house.guests || 1,
       }));
       setHouses(housesWithImages);
       setFilteredHouses(housesWithImages);
@@ -3567,17 +3650,80 @@ export const HouseManagement: React.FC = () => {
     }
   }, [t]);
 
+  // LIVE VALIDATION - validates in real-time as user types
+  const validateForm = useCallback(() => {
+    const errors: Record<string, string> = {};
+    const v = t.validation;
+
+    // Name validation
+    if (!propertyFormData.name?.trim()) errors.name = v.nameRequired;
+    else if (propertyFormData.name.length < 3) errors.name = v.nameMinLength;
+    else if (propertyFormData.name.length > 100) errors.name = v.nameMaxLength;
+
+    // House Type validation - REQUIRED by backend
+    if (!propertyFormData.houseType?.trim()) errors.houseType = v.houseTypeRequired;
+
+    // Description validation
+    if (!propertyFormData.description?.trim()) errors.description = v.descriptionRequired;
+    else if (propertyFormData.description.length < 20) errors.description = v.descriptionMinLength;
+    else if (propertyFormData.description.length > 2000) errors.description = v.descriptionMaxLength;
+
+    // Location validation
+    if (!propertyFormData.location.province) errors.province = v.provinceRequired;
+    if (!propertyFormData.location.district?.trim()) errors.district = v.districtRequired;
+    if (!propertyFormData.location.sector?.trim()) errors.sector = v.sectorRequired;
+    if (!propertyFormData.location.cell?.trim()) errors.cell = v.cellRequired;
+    if (!propertyFormData.location.village?.trim()) errors.village = v.villageRequired;
+
+    // University validation
+    if (!propertyFormData.university?.trim()) errors.university = v.universityRequired;
+
+    // Price validation
+    if (propertyFormData.pricePerMonth <= 0) errors.pricePerMonth = v.priceMin;
+
+    // Bedrooms validation
+    if (propertyFormData.bedrooms < 0) errors.bedrooms = v.bedroomsMin;
+    
+    // Bathrooms validation
+    if (propertyFormData.bathrooms < 0) errors.bathrooms = v.bathroomsMin;
+    
+    // Max Guests validation - using maxGuests to match backend
+    if (propertyFormData.maxGuests < 1) errors.maxGuests = v.maxGuestsMin;
+
+    // Owner validation
+    if (!propertyFormData.ownerName?.trim()) errors.ownerName = v.ownerNameRequired;
+    if (!propertyFormData.ownerEmail?.trim()) errors.ownerEmail = v.ownerEmailRequired;
+    else if (!/\S+@\S+\.\S+/.test(propertyFormData.ownerEmail)) errors.ownerEmail = v.ownerEmailInvalid;
+
+    // Images validation - require at least 2 images, max 10
+    const imageCount = imageFiles.length + (selectedHouse?.images?.length || 0);
+    if (imageCount < 2) errors.images = v.imagesMin;
+    else if (imageCount > 10) errors.images = v.imagesMax;
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  }, [propertyFormData, imageFiles, selectedHouse, t.validation]);
+
+  // Check if form is valid - used to enable/disable submit button
   const isFormValid = useCallback(() => {
     const requiredFields = [
-      "name", "description", "university", "province", "district",
+      "name", "houseType", "description", "university", "province", "district",
       "sector", "cell", "village", "pricePerMonth", "bedrooms",
-      "bathrooms", "maxGuests", "hostName", "hostEmail", "images"
+      "bathrooms", "maxGuests", "ownerName", "ownerEmail"
     ];
 
+    // Check if all required fields have been touched
     const allTouched = requiredFields.every((field) => touchedFields[field]);
-    if (!allTouched) return false;
-    return Object.keys(formErrors).length === 0;
-  }, [touchedFields, formErrors]);
+    
+    // Check if there are any errors
+    const hasNoErrors = Object.keys(formErrors).length === 0;
+    
+    // Check if images are uploaded (2-10 images)
+    const imageCount = imageFiles.length + (selectedHouse?.images?.length || 0);
+    const hasValidImages = imageCount >= 2 && imageCount <= 10;
+    
+    return allTouched && hasNoErrors && hasValidImages;
+  }, [touchedFields, formErrors, imageFiles, selectedHouse]);
 
   useEffect(() => {
     loadHouses();
@@ -3590,10 +3736,11 @@ export const HouseManagement: React.FC = () => {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(
         (h) =>
-          h.name.toLowerCase().includes(term) ||
-          h.university.toLowerCase().includes(term) ||
-          h.location.district.toLowerCase().includes(term) ||
-          h.location.village.toLowerCase().includes(term),
+          h.name?.toLowerCase().includes(term) ||
+          h.houseType?.toLowerCase().includes(term) ||
+          h.university?.toLowerCase().includes(term) ||
+          h.location?.district?.toLowerCase().includes(term) ||
+          h.location?.village?.toLowerCase().includes(term),
       );
     }
     if (filterStatus !== "all") {
@@ -3608,11 +3755,13 @@ export const HouseManagement: React.FC = () => {
       total: houses.length,
       available: houses.filter((h) => h.status === "available").length,
       pending: houses.filter((h) => h.status === "pending").length,
+      booked: houses.filter((h) => h.status === "booked").length,
       unavailable: houses.filter((h) => h.status === "unavailable").length,
       maintenance: houses.filter((h) => h.status === "maintenance").length,
-      totalReviews: houses.reduce((sum, h) => sum + h.totalReviews, 0),
+      inactive: houses.filter((h) => h.status === "inactive").length,
+      totalReviews: houses.reduce((sum, h) => sum + (h.totalReviews || 0), 0),
       averageRating: houses.length > 0
-        ? houses.reduce((sum, h) => sum + h.rating, 0) / houses.length
+        ? houses.reduce((sum, h) => sum + (h.rating || 0), 0) / houses.length
         : 0,
     });
   }, [houses]);
@@ -3622,8 +3771,10 @@ export const HouseManagement: React.FC = () => {
     const colors = {
       available: "bg-green-100 text-green-800 border-green-200",
       pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
+      booked: "bg-blue-100 text-blue-800 border-blue-200",
       unavailable: "bg-gray-100 text-gray-800 border-gray-200",
       maintenance: "bg-red-100 text-red-800 border-red-200",
+      inactive: "bg-gray-300 text-gray-600 border-gray-300",
     };
     return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800";
   };
@@ -3632,14 +3783,16 @@ export const HouseManagement: React.FC = () => {
     const labels = {
       available: t.available,
       pending: t.pending,
+      booked: t.booked,
       unavailable: t.unavailable,
       maintenance: t.maintenance,
+      inactive: t.inactive,
     };
     return labels[status as keyof typeof labels] || status;
   };
 
   const formatCurrency = (amount: number): string => {
-    return `RWF ${amount.toLocaleString()}`;
+    return `RWF ${amount?.toLocaleString() || 0}`;
   };
 
   // Amenity functions
@@ -3660,57 +3813,12 @@ export const HouseManagement: React.FC = () => {
     }));
   };
 
-  // Validate form
-  const validateForm = () => {
-    const errors: Record<string, string> = {};
-    const v = t.validation;
-
-    if (!propertyFormData.name.trim()) errors.name = v.nameRequired;
-    else if (propertyFormData.name.length < 3) errors.name = v.nameMinLength;
-    else if (propertyFormData.name.length > 100) errors.name = v.nameMaxLength;
-
-    if (!propertyFormData.description.trim()) errors.description = v.descriptionRequired;
-    else if (propertyFormData.description.length < 20) errors.description = v.descriptionMinLength;
-    else if (propertyFormData.description.length > 2000) errors.description = v.descriptionMaxLength;
-
-    if (!propertyFormData.location.province) errors.province = v.provinceRequired;
-    if (!propertyFormData.location.district.trim()) errors.district = v.districtRequired;
-    if (!propertyFormData.location.sector.trim()) errors.sector = v.sectorRequired;
-    if (!propertyFormData.location.cell.trim()) errors.cell = v.cellRequired;
-    if (!propertyFormData.location.village.trim()) errors.village = v.villageRequired;
-
-    if (!propertyFormData.university.trim()) errors.university = v.universityRequired;
-
-    if (propertyFormData.pricePerMonth <= 0) errors.pricePerMonth = v.priceMin;
-
-    if (propertyFormData.bedrooms < 0) errors.bedrooms = v.bedroomsMin;
-    if (propertyFormData.bathrooms < 0) errors.bathrooms = v.bathroomsMin;
-    if (propertyFormData.maxGuests < 1) errors.maxGuests = v.maxGuestsMin;
-
-    if (!propertyFormData.host.name.trim()) errors.hostName = v.hostNameRequired;
-    if (!propertyFormData.host.email.trim()) errors.hostEmail = v.hostEmailRequired;
-    else if (!/\S+@\S+\.\S+/.test(propertyFormData.host.email)) errors.hostEmail = v.hostEmailInvalid;
-
-    if (imageFiles.length === 0 && !selectedHouse) errors.images = v.imagesRequired;
-
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
+  // Handle field blur - marks field as touched
   const handleFieldBlur = (field: string) => {
     setTouchedFields((prev) => ({ ...prev, [field]: true }));
-    validateForm();
   };
 
-  const hasError = (field: string): boolean => {
-    return touchedFields[field] && !!formErrors[field];
-  };
-
-  const isValidField = (field: string): boolean => {
-    return touchedFields[field] && !formErrors[field];
-  };
-
-  // Handle input change
+  // Handle input change - validates in real-time
   const handleInputChange = (field: string, value: any) => {
     const keys = field.split(".");
     if (keys.length > 1) {
@@ -3724,11 +3832,12 @@ export const HouseManagement: React.FC = () => {
     } else {
       setPropertyFormData((prev) => ({ ...prev, [field]: value }));
     }
-    setFormErrors((prev) => {
-      const newErrors = { ...prev };
-      delete newErrors[field];
-      return newErrors;
-    });
+    
+    // Mark field as touched
+    const fieldName = field.includes(".") ? field.split(".")[1] : field;
+    setTouchedFields((prev) => ({ ...prev, [fieldName]: true }));
+    
+    // Validate immediately
     validateForm();
   };
 
@@ -3737,21 +3846,27 @@ export const HouseManagement: React.FC = () => {
       ...prev,
       location: { ...prev.location, [field]: value },
     }));
-    setFormErrors((prev) => {
-      const newErrors = { ...prev };
-      delete newErrors[field];
-      return newErrors;
-    });
+    setTouchedFields((prev) => ({ ...prev, [field]: true }));
     validateForm();
   };
 
-  // Image handling
+  // Image handling - allow 2-10 images
   const handleImageUpload = (files: FileList | null) => {
     if (!files) return;
     const fileArray = Array.from(files);
-    setImageFiles((prev) => [...prev, ...fileArray]);
+    const currentCount = imageFiles.length + (selectedHouse?.images?.length || 0);
+    const maxAllowed = 10;
+    const remaining = maxAllowed - currentCount;
+    
+    if (remaining <= 0) {
+      showErrorModal(t.error || "Error", t.validation.imagesMax || "Maximum 10 images allowed");
+      return;
+    }
+    
+    const filesToAdd = fileArray.slice(0, remaining);
+    setImageFiles((prev) => [...prev, ...filesToAdd]);
 
-    fileArray.forEach((file) => {
+    filesToAdd.forEach((file) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreviews((prev) => [...prev, e.target?.result as string]);
@@ -3759,45 +3874,65 @@ export const HouseManagement: React.FC = () => {
       reader.readAsDataURL(file);
     });
 
-    setFormErrors((prev) => {
-      const newErrors = { ...prev };
-      delete newErrors.images;
-      return newErrors;
-    });
+    setTouchedFields((prev) => ({ ...prev, images: true }));
     validateForm();
   };
 
   const removeImage = (index: number) => {
-    setImageFiles((prev) => prev.filter((_, i) => i !== index));
-    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    // Check if removing would leave less than 2 images
+    const newImageFiles = imageFiles.filter((_, i) => i !== index);
+    const newImagePreviews = imagePreviews.filter((_, i) => i !== index);
+    const totalImages = newImageFiles.length + (selectedHouse?.images?.length || 0);
+    
+    if (totalImages < 2) {
+      showErrorModal(t.error || "Error", t.validation.imagesMin || "Minimum 2 images required");
+      return;
+    }
+    
+    setImageFiles(newImageFiles);
+    setImagePreviews(newImagePreviews);
     validateForm();
   };
 
-  // Create FormData for API
+  // Create FormData for API - matches backend expectations
   const createFormData = (): FormData => {
     const formData = new FormData();
 
-    formData.append("name", propertyFormData.name);
-    formData.append("description", propertyFormData.description);
-    formData.append("university", propertyFormData.university);
-    formData.append("pricePerMonth", String(propertyFormData.pricePerMonth));
-    formData.append("bedrooms", String(propertyFormData.bedrooms));
-    formData.append("bathrooms", String(propertyFormData.bathrooms));
-    formData.append("maxGuests", String(propertyFormData.maxGuests));
-    formData.append("status", propertyFormData.status);
+    // Required fields - using maxGuests for backend
+    formData.append("name", propertyFormData.name || "");
+    formData.append("houseType", propertyFormData.houseType || "apartment");
+    formData.append("description", propertyFormData.description || "");
+    formData.append("university", propertyFormData.university || "");
+    formData.append("pricePerMonth", String(propertyFormData.pricePerMonth || 0));
+    formData.append("bedrooms", String(propertyFormData.bedrooms || 0));
+    formData.append("bathrooms", String(propertyFormData.bathrooms || 0));
+    formData.append("maxGuests", String(propertyFormData.maxGuests || 1)); // Backend expects maxGuests
+    formData.append("status", propertyFormData.status || "pending");
 
-    Object.entries(propertyFormData.location).forEach(([key, value]) => {
+    // Location - matches backend locationSchema
+    const location = {
+      province: propertyFormData.location.province || "",
+      district: propertyFormData.location.district || "",
+      sector: propertyFormData.location.sector || "",
+      cell: propertyFormData.location.cell || "",
+      village: propertyFormData.location.village || "",
+    };
+
+    Object.entries(location).forEach(([key, value]) => {
       formData.append(`location[${key}]`, value);
     });
 
-    Object.entries(propertyFormData.host).forEach(([key, value]) => {
-      formData.append(`host[${key}]`, String(value));
-    });
+    // Owner data - matches backend owner fields
+    formData.append("ownerName", propertyFormData.ownerName || "");
+    formData.append("ownerEmail", propertyFormData.ownerEmail || "");
+    formData.append("ownerContact", propertyFormData.ownerContact || "");
 
+    // Amenities
     propertyFormData.amenities.forEach((amenity) => {
       formData.append("amenities[]", amenity);
     });
 
+    // Images
     imageFiles.forEach((file) => {
       formData.append("images", file);
     });
@@ -3807,16 +3942,19 @@ export const HouseManagement: React.FC = () => {
 
   // CRUD Operations
   const handleCreateProperty = async () => {
+    // Touch all fields to show validation state
     const allFields = [
-      "name", "description", "university", "province", "district",
+      "name", "houseType", "description", "university", "province", "district",
       "sector", "cell", "village", "pricePerMonth", "bedrooms",
-      "bathrooms", "maxGuests", "hostName", "hostEmail", "images"
+      "bathrooms", "maxGuests", "ownerName", "ownerEmail"
     ];
     const touched: Record<string, boolean> = {};
     allFields.forEach((field) => { touched[field] = true; });
     setTouchedFields(touched);
 
-    if (!validateForm()) {
+    // Run validation
+    const isValid = validateForm();
+    if (!isValid) {
       showErrorModal(t.error || "Error", "Please fix all validation errors");
       return;
     }
@@ -3825,7 +3963,19 @@ export const HouseManagement: React.FC = () => {
     try {
       const formData = createFormData();
       const newHouse = await houseApi.createHouse(formData);
-      const houseWithImages = { ...newHouse, images: newHouse.images || [] };
+      // Backend returns "guests" not "maxGuests"
+      const houseWithImages = { 
+        ...newHouse, 
+        images: newHouse.images || [],
+        location: newHouse.location || {
+          province: "",
+          district: "",
+          sector: "",
+          cell: "",
+          village: "",
+        },
+        guests: newHouse.guests || 1, // Use guests from response
+      };
       setHouses((prev) => [houseWithImages, ...prev]);
       showSuccessModal(
         t.success || "Success!",
@@ -3851,15 +4001,16 @@ export const HouseManagement: React.FC = () => {
     if (!selectedHouse) return;
 
     const allFields = [
-      "name", "description", "university", "province", "district",
+      "name", "houseType", "description", "university", "province", "district",
       "sector", "cell", "village", "pricePerMonth", "bedrooms",
-      "bathrooms", "maxGuests", "hostName", "hostEmail", "images"
+      "bathrooms", "maxGuests", "ownerName", "ownerEmail"
     ];
     const touched: Record<string, boolean> = {};
     allFields.forEach((field) => { touched[field] = true; });
     setTouchedFields(touched);
 
-    if (!validateForm()) {
+    const isValid = validateForm();
+    if (!isValid) {
       showErrorModal(t.error || "Error", "Please fix all validation errors");
       return;
     }
@@ -3868,7 +4019,19 @@ export const HouseManagement: React.FC = () => {
     try {
       const formData = createFormData();
       const updatedHouse = await houseApi.updateHouse(selectedHouse._id!, formData);
-      const houseWithImages = { ...updatedHouse, images: updatedHouse.images || [] };
+      // Backend returns "guests" not "maxGuests"
+      const houseWithImages = { 
+        ...updatedHouse, 
+        images: updatedHouse.images || [],
+        location: updatedHouse.location || {
+          province: "",
+          district: "",
+          sector: "",
+          cell: "",
+          village: "",
+        },
+        guests: updatedHouse.guests || 1, // Use guests from response
+      };
       setHouses((prev) => prev.map((h) => (h._id === selectedHouse._id ? houseWithImages : h)));
       showSuccessModal(
         t.success || "Success!",
@@ -3917,10 +4080,63 @@ export const HouseManagement: React.FC = () => {
     }
   };
 
+  const handleStatusUpdate = async () => {
+    if (!selectedHouse || !newStatus) return;
+
+    setSubmitting(true);
+    try {
+      const updatedHouse = await houseApi.updateHouseStatus(
+        selectedHouse._id!,
+        newStatus
+      );
+
+      // Backend returns "guests" not "maxGuests"
+      const houseWithImages = {
+        ...updatedHouse,
+        images: updatedHouse.images || [],
+        location: updatedHouse.location || {
+          province: "",
+          district: "",
+          sector: "",
+          cell: "",
+          village: "",
+        },
+        guests: updatedHouse.guests || 1, // Use guests from response
+      };
+
+      setHouses((prev) =>
+        prev.map((h) =>
+          h._id === selectedHouse._id ? houseWithImages : h
+        )
+      );
+
+      showSuccessModal(
+        t.success || "Success!",
+        "Status updated successfully!",
+        `${selectedHouse.name} is now ${getStatusLabel(newStatus)}`
+      );
+
+      setIsStatusModalOpen(false);
+      setSelectedHouse(null);
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      showErrorModal(
+        t.error || "Error",
+        "Failed to update status",
+        axiosError.response?.data
+          ? String(axiosError.response?.data)
+          : undefined
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   // Reset form
   const resetForm = () => {
     setPropertyFormData({
       name: "",
+      houseType: "",
       description: "",
       university: "",
       location: {
@@ -3936,13 +4152,9 @@ export const HouseManagement: React.FC = () => {
       maxGuests: 2,
       amenities: [],
       status: "pending",
-      host: {
-        name: userName || "",
-        email: userEmail || "",
-        phone: "",
-        responseRate: 0,
-        responseTime: "24 hours",
-      },
+      ownerName: userName || "",
+      ownerEmail: userEmail || "",
+      ownerContact: "",
     });
     setImageFiles([]);
     setImagePreviews([]);
@@ -3960,18 +4172,28 @@ export const HouseManagement: React.FC = () => {
 
   const openEditModal = (house: House) => {
     setSelectedHouse(house);
+    // Map guests from house to maxGuests for the form
     setPropertyFormData({
-      name: house.name,
-      description: house.description,
-      university: house.university,
-      location: house.location,
-      pricePerMonth: house.pricePerMonth,
-      bedrooms: house.bedrooms,
-      bathrooms: house.bathrooms,
-      maxGuests: house.maxGuests,
+      name: house.name || "",
+      houseType: house.houseType || "",
+      description: house.description || "",
+      university: house.university || "",
+      location: house.location || {
+        province: "",
+        district: "",
+        sector: "",
+        cell: "",
+        village: "",
+      },
+      pricePerMonth: house.pricePerMonth || 0,
+      bedrooms: house.bedrooms || 1,
+      bathrooms: house.bathrooms || 1,
+      maxGuests: house.guests || 2, // Map guests to maxGuests for form
       amenities: house.amenities || [],
-      status: house.status,
-      host: house.host,
+      status: house.status || "pending",
+      ownerName: house.ownerName || "",
+      ownerEmail: house.ownerEmail || "",
+      ownerContact: house.ownerContact || "",
     });
     setImageFiles([]);
     setImagePreviews(house.images ? house.images.map((img) => img.url) : []);
@@ -3990,7 +4212,26 @@ export const HouseManagement: React.FC = () => {
     setIsCreateModalOpen(true);
   };
 
-  // Render input with validation
+  const openStatusModal = (house: House) => {
+    setSelectedHouse(house);
+    setNewStatus(house.status || "available");
+    setIsStatusModalOpen(true);
+  };
+
+  const getStatusOptions = (currentStatus: string): House["status"][] => {
+    const allStatuses: House["status"][] = [
+      "available",
+      "pending",
+      "booked",
+      "unavailable",
+      "maintenance",
+      "inactive",
+    ];
+
+    return allStatuses.filter(status => status !== currentStatus);
+  };
+
+  // Render input with live validation
   const renderInput = (
     label: string,
     field: string,
@@ -4017,7 +4258,7 @@ export const HouseManagement: React.FC = () => {
             onBlur={() => handleFieldBlur(fieldName)}
             rows={3}
             className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all resize-none ${
-              hasError(fieldName) ? "border-red-500 bg-red-50" :
+              error && isTouched ? "border-red-500 bg-red-50" :
               isValid ? "border-green-500 bg-green-50" : "border-gray-300"
             }`}
             placeholder={placeholder}
@@ -4028,12 +4269,11 @@ export const HouseManagement: React.FC = () => {
             onChange={onChange}
             onBlur={() => handleFieldBlur(fieldName)}
             className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white transition-all ${
-              hasError(fieldName) ? "border-red-500 bg-red-50" :
+              error && isTouched ? "border-red-500 bg-red-50" :
               isValid ? "border-green-500 bg-green-50" : "border-gray-300"
             }`}
           >
             {placeholder && <option value="">{placeholder}</option>}
-            {onChange && (onChange as any).options}
           </select>
         ) : (
           <input
@@ -4042,14 +4282,14 @@ export const HouseManagement: React.FC = () => {
             onChange={onChange}
             onBlur={() => handleFieldBlur(fieldName)}
             className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
-              hasError(fieldName) ? "border-red-500 bg-red-50" :
+              error && isTouched ? "border-red-500 bg-red-50" :
               isValid ? "border-green-500 bg-green-50" : "border-gray-300"
             }`}
             placeholder={placeholder}
             min={type === "number" ? 0 : undefined}
           />
         )}
-        {hasError(fieldName) && (
+        {error && isTouched && (
           <p className="mt-1 text-sm text-red-500">{error}</p>
         )}
         {isValid && (
@@ -4127,15 +4367,16 @@ export const HouseManagement: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-3 mb-8">
         {[
           { label: t.totalProperties, value: stats.total, color: "bg-gradient-to-br from-blue-500 to-blue-600" },
           { label: t.availableProperties, value: stats.available, color: "bg-gradient-to-br from-green-500 to-green-600" },
           { label: t.pendingProperties, value: stats.pending, color: "bg-gradient-to-br from-yellow-500 to-yellow-600" },
+          { label: t.bookedProperties, value: stats.booked, color: "bg-gradient-to-br from-purple-500 to-purple-600" },
           { label: t.unavailableProperties, value: stats.unavailable, color: "bg-gradient-to-br from-gray-500 to-gray-600" },
           { label: t.maintenanceProperties, value: stats.maintenance, color: "bg-gradient-to-br from-red-500 to-red-600" },
-          { label: t.totalReviews, value: stats.totalReviews, color: "bg-gradient-to-br from-purple-500 to-purple-600" },
-          { label: t.rating, value: stats.averageRating.toFixed(1), color: "bg-gradient-to-br from-orange-500 to-orange-600" },
+          { label: t.inactiveProperties, value: stats.inactive, color: "bg-gradient-to-br from-gray-400 to-gray-500" },
+          { label: t.totalReviews, value: stats.totalReviews, color: "bg-gradient-to-br from-orange-500 to-orange-600" },
         ].map((stat, index) => (
           <motion.div
             key={index}
@@ -4172,8 +4413,10 @@ export const HouseManagement: React.FC = () => {
               <option value="all">{t.allStatus}</option>
               <option value="available">{t.available}</option>
               <option value="pending">{t.pending}</option>
+              <option value="booked">{t.booked}</option>
               <option value="unavailable">{t.unavailable}</option>
               <option value="maintenance">{t.maintenance}</option>
+              <option value="inactive">{t.inactive}</option>
             </select>
             <button
               onClick={() => {
@@ -4216,7 +4459,7 @@ export const HouseManagement: React.FC = () => {
               <div className="relative h-48 overflow-hidden">
                 <img
                   src={house.images && house.images.length > 0 ? house.images[0].url : "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop"}
-                  alt={house.name}
+                  alt={house.name || "Property"}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute top-3 right-3">
@@ -4231,22 +4474,22 @@ export const HouseManagement: React.FC = () => {
                 )}
               </div>
               <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-900 truncate">{house.name}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 truncate">{house.name || "Unnamed Property"}</h3>
                 <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
                   <Icons.Location />
-                  {house.location.village}, {house.location.district}
+                  {getLocationDisplay(house)}
                 </p>
                 <div className="flex items-center gap-2 mt-2 text-sm">
                   <span className="flex items-center gap-1 text-gray-600">
-                    <Icons.Bed /> {house.bedrooms}
+                    <Icons.Bed /> {house.bedrooms || 0}
                   </span>
                   <span className="text-gray-300">|</span>
                   <span className="flex items-center gap-1 text-gray-600">
-                    <Icons.Bath /> {house.bathrooms}
+                    <Icons.Bath /> {house.bathrooms || 0}
                   </span>
                   <span className="text-gray-300">|</span>
                   <span className="flex items-center gap-1 text-gray-600">
-                    <Icons.User /> {house.maxGuests}
+                    <Icons.User /> {house.guests || 0}
                   </span>
                 </div>
                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
@@ -4260,6 +4503,7 @@ export const HouseManagement: React.FC = () => {
                       whileTap={{ scale: 0.9 }}
                       onClick={() => openViewModal(house)}
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                      title="View Property"
                     >
                       <Icons.View />
                     </motion.button>
@@ -4268,14 +4512,25 @@ export const HouseManagement: React.FC = () => {
                       whileTap={{ scale: 0.9 }}
                       onClick={() => openEditModal(house)}
                       className="p-2 text-green-600 hover:bg-green-50 rounded-xl transition-all"
+                      title="Edit Property"
                     >
                       <Icons.Edit />
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
+                      onClick={() => openStatusModal(house)}
+                      className="p-2 text-purple-600 hover:bg-purple-50 rounded-xl transition-all"
+                      title="Change Status"
+                    >
+                      <Icons.Status />
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
                       onClick={() => openDeleteModal(house)}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                      title="Delete Property"
                     >
                       <Icons.Delete />
                     </motion.button>
@@ -4286,6 +4541,110 @@ export const HouseManagement: React.FC = () => {
           ))}
         </div>
       )}
+
+      {/* Status Update Modal */}
+      <AnimatePresence>
+        {isStatusModalOpen && selectedHouse && (
+          <>
+            <motion.div
+              variants={overlayVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+              onClick={() => setIsStatusModalOpen(false)}
+            />
+            <motion.div
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="fixed inset-0 z-[101] flex items-center justify-center p-4"
+            >
+              <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative">
+                <div className="px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl">
+                  <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                    <Icons.Status />
+                    Change Status
+                  </h2>
+                  <motion.button
+                    whileHover={{ rotate: 90 }}
+                    onClick={() => {
+                      setIsStatusModalOpen(false);
+                      setSelectedHouse(null);
+                    }}
+                    className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500"
+                  >
+                    <Icons.Close />
+                  </motion.button>
+                </div>
+                <div className="p-6 space-y-4">
+                  <div>
+                    <p className="text-sm text-gray-500">Property</p>
+                    <p className="text-lg font-semibold text-gray-900">{selectedHouse.name || "Unnamed Property"}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Current Status</p>
+                    <span className={`px-3 py-1.5 text-sm font-medium rounded-full ${getStatusColor(selectedHouse.status)}`}>
+                      {getStatusLabel(selectedHouse.status)}
+                    </span>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      New Status
+                    </label>
+                    <select
+                      value={newStatus}
+                      onChange={(e) => setNewStatus(e.target.value as House["status"])}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
+                    >
+                      {getStatusOptions(selectedHouse.status).map((status) => (
+                        <option key={status} value={status}>
+                          {getStatusLabel(status)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex gap-3 pt-4 border-t border-gray-200">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleStatusUpdate}
+                      disabled={submitting}
+                      className={`flex-1 px-6 py-3 rounded-xl text-white font-medium transition-all flex items-center justify-center gap-2 ${
+                        submitting ? "bg-gray-400 cursor-not-allowed" :
+                        "bg-gradient-to-r from-[#FF385C] to-[#E31C5F] hover:shadow-lg"
+                      }`}
+                    >
+                      {submitting ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          Updating...
+                        </>
+                      ) : (
+                        <>
+                          <Icons.Status /> Update Status
+                        </>
+                      )}
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        setIsStatusModalOpen(false);
+                        setSelectedHouse(null);
+                      }}
+                      className="flex-1 px-6 py-3 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                    >
+                      {t.cancel}
+                    </motion.button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* View Property Modal */}
       <AnimatePresence>
@@ -4327,7 +4686,7 @@ export const HouseManagement: React.FC = () => {
                         <img
                           key={index}
                           src={img.url}
-                          alt={selectedHouse.name}
+                          alt={selectedHouse.name || "Property"}
                           className={`rounded-xl object-cover h-48 ${index === 0 ? "col-span-2" : ""}`}
                         />
                       ))}
@@ -4337,43 +4696,47 @@ export const HouseManagement: React.FC = () => {
                       <p className="text-gray-500">No images available</p>
                     </div>
                   )}
-                  <h3 className="text-2xl font-bold text-gray-900">{selectedHouse.name}</h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-2xl font-bold text-gray-900">{selectedHouse.name || "Unnamed Property"}</h3>
+                    <span className={`px-3 py-1.5 text-sm font-medium rounded-full ${getStatusColor(selectedHouse.status)}`}>
+                      {getStatusLabel(selectedHouse.status)}
+                    </span>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">{t.status}</p>
-                      <span className={`px-2.5 py-1 text-sm font-medium rounded-full ${getStatusColor(selectedHouse.status)}`}>
-                        {getStatusLabel(selectedHouse.status)}
-                      </span>
-                    </div>
                     <div>
                       <p className="text-sm font-medium text-gray-500">{t.pricePerMonth}</p>
                       <p className="text-lg font-bold text-[#FF385C]">{formatCurrency(selectedHouse.pricePerMonth)}</p>
                     </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">{t.university}</p>
+                      <p className="text-sm text-gray-700">{selectedHouse.university || "N/A"}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">{t.houseType}</p>
+                    <p className="text-sm text-gray-700">{selectedHouse.houseType || "N/A"}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-500">{t.description}</p>
-                    <p className="text-sm text-gray-700 mt-1">{selectedHouse.description}</p>
+                    <p className="text-sm text-gray-700 mt-1">{selectedHouse.description || "No description available"}</p>
                   </div>
                   <div className="grid grid-cols-3 gap-4">
                     <div>
                       <p className="text-sm font-medium text-gray-500">{t.bedrooms}</p>
-                      <p className="text-lg font-semibold">{selectedHouse.bedrooms}</p>
+                      <p className="text-lg font-semibold">{selectedHouse.bedrooms || 0}</p>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-500">{t.bathrooms}</p>
-                      <p className="text-lg font-semibold">{selectedHouse.bathrooms}</p>
+                      <p className="text-lg font-semibold">{selectedHouse.bathrooms || 0}</p>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-500">{t.maxGuests}</p>
-                      <p className="text-lg font-semibold">{selectedHouse.maxGuests}</p>
+                      <p className="text-lg font-semibold">{selectedHouse.guests || 0}</p>
                     </div>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-500">{t.location}</p>
-                    <p className="text-sm text-gray-700">
-                      {selectedHouse.location.village}, {selectedHouse.location.sector},<br />
-                      {selectedHouse.location.district}, {selectedHouse.location.province}
-                    </p>
+                    <p className="text-sm text-gray-700">{getFullLocationDisplay(selectedHouse)}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-500">{t.amenities}</p>
@@ -4389,7 +4752,7 @@ export const HouseManagement: React.FC = () => {
                       )}
                     </div>
                   </div>
-                  <div className="flex gap-3 pt-4 border-t border-gray-200">
+                  <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -4400,6 +4763,17 @@ export const HouseManagement: React.FC = () => {
                       className="px-4 py-2.5 bg-[#FF385C] text-white rounded-xl hover:bg-[#E31C5F] transition-colors flex items-center gap-2"
                     >
                       <Icons.Edit /> {t.editProperty}
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        setIsViewModalOpen(false);
+                        openStatusModal(selectedHouse);
+                      }}
+                      className="px-4 py-2.5 bg-purple-500 text-white rounded-xl hover:bg-purple-600 transition-colors flex items-center gap-2"
+                    >
+                      <Icons.Status /> Change Status
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.02 }}
@@ -4481,6 +4855,15 @@ export const HouseManagement: React.FC = () => {
                     (e) => handleInputChange("name", (e.target as HTMLInputElement).value),
                   )}
                   {renderInput(
+                    t.houseType,
+                    "houseType",
+                    "text",
+                    t.enterHouseType,
+                    true,
+                    propertyFormData.houseType,
+                    (e) => handleInputChange("houseType", (e.target as HTMLInputElement).value),
+                  )}
+                  {renderInput(
                     t.description,
                     "description",
                     "textarea",
@@ -4514,8 +4897,8 @@ export const HouseManagement: React.FC = () => {
                           onChange={(e) => handleLocationChange("province", e.target.value)}
                           onBlur={() => handleFieldBlur("province")}
                           className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white transition-all ${
-                            hasError("province") ? "border-red-500 bg-red-50" :
-                            isValidField("province") ? "border-green-500 bg-green-50" : "border-gray-300"
+                            formErrors.province && touchedFields.province ? "border-red-500 bg-red-50" :
+                            touchedFields.province && !formErrors.province ? "border-green-500 bg-green-50" : "border-gray-300"
                           }`}
                         >
                           <option value="">{t.provincePlaceholder}</option>
@@ -4525,8 +4908,10 @@ export const HouseManagement: React.FC = () => {
                           <option value="Eastern">Eastern</option>
                           <option value="Western">Western</option>
                         </select>
-                        {hasError("province") && <p className="mt-1 text-sm text-red-500">{formErrors.province}</p>}
-                        {isValidField("province") && (
+                        {formErrors.province && touchedFields.province && (
+                          <p className="mt-1 text-sm text-red-500">{formErrors.province}</p>
+                        )}
+                        {touchedFields.province && !formErrors.province && (
                           <p className="mt-1 text-sm text-green-500 flex items-center gap-1"><Icons.Check /> Valid</p>
                         )}
                       </div>
@@ -4541,12 +4926,14 @@ export const HouseManagement: React.FC = () => {
                           onBlur={() => handleFieldBlur("district")}
                           placeholder={t.districtPlaceholder}
                           className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
-                            hasError("district") ? "border-red-500 bg-red-50" :
-                            isValidField("district") ? "border-green-500 bg-green-50" : "border-gray-300"
+                            formErrors.district && touchedFields.district ? "border-red-500 bg-red-50" :
+                            touchedFields.district && !formErrors.district ? "border-green-500 bg-green-50" : "border-gray-300"
                           }`}
                         />
-                        {hasError("district") && <p className="mt-1 text-sm text-red-500">{formErrors.district}</p>}
-                        {isValidField("district") && (
+                        {formErrors.district && touchedFields.district && (
+                          <p className="mt-1 text-sm text-red-500">{formErrors.district}</p>
+                        )}
+                        {touchedFields.district && !formErrors.district && (
                           <p className="mt-1 text-sm text-green-500 flex items-center gap-1"><Icons.Check /> Valid</p>
                         )}
                       </div>
@@ -4563,12 +4950,14 @@ export const HouseManagement: React.FC = () => {
                           onBlur={() => handleFieldBlur("sector")}
                           placeholder={t.sectorPlaceholder}
                           className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
-                            hasError("sector") ? "border-red-500 bg-red-50" :
-                            isValidField("sector") ? "border-green-500 bg-green-50" : "border-gray-300"
+                            formErrors.sector && touchedFields.sector ? "border-red-500 bg-red-50" :
+                            touchedFields.sector && !formErrors.sector ? "border-green-500 bg-green-50" : "border-gray-300"
                           }`}
                         />
-                        {hasError("sector") && <p className="mt-1 text-sm text-red-500">{formErrors.sector}</p>}
-                        {isValidField("sector") && (
+                        {formErrors.sector && touchedFields.sector && (
+                          <p className="mt-1 text-sm text-red-500">{formErrors.sector}</p>
+                        )}
+                        {touchedFields.sector && !formErrors.sector && (
                           <p className="mt-1 text-sm text-green-500 flex items-center gap-1"><Icons.Check /> Valid</p>
                         )}
                       </div>
@@ -4583,12 +4972,14 @@ export const HouseManagement: React.FC = () => {
                           onBlur={() => handleFieldBlur("cell")}
                           placeholder={t.cellPlaceholder}
                           className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
-                            hasError("cell") ? "border-red-500 bg-red-50" :
-                            isValidField("cell") ? "border-green-500 bg-green-50" : "border-gray-300"
+                            formErrors.cell && touchedFields.cell ? "border-red-500 bg-red-50" :
+                            touchedFields.cell && !formErrors.cell ? "border-green-500 bg-green-50" : "border-gray-300"
                           }`}
                         />
-                        {hasError("cell") && <p className="mt-1 text-sm text-red-500">{formErrors.cell}</p>}
-                        {isValidField("cell") && (
+                        {formErrors.cell && touchedFields.cell && (
+                          <p className="mt-1 text-sm text-red-500">{formErrors.cell}</p>
+                        )}
+                        {touchedFields.cell && !formErrors.cell && (
                           <p className="mt-1 text-sm text-green-500 flex items-center gap-1"><Icons.Check /> Valid</p>
                         )}
                       </div>
@@ -4604,12 +4995,14 @@ export const HouseManagement: React.FC = () => {
                         onBlur={() => handleFieldBlur("village")}
                         placeholder={t.villagePlaceholder}
                         className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm transition-all ${
-                          hasError("village") ? "border-red-500 bg-red-50" :
-                          isValidField("village") ? "border-green-500 bg-green-50" : "border-gray-300"
+                          formErrors.village && touchedFields.village ? "border-red-500 bg-red-50" :
+                          touchedFields.village && !formErrors.village ? "border-green-500 bg-green-50" : "border-gray-300"
                         }`}
                       />
-                      {hasError("village") && <p className="mt-1 text-sm text-red-500">{formErrors.village}</p>}
-                      {isValidField("village") && (
+                      {formErrors.village && touchedFields.village && (
+                        <p className="mt-1 text-sm text-red-500">{formErrors.village}</p>
+                      )}
+                      {touchedFields.village && !formErrors.village && (
                         <p className="mt-1 text-sm text-green-500 flex items-center gap-1"><Icons.Check /> Valid</p>
                       )}
                     </div>
@@ -4671,58 +5064,51 @@ export const HouseManagement: React.FC = () => {
                           onChange={(e) => handleInputChange("status", e.target.value)}
                           className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
                         >
-                          <option value="pending">{t.pending}</option>
                           <option value="available">{t.available}</option>
+                          <option value="pending">{t.pending}</option>
+                          <option value="booked">{t.booked}</option>
                           <option value="unavailable">{t.unavailable}</option>
                           <option value="maintenance">{t.maintenance}</option>
+                          <option value="inactive">{t.inactive}</option>
                         </select>
                       </div>
                     </div>
                   </div>
 
-                  {/* Host Information */}
+                  {/* Owner Information */}
                   <div className="border-t border-gray-200 pt-4">
                     <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
-                      <Icons.User /> Host Information
+                      <Icons.User /> Owner Information
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {renderInput(
-                        t.hostName,
-                        "hostName",
+                        t.ownerName,
+                        "ownerName",
                         "text",
-                        "Enter host name",
+                        "Enter owner name",
                         true,
-                        propertyFormData.host.name,
-                        (e) => handleInputChange("host.name", (e.target as HTMLInputElement).value),
+                        propertyFormData.ownerName,
+                        (e) => handleInputChange("ownerName", (e.target as HTMLInputElement).value),
                       )}
                       {renderInput(
-                        t.hostEmail,
-                        "hostEmail",
+                        t.ownerEmail,
+                        "ownerEmail",
                         "email",
-                        "Enter host email",
+                        "Enter owner email",
                         true,
-                        propertyFormData.host.email,
-                        (e) => handleInputChange("host.email", (e.target as HTMLInputElement).value),
+                        propertyFormData.ownerEmail,
+                        (e) => handleInputChange("ownerEmail", (e.target as HTMLInputElement).value),
                       )}
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                    <div className="mt-3">
                       {renderInput(
-                        t.hostPhone,
-                        "hostPhone",
+                        t.ownerContact,
+                        "ownerContact",
                         "text",
-                        "Enter host phone",
+                        "Enter owner phone number",
                         false,
-                        propertyFormData.host.phone,
-                        (e) => handleInputChange("host.phone", (e.target as HTMLInputElement).value),
-                      )}
-                      {renderInput(
-                        t.responseRate,
-                        "responseRate",
-                        "number",
-                        "0-100",
-                        false,
-                        propertyFormData.host.responseRate,
-                        (e) => handleInputChange("host.responseRate", parseFloat((e.target as HTMLInputElement).value) || 0),
+                        propertyFormData.ownerContact,
+                        (e) => handleInputChange("ownerContact", (e.target as HTMLInputElement).value),
                       )}
                     </div>
                   </div>
@@ -4765,15 +5151,16 @@ export const HouseManagement: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Image Upload */}
+                  {/* Image Upload - 2 to 10 images */}
                   <div className="border-t border-gray-200 pt-4">
                     <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
                       <Icons.Upload /> {t.uploadImages} <span className="text-red-500">*</span>
                     </h3>
+                    <p className="text-xs text-gray-500 mb-2">Upload 2-10 images</p>
                     <div
                       className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
-                        hasError("images") ? "border-red-500 bg-red-50" :
-                        imageFiles.length > 0 || imagePreviews.length > 0 ? "border-green-500 bg-green-50" :
+                        formErrors.images && touchedFields.images ? "border-red-500 bg-red-50" :
+                        imageFiles.length >= 2 && imageFiles.length <= 10 ? "border-green-500 bg-green-50" :
                         "border-gray-300 hover:border-[#FF385C] hover:bg-gray-50"
                       }`}
                       onClick={() => fileInputRef.current?.click()}
@@ -4793,7 +5180,9 @@ export const HouseManagement: React.FC = () => {
                       />
                       <Icons.Upload />
                       <p className="mt-2 text-sm text-gray-600">{t.dragDrop}</p>
-                      <p className="text-xs text-gray-400 mt-1">PNG, JPG, JPEG up to 5MB</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {imageFiles.length + (selectedHouse?.images?.length || 0)} / 10 images
+                      </p>
                     </div>
                     {(imagePreviews.length > 0 || (selectedHouse && selectedHouse.images && selectedHouse.images.length > 0)) && (
                       <div className="mt-3 grid grid-cols-4 gap-2">
@@ -4817,7 +5206,30 @@ export const HouseManagement: React.FC = () => {
                         ))}
                       </div>
                     )}
-                    {hasError("images") && <p className="mt-1 text-sm text-red-500">{formErrors.images}</p>}
+                    {formErrors.images && touchedFields.images && (
+                      <p className="mt-1 text-sm text-red-500">{formErrors.images}</p>
+                    )}
+                    {imageFiles.length + (selectedHouse?.images?.length || 0) < 2 && (
+                      <p className="mt-1 text-sm text-yellow-500">⚠️ Minimum 2 images required</p>
+                    )}
+                    {imageFiles.length + (selectedHouse?.images?.length || 0) > 10 && (
+                      <p className="mt-1 text-sm text-red-500">⚠️ Maximum 10 images allowed</p>
+                    )}
+                  </div>
+
+                  {/* Form Validation Status */}
+                  <div className="flex items-center gap-2 text-sm">
+                    {isFormValid() ? (
+                      <span className="text-green-600 flex items-center gap-1">
+                        <Icons.Check /> All fields are valid
+                      </span>
+                    ) : (
+                      <span className="text-gray-500">
+                        {Object.keys(touchedFields).length === 0 
+                          ? "Please fill in all required fields" 
+                          : `${Object.keys(formErrors).length} field(s) need attention`}
+                      </span>
+                    )}
                   </div>
 
                   <div className="flex gap-3 pt-4 border-t border-gray-200">

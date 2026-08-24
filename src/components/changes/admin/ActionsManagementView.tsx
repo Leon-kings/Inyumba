@@ -1,7 +1,8 @@
+
 // /* eslint-disable react-hooks/set-state-in-effect */
 // /* eslint-disable react-hooks/immutability */
-// import React, { useState, useEffect, useCallback, type JSX } from 'react';
-// import { format, parseISO, formatDistanceToNow } from 'date-fns';
+// import React, { useState, useEffect, useCallback, type JSX } from "react";
+// import { format, parseISO, formatDistanceToNow } from "date-fns";
 // import {
 //   Search as SearchIcon,
 //   Refresh as RefreshIcon,
@@ -18,18 +19,26 @@
 //   Visibility as VisibilityIcon,
 //   Login as LoginIcon,
 //   PersonAdd as PersonAddIcon,
-// } from '@mui/icons-material';
+//   Dashboard as DashboardIcon,
+//   TrendingUp as TrendingUpIcon,
+//   People as PeopleIcon,
+//   EventNote as EventNoteIcon,
+//   FilterList as FilterListIcon,
+//   Close as CloseIcon,
+// } from "@mui/icons-material";
 
 // // Types - Updated to handle both string and object for userId
 // interface ActivityLog {
 //   _id: string;
-//   userId: string | {
-//     _id: string;
-//     name: string;
-//     email: string;
-//     phone: string;
-//     role: string;
-//   };
+//   userId:
+//     | string
+//     | {
+//         _id: string;
+//         name: string;
+//         email: string;
+//         phone: string;
+//         role: string;
+//       };
 //   userName: string;
 //   userEmail: string;
 //   action: string;
@@ -45,7 +54,7 @@
 
 // interface FilterOptions {
 //   action: string;
-//   dateRange: 'today' | 'week' | 'month' | 'all';
+//   dateRange: "today" | "week" | "month" | "all";
 //   searchTerm: string;
 // }
 
@@ -56,27 +65,40 @@
 // }
 
 // // Helper function to safely format dates
-// const formatDateSafe = (timestamp: string | undefined | null, formatStr: string): string => {
-//   if (!timestamp) return 'N/A';
+// const formatDateSafe = (
+//   timestamp: string | undefined | null,
+//   formatStr: string,
+// ): string => {
+//   if (!timestamp) return "N/A";
 //   try {
 //     return format(parseISO(timestamp), formatStr);
 //   } catch {
-//     return 'Invalid Date';
+//     return "Invalid Date";
 //   }
 // };
 
 // const formatDistanceSafe = (timestamp: string | undefined | null): string => {
-//   if (!timestamp) return 'N/A';
+//   if (!timestamp) return "N/A";
 //   try {
 //     return formatDistanceToNow(parseISO(timestamp), { addSuffix: true });
 //   } catch {
-//     return 'Invalid Date';
+//     return "Invalid Date";
 //   }
 // };
 
 // // Type guard to check if userId is an object
-// const isUserIdObject = (userId: string | { _id: string; name: string; email: string; phone: string; role: string; }): userId is { _id: string; name: string; email: string; phone: string; role: string; } => {
-//   return typeof userId === 'object' && userId !== null && '_id' in userId;
+// const isUserIdObject = (
+//   userId:
+//     | string
+//     | { _id: string; name: string; email: string; phone: string; role: string },
+// ): userId is {
+//   _id: string;
+//   name: string;
+//   email: string;
+//   phone: string;
+//   role: string;
+// } => {
+//   return typeof userId === "object" && userId !== null && "_id" in userId;
 // };
 
 // // Helper functions to safely access user data
@@ -88,23 +110,23 @@
 // const getUserName = (log: ActivityLog): string => {
 //   if (log.userName) return log.userName;
 //   if (isUserIdObject(log.userId) && log.userId.name) return log.userId.name;
-//   return 'Unknown User';
+//   return "Unknown User";
 // };
 
 // const getUserEmail = (log: ActivityLog): string => {
 //   if (log.userEmail) return log.userEmail;
 //   if (isUserIdObject(log.userId) && log.userId.email) return log.userId.email;
-//   return '';
+//   return "";
 // };
 
 // const getUserRole = (log: ActivityLog): string => {
 //   if (isUserIdObject(log.userId) && log.userId.role) return log.userId.role;
-//   return '';
+//   return "";
 // };
 
 // const getUserPhone = (log: ActivityLog): string => {
 //   if (isUserIdObject(log.userId) && log.userId.phone) return log.userId.phone;
-//   return '';
+//   return "";
 // };
 
 // export const ActionsManagement: React.FC = () => {
@@ -118,9 +140,9 @@
 //   const [selectedLog, setSelectedLog] = useState<ActivityLog | null>(null);
 //   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 //   const [filters, setFilters] = useState<FilterOptions>({
-//     action: 'all',
-//     dateRange: 'all',
-//     searchTerm: '',
+//     action: "all",
+//     dateRange: "all",
+//     searchTerm: "",
 //   });
 //   const [stats, setStats] = useState<Stats>({
 //     totalActivities: 0,
@@ -134,13 +156,16 @@
 //       setLoading(true);
 //       setError(null);
 
-//       const response = await fetch('https://rene-inyumba-nodejs.onrender.com/auth/activities', {
-//         method: 'GET',
-//         headers: {
-//           'Content-Type': 'application/json',
-//           'Authorization': `Bearer ${localStorage.getItem('token')}`,
+//       const response = await fetch(
+//         "https://rene-inyumba-nodejs.onrender.com/auth/activities",
+//         {
+//           method: "GET",
+//           headers: {
+//             "Content-Type": "application/json",
+//             Authorization: `Bearer ${localStorage.getItem("token")}`,
+//           },
 //         },
-//       });
+//       );
 
 //       if (!response.ok) {
 //         throw new Error(`Failed to fetch activities: ${response.statusText}`);
@@ -150,7 +175,6 @@
 
 //       let activities: ActivityLog[] = [];
 
-//       // Handle the API response structure - it has { success, count, activities: [...] }
 //       if (data.activities && Array.isArray(data.activities)) {
 //         activities = data.activities;
 //       } else if (Array.isArray(data)) {
@@ -158,7 +182,7 @@
 //       } else if (data.data && Array.isArray(data.data)) {
 //         activities = data.data;
 //       } else {
-//         console.warn('Unexpected API response structure:', data);
+//         console.warn("Unexpected API response structure:", data);
 //         activities = [];
 //       }
 
@@ -166,8 +190,12 @@
 //       calculateStats(activities);
 //       applyFilters(activities, filters);
 //     } catch (err) {
-//       setError(err instanceof Error ? err.message : 'An error occurred while fetching logs');
-//       console.error('Error fetching logs:', err);
+//       setError(
+//         err instanceof Error
+//           ? err.message
+//           : "An error occurred while fetching logs",
+//       );
+//       console.error("Error fetching logs:", err);
 //     } finally {
 //       setLoading(false);
 //     }
@@ -175,11 +203,13 @@
 
 //   // Calculate statistics
 //   const calculateStats = (logsData: ActivityLog[]) => {
-//     const uniqueUsers = new Set(logsData.map(log => getUserEmail(log) || getUserId(log))).size;
+//     const uniqueUsers = new Set(
+//       logsData.map((log) => getUserEmail(log) || getUserId(log)),
+//     ).size;
 
 //     const actionsByType: { [key: string]: number } = {};
 
-//     logsData.forEach(log => {
+//     logsData.forEach((log) => {
 //       actionsByType[log.action] = (actionsByType[log.action] || 0) + 1;
 //     });
 
@@ -191,17 +221,20 @@
 //   };
 
 //   // Apply filters
-//   const applyFilters = (logsData: ActivityLog[], currentFilters: FilterOptions) => {
+//   const applyFilters = (
+//     logsData: ActivityLog[],
+//     currentFilters: FilterOptions,
+//   ) => {
 //     let filtered = [...logsData];
 
-//     if (currentFilters.action !== 'all') {
-//       filtered = filtered.filter(log => log.action === currentFilters.action);
+//     if (currentFilters.action !== "all") {
+//       filtered = filtered.filter((log) => log.action === currentFilters.action);
 //     }
 
 //     const now = new Date();
-//     if (currentFilters.dateRange === 'today') {
+//     if (currentFilters.dateRange === "today") {
 //       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-//       filtered = filtered.filter(log => {
+//       filtered = filtered.filter((log) => {
 //         if (!log.createdAt) return false;
 //         try {
 //           return new Date(parseISO(log.createdAt)) >= today;
@@ -209,9 +242,9 @@
 //           return false;
 //         }
 //       });
-//     } else if (currentFilters.dateRange === 'week') {
+//     } else if (currentFilters.dateRange === "week") {
 //       const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-//       filtered = filtered.filter(log => {
+//       filtered = filtered.filter((log) => {
 //         if (!log.createdAt) return false;
 //         try {
 //           return new Date(parseISO(log.createdAt)) >= weekAgo;
@@ -219,9 +252,9 @@
 //           return false;
 //         }
 //       });
-//     } else if (currentFilters.dateRange === 'month') {
+//     } else if (currentFilters.dateRange === "month") {
 //       const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-//       filtered = filtered.filter(log => {
+//       filtered = filtered.filter((log) => {
 //         if (!log.createdAt) return false;
 //         try {
 //           return new Date(parseISO(log.createdAt)) >= monthAgo;
@@ -233,7 +266,7 @@
 
 //     if (currentFilters.searchTerm.trim()) {
 //       const search = currentFilters.searchTerm.toLowerCase().trim();
-//       filtered = filtered.filter(log => {
+//       filtered = filtered.filter((log) => {
 //         return (
 //           getUserEmail(log).toLowerCase().includes(search) ||
 //           getUserName(log).toLowerCase().includes(search) ||
@@ -256,15 +289,15 @@
 
 //   // Handle search
 //   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-//     handleFilterChange('searchTerm', event.target.value);
+//     handleFilterChange("searchTerm", event.target.value);
 //   };
 
 //   // Clear filters
 //   const clearFilters = () => {
 //     const defaultFilters: FilterOptions = {
-//       action: 'all',
-//       dateRange: 'all',
-//       searchTerm: '',
+//       action: "all",
+//       dateRange: "all",
+//       searchTerm: "",
 //     };
 //     setFilters(defaultFilters);
 //     applyFilters(logs, defaultFilters);
@@ -275,7 +308,9 @@
 //     setPage(newPage);
 //   };
 
-//   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLSelectElement>) => {
+//   const handleChangeRowsPerPage = (
+//     event: React.ChangeEvent<HTMLSelectElement>,
+//   ) => {
 //     setRowsPerPage(parseInt(event.target.value, 10));
 //     setPage(0);
 //   };
@@ -289,389 +324,756 @@
 //   // Get action icon
 //   const getActionIcon = (action: string) => {
 //     const iconMap: { [key: string]: JSX.Element } = {
-//       'user_login': <LoginIcon className="text-blue-600" style={{ fontSize: '20px' }} />,
-//       'user_created': <PersonAddIcon className="text-green-600" style={{ fontSize: '20px' }} />,
-//       'user_updated': <SettingsIcon className="text-orange-500" style={{ fontSize: '20px' }} />,
-//       'user_deleted': <ClearIcon className="text-red-600" style={{ fontSize: '20px' }} />,
-//       'house_created': <HomeIcon className="text-green-600" style={{ fontSize: '20px' }} />,
-//       'house_updated': <SettingsIcon className="text-orange-500" style={{ fontSize: '20px' }} />,
-//       'house_deleted': <ClearIcon className="text-red-600" style={{ fontSize: '20px' }} />,
-//       'booking_created': <BookOnlineIcon className="text-blue-600" style={{ fontSize: '20px' }} />,
-//       'booking_updated': <SettingsIcon className="text-orange-500" style={{ fontSize: '20px' }} />,
-//       'booking_deleted': <ClearIcon className="text-red-600" style={{ fontSize: '20px' }} />,
-//       'contact_created': <ContactMailIcon className="text-purple-600" style={{ fontSize: '20px' }} />,
-//       'message_created': <MessageIcon className="text-blue-600" style={{ fontSize: '20px' }} />,
-//       'testimonial_created': <RateReviewIcon className="text-green-600" style={{ fontSize: '20px' }} />,
+//       user_login: (
+//         <LoginIcon className="text-blue-600" style={{ fontSize: "20px" }} />
+//       ),
+//       user_created: (
+//         <PersonAddIcon
+//           className="text-green-600"
+//           style={{ fontSize: "20px" }}
+//         />
+//       ),
+//       user_updated: (
+//         <SettingsIcon
+//           className="text-orange-500"
+//           style={{ fontSize: "20px" }}
+//         />
+//       ),
+//       user_deleted: (
+//         <ClearIcon className="text-red-600" style={{ fontSize: "20px" }} />
+//       ),
+//       house_created: (
+//         <HomeIcon className="text-green-600" style={{ fontSize: "20px" }} />
+//       ),
+//       house_updated: (
+//         <SettingsIcon
+//           className="text-orange-500"
+//           style={{ fontSize: "20px" }}
+//         />
+//       ),
+//       house_deleted: (
+//         <ClearIcon className="text-red-600" style={{ fontSize: "20px" }} />
+//       ),
+//       booking_created: (
+//         <BookOnlineIcon
+//           className="text-blue-600"
+//           style={{ fontSize: "20px" }}
+//         />
+//       ),
+//       booking_updated: (
+//         <SettingsIcon
+//           className="text-orange-500"
+//           style={{ fontSize: "20px" }}
+//         />
+//       ),
+//       booking_deleted: (
+//         <ClearIcon className="text-red-600" style={{ fontSize: "20px" }} />
+//       ),
+//       contact_created: (
+//         <ContactMailIcon
+//           className="text-purple-600"
+//           style={{ fontSize: "20px" }}
+//         />
+//       ),
+//       message_created: (
+//         <MessageIcon className="text-blue-600" style={{ fontSize: "20px" }} />
+//       ),
+//       testimonial_created: (
+//         <RateReviewIcon
+//           className="text-green-600"
+//           style={{ fontSize: "20px" }}
+//         />
+//       ),
 //     };
-//     return iconMap[action] || <InfoIcon className="text-gray-600" style={{ fontSize: '20px' }} />;
+//     return (
+//       iconMap[action] || (
+//         <InfoIcon className="text-gray-600" style={{ fontSize: "20px" }} />
+//       )
+//     );
 //   };
 
 //   // Get action color
-//   const getActionColor = (action: string): string => {
-//     const colorMap: { [key: string]: string } = {
-//       'user_login': 'bg-blue-100 text-blue-800 border-blue-300',
-//       'user_created': 'bg-green-100 text-green-800 border-green-300',
-//       'user_updated': 'bg-orange-100 text-orange-800 border-orange-300',
-//       'user_deleted': 'bg-red-100 text-red-800 border-red-300',
-//       'house_created': 'bg-green-100 text-green-800 border-green-300',
-//       'house_updated': 'bg-orange-100 text-orange-800 border-orange-300',
-//       'house_deleted': 'bg-red-100 text-red-800 border-red-300',
-//       'booking_created': 'bg-blue-100 text-blue-800 border-blue-300',
-//       'booking_updated': 'bg-orange-100 text-orange-800 border-orange-300',
-//       'booking_deleted': 'bg-red-100 text-red-800 border-red-300',
-//       'contact_created': 'bg-purple-100 text-purple-800 border-purple-300',
-//       'message_created': 'bg-blue-100 text-blue-800 border-blue-300',
-//       'testimonial_created': 'bg-green-100 text-green-800 border-green-300',
-//     };
-//     return colorMap[action] || 'bg-gray-100 text-gray-800 border-gray-300';
-//   };
 
 //   // Get entity type icon
 //   const getEntityIcon = (action: string) => {
-//     if (action.includes('user')) return <PersonIcon className="text-gray-600" style={{ fontSize: '18px' }} />;
-//     if (action.includes('house')) return <HomeIcon className="text-gray-600" style={{ fontSize: '18px' }} />;
-//     if (action.includes('booking')) return <BookOnlineIcon className="text-gray-600" style={{ fontSize: '18px' }} />;
-//     if (action.includes('contact')) return <ContactMailIcon className="text-gray-600" style={{ fontSize: '18px' }} />;
-//     if (action.includes('message')) return <MessageIcon className="text-gray-600" style={{ fontSize: '18px' }} />;
-//     if (action.includes('testimonial')) return <RateReviewIcon className="text-gray-600" style={{ fontSize: '18px' }} />;
-//     return <InfoIcon className="text-gray-600" style={{ fontSize: '18px' }} />;
+//     if (action.includes("user"))
+//       return (
+//         <PersonIcon className="text-gray-600" style={{ fontSize: "18px" }} />
+//       );
+//     if (action.includes("house"))
+//       return (
+//         <HomeIcon className="text-gray-600" style={{ fontSize: "18px" }} />
+//       );
+//     if (action.includes("booking"))
+//       return (
+//         <BookOnlineIcon
+//           className="text-gray-600"
+//           style={{ fontSize: "18px" }}
+//         />
+//       );
+//     if (action.includes("contact"))
+//       return (
+//         <ContactMailIcon
+//           className="text-gray-600"
+//           style={{ fontSize: "18px" }}
+//         />
+//       );
+//     if (action.includes("message"))
+//       return (
+//         <MessageIcon className="text-gray-600" style={{ fontSize: "18px" }} />
+//       );
+//     if (action.includes("testimonial"))
+//       return (
+//         <RateReviewIcon
+//           className="text-gray-600"
+//           style={{ fontSize: "18px" }}
+//         />
+//       );
+//     return <InfoIcon className="text-gray-600" style={{ fontSize: "18px" }} />;
 //   };
 
 //   // Get entity type from action
 //   const getEntityType = (action: string): string => {
-//     if (action.includes('user')) return 'User';
-//     if (action.includes('house')) return 'House';
-//     if (action.includes('booking')) return 'Booking';
-//     if (action.includes('contact')) return 'Contact';
-//     if (action.includes('message')) return 'Message';
-//     if (action.includes('testimonial')) return 'Testimonial';
+//     if (action.includes("user")) return "User";
+//     if (action.includes("house")) return "House";
+//     if (action.includes("booking")) return "Booking";
+//     if (action.includes("contact")) return "Contact";
+//     if (action.includes("message")) return "Message";
+//     if (action.includes("testimonial")) return "Testimonial";
 //     return action;
+//   };
+
+//   // Get action badge style
+//   const getActionBadgeStyle = (action: string): string => {
+//     const styleMap: { [key: string]: string } = {
+//       user_login: "bg-blue-50 text-blue-700 border-blue-200",
+//       user_created: "bg-emerald-50 text-emerald-700 border-emerald-200",
+//       user_updated: "bg-amber-50 text-amber-700 border-amber-200",
+//       user_deleted: "bg-red-50 text-red-700 border-red-200",
+//       house_created: "bg-emerald-50 text-emerald-700 border-emerald-200",
+//       house_updated: "bg-amber-50 text-amber-700 border-amber-200",
+//       house_deleted: "bg-red-50 text-red-700 border-red-200",
+//       booking_created: "bg-blue-50 text-blue-700 border-blue-200",
+//       booking_updated: "bg-amber-50 text-amber-700 border-amber-200",
+//       booking_deleted: "bg-red-50 text-red-700 border-red-200",
+//       contact_created: "bg-purple-50 text-purple-700 border-purple-200",
+//       message_created: "bg-indigo-50 text-indigo-700 border-indigo-200",
+//       testimonial_created: "bg-emerald-50 text-emerald-700 border-emerald-200",
+//     };
+//     return styleMap[action] || "bg-gray-50 text-gray-700 border-gray-200";
 //   };
 
 //   useEffect(() => {
 //     fetchLogs();
 //   }, [fetchLogs]);
 
-//   // Loading state
+//   // Loading state with skeleton
 //   if (loading) {
 //     return (
-//       <div className="flex justify-center items-center h-screen">
-//         <div className="w-10 h-10 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
+//       <div className="p-6 font-sans bg-gray-50 min-h-screen">
+//         <div className="max-w-7xl mx-auto">
+//           <div className="animate-pulse">
+//             {/* Header Skeleton */}
+//             <div className="bg-white rounded-2xl shadow-sm p-6 mb-6 border border-gray-100">
+//               <div className="flex justify-between items-center mb-4">
+//                 <div className="h-8 w-48 bg-gray-200 rounded"></div>
+//                 <div className="flex gap-2">
+//                   <div className="h-10 w-10 bg-gray-200 rounded-full"></div>
+//                   <div className="h-10 w-10 bg-gray-200 rounded-full"></div>
+//                 </div>
+//               </div>
+//               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+//                 {[1, 2, 3].map((i) => (
+//                   <div
+//                     key={i}
+//                     className="p-4 bg-gray-50 rounded-xl border border-gray-100"
+//                   >
+//                     <div className="h-4 w-24 bg-gray-200 rounded mb-2"></div>
+//                     <div className="h-8 w-16 bg-gray-200 rounded"></div>
+//                   </div>
+//                 ))}
+//               </div>
+//               <div className="flex flex-wrap gap-4">
+//                 <div className="h-10 flex-1 min-w-[200px] bg-gray-200 rounded"></div>
+//                 <div className="h-10 w-40 bg-gray-200 rounded"></div>
+//                 <div className="h-10 w-40 bg-gray-200 rounded"></div>
+//                 <div className="h-10 w-24 bg-gray-200 rounded"></div>
+//               </div>
+//             </div>
+//             {/* Table Skeleton */}
+//             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+//               <div className="p-4">
+//                 {[1, 2, 3, 4, 5].map((i) => (
+//                   <div
+//                     key={i}
+//                     className="flex items-center gap-4 py-3 border-b border-gray-100"
+//                   >
+//                     <div className="h-10 w-32 bg-gray-200 rounded"></div>
+//                     <div className="h-10 w-40 bg-gray-200 rounded"></div>
+//                     <div className="h-10 w-24 bg-gray-200 rounded"></div>
+//                     <div className="h-10 flex-1 bg-gray-200 rounded"></div>
+//                     <div className="h-10 w-20 bg-gray-200 rounded"></div>
+//                   </div>
+//                 ))}
+//               </div>
+//             </div>
+//           </div>
+//         </div>
 //       </div>
 //     );
 //   }
 
 //   // Get unique action types for filters
-//   const actionTypes = Array.from(new Set(logs.map(log => log.action)));
+//   const actionTypes = Array.from(new Set(logs.map((log) => log.action)));
 
 //   return (
-//     <div className="p-6 font-sans">
-//       {/* Header */}
-//       <div className="p-6 mb-6 bg-white rounded-lg shadow-md">
-//         <div className="flex justify-between items-center mb-4">
-//           <h1 className="text-2xl font-bold m-0">Activity Logs</h1>
-//           <div className="flex gap-2">
-//             <button
-//               onClick={fetchLogs}
-//               className="p-2 bg-transparent border-none cursor-pointer rounded hover:bg-gray-100 text-blue-700 transition-colors"
-//             >
-//               <RefreshIcon />
-//             </button>
-//             <button
-//               className="p-2 bg-transparent border-none cursor-pointer rounded hover:bg-gray-100 text-blue-700 transition-colors"
-//             >
-//               <DownloadIcon />
-//             </button>
-//           </div>
-//         </div>
-//         <hr className="my-4 border-gray-200" />
-
-//         {/* Stats Cards */}
-//         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-//           <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-//             <div className="text-gray-600 text-sm">Total Activities</div>
-//             <div className="text-3xl font-bold mt-1">{stats.totalActivities}</div>
-//           </div>
-//           <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-//             <div className="text-gray-600 text-sm">Unique Users</div>
-//             <div className="text-3xl font-bold mt-1">{stats.uniqueUsers}</div>
-//           </div>
-//           <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-//             <div className="text-gray-600 text-sm">Most Active Action</div>
-//             <div className="text-xl font-bold mt-1">
-//               {Object.entries(stats.actionsByType).sort((a, b) => b[1] - a[1])[0]?.[0]?.replace('_', ' ') || 'N/A'}
+//     <div className="p-4 sm:p-6 font-sans bg-gray-50 min-h-screen">
+//       <div className="max-w-7xl mx-auto">
+//         {/* Header */}
+//         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 hover:shadow-md transition-shadow duration-300">
+//           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+//             <div>
+//               <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+//                 <DashboardIcon
+//                   className="text-blue-600"
+//                   style={{ fontSize: "28px" }}
+//                 />
+//                 Activity Logs
+//               </h1>
+//               <p className="text-sm text-gray-500 mt-1">
+//                 Monitor and track all user activities across the platform
+//               </p>
+//             </div>
+//             <div className="flex gap-2">
+//               <button
+//                 onClick={fetchLogs}
+//                 className="inline-flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 text-sm font-medium cursor-pointer"
+//               >
+//                 <RefreshIcon style={{ fontSize: "18px" }} />
+//                 Refresh
+//               </button>
+//               <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white border-none rounded-xl hover:bg-blue-700 transition-all duration-200 text-sm font-medium cursor-pointer shadow-sm hover:shadow-md">
+//                 <DownloadIcon style={{ fontSize: "18px" }} />
+//                 Export
+//               </button>
 //             </div>
 //           </div>
-//         </div>
 
-//         {/* Filters */}
-//         <div className="flex flex-wrap gap-4 items-center mt-4">
-//           <div className="relative flex-1 min-w-[200px]">
-//             <input
-//               type="text"
-//               placeholder="Search logs by user, action, IP, description..."
-//               value={filters.searchTerm}
-//               onChange={handleSearch}
-//               className="w-full px-3 py-2 pl-10 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-//             />
-//             <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" style={{ fontSize: '20px' }} />
+//           {/* Stats Cards */}
+//           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+//             <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 p-4 rounded-xl border border-blue-200/50">
+//               <div className="flex items-center justify-between">
+//                 <div>
+//                   <div className="text-sm text-blue-700 font-medium">
+//                     Total Activities
+//                   </div>
+//                   <div className="text-3xl font-bold text-blue-900 mt-1">
+//                     {stats.totalActivities.toLocaleString()}
+//                   </div>
+//                 </div>
+//                 <div className="w-12 h-12 bg-blue-200/50 rounded-xl flex items-center justify-center">
+//                   <EventNoteIcon
+//                     className="text-blue-700"
+//                     style={{ fontSize: "24px" }}
+//                   />
+//                 </div>
+//               </div>
+//               <div className="mt-2 flex items-center gap-2">
+//                 <span className="text-xs text-blue-600">Last 30 days</span>
+//               </div>
+//             </div>
+
+//             <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-4 rounded-xl border border-emerald-200/50">
+//               <div className="flex items-center justify-between">
+//                 <div>
+//                   <div className="text-sm text-emerald-700 font-medium">
+//                     Unique Users
+//                   </div>
+//                   <div className="text-3xl font-bold text-emerald-900 mt-1">
+//                     {stats.uniqueUsers.toLocaleString()}
+//                   </div>
+//                 </div>
+//                 <div className="w-12 h-12 bg-emerald-200/50 rounded-xl flex items-center justify-center">
+//                   <PeopleIcon
+//                     className="text-emerald-700"
+//                     style={{ fontSize: "24px" }}
+//                   />
+//                 </div>
+//               </div>
+//               <div className="mt-2 flex items-center gap-2">
+//                 <span className="text-xs text-emerald-600">Active users</span>
+//               </div>
+//             </div>
+
+//             <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 p-4 rounded-xl border border-purple-200/50">
+//               <div className="flex items-center justify-between">
+//                 <div>
+//                   <div className="text-sm text-purple-700 font-medium">
+//                     Most Active
+//                   </div>
+//                   <div className="text-lg font-bold text-purple-900 mt-1 truncate max-w-[140px]">
+//                     {Object.entries(stats.actionsByType)
+//                       .sort((a, b) => b[1] - a[1])[0]?.[0]
+//                       ?.replace("_", " ") || "N/A"}
+//                   </div>
+//                 </div>
+//                 <div className="w-12 h-12 bg-purple-200/50 rounded-xl flex items-center justify-center">
+//                   <TrendingUpIcon
+//                     className="text-purple-700"
+//                     style={{ fontSize: "24px" }}
+//                   />
+//                 </div>
+//               </div>
+//               <div className="mt-2 flex items-center gap-2">
+//                 <span className="text-xs text-purple-600">
+//                   {Object.entries(stats.actionsByType).sort(
+//                     (a, b) => b[1] - a[1],
+//                   )[0]?.[1] || 0}{" "}
+//                   occurrences
+//                 </span>
+//               </div>
+//             </div>
+
+//             <div className="bg-gradient-to-br from-amber-50 to-amber-100/50 p-4 rounded-xl border border-amber-200/50">
+//               <div className="flex items-center justify-between">
+//                 <div>
+//                   <div className="text-sm text-amber-700 font-medium">
+//                     Action Types
+//                   </div>
+//                   <div className="text-3xl font-bold text-amber-900 mt-1">
+//                     {Object.keys(stats.actionsByType).length}
+//                   </div>
+//                 </div>
+//                 <div className="w-12 h-12 bg-amber-200/50 rounded-xl flex items-center justify-center">
+//                   <FilterListIcon
+//                     className="text-amber-700"
+//                     style={{ fontSize: "24px" }}
+//                   />
+//                 </div>
+//               </div>
+//               <div className="mt-2 flex items-center gap-2">
+//                 <span className="text-xs text-amber-600">
+//                   Different action types
+//                 </span>
+//               </div>
+//             </div>
 //           </div>
 
-//           <select
-//             value={filters.action}
-//             onChange={(e) => handleFilterChange('action', e.target.value)}
-//             className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white min-w-[150px]"
-//           >
-//             <option value="all">All Actions</option>
-//             {actionTypes.map(action => (
-//               <option key={action} value={action}>{action.replace('_', ' ')}</option>
-//             ))}
-//           </select>
+//           {/* Filters */}
+//           <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-start sm:items-center">
+//             <div className="relative flex-1 min-w-[200px] w-full sm:w-auto">
+//               <input
+//                 type="text"
+//                 placeholder="Search logs by user, action, IP, description..."
+//                 value={filters.searchTerm}
+//                 onChange={handleSearch}
+//                 className="w-full px-4 py-2.5 pl-11 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm"
+//               />
+//               <SearchIcon
+//                 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+//                 style={{ fontSize: "20px" }}
+//               />
+//             </div>
 
-//           <select
-//             value={filters.dateRange}
-//             onChange={(e) => handleFilterChange('dateRange', e.target.value)}
-//             className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white min-w-[150px]"
-//           >
-//             <option value="all">All Time</option>
-//             <option value="today">Today</option>
-//             <option value="week">This Week</option>
-//             <option value="month">This Month</option>
-//           </select>
-
-//           <button
-//             onClick={clearFilters}
-//             className="px-4 py-2 border border-gray-300 rounded bg-white hover:bg-gray-50 cursor-pointer flex items-center gap-1 text-sm transition-colors"
-//           >
-//             <ClearIcon style={{ fontSize: '18px' }} />
-//             Clear
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Error message */}
-//       {error && (
-//         <div className="p-3 px-4 bg-red-50 text-red-700 rounded mb-4 border border-red-200">
-//           {error}
-//         </div>
-//       )}
-
-//       {/* Logs Table */}
-//       <div className="bg-white rounded-lg shadow-md overflow-hidden">
-//         <div className="overflow-x-auto">
-//           <table className="w-full border-collapse text-sm">
-//             <thead className="bg-gray-50">
-//               <tr>
-//                 <th className="px-4 py-3 text-left border-b-2 border-gray-200 font-semibold text-gray-700">Time</th>
-//                 <th className="px-4 py-3 text-left border-b-2 border-gray-200 font-semibold text-gray-700">User</th>
-//                 <th className="px-4 py-3 text-left border-b-2 border-gray-200 font-semibold text-gray-700">Action</th>
-//                 <th className="px-4 py-3 text-left border-b-2 border-gray-200 font-semibold text-gray-700">Description</th>
-//                 <th className="px-4 py-3 text-left border-b-2 border-gray-200 font-semibold text-gray-700">IP Address</th>
-//                 <th className="px-4 py-3 text-right border-b-2 border-gray-200 font-semibold text-gray-700">Actions</th>
-//               </tr>
-//             </thead>
-//             <tbody>
-//               {filteredLogs.length === 0 ? (
-//                 <tr>
-//                   <td colSpan={6} className="py-10 text-center text-gray-600">
-//                     No logs found matching the current filters
-//                   </td>
-//                 </tr>
-//               ) : (
-//                 filteredLogs
-//                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-//                   .map((log) => (
-//                     <tr key={log._id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
-//                       <td className="px-4 py-3">
-//                         <div>
-//                           <span className="text-sm">{formatDistanceSafe(log.createdAt)}</span>
-//                           <div className="text-xs text-gray-500">{log.timeHappened || formatDateSafe(log.createdAt, 'PPpp')}</div>
-//                         </div>
-//                       </td>
-//                       <td className="px-4 py-3">
-//                         <div className="flex items-center gap-2">
-//                           <PersonIcon className="text-gray-500" style={{ fontSize: '16px' }} />
-//                           <div>
-//                             <div className="font-medium">{getUserName(log)}</div>
-//                             <div className="text-xs text-gray-500">{getUserEmail(log)}</div>
-//                             {getUserRole(log) && (
-//                               <div className="text-xs text-gray-400 capitalize">{getUserRole(log)}</div>
-//                             )}
-//                           </div>
-//                         </div>
-//                       </td>
-//                       <td className="px-4 py-3">
-//                         <div className="flex items-center gap-2">
-//                           {getActionIcon(log.action)}
-//                           <span className={`px-2 py-0.5 rounded-full text-xs border ${getActionColor(log.action)}`}>
-//                             {log.action.replace('_', ' ')}
-//                           </span>
-//                         </div>
-//                       </td>
-//                       <td className="px-4 py-3">
-//                         <div className="max-w-[250px]">
-//                           <div className="text-sm text-gray-700">{log.description}</div>
-//                           <div className="flex items-center gap-1 mt-0.5">
-//                             {getEntityIcon(log.action)}
-//                             <span className="text-xs text-gray-500">{getEntityType(log.action)}</span>
-//                           </div>
-//                         </div>
-//                       </td>
-//                       <td className="px-4 py-3">
-//                         <div className="text-sm font-mono">{log.ipAddress || log.ipv4Address || 'N/A'}</div>
-//                       </td>
-//                       <td className="px-4 py-3 text-right">
-//                         <button
-//                           onClick={() => handleViewDetails(log)}
-//                           className="p-1 bg-transparent border-none cursor-pointer text-blue-600 rounded hover:bg-blue-50 transition-colors"
-//                           title="View Details"
-//                         >
-//                           <VisibilityIcon style={{ fontSize: '20px' }} />
-//                         </button>
-//                       </td>
-//                     </tr>
-//                   ))
-//               )}
-//             </tbody>
-//           </table>
-//         </div>
-
-//         {/* Pagination */}
-//         <div className="p-4 flex flex-wrap justify-between items-center border-t border-gray-200 gap-2">
-//           <div className="flex items-center gap-2">
-//             <span className="text-sm text-gray-600">Rows per page:</span>
 //             <select
-//               value={rowsPerPage}
-//               onChange={handleChangeRowsPerPage}
-//               className="px-2 py-1 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+//               value={filters.action}
+//               onChange={(e) => handleFilterChange("action", e.target.value)}
+//               className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-w-[150px] transition-all duration-200"
 //             >
-//               <option value={5}>5</option>
-//               <option value={10}>10</option>
-//               <option value={25}>25</option>
-//               <option value={50}>50</option>
+//               <option value="all">All Actions</option>
+//               {actionTypes.map((action) => (
+//                 <option key={action} value={action}>
+//                   {action.replace("_", " ")}
+//                 </option>
+//               ))}
 //             </select>
-//           </div>
-//           <div className="text-sm text-gray-600">
-//             {filteredLogs.length > 0 ? `${page * rowsPerPage + 1} - ${Math.min((page + 1) * rowsPerPage, filteredLogs.length)} of ${filteredLogs.length}` : '0 of 0'}
-//           </div>
-//           <div className="flex gap-1">
-//             <button
-//               onClick={() => handleChangePage(page - 1)}
-//               disabled={page === 0}
-//               className={`px-3 py-1 border border-gray-300 rounded bg-white ${
-//                 page === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50 cursor-pointer'
-//               } transition-colors`}
+
+//             <select
+//               value={filters.dateRange}
+//               onChange={(e) => handleFilterChange("dateRange", e.target.value)}
+//               className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-w-[150px] transition-all duration-200"
 //             >
-//               Previous
-//             </button>
+//               <option value="all">All Time</option>
+//               <option value="today">Today</option>
+//               <option value="week">This Week</option>
+//               <option value="month">This Month</option>
+//             </select>
+
 //             <button
-//               onClick={() => handleChangePage(page + 1)}
-//               disabled={page >= Math.ceil(filteredLogs.length / rowsPerPage) - 1}
-//               className={`px-3 py-1 border border-gray-300 rounded bg-white ${
-//                 page >= Math.ceil(filteredLogs.length / rowsPerPage) - 1
-//                   ? 'opacity-50 cursor-not-allowed'
-//                   : 'hover:bg-gray-50 cursor-pointer'
-//               } transition-colors`}
+//               onClick={clearFilters}
+//               className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 text-sm text-gray-700 cursor-pointer"
 //             >
-//               Next
+//               <ClearIcon style={{ fontSize: "18px" }} />
+//               Clear
 //             </button>
 //           </div>
 //         </div>
+
+//         {/* Error message */}
+//         {error && (
+//           <div className="p-4 px-6 bg-red-50 text-red-700 rounded-xl mb-4 border border-red-200 flex items-center gap-3">
+//             <InfoIcon className="text-red-500" style={{ fontSize: "20px" }} />
+//             <span>{error}</span>
+//           </div>
+//         )}
+
+//         {/* Logs Table */}
+//         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
+//           <div className="overflow-x-auto">
+//             <table className="w-full border-collapse text-sm">
+//               <thead className="bg-gray-50/80">
+//                 <tr>
+//                   <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+//                     Time
+//                   </th>
+//                   <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+//                     User
+//                   </th>
+//                   <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+//                     Action
+//                   </th>
+//                   <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+//                     Description
+//                   </th>
+//                   <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+//                     IP Address
+//                   </th>
+//                   <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+//                     Details
+//                   </th>
+//                 </tr>
+//               </thead>
+//               <tbody className="divide-y divide-gray-100">
+//                 {filteredLogs.length === 0 ? (
+//                   <tr>
+//                     <td colSpan={6} className="py-16 text-center">
+//                       <div className="flex flex-col items-center gap-2">
+//                         <InfoIcon
+//                           className="text-gray-300"
+//                           style={{ fontSize: "48px" }}
+//                         />
+//                         <p className="text-gray-500 font-medium">
+//                           No logs found
+//                         </p>
+//                         <p className="text-sm text-gray-400">
+//                           Try adjusting your filters or search terms
+//                         </p>
+//                       </div>
+//                     </td>
+//                   </tr>
+//                 ) : (
+//                   filteredLogs
+//                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+//                     .map((log) => (
+//                       <tr
+//                         key={log._id}
+//                         className="hover:bg-gray-50/50 transition-colors duration-150"
+//                       >
+//                         <td className="px-4 py-3.5">
+//                           <div className="flex flex-col">
+//                             <span className="text-sm font-medium text-gray-700">
+//                               {formatDistanceSafe(log.createdAt)}
+//                             </span>
+//                             <span className="text-xs text-gray-400">
+//                               {formatDateSafe(
+//                                 log.createdAt,
+//                                 "MMM d, yyyy HH:mm",
+//                               )}
+//                             </span>
+//                           </div>
+//                         </td>
+//                         <td className="px-4 py-3.5">
+//                           <div className="flex items-center gap-3">
+//                             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-700 font-semibold text-xs">
+//                               {getUserName(log).charAt(0).toUpperCase()}
+//                             </div>
+//                             <div className="flex flex-col">
+//                               <span className="text-sm font-medium text-gray-800">
+//                                 {getUserName(log)}
+//                               </span>
+//                               <span className="text-xs text-gray-500">
+//                                 {getUserEmail(log)}
+//                               </span>
+//                               {getUserRole(log) && (
+//                                 <span className="text-xs text-gray-400 capitalize">
+//                                   {getUserRole(log)}
+//                                 </span>
+//                               )}
+//                             </div>
+//                           </div>
+//                         </td>
+//                         <td className="px-4 py-3.5">
+//                           <span
+//                             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border ${getActionBadgeStyle(log.action)}`}
+//                           >
+//                             {getActionIcon(log.action)}
+//                             {log.action.replace("_", " ")}
+//                           </span>
+//                         </td>
+//                         <td className="px-4 py-3.5">
+//                           <div className="flex flex-col gap-0.5 max-w-[220px]">
+//                             <span className="text-sm text-gray-700 truncate">
+//                               {log.description}
+//                             </span>
+//                             <span className="flex items-center gap-1 text-xs text-gray-400">
+//                               {getEntityIcon(log.action)}
+//                               {getEntityType(log.action)}
+//                             </span>
+//                           </div>
+//                         </td>
+//                         <td className="px-4 py-3.5">
+//                           <code className="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-600">
+//                             {log.ipAddress || log.ipv4Address || "N/A"}
+//                           </code>
+//                         </td>
+//                         <td className="px-4 py-3.5 text-right">
+//                           <button
+//                             onClick={() => handleViewDetails(log)}
+//                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 transition-all duration-200 text-sm font-medium cursor-pointer"
+//                           >
+//                             <VisibilityIcon style={{ fontSize: "16px" }} />
+//                             View
+//                           </button>
+//                         </td>
+//                       </tr>
+//                     ))
+//                 )}
+//               </tbody>
+//             </table>
+//           </div>
+
+//           {/* Pagination */}
+//           {filteredLogs.length > 0 && (
+//             <div className="px-4 py-3.5 flex flex-wrap justify-between items-center border-t border-gray-100 gap-3 bg-gray-50/50">
+//               <div className="flex items-center gap-3">
+//                 <span className="text-sm text-gray-600">Rows per page:</span>
+//                 <select
+//                   value={rowsPerPage}
+//                   onChange={handleChangeRowsPerPage}
+//                   className="px-2 py-1.5 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+//                 >
+//                   <option value={5}>5</option>
+//                   <option value={10}>10</option>
+//                   <option value={25}>25</option>
+//                   <option value={50}>50</option>
+//                 </select>
+//               </div>
+//               <div className="text-sm text-gray-600">
+//                 <span className="font-medium">{filteredLogs.length}</span> total
+//                 logs
+//                 <span className="mx-2 text-gray-300">|</span>
+//                 <span className="font-medium">
+//                   {page * rowsPerPage + 1}
+//                 </span> -{" "}
+//                 <span className="font-medium">
+//                   {Math.min((page + 1) * rowsPerPage, filteredLogs.length)}
+//                 </span>
+//               </div>
+//               <div className="flex gap-1.5">
+//                 <button
+//                   onClick={() => handleChangePage(page - 1)}
+//                   disabled={page === 0}
+//                   className={`px-4 py-1.5 border rounded-lg text-sm transition-all duration-200 ${
+//                     page === 0
+//                       ? "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
+//                       : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 cursor-pointer"
+//                   }`}
+//                 >
+//                   Previous
+//                 </button>
+//                 <button
+//                   onClick={() => handleChangePage(page + 1)}
+//                   disabled={
+//                     page >= Math.ceil(filteredLogs.length / rowsPerPage) - 1
+//                   }
+//                   className={`px-4 py-1.5 border rounded-lg text-sm transition-all duration-200 ${
+//                     page >= Math.ceil(filteredLogs.length / rowsPerPage) - 1
+//                       ? "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
+//                       : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 cursor-pointer"
+//                   }`}
+//                 >
+//                   Next
+//                 </button>
+//               </div>
+//             </div>
+//           )}
+//         </div>
 //       </div>
 
-//       {/* Detail Dialog */}
+//       {/* Detail Dialog - Modern Modal */}
 //       {detailDialogOpen && selectedLog && (
-//         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-//           <div className="bg-white rounded-lg max-w-[700px] w-full max-h-[90vh] overflow-auto shadow-xl">
-//             <div className="p-5 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
-//               <h2 className="text-xl font-bold m-0">Activity Details</h2>
-//               <span className={`px-3 py-0.5 rounded-full text-xs border ${getActionColor(selectedLog.action)}`}>
-//                 {selectedLog.action.replace('_', ' ')}
-//               </span>
-//             </div>
-
-//             <div className="p-6">
-//               <div className="mb-4">
-//                 <div className="text-sm text-gray-600 mb-1">User Information</div>
-//                 <div className="text-base font-medium">{getUserName(selectedLog)}</div>
-//                 <div className="text-sm text-gray-600">{getUserEmail(selectedLog)}</div>
-//                 {getUserRole(selectedLog) && (
-//                   <div className="text-sm text-gray-500 capitalize">Role: {getUserRole(selectedLog)}</div>
-//                 )}
-//                 {getUserPhone(selectedLog) && (
-//                   <div className="text-sm text-gray-500">Phone: {getUserPhone(selectedLog)}</div>
-//                 )}
-//                 <div className="text-xs text-gray-500">User ID: {getUserId(selectedLog)}</div>
+//         <div
+//           className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4"
+//           onClick={() => setDetailDialogOpen(false)}
+//         >
+//           <div
+//             className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-auto shadow-2xl"
+//             onClick={(e) => e.stopPropagation()}
+//           >
+//             {/* Modal Header */}
+//             <div className="sticky top-0 bg-white/95 backdrop-blur-sm z-10 px-6 py-4 border-b border-gray-100 flex justify-between items-start gap-4">
+//               <div>
+//                 <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+//                   <InfoIcon
+//                     className="text-blue-600"
+//                     style={{ fontSize: "24px" }}
+//                   />
+//                   Activity Details
+//                 </h2>
+//                 <span
+//                   className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border mt-1.5 ${getActionBadgeStyle(selectedLog.action)}`}
+//                 >
+//                   {getActionIcon(selectedLog.action)}
+//                   {selectedLog.action.replace("_", " ")}
+//                 </span>
 //               </div>
-
-//               <hr className="my-4 border-gray-200" />
-
-//               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-//                 <div>
-//                   <div className="text-sm text-gray-600 mb-1">Action</div>
-//                   <div className="flex items-center gap-2">
-//                     {getActionIcon(selectedLog.action)}
-//                     <span className="text-sm">{selectedLog.action.replace('_', ' ')}</span>
-//                   </div>
-//                 </div>
-//                 <div>
-//                   <div className="text-sm text-gray-600 mb-1">Entity Type</div>
-//                   <div className="flex items-center gap-2">
-//                     {getEntityIcon(selectedLog.action)}
-//                     <span className="text-sm">{getEntityType(selectedLog.action)}</span>
-//                   </div>
-//                 </div>
-//               </div>
-
-//               <div className="mb-4">
-//                 <div className="text-sm text-gray-600 mb-1">Description</div>
-//                 <div className="p-3 bg-gray-50 rounded border border-gray-200">
-//                   <div className="text-sm">{selectedLog.description}</div>
-//                 </div>
-//               </div>
-
-//               <hr className="my-4 border-gray-200" />
-
-//               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-//                 <div>
-//                   <div className="text-sm text-gray-600 mb-1">IP Address</div>
-//                   <div className="text-sm font-mono">{selectedLog.ipAddress || selectedLog.ipv4Address || 'N/A'}</div>
-//                 </div>
-//                 <div>
-//                   <div className="text-sm text-gray-600 mb-1">User Agent</div>
-//                   <div className="text-xs break-all">{selectedLog.userAgent || 'N/A'}</div>
-//                 </div>
-//               </div>
-
-//               <hr className="my-4 border-gray-200" />
-
-//               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                 <div>
-//                   <div className="text-sm text-gray-600 mb-1">Created At</div>
-//                   <div className="text-sm">{formatDateSafe(selectedLog.createdAt, 'PPpp')}</div>
-//                   <div className="text-xs text-gray-500">{formatDistanceSafe(selectedLog.createdAt)}</div>
-//                 </div>
-//                 <div>
-//                   <div className="text-sm text-gray-600 mb-1">Time Happened</div>
-//                   <div className="text-sm">{selectedLog.timeHappened || 'N/A'}</div>
-//                 </div>
-//               </div>
-
-//               {selectedLog.updatedAt && selectedLog.updatedAt !== selectedLog.createdAt && (
-//                 <>
-//                   <hr className="my-4 border-gray-200" />
-//                   <div>
-//                     <div className="text-sm text-gray-600 mb-1">Updated At</div>
-//                     <div className="text-sm">{formatDateSafe(selectedLog.updatedAt, 'PPpp')}</div>
-//                   </div>
-//                 </>
-//               )}
-//             </div>
-
-//             <div className="p-3 px-6 border-t border-gray-200 flex justify-end sticky bottom-0 bg-white">
 //               <button
 //                 onClick={() => setDetailDialogOpen(false)}
-//                 className="px-6 py-2 bg-blue-600 text-white border-none rounded cursor-pointer text-sm hover:bg-blue-700 transition-colors"
+//                 className="p-2 hover:bg-gray-100 rounded-xl transition-colors duration-200 text-gray-500 hover:text-gray-700"
+//               >
+//                 <CloseIcon style={{ fontSize: "20px" }} />
+//               </button>
+//             </div>
+
+//             {/* Modal Content */}
+//             <div className="p-6">
+//               {/* User Information */}
+//               <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl p-4 border border-gray-200 mb-6">
+//                 <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+//                   <PersonIcon style={{ fontSize: "18px" }} />
+//                   User Information
+//                 </h4>
+//                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+//                   <div className="flex flex-col">
+//                     <span className="text-xs text-gray-500">Name</span>
+//                     <span className="text-sm font-medium text-gray-900">
+//                       {getUserName(selectedLog)}
+//                     </span>
+//                   </div>
+//                   <div className="flex flex-col">
+//                     <span className="text-xs text-gray-500">Email</span>
+//                     <span className="text-sm text-gray-700">
+//                       {getUserEmail(selectedLog)}
+//                     </span>
+//                   </div>
+//                   {getUserRole(selectedLog) && (
+//                     <div className="flex flex-col">
+//                       <span className="text-xs text-gray-500">Role</span>
+//                       <span className="text-sm capitalize">
+//                         {getUserRole(selectedLog)}
+//                       </span>
+//                     </div>
+//                   )}
+//                   {getUserPhone(selectedLog) && (
+//                     <div className="flex flex-col">
+//                       <span className="text-xs text-gray-500">Phone</span>
+//                       <span className="text-sm">
+//                         {getUserPhone(selectedLog)}
+//                       </span>
+//                     </div>
+//                   )}
+//                   <div className="flex flex-col col-span-full">
+//                     <span className="text-xs text-gray-500">User ID</span>
+//                     <code className="text-xs font-mono bg-white px-2 py-1 rounded border border-gray-200 text-gray-600 truncate">
+//                       {getUserId(selectedLog)}
+//                     </code>
+//                   </div>
+//                 </div>
+//               </div>
+
+//               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+//                 <div className="flex flex-col">
+//                   <span className="text-xs text-gray-500 font-medium">
+//                     Entity Type
+//                   </span>
+//                   <div className="flex items-center gap-2 mt-1">
+//                     {getEntityIcon(selectedLog.action)}
+//                     <span className="text-sm font-medium">
+//                       {getEntityType(selectedLog.action)}
+//                     </span>
+//                   </div>
+//                 </div>
+//                 <div className="flex flex-col">
+//                   <span className="text-xs text-gray-500 font-medium">
+//                     Action
+//                   </span>
+//                   <span className="text-sm mt-1">
+//                     {selectedLog.action.replace("_", " ")}
+//                   </span>
+//                 </div>
+//               </div>
+
+//               {/* Description */}
+//               <div className="mb-4">
+//                 <span className="text-xs text-gray-500 font-medium">
+//                   Description
+//                 </span>
+//                 <div className="mt-1.5 p-3 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl border border-gray-200">
+//                   <p className="text-sm text-gray-700">
+//                     {selectedLog.description}
+//                   </p>
+//                 </div>
+//               </div>
+
+//               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+//                 <div className="flex flex-col">
+//                   <span className="text-xs text-gray-500 font-medium">
+//                     IP Address
+//                   </span>
+//                   <code className="text-sm font-mono bg-white px-2 py-1 rounded border border-gray-200 text-gray-600 mt-1">
+//                     {selectedLog.ipAddress || selectedLog.ipv4Address || "N/A"}
+//                   </code>
+//                 </div>
+//                 <div className="flex flex-col">
+//                   <span className="text-xs text-gray-500 font-medium">
+//                     User Agent
+//                   </span>
+//                   <span className="text-xs text-gray-600 mt-1 break-all line-clamp-2">
+//                     {selectedLog.userAgent || "N/A"}
+//                   </span>
+//                 </div>
+//               </div>
+
+//               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100">
+//                 <div className="flex flex-col">
+//                   <span className="text-xs text-gray-500 font-medium">
+//                     Created At
+//                   </span>
+//                   <span className="text-sm font-medium mt-1">
+//                     {formatDateSafe(selectedLog.createdAt, "PPpp")}
+//                   </span>
+//                   <span className="text-xs text-gray-400">
+//                     {formatDistanceSafe(selectedLog.createdAt)}
+//                   </span>
+//                 </div>
+//                 <div className="flex flex-col">
+//                   <span className="text-xs text-gray-500 font-medium">
+//                     Time Happened
+//                   </span>
+//                   <span className="text-sm mt-1">
+//                     {selectedLog.timeHappened || "N/A"}
+//                   </span>
+//                 </div>
+//               </div>
+
+//               {selectedLog.updatedAt &&
+//                 selectedLog.updatedAt !== selectedLog.createdAt && (
+//                   <div className="mt-4 pt-4 border-t border-gray-100">
+//                     <span className="text-xs text-gray-500 font-medium">
+//                       Updated At
+//                     </span>
+//                     <span className="text-sm block mt-1">
+//                       {formatDateSafe(selectedLog.updatedAt, "PPpp")}
+//                     </span>
+//                   </div>
+//                 )}
+//             </div>
+
+//             {/* Modal Footer */}
+//             <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm px-6 py-4 border-t border-gray-100 flex justify-end">
+//               <button
+//                 onClick={() => setDetailDialogOpen(false)}
+//                 className="px-6 py-2.5 bg-blue-600 text-white border-none rounded-xl hover:bg-blue-700 transition-all duration-200 text-sm font-medium cursor-pointer shadow-sm hover:shadow-md"
 //               >
 //                 Close
 //               </button>
@@ -683,10 +1085,15 @@
 //   );
 // };
 
+
+
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect, useCallback, type JSX } from "react";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
+import axios from "axios";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import {
   Search as SearchIcon,
   Refresh as RefreshIcon,
@@ -709,9 +1116,15 @@ import {
   EventNote as EventNoteIcon,
   FilterList as FilterListIcon,
   Close as CloseIcon,
+  Error as ErrorIcon,
+  Schedule as ScheduleIcon,
+  Public as PublicIcon,
 } from "@mui/icons-material";
 
-// Types - Updated to handle both string and object for userId
+// API Base URL
+const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
+
+// Types
 interface ActivityLog {
   _id: string;
   userId:
@@ -813,6 +1226,28 @@ const getUserPhone = (log: ActivityLog): string => {
   return "";
 };
 
+// Create axios instance with interceptors
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Add request interceptor for authentication
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
+
 export const ActionsManagement: React.FC = () => {
   // State
   const [logs, setLogs] = useState<ActivityLog[]>([]);
@@ -834,39 +1269,24 @@ export const ActionsManagement: React.FC = () => {
     actionsByType: {},
   });
 
-  // Fetch logs
+  // Fetch logs using axios
   const fetchLogs = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(
-        "https://rene-inyumba-nodejs.onrender.com/auth/activities",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch activities: ${response.statusText}`);
-      }
-
-      const data = await response.json();
+      const response = await api.get("/auth/activities");
 
       let activities: ActivityLog[] = [];
 
-      if (data.activities && Array.isArray(data.activities)) {
-        activities = data.activities;
-      } else if (Array.isArray(data)) {
-        activities = data;
-      } else if (data.data && Array.isArray(data.data)) {
-        activities = data.data;
+      if (response.data.activities && Array.isArray(response.data.activities)) {
+        activities = response.data.activities;
+      } else if (Array.isArray(response.data)) {
+        activities = response.data;
+      } else if (response.data.data && Array.isArray(response.data.data)) {
+        activities = response.data.data;
       } else {
-        console.warn("Unexpected API response structure:", data);
+        console.warn("Unexpected API response structure:", response.data);
         activities = [];
       }
 
@@ -874,11 +1294,10 @@ export const ActionsManagement: React.FC = () => {
       calculateStats(activities);
       applyFilters(activities, filters);
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "An error occurred while fetching logs",
-      );
+      const errorMessage = axios.isAxiosError(err)
+        ? err.response?.data?.message || err.message
+        : "An error occurred while fetching logs";
+      setError(errorMessage);
       console.error("Error fetching logs:", err);
     } finally {
       setLoading(false);
@@ -1005,6 +1424,87 @@ export const ActionsManagement: React.FC = () => {
     setDetailDialogOpen(true);
   };
 
+  // Export logs as PDF
+  const exportLogsPDF = () => {
+    if (filteredLogs.length === 0) return;
+
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "mm",
+      format: "a4",
+    });
+
+    // Add header with gradient effect
+    doc.setFillColor(52, 58, 64);
+    doc.rect(0, 0, doc.internal.pageSize.getWidth(), 40, "F");
+
+    // Title
+    doc.setFontSize(22);
+    doc.setTextColor(255, 255, 255);
+    doc.text("Activity Logs Report", 14, 22);
+
+    // Subtitle
+    doc.setFontSize(10);
+    doc.setTextColor(200, 200, 200);
+    doc.text(`Generated: ${format(new Date(), "PPpp")}`, 14, 32);
+    doc.text(`Total Records: ${filteredLogs.length}`, doc.internal.pageSize.getWidth() - 14, 32, { align: "right" });
+
+    // Prepare table data
+    const tableData = filteredLogs.map((log) => [
+      formatDateSafe(log.createdAt, "MMM d, yyyy HH:mm"),
+      getUserName(log),
+      getUserEmail(log),
+      log.action.replace("_", " "),
+      log.description?.substring(0, 50) + (log.description?.length > 50 ? "..." : ""),
+      log.ipAddress || log.ipv4Address || "N/A",
+    ]);
+
+    // Add table with professional styling
+    autoTable(doc, {
+      head: [["Time", "User", "Email", "Action", "Description", "IP Address"]],
+      body: tableData,
+      startY: 48,
+      styles: {
+        fontSize: 7,
+        cellPadding: 3,
+        valign: "middle",
+      },
+      headStyles: {
+        fillColor: [33, 37, 41],
+        textColor: [255, 255, 255],
+        fontSize: 8,
+        fontStyle: "bold",
+        halign: "center",
+      },
+      alternateRowStyles: {
+        fillColor: [245, 247, 250],
+      },
+      columnStyles: {
+        0: { cellWidth: 35, halign: "center" },
+        1: { cellWidth: 30 },
+        2: { cellWidth: 35 },
+        3: { cellWidth: 25, halign: "center" },
+        4: { cellWidth: 55 },
+        5: { cellWidth: 30, halign: "center" },
+      },
+      margin: { left: 14, right: 14 },
+      didDrawPage: (data) => {
+        // Footer
+        const pageCount = doc.getNumberOfPages();
+        doc.setFontSize(8);
+        doc.setTextColor(108, 117, 125);
+        doc.text(
+          `Page ${data.pageNumber} of ${pageCount} - © ${new Date().getFullYear()} Activity Logs`,
+          doc.internal.pageSize.getWidth() / 2,
+          doc.internal.pageSize.getHeight() - 8,
+          { align: "center" },
+        );
+      },
+    });
+
+    doc.save(`activity-logs-${format(new Date(), "yyyy-MM-dd")}.pdf`);
+  };
+
   // Get action icon
   const getActionIcon = (action: string) => {
     const iconMap: { [key: string]: JSX.Element } = {
@@ -1075,8 +1575,6 @@ export const ActionsManagement: React.FC = () => {
       )
     );
   };
-
-  // Get action color
 
   // Get entity type icon
   const getEntityIcon = (action: string) => {
@@ -1151,52 +1649,52 @@ export const ActionsManagement: React.FC = () => {
     fetchLogs();
   }, [fetchLogs]);
 
-  // Loading state with skeleton
+  // Loading state with professional skeleton
   if (loading) {
     return (
-      <div className="p-6 font-sans bg-gray-50 min-h-screen">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 p-6 mt-4">
         <div className="max-w-7xl mx-auto">
           <div className="animate-pulse">
             {/* Header Skeleton */}
-            <div className="bg-white rounded-2xl shadow-sm p-6 mb-6 border border-gray-100">
-              <div className="flex justify-between items-center mb-4">
-                <div className="h-8 w-48 bg-gray-200 rounded"></div>
-                <div className="flex gap-2">
-                  <div className="h-10 w-10 bg-gray-200 rounded-full"></div>
-                  <div className="h-10 w-10 bg-gray-200 rounded-full"></div>
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/50 p-8 mb-8">
+              <div className="flex justify-between items-center mb-6">
+                <div className="h-10 w-56 bg-gradient-to-r from-slate-200 to-slate-300 rounded-2xl"></div>
+                <div className="flex gap-3">
+                  <div className="h-12 w-12 bg-gradient-to-r from-slate-200 to-slate-300 rounded-2xl"></div>
+                  <div className="h-12 w-12 bg-gradient-to-r from-slate-200 to-slate-300 rounded-2xl"></div>
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                {[1, 2, 3].map((i) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+                {[1, 2, 3, 4].map((i) => (
                   <div
                     key={i}
-                    className="p-4 bg-gray-50 rounded-xl border border-gray-100"
+                    className="p-5 bg-gradient-to-br from-slate-100 to-slate-200/50 rounded-2xl border border-slate-200/50"
                   >
-                    <div className="h-4 w-24 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-8 w-16 bg-gray-200 rounded"></div>
+                    <div className="h-4 w-28 bg-gradient-to-r from-slate-200 to-slate-300 rounded-lg mb-3"></div>
+                    <div className="h-10 w-20 bg-gradient-to-r from-slate-200 to-slate-300 rounded-xl"></div>
                   </div>
                 ))}
               </div>
               <div className="flex flex-wrap gap-4">
-                <div className="h-10 flex-1 min-w-[200px] bg-gray-200 rounded"></div>
-                <div className="h-10 w-40 bg-gray-200 rounded"></div>
-                <div className="h-10 w-40 bg-gray-200 rounded"></div>
-                <div className="h-10 w-24 bg-gray-200 rounded"></div>
+                <div className="h-12 flex-1 min-w-[200px] bg-gradient-to-r from-slate-200 to-slate-300 rounded-2xl"></div>
+                <div className="h-12 w-44 bg-gradient-to-r from-slate-200 to-slate-300 rounded-2xl"></div>
+                <div className="h-12 w-44 bg-gradient-to-r from-slate-200 to-slate-300 rounded-2xl"></div>
+                <div className="h-12 w-28 bg-gradient-to-r from-slate-200 to-slate-300 rounded-2xl"></div>
               </div>
             </div>
             {/* Table Skeleton */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-4">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/50 overflow-hidden">
+              <div className="p-6">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-4 py-3 border-b border-gray-100"
+                    className="flex items-center gap-4 py-4 border-b border-slate-100"
                   >
-                    <div className="h-10 w-32 bg-gray-200 rounded"></div>
-                    <div className="h-10 w-40 bg-gray-200 rounded"></div>
-                    <div className="h-10 w-24 bg-gray-200 rounded"></div>
-                    <div className="h-10 flex-1 bg-gray-200 rounded"></div>
-                    <div className="h-10 w-20 bg-gray-200 rounded"></div>
+                    <div className="h-12 w-36 bg-gradient-to-r from-slate-200 to-slate-300 rounded-xl"></div>
+                    <div className="h-12 w-44 bg-gradient-to-r from-slate-200 to-slate-300 rounded-xl"></div>
+                    <div className="h-12 w-28 bg-gradient-to-r from-slate-200 to-slate-300 rounded-xl"></div>
+                    <div className="h-12 flex-1 bg-gradient-to-r from-slate-200 to-slate-300 rounded-xl"></div>
+                    <div className="h-12 w-24 bg-gradient-to-r from-slate-200 to-slate-300 rounded-xl"></div>
                   </div>
                 ))}
               </div>
@@ -1211,105 +1709,108 @@ export const ActionsManagement: React.FC = () => {
   const actionTypes = Array.from(new Set(logs.map((log) => log.action)));
 
   return (
-    <div className="p-4 sm:p-6 font-sans bg-gray-50 min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 p-4 sm:p-6 lg:p-8 mt-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 hover:shadow-md transition-shadow duration-300">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                <DashboardIcon
-                  className="text-blue-600"
-                  style={{ fontSize: "28px" }}
-                />
-                Activity Logs
-              </h1>
-              <p className="text-sm text-gray-500 mt-1">
-                Monitor and track all user activities across the platform
-              </p>
+        {/* Modern Header with Glass Effect */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/50 p-6 sm:p-8 mb-8 hover:shadow-3xl transition-all duration-500 mt-4">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 rounded-2xl shadow-lg shadow-blue-500/25">
+                <DashboardIcon className="text-white" style={{ fontSize: "28px" }} />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                  Activity Logs
+                </h1>
+                <p className="text-sm text-slate-500 mt-1 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Real-time monitoring & analytics
+                </p>
+              </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-3">
               <button
                 onClick={fetchLogs}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 text-sm font-medium cursor-pointer"
+                className="group inline-flex items-center gap-2.5 px-5 py-2.5 bg-white text-slate-700 border border-slate-200 rounded-2xl hover:bg-slate-50 hover:border-slate-300 hover:shadow-lg transition-all duration-300 text-sm font-medium"
               >
-                <RefreshIcon style={{ fontSize: "18px" }} />
+                <RefreshIcon className="text-slate-500 group-hover:rotate-180 transition-transform duration-500" style={{ fontSize: "18px" }} />
                 Refresh
               </button>
-              <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white border-none rounded-xl hover:bg-blue-700 transition-all duration-200 text-sm font-medium cursor-pointer shadow-sm hover:shadow-md">
-                <DownloadIcon style={{ fontSize: "18px" }} />
-                Export
+              <button
+                onClick={exportLogsPDF}
+                className="group inline-flex items-center gap-2.5 px-5 py-2.5 bg-gradient-to-r from-rose-500 via-rose-600 to-pink-600 text-white rounded-2xl hover:from-rose-600 hover:via-rose-700 hover:to-pink-700 hover:shadow-xl shadow-rose-500/25 transition-all duration-300 text-sm font-medium"
+              >
+                <DownloadIcon className="group-hover:scale-110 transition-transform duration-300" style={{ fontSize: "18px" }} />
+                Export PDF
               </button>
             </div>
           </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 p-4 rounded-xl border border-blue-200/50">
+          {/* Premium Stats Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-8">
+            <div className="group bg-gradient-to-br from-blue-50 to-blue-100/50 p-5 rounded-2xl border border-blue-200/50 hover:shadow-xl hover:shadow-blue-500/10 hover:scale-[1.02] transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-sm text-blue-700 font-medium">
+                  <div className="text-sm font-medium text-blue-700/80 flex items-center gap-2">
+                    <EventNoteIcon style={{ fontSize: "16px" }} />
                     Total Activities
                   </div>
-                  <div className="text-3xl font-bold text-blue-900 mt-1">
+                  <div className="text-3xl font-bold text-blue-900 mt-2">
                     {stats.totalActivities.toLocaleString()}
                   </div>
                 </div>
-                <div className="w-12 h-12 bg-blue-200/50 rounded-xl flex items-center justify-center">
-                  <EventNoteIcon
-                    className="text-blue-700"
-                    style={{ fontSize: "24px" }}
-                  />
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-300">
+                  <EventNoteIcon className="text-white" style={{ fontSize: "28px" }} />
                 </div>
               </div>
-              <div className="mt-2 flex items-center gap-2">
-                <span className="text-xs text-blue-600">Last 30 days</span>
+              <div className="mt-3 flex items-center gap-2">
+                <span className="text-xs font-medium text-blue-600 bg-blue-200/60 px-3 py-1 rounded-full">
+                  Last 30 days
+                </span>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-4 rounded-xl border border-emerald-200/50">
+            <div className="group bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-5 rounded-2xl border border-emerald-200/50 hover:shadow-xl hover:shadow-emerald-500/10 hover:scale-[1.02] transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-sm text-emerald-700 font-medium">
+                  <div className="text-sm font-medium text-emerald-700/80 flex items-center gap-2">
+                    <PeopleIcon style={{ fontSize: "16px" }} />
                     Unique Users
                   </div>
-                  <div className="text-3xl font-bold text-emerald-900 mt-1">
+                  <div className="text-3xl font-bold text-emerald-900 mt-2">
                     {stats.uniqueUsers.toLocaleString()}
                   </div>
                 </div>
-                <div className="w-12 h-12 bg-emerald-200/50 rounded-xl flex items-center justify-center">
-                  <PeopleIcon
-                    className="text-emerald-700"
-                    style={{ fontSize: "24px" }}
-                  />
+                <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform duration-300">
+                  <PeopleIcon className="text-white" style={{ fontSize: "28px" }} />
                 </div>
               </div>
-              <div className="mt-2 flex items-center gap-2">
-                <span className="text-xs text-emerald-600">Active users</span>
+              <div className="mt-3 flex items-center gap-2">
+                <span className="text-xs font-medium text-emerald-600 bg-emerald-200/60 px-3 py-1 rounded-full">
+                  Active users
+                </span>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 p-4 rounded-xl border border-purple-200/50">
+            <div className="group bg-gradient-to-br from-purple-50 to-purple-100/50 p-5 rounded-2xl border border-purple-200/50 hover:shadow-xl hover:shadow-purple-500/10 hover:scale-[1.02] transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-sm text-purple-700 font-medium">
+                  <div className="text-sm font-medium text-purple-700/80 flex items-center gap-2">
+                    <TrendingUpIcon style={{ fontSize: "16px" }} />
                     Most Active
                   </div>
-                  <div className="text-lg font-bold text-purple-900 mt-1 truncate max-w-[140px]">
+                  <div className="text-lg font-bold text-purple-900 mt-2 truncate max-w-[140px]">
                     {Object.entries(stats.actionsByType)
                       .sort((a, b) => b[1] - a[1])[0]?.[0]
                       ?.replace("_", " ") || "N/A"}
                   </div>
                 </div>
-                <div className="w-12 h-12 bg-purple-200/50 rounded-xl flex items-center justify-center">
-                  <TrendingUpIcon
-                    className="text-purple-700"
-                    style={{ fontSize: "24px" }}
-                  />
+                <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform duration-300">
+                  <TrendingUpIcon className="text-white" style={{ fontSize: "28px" }} />
                 </div>
               </div>
-              <div className="mt-2 flex items-center gap-2">
-                <span className="text-xs text-purple-600">
+              <div className="mt-3 flex items-center gap-2">
+                <span className="text-xs font-medium text-purple-600 bg-purple-200/60 px-3 py-1 rounded-full">
                   {Object.entries(stats.actionsByType).sort(
                     (a, b) => b[1] - a[1],
                   )[0]?.[1] || 0}{" "}
@@ -1318,43 +1819,41 @@ export const ActionsManagement: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-amber-50 to-amber-100/50 p-4 rounded-xl border border-amber-200/50">
+            <div className="group bg-gradient-to-br from-amber-50 to-amber-100/50 p-5 rounded-2xl border border-amber-200/50 hover:shadow-xl hover:shadow-amber-500/10 hover:scale-[1.02] transition-all duration-300">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-sm text-amber-700 font-medium">
+                  <div className="text-sm font-medium text-amber-700/80 flex items-center gap-2">
+                    <FilterListIcon style={{ fontSize: "16px" }} />
                     Action Types
                   </div>
-                  <div className="text-3xl font-bold text-amber-900 mt-1">
+                  <div className="text-3xl font-bold text-amber-900 mt-2">
                     {Object.keys(stats.actionsByType).length}
                   </div>
                 </div>
-                <div className="w-12 h-12 bg-amber-200/50 rounded-xl flex items-center justify-center">
-                  <FilterListIcon
-                    className="text-amber-700"
-                    style={{ fontSize: "24px" }}
-                  />
+                <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform duration-300">
+                  <FilterListIcon className="text-white" style={{ fontSize: "28px" }} />
                 </div>
               </div>
-              <div className="mt-2 flex items-center gap-2">
-                <span className="text-xs text-amber-600">
-                  Different action types
+              <div className="mt-3 flex items-center gap-2">
+                <span className="text-xs font-medium text-amber-600 bg-amber-200/60 px-3 py-1 rounded-full">
+                  Different types
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Filters */}
-          <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-start sm:items-center">
+          {/* Premium Filters with Glass Effect */}
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-start sm:items-center p-4 bg-gradient-to-br from-slate-50/80 to-white/80 rounded-2xl border border-slate-200/50 backdrop-blur-sm">
             <div className="relative flex-1 min-w-[200px] w-full sm:w-auto">
               <input
                 type="text"
                 placeholder="Search logs by user, action, IP, description..."
                 value={filters.searchTerm}
                 onChange={handleSearch}
-                className="w-full px-4 py-2.5 pl-11 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm"
+                className="w-full px-4 py-3 pl-12 bg-white/80 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-200 text-sm placeholder:text-slate-400"
               />
               <SearchIcon
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"
                 style={{ fontSize: "20px" }}
               />
             </div>
@@ -1362,7 +1861,7 @@ export const ActionsManagement: React.FC = () => {
             <select
               value={filters.action}
               onChange={(e) => handleFilterChange("action", e.target.value)}
-              className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-w-[150px] transition-all duration-200"
+              className="px-4 py-3 bg-white/80 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent text-sm min-w-[150px] transition-all duration-200 hover:border-slate-300 cursor-pointer"
             >
               <option value="all">All Actions</option>
               {actionTypes.map((action) => (
@@ -1375,7 +1874,7 @@ export const ActionsManagement: React.FC = () => {
             <select
               value={filters.dateRange}
               onChange={(e) => handleFilterChange("dateRange", e.target.value)}
-              className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-w-[150px] transition-all duration-200"
+              className="px-4 py-3 bg-white/80 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent text-sm min-w-[150px] transition-all duration-200 hover:border-slate-300 cursor-pointer"
             >
               <option value="all">All Time</option>
               <option value="today">Today</option>
@@ -1385,7 +1884,7 @@ export const ActionsManagement: React.FC = () => {
 
             <button
               onClick={clearFilters}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 text-sm text-gray-700 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-5 py-3 bg-white/80 border border-slate-200 rounded-2xl hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 text-sm text-slate-700 font-medium hover:shadow-lg"
             >
               <ClearIcon style={{ fontSize: "18px" }} />
               Clear
@@ -1393,53 +1892,75 @@ export const ActionsManagement: React.FC = () => {
           </div>
         </div>
 
-        {/* Error message */}
+        {/* Error message with glass effect */}
         {error && (
-          <div className="p-4 px-6 bg-red-50 text-red-700 rounded-xl mb-4 border border-red-200 flex items-center gap-3">
-            <InfoIcon className="text-red-500" style={{ fontSize: "20px" }} />
-            <span>{error}</span>
+          <div className="p-5 px-7 bg-gradient-to-br from-red-50/90 to-red-100/50 backdrop-blur-sm text-red-700 rounded-2xl mb-6 border border-red-200 flex items-center gap-4 shadow-lg shadow-red-500/10 mt-4">
+            <div className="p-2 bg-red-200/50 rounded-xl">
+              <ErrorIcon className="text-red-500" style={{ fontSize: "24px" }} />
+            </div>
+            <span className="flex-1 font-medium">{error}</span>
+            <button
+              onClick={() => setError(null)}
+              className="p-2 hover:bg-red-200/50 rounded-xl transition-colors duration-200 text-red-500 hover:text-red-700"
+            >
+              <CloseIcon style={{ fontSize: "20px" }} />
+            </button>
           </div>
         )}
 
-        {/* Logs Table */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
+        {/* Premium Table with Glass Effect */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/50 overflow-hidden hover:shadow-3xl transition-all duration-500 mt-4">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-sm">
-              <thead className="bg-gray-50/80">
-                <tr>
-                  <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Time
+              <thead>
+                <tr className="bg-gradient-to-br from-slate-50/80 to-slate-100/50">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                    <div className="flex items-center gap-2">
+                      <ScheduleIcon style={{ fontSize: "14px" }} />
+                      Time
+                    </div>
                   </th>
-                  <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    User
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                    <div className="flex items-center gap-2">
+                      <PersonIcon style={{ fontSize: "14px" }} />
+                      User
+                    </div>
                   </th>
-                  <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Action
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                    <div className="flex items-center gap-2">
+                      <SettingsIcon style={{ fontSize: "14px" }} />
+                      Action
+                    </div>
                   </th>
-                  <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
                     Description
                   </th>
-                  <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    IP Address
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                    <div className="flex items-center gap-2">
+                      <PublicIcon style={{ fontSize: "14px" }} />
+                      IP Address
+                    </div>
                   </th>
-                  <th className="px-4 py-3.5 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">
                     Details
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-slate-100">
                 {filteredLogs.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="py-16 text-center">
-                      <div className="flex flex-col items-center gap-2">
-                        <InfoIcon
-                          className="text-gray-300"
-                          style={{ fontSize: "48px" }}
-                        />
-                        <p className="text-gray-500 font-medium">
+                    <td colSpan={6} className="py-20 text-center">
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="p-4 bg-slate-100 rounded-full">
+                          <InfoIcon
+                            className="text-slate-300"
+                            style={{ fontSize: "56px" }}
+                          />
+                        </div>
+                        <p className="text-slate-500 font-semibold text-lg">
                           No logs found
                         </p>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-sm text-slate-400">
                           Try adjusting your filters or search terms
                         </p>
                       </div>
@@ -1448,17 +1969,19 @@ export const ActionsManagement: React.FC = () => {
                 ) : (
                   filteredLogs
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((log) => (
+                    .map((log, index) => (
                       <tr
                         key={log._id}
-                        className="hover:bg-gray-50/50 transition-colors duration-150"
+                        className={`hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-transparent transition-all duration-300 group ${
+                          index % 2 === 0 ? "bg-white/50" : "bg-slate-50/30"
+                        }`}
                       >
-                        <td className="px-4 py-3.5">
+                        <td className="px-6 py-4">
                           <div className="flex flex-col">
-                            <span className="text-sm font-medium text-gray-700">
+                            <span className="text-sm font-semibold text-slate-700">
                               {formatDistanceSafe(log.createdAt)}
                             </span>
-                            <span className="text-xs text-gray-400">
+                            <span className="text-xs text-slate-400 mt-0.5">
                               {formatDateSafe(
                                 log.createdAt,
                                 "MMM d, yyyy HH:mm",
@@ -1466,56 +1989,59 @@ export const ActionsManagement: React.FC = () => {
                             </span>
                           </div>
                         </td>
-                        <td className="px-4 py-3.5">
+                        <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-700 font-semibold text-xs">
-                              {getUserName(log).charAt(0).toUpperCase()}
+                            <div className="relative">
+                              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 via-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-500/25">
+                                {getUserName(log).charAt(0).toUpperCase()}
+                              </div>
+                              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white"></div>
                             </div>
                             <div className="flex flex-col">
-                              <span className="text-sm font-medium text-gray-800">
+                              <span className="text-sm font-semibold text-slate-800">
                                 {getUserName(log)}
                               </span>
-                              <span className="text-xs text-gray-500">
+                              <span className="text-xs text-slate-500">
                                 {getUserEmail(log)}
                               </span>
                               {getUserRole(log) && (
-                                <span className="text-xs text-gray-400 capitalize">
+                                <span className="text-xs font-medium text-slate-400 capitalize">
                                   {getUserRole(log)}
                                 </span>
                               )}
                             </div>
                           </div>
                         </td>
-                        <td className="px-4 py-3.5">
+                        <td className="px-6 py-4">
                           <span
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border ${getActionBadgeStyle(log.action)}`}
+                            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border ${getActionBadgeStyle(log.action)} shadow-sm`}
                           >
                             {getActionIcon(log.action)}
                             {log.action.replace("_", " ")}
                           </span>
                         </td>
-                        <td className="px-4 py-3.5">
-                          <div className="flex flex-col gap-0.5 max-w-[220px]">
-                            <span className="text-sm text-gray-700 truncate">
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col gap-0.5 max-w-[240px]">
+                            <span className="text-sm text-slate-700 truncate">
                               {log.description}
                             </span>
-                            <span className="flex items-center gap-1 text-xs text-gray-400">
+                            <span className="flex items-center gap-1.5 text-xs text-slate-400">
                               {getEntityIcon(log.action)}
                               {getEntityType(log.action)}
                             </span>
                           </div>
                         </td>
-                        <td className="px-4 py-3.5">
-                          <code className="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-600">
+                        <td className="px-6 py-4">
+                          <code className="text-xs font-mono bg-slate-100/80 px-3 py-1.5 rounded-xl text-slate-600 border border-slate-200/50">
                             {log.ipAddress || log.ipv4Address || "N/A"}
                           </code>
                         </td>
-                        <td className="px-4 py-3.5 text-right">
+                        <td className="px-6 py-4 text-right">
                           <button
                             onClick={() => handleViewDetails(log)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 transition-all duration-200 text-sm font-medium cursor-pointer"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 hover:shadow-lg shadow-blue-500/25 transition-all duration-300 text-sm font-medium group"
                           >
-                            <VisibilityIcon style={{ fontSize: "16px" }} />
+                            <VisibilityIcon className="group-hover:scale-110 transition-transform duration-300" style={{ fontSize: "16px" }} />
                             View
                           </button>
                         </td>
@@ -1526,15 +2052,15 @@ export const ActionsManagement: React.FC = () => {
             </table>
           </div>
 
-          {/* Pagination */}
+          {/* Premium Pagination */}
           {filteredLogs.length > 0 && (
-            <div className="px-4 py-3.5 flex flex-wrap justify-between items-center border-t border-gray-100 gap-3 bg-gray-50/50">
+            <div className="px-6 py-4 flex flex-wrap justify-between items-center border-t border-slate-100 gap-3 bg-gradient-to-br from-slate-50/30 to-transparent backdrop-blur-sm">
               <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-600">Rows per page:</span>
+                <span className="text-sm text-slate-600 font-medium">Rows per page:</span>
                 <select
                   value={rowsPerPage}
                   onChange={handleChangeRowsPerPage}
-                  className="px-2 py-1.5 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                  className="px-3 py-2 bg-white/80 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-200 hover:border-slate-300 cursor-pointer"
                 >
                   <option value={5}>5</option>
                   <option value={10}>10</option>
@@ -1542,25 +2068,25 @@ export const ActionsManagement: React.FC = () => {
                   <option value={50}>50</option>
                 </select>
               </div>
-              <div className="text-sm text-gray-600">
-                <span className="font-medium">{filteredLogs.length}</span> total
+              <div className="text-sm text-slate-600 font-medium">
+                <span className="text-slate-800">{filteredLogs.length}</span> total
                 logs
-                <span className="mx-2 text-gray-300">|</span>
-                <span className="font-medium">
+                <span className="mx-2 text-slate-300">|</span>
+                <span className="text-slate-800">
                   {page * rowsPerPage + 1}
                 </span> -{" "}
-                <span className="font-medium">
+                <span className="text-slate-800">
                   {Math.min((page + 1) * rowsPerPage, filteredLogs.length)}
                 </span>
               </div>
-              <div className="flex gap-1.5">
+              <div className="flex gap-2">
                 <button
                   onClick={() => handleChangePage(page - 1)}
                   disabled={page === 0}
-                  className={`px-4 py-1.5 border rounded-lg text-sm transition-all duration-200 ${
+                  className={`px-5 py-2 border rounded-xl text-sm font-medium transition-all duration-200 ${
                     page === 0
-                      ? "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
-                      : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 cursor-pointer"
+                      ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                      : "bg-white/80 border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 hover:shadow-lg"
                   }`}
                 >
                   Previous
@@ -1570,10 +2096,10 @@ export const ActionsManagement: React.FC = () => {
                   disabled={
                     page >= Math.ceil(filteredLogs.length / rowsPerPage) - 1
                   }
-                  className={`px-4 py-1.5 border rounded-lg text-sm transition-all duration-200 ${
+                  className={`px-5 py-2 border rounded-xl text-sm font-medium transition-all duration-200 ${
                     page >= Math.ceil(filteredLogs.length / rowsPerPage) - 1
-                      ? "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
-                      : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 cursor-pointer"
+                      ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                      : "bg-white/80 border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 hover:shadow-lg"
                   }`}
                 >
                   Next
@@ -1582,30 +2108,37 @@ export const ActionsManagement: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Footer */}
+        <div className="mt-8 text-center">
+          <p className="text-xs text-slate-400 font-medium">
+            Showing <span className="text-slate-600">{filteredLogs.length}</span> of{" "}
+            <span className="text-slate-600">{logs.length}</span> total activities
+          </p>
+        </div>
       </div>
 
-      {/* Detail Dialog - Modern Modal */}
+      {/* Premium Detail Dialog */}
       {detailDialogOpen && selectedLog && (
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4"
+          className="fixed inset-0 bg-black/60 backdrop-blur-md flex justify-center items-center z-50 p-4 animate-in fade-in duration-300"
           onClick={() => setDetailDialogOpen(false)}
         >
           <div
-            className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-auto shadow-2xl"
+            className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-auto shadow-2xl shadow-black/25 animate-in slide-in-from-bottom-10 duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="sticky top-0 bg-white/95 backdrop-blur-sm z-10 px-6 py-4 border-b border-gray-100 flex justify-between items-start gap-4">
+            <div className="sticky top-0 bg-white/95 backdrop-blur-sm z-10 px-8 py-5 border-b border-slate-100 flex justify-between items-start gap-4">
               <div>
-                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <InfoIcon
-                    className="text-blue-600"
-                    style={{ fontSize: "24px" }}
-                  />
+                <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+                  <span className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl text-white shadow-lg shadow-blue-500/25">
+                    <InfoIcon style={{ fontSize: "22px" }} />
+                  </span>
                   Activity Details
                 </h2>
                 <span
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border mt-1.5 ${getActionBadgeStyle(selectedLog.action)}`}
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border mt-2 ${getActionBadgeStyle(selectedLog.action)}`}
                 >
                   {getActionIcon(selectedLog.action)}
                   {selectedLog.action.replace("_", " ")}
@@ -1613,128 +2146,118 @@ export const ActionsManagement: React.FC = () => {
               </div>
               <button
                 onClick={() => setDetailDialogOpen(false)}
-                className="p-2 hover:bg-gray-100 rounded-xl transition-colors duration-200 text-gray-500 hover:text-gray-700"
+                className="p-2 hover:bg-slate-100 rounded-2xl transition-colors duration-200 text-slate-400 hover:text-slate-600"
               >
-                <CloseIcon style={{ fontSize: "20px" }} />
+                <CloseIcon style={{ fontSize: "24px" }} />
               </button>
             </div>
 
             {/* Modal Content */}
-            <div className="p-6">
+            <div className="p-8">
               {/* User Information */}
-              <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl p-4 border border-gray-200 mb-6">
-                <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                  <PersonIcon style={{ fontSize: "18px" }} />
+              <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl p-5 border border-slate-200/50 mb-6">
+                <h4 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
+                  <div className="p-1.5 bg-blue-500/10 rounded-lg">
+                    <PersonIcon className="text-blue-600" style={{ fontSize: "18px" }} />
+                  </div>
                   User Information
                 </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col">
-                    <span className="text-xs text-gray-500">Name</span>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-xs text-slate-500 font-medium">Name</span>
+                    <span className="text-sm font-semibold text-slate-900 mt-1">
                       {getUserName(selectedLog)}
                     </span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs text-gray-500">Email</span>
-                    <span className="text-sm text-gray-700">
+                    <span className="text-xs text-slate-500 font-medium">Email</span>
+                    <span className="text-sm text-slate-700 mt-1">
                       {getUserEmail(selectedLog)}
                     </span>
                   </div>
                   {getUserRole(selectedLog) && (
                     <div className="flex flex-col">
-                      <span className="text-xs text-gray-500">Role</span>
-                      <span className="text-sm capitalize">
+                      <span className="text-xs text-slate-500 font-medium">Role</span>
+                      <span className="text-sm capitalize font-semibold text-slate-800 mt-1">
                         {getUserRole(selectedLog)}
                       </span>
                     </div>
                   )}
                   {getUserPhone(selectedLog) && (
                     <div className="flex flex-col">
-                      <span className="text-xs text-gray-500">Phone</span>
-                      <span className="text-sm">
+                      <span className="text-xs text-slate-500 font-medium">Phone</span>
+                      <span className="text-sm text-slate-700 mt-1">
                         {getUserPhone(selectedLog)}
                       </span>
                     </div>
                   )}
                   <div className="flex flex-col col-span-full">
-                    <span className="text-xs text-gray-500">User ID</span>
-                    <code className="text-xs font-mono bg-white px-2 py-1 rounded border border-gray-200 text-gray-600 truncate">
+                    <span className="text-xs text-slate-500 font-medium">User ID</span>
+                    <code className="text-xs font-mono bg-white px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600 truncate mt-1">
                       {getUserId(selectedLog)}
                     </code>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
                 <div className="flex flex-col">
-                  <span className="text-xs text-gray-500 font-medium">
-                    Entity Type
-                  </span>
-                  <div className="flex items-center gap-2 mt-1">
-                    {getEntityIcon(selectedLog.action)}
-                    <span className="text-sm font-medium">
+                  <span className="text-xs text-slate-500 font-medium">Entity Type</span>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <div className="p-1.5 bg-slate-100 rounded-lg">
+                      {getEntityIcon(selectedLog.action)}
+                    </div>
+                    <span className="text-sm font-semibold text-slate-800">
                       {getEntityType(selectedLog.action)}
                     </span>
                   </div>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xs text-gray-500 font-medium">
-                    Action
-                  </span>
-                  <span className="text-sm mt-1">
+                  <span className="text-xs text-slate-500 font-medium">Action</span>
+                  <span className="text-sm font-semibold text-slate-800 mt-1.5">
                     {selectedLog.action.replace("_", " ")}
                   </span>
                 </div>
               </div>
 
               {/* Description */}
-              <div className="mb-4">
-                <span className="text-xs text-gray-500 font-medium">
-                  Description
-                </span>
-                <div className="mt-1.5 p-3 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl border border-gray-200">
-                  <p className="text-sm text-gray-700">
+              <div className="mb-5">
+                <span className="text-xs text-slate-500 font-medium">Description</span>
+                <div className="mt-1.5 p-4 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-200/50">
+                  <p className="text-sm text-slate-700 leading-relaxed">
                     {selectedLog.description}
                   </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="flex flex-col">
-                  <span className="text-xs text-gray-500 font-medium">
-                    IP Address
-                  </span>
-                  <code className="text-sm font-mono bg-white px-2 py-1 rounded border border-gray-200 text-gray-600 mt-1">
+                  <span className="text-xs text-slate-500 font-medium">IP Address</span>
+                  <code className="text-sm font-mono bg-white px-3 py-2 rounded-xl border border-slate-200 text-slate-600 mt-1.5">
                     {selectedLog.ipAddress || selectedLog.ipv4Address || "N/A"}
                   </code>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xs text-gray-500 font-medium">
-                    User Agent
-                  </span>
-                  <span className="text-xs text-gray-600 mt-1 break-all line-clamp-2">
+                  <span className="text-xs text-slate-500 font-medium">User Agent</span>
+                  <span className="text-xs text-slate-600 mt-1.5 break-all line-clamp-2 bg-white p-3 rounded-xl border border-slate-200">
                     {selectedLog.userAgent || "N/A"}
                   </span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-6 pt-6 border-t border-slate-100">
                 <div className="flex flex-col">
-                  <span className="text-xs text-gray-500 font-medium">
-                    Created At
-                  </span>
-                  <span className="text-sm font-medium mt-1">
+                  <span className="text-xs text-slate-500 font-medium">Created At</span>
+                  <span className="text-sm font-semibold text-slate-800 mt-1">
                     {formatDateSafe(selectedLog.createdAt, "PPpp")}
                   </span>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-slate-400 mt-0.5">
                     {formatDistanceSafe(selectedLog.createdAt)}
                   </span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xs text-gray-500 font-medium">
-                    Time Happened
-                  </span>
-                  <span className="text-sm mt-1">
+                  <span className="text-xs text-slate-500 font-medium">Time Happened</span>
+                  <span className="text-sm font-semibold text-slate-800 mt-1">
                     {selectedLog.timeHappened || "N/A"}
                   </span>
                 </div>
@@ -1742,11 +2265,9 @@ export const ActionsManagement: React.FC = () => {
 
               {selectedLog.updatedAt &&
                 selectedLog.updatedAt !== selectedLog.createdAt && (
-                  <div className="mt-4 pt-4 border-t border-gray-100">
-                    <span className="text-xs text-gray-500 font-medium">
-                      Updated At
-                    </span>
-                    <span className="text-sm block mt-1">
+                  <div className="mt-6 pt-6 border-t border-slate-100">
+                    <span className="text-xs text-slate-500 font-medium">Updated At</span>
+                    <span className="text-sm font-semibold text-slate-800 block mt-1">
                       {formatDateSafe(selectedLog.updatedAt, "PPpp")}
                     </span>
                   </div>
@@ -1754,10 +2275,10 @@ export const ActionsManagement: React.FC = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm px-6 py-4 border-t border-gray-100 flex justify-end">
+            <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm px-8 py-5 border-t border-slate-100 flex justify-end">
               <button
                 onClick={() => setDetailDialogOpen(false)}
-                className="px-6 py-2.5 bg-blue-600 text-white border-none rounded-xl hover:bg-blue-700 transition-all duration-200 text-sm font-medium cursor-pointer shadow-sm hover:shadow-md"
+                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl hover:from-blue-700 hover:to-blue-800 hover:shadow-xl shadow-blue-500/25 transition-all duration-300 text-sm font-semibold"
               >
                 Close
               </button>
