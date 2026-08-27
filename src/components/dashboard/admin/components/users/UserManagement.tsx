@@ -1,13 +1,9 @@
-
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/immutability */
-/* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import "react-toastify/dist/ReactToastify.css";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import axios from "axios";
 
 // Material-UI Icons
@@ -29,12 +25,8 @@ import SecurityIcon from "@mui/icons-material/Security";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import InfoIcon from "@mui/icons-material/Info";
-import {
-  CheckCircleOutlineRounded,
-  ErrorOutlineOutlined,
-  ViewAgenda,
-} from "@mui/icons-material";
+import ErrorIcon from "@mui/icons-material/Error";
+import AssignmentIcon from "@mui/icons-material/Assignment";
 
 // API Configuration
 const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
@@ -93,238 +85,352 @@ const safeUserHelpers = {
     if (!user || !user.name || user.name.length === 0) return "U";
     return user.name.charAt(0).toUpperCase();
   },
-  
+
   formatRole: (user: User | null | undefined): string => {
     if (!user || !user.role || user.role.length === 0) return "User";
     return user.role.charAt(0).toUpperCase() + user.role.slice(1);
   },
-  
+
   formatStatus: (user: User | null | undefined): string => {
     if (!user) return "Active";
     return user.isActive ? "Active" : "Inactive";
   },
-  
+
   getDisplayName: (user: User | null | undefined): string => {
     if (!user || !user.name) return "Unknown User";
     return user.name;
   },
-  
+
   getDisplayEmail: (user: User | null | undefined): string => {
     if (!user || !user.email) return "No email";
     return user.email;
   },
-  
+
   getDisplayPhone: (user: User | null | undefined): string => {
     if (!user || !user.phone) return "No phone";
     return user.phone;
   },
-  
+
   getDisplayRole: (user: User | null | undefined): string => {
     if (!user || !user.role) return "user";
     return user.role;
   },
-  
+
   getDisplayStatus: (user: User | null | undefined): string => {
     if (!user) return "active";
     return user.isActive ? "active" : "inactive";
-  }
+  },
 };
 
-// Status Modal Component
-interface StatusModalProps {
+// Custom Modal Components (matching booking management style)
+
+interface SuccessModalProps {
   isOpen: boolean;
   onClose: () => void;
-  type: "success" | "error" | "info" | "confirm";
   title: string;
   message: string;
   details?: string;
-  onConfirm?: () => void;
-  confirmText?: string;
-  cancelText?: string;
 }
 
-const StatusModal: React.FC<StatusModalProps> = ({
+const SuccessModal: React.FC<SuccessModalProps> = ({
   isOpen,
   onClose,
-  type,
   title,
   message,
   details,
-  onConfirm,
-  confirmText = "Confirm",
-  cancelText = "Cancel",
 }) => {
-  const getIcon = () => {
-    switch (type) {
-      case "success":
-        return (
-          <CheckCircleOutlineRounded className="w-16 h-16 text-green-500" />
-        );
-      case "error":
-        return <ErrorOutlineOutlined className="w-16 h-16 text-red-500" />;
-      case "info":
-        return <InfoIcon className="w-16 h-16 text-blue-500" />;
-      case "confirm":
-        return <WarningIcon className="w-16 h-16 text-yellow-500" />;
-    }
-  };
-
-  const getColors = () => {
-    switch (type) {
-      case "success":
-        return {
-          bg: "bg-green-50",
-          border: "border-green-200",
-          text: "text-green-800",
-          button: "bg-green-500 hover:bg-green-600",
-        };
-      case "error":
-        return {
-          bg: "bg-red-50",
-          border: "border-red-200",
-          text: "text-red-800",
-          button: "bg-red-500 hover:bg-red-600",
-        };
-      case "info":
-        return {
-          bg: "bg-blue-50",
-          border: "border-blue-200",
-          text: "text-blue-800",
-          button: "bg-blue-500 hover:bg-blue-600",
-        };
-      case "confirm":
-        return {
-          bg: "bg-yellow-50",
-          border: "border-yellow-200",
-          text: "text-yellow-800",
-          button: "bg-yellow-500 hover:bg-yellow-600",
-        };
-    }
-  };
-
-  const colors = getColors();
-
-  const modalVariants = {
-    hidden: { opacity: 0, scale: 0.8, y: 30 },
-    visible: { opacity: 1, scale: 1, y: 0 },
-    exit: { opacity: 0, scale: 0.8, y: 30 },
-  };
-
-  const overlayVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-    exit: { opacity: 0 },
-  };
+  if (!isOpen) return null;
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
           <motion.div
-            variants={overlayVariants}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1 },
+              exit: { opacity: 0 },
+            }}
             initial="hidden"
             animate="visible"
             exit="exit"
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200]"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300]"
             onClick={onClose}
           />
           <motion.div
-            variants={modalVariants}
+            variants={{
+              hidden: { opacity: 0, scale: 0.8, y: 30 },
+              visible: { opacity: 1, scale: 1, y: 0 },
+              exit: { opacity: 0, scale: 0.8, y: 30 },
+            }}
             initial="hidden"
             animate="visible"
             exit="exit"
-            transition={{ duration: 0.4, type: "spring", stiffness: 300 }}
-            className="fixed inset-0 z-[201] flex items-center justify-center p-4"
+            className="fixed inset-0 z-[301] flex items-center justify-center p-4"
           >
-            <div
-              className={`w-full max-w-md rounded-2xl shadow-2xl border ${colors.border} ${colors.bg} relative overflow-hidden`}
-            >
-              <div className="relative z-10 p-6">
-                <div className="flex flex-col items-center text-center">
-                  {/* Icon */}
-                  <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ duration: 0.5, type: "spring" }}
-                    className="mb-4"
+            <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 to-green-600" />
+              <div className="p-6">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center relative">
+                    <div className="absolute inset-0 rounded-full border-4 border-green-200 animate-ping opacity-75" />
+                    <CheckCircleIcon className="w-10 h-10 text-green-600 relative z-10" />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+                  {title}
+                </h3>
+                <p className="text-gray-600 text-center mb-2">{message}</p>
+                {details && (
+                  <p className="text-sm text-gray-400 text-center mb-6">
+                    {details}
+                  </p>
+                )}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={onClose}
+                  className="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+                >
+                  Got it!
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
+
+interface ErrorModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  message: string;
+  details?: string;
+}
+
+const ErrorModal: React.FC<ErrorModalProps> = ({
+  isOpen,
+  onClose,
+  title,
+  message,
+  details,
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1 },
+              exit: { opacity: 0 },
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300]"
+            onClick={onClose}
+          />
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, scale: 0.8, y: 30 },
+              visible: { opacity: 1, scale: 1, y: 0 },
+              exit: { opacity: 0, scale: 0.8, y: 30 },
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 z-[301] flex items-center justify-center p-4"
+          >
+            <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-400 to-red-600" />
+              <div className="p-6">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center relative">
+                    <div className="absolute inset-0 rounded-full border-4 border-red-200 animate-ping opacity-75" />
+                    <ErrorIcon className="w-10 h-10 text-red-600 relative z-10" />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+                  {title}
+                </h3>
+                <p className="text-gray-600 text-center mb-2">{message}</p>
+                {details && (
+                  <p className="text-sm text-gray-400 text-center mb-6">
+                    {details}
+                  </p>
+                )}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={onClose}
+                  className="w-full px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+                >
+                  Try Again
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
+
+interface ConfirmModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  icon?: React.ReactNode;
+  isSubmitting?: boolean;
+  type?: "danger" | "warning" | "info" | "success";
+}
+
+const ConfirmModal: React.FC<ConfirmModalProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmText = "Confirm",
+  cancelText = "Cancel",
+  icon,
+  isSubmitting = false,
+  type = "warning",
+}) => {
+  if (!isOpen) return null;
+
+  const getColors = () => {
+    switch (type) {
+      case "danger":
+        return {
+          iconBg: "bg-red-100",
+          iconColor: "text-red-600",
+          iconBorder: "border-red-200",
+          buttonBg: "bg-gradient-to-r from-red-500 to-red-600",
+          buttonHover: "hover:shadow-lg",
+        };
+      case "warning":
+        return {
+          iconBg: "bg-yellow-100",
+          iconColor: "text-yellow-600",
+          iconBorder: "border-yellow-200",
+          buttonBg: "bg-gradient-to-r from-yellow-500 to-yellow-600",
+          buttonHover: "hover:shadow-lg",
+        };
+      case "success":
+        return {
+          iconBg: "bg-green-100",
+          iconColor: "text-green-600",
+          iconBorder: "border-green-200",
+          buttonBg: "bg-gradient-to-r from-green-500 to-green-600",
+          buttonHover: "hover:shadow-lg",
+        };
+      default:
+        return {
+          iconBg: "bg-blue-100",
+          iconColor: "text-blue-600",
+          iconBorder: "border-blue-200",
+          buttonBg: "bg-gradient-to-r from-blue-500 to-blue-600",
+          buttonHover: "hover:shadow-lg",
+        };
+    }
+  };
+
+  const colors = getColors();
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1 },
+              exit: { opacity: 0 },
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300]"
+            onClick={onClose}
+          />
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, scale: 0.8, y: 30 },
+              visible: { opacity: 1, scale: 1, y: 0 },
+              exit: { opacity: 0, scale: 0.8, y: 30 },
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 z-[301] flex items-center justify-center p-4"
+          >
+            <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative overflow-hidden">
+              <div
+                className={`absolute top-0 left-0 right-0 h-1 ${colors.buttonBg}`}
+              />
+              <div className="p-6">
+                <div className="flex items-center justify-center mb-4">
+                  <div
+                    className={`w-20 h-20 ${colors.iconBg} rounded-full flex items-center justify-center relative`}
                   >
-                    {getIcon()}
-                  </motion.div>
-
-                  {/* Title */}
-                  <motion.h3
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className={`text-2xl font-bold ${colors.text} mb-2`}
+                    <div
+                      className={`absolute inset-0 rounded-full border-4 ${colors.iconBorder} animate-ping opacity-75`}
+                    />
+                    <div className={`${colors.iconColor} relative z-10`}>
+                      {icon ||
+                        (type === "danger" ? (
+                          <DeleteIcon className="w-10 h-10" />
+                        ) : type === "warning" ? (
+                          <CancelIcon className="w-10 h-10" />
+                        ) : type === "success" ? (
+                          <CheckCircleIcon className="w-10 h-10" />
+                        ) : (
+                          <AssignmentIcon className="w-10 h-10" />
+                        ))}
+                    </div>
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+                  {title}
+                </h3>
+                <p className="text-gray-600 text-center mb-6">{message}</p>
+                <div className="flex gap-3">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={onClose}
+                    disabled={isSubmitting}
+                    className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
                   >
-                    {title}
-                  </motion.h3>
-
-                  {/* Message */}
-                  <motion.p
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-gray-700 mb-4"
+                    {cancelText}
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={onConfirm}
+                    disabled={isSubmitting}
+                    className={`flex-1 px-4 py-2.5 ${colors.buttonBg} text-white rounded-xl font-medium ${colors.buttonHover} transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2`}
                   >
-                    {message}
-                  </motion.p>
-
-                  {/* Details */}
-                  {details && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 }}
-                      className="bg-white/50 rounded-lg p-3 mb-4 w-full text-sm text-gray-600"
-                    >
-                      {details}
-                    </motion.div>
-                  )}
-
-                  {/* Buttons */}
-                  <div className="flex gap-3 w-full">
-                    {type === "confirm" ? (
+                    {isSubmitting ? (
                       <>
-                        <motion.button
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.4 }}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={onClose}
-                          className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-                        >
-                          {cancelText}
-                        </motion.button>
-                        <motion.button
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.5 }}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={onConfirm}
-                          className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-all ${colors.button} shadow-lg`}
-                        >
-                          {confirmText}
-                        </motion.button>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Loading...
                       </>
                     ) : (
-                      <motion.button
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={onClose}
-                        className={`w-full px-6 py-2.5 rounded-lg text-white font-medium transition-all ${colors.button} shadow-lg`}
-                      >
-                        Got it
-                      </motion.button>
+                      confirmText
                     )}
-                  </div>
+                  </motion.button>
                 </div>
               </div>
             </div>
@@ -335,27 +441,19 @@ const StatusModal: React.FC<StatusModalProps> = ({
   );
 };
 
-// View User Modal
+// View User Modal (with booking management styling)
 interface ViewUserModalProps {
   isOpen: boolean;
   onClose: () => void;
   user: User | null;
 }
 
-const ViewUserModal: React.FC<ViewUserModalProps> = ({ isOpen, onClose, user }) => {
+const ViewUserModal: React.FC<ViewUserModalProps> = ({
+  isOpen,
+  onClose,
+  user,
+}) => {
   if (!user) return null;
-
-  const modalVariants = {
-    hidden: { opacity: 0, scale: 0.8, y: 30 },
-    visible: { opacity: 1, scale: 1, y: 0 },
-    exit: { opacity: 0, scale: 0.8, y: 30 },
-  };
-
-  const overlayVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-    exit: { opacity: 0 },
-  };
 
   const getRoleColor = (role: string): string => {
     switch (role) {
@@ -371,39 +469,39 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({ isOpen, onClose, user }) 
   };
 
   const getStatusColor = (isActive: boolean): string => {
-    return isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800";
+    return isActive
+      ? "bg-green-100 text-green-800"
+      : "bg-gray-100 text-gray-800";
   };
-
-  // Safe user data access
-  const userInitial = safeUserHelpers.getInitial(user);
-  const userDisplayName = safeUserHelpers.getDisplayName(user);
-  const userDisplayEmail = safeUserHelpers.getDisplayEmail(user);
-  const userDisplayRole = safeUserHelpers.getDisplayRole(user);
-  const formattedRole = safeUserHelpers.formatRole(user);
-  const formattedStatus = safeUserHelpers.formatStatus(user);
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
           <motion.div
-            variants={overlayVariants}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1 },
+              exit: { opacity: 0 },
+            }}
             initial="hidden"
             animate="visible"
             exit="exit"
-            transition={{ duration: 0.3 }}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150]"
             onClick={onClose}
           />
           <motion.div
-            variants={modalVariants}
+            variants={{
+              hidden: { opacity: 0, scale: 0.8, y: 30 },
+              visible: { opacity: 1, scale: 1, y: 0 },
+              exit: { opacity: 0, scale: 0.8, y: 30 },
+            }}
             initial="hidden"
             animate="visible"
             exit="exit"
-            transition={{ duration: 0.4, type: "spring", stiffness: 300 }}
             className="fixed inset-0 z-[151] flex items-center justify-center p-4"
           >
-            <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative overflow-hidden">
+            <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white relative">
               <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl z-10">
                 <div className="flex items-center gap-2">
                   <PersonIcon className="text-[#FF385C] w-5 h-5" />
@@ -422,78 +520,96 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({ isOpen, onClose, user }) 
               </div>
 
               <div className="p-6">
+                {/* User Profile Header */}
                 <div className="flex flex-col items-center mb-6">
                   <motion.div
                     className="w-24 h-24 rounded-full bg-[#FF385C] text-white flex items-center justify-center text-3xl font-bold mb-3"
                     whileHover={{ scale: 1.1, rotate: 10 }}
                     transition={{ duration: 0.3 }}
                   >
-                    {userInitial}
+                    {safeUserHelpers.getInitial(user)}
                   </motion.div>
                   <h3 className="text-xl font-semibold text-gray-900">
-                    {userDisplayName}
+                    {safeUserHelpers.getDisplayName(user)}
                   </h3>
-                  <p className="text-sm text-gray-500">{userDisplayEmail}</p>
-                  <div className="flex gap-2 mt-2">
+                  <p className="text-sm text-gray-500">
+                    {safeUserHelpers.getDisplayEmail(user)}
+                  </p>
+                  <div className="flex gap-2 mt-2 flex-wrap justify-center">
                     <span
                       className={`px-3 py-1 text-xs font-medium rounded-full ${getRoleColor(
-                        userDisplayRole,
+                        safeUserHelpers.getDisplayRole(user),
                       )}`}
                     >
-                      {formattedRole}
+                      {safeUserHelpers.formatRole(user)}
                     </span>
                     <span
                       className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(
                         user.isActive,
                       )}`}
                     >
-                      {formattedStatus}
+                      {safeUserHelpers.formatStatus(user)}
                     </span>
                     {user.isEmailVerified && (
-                      <span className="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                      <span className="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 flex items-center gap-1">
+                        <VerifiedIcon className="w-3 h-3" />
                         Verified
                       </span>
                     )}
                   </div>
                 </div>
 
-                <div className="space-y-3 border-t border-gray-200 pt-4">
-                  <div className="flex justify-between py-2 border-b border-gray-100">
-                    <span className="text-sm text-gray-500">Phone</span>
-                    <span className="text-sm font-medium text-gray-900">
+                {/* User Details Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4">
+                  <div>
+                    <label className="text-xs font-medium text-gray-500">
+                      Phone
+                    </label>
+                    <p className="text-sm text-gray-900 flex items-center gap-1">
+                      <PhoneIcon className="w-3 h-3 text-gray-400" />
                       {safeUserHelpers.getDisplayPhone(user)}
-                    </span>
+                    </p>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-gray-100">
-                    <span className="text-sm text-gray-500">User ID</span>
-                    <span className="text-sm font-medium text-gray-900">
-                      {user.id || "N/A"}
-                    </span>
+                  <div>
+                    <label className="text-xs font-medium text-gray-500">
+                      User ID
+                    </label>
+                    <p className="text-sm text-gray-900">{user.id || "N/A"}</p>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-gray-100">
-                    <span className="text-sm text-gray-500">Joined</span>
-                    <span className="text-sm font-medium text-gray-900">
-                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      }) : "N/A"}
-                    </span>
+                  <div>
+                    <label className="text-xs font-medium text-gray-500">
+                      Joined
+                    </label>
+                    <p className="text-sm text-gray-900">
+                      {user.createdAt
+                        ? new Date(user.createdAt).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })
+                        : "N/A"}
+                    </p>
                   </div>
-                  <div className="flex justify-between py-2">
-                    <span className="text-sm text-gray-500">Last Updated</span>
-                    <span className="text-sm font-medium text-gray-900">
-                      {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      }) : "N/A"}
-                    </span>
+                  <div>
+                    <label className="text-xs font-medium text-gray-500">
+                      Last Updated
+                    </label>
+                    <p className="text-sm text-gray-900">
+                      {user.updatedAt
+                        ? new Date(user.updatedAt).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })
+                        : "N/A"}
+                    </p>
                   </div>
                   {user.lastLogin && (
-                    <div className="flex justify-between py-2">
-                      <span className="text-sm text-gray-500">Last Login</span>
-                      <span className="text-sm font-medium text-gray-900">
+                    <div className="md:col-span-2">
+                      <label className="text-xs font-medium text-gray-500">
+                        Last Login
+                      </label>
+                      <p className="text-sm text-gray-900">
                         {new Date(user.lastLogin).toLocaleDateString("en-US", {
                           year: "numeric",
                           month: "long",
@@ -501,7 +617,7 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({ isOpen, onClose, user }) 
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
-                      </span>
+                      </p>
                     </div>
                   )}
                 </div>
@@ -595,6 +711,8 @@ const translations = {
     strong: "Strong",
     editPasswordNote: "Password fields are optional for editing.",
     viewUser: "View User",
+    success: "Success!",
+    error: "Error",
   },
   fr: {
     userManagement: "Gestion des Utilisateurs",
@@ -664,8 +782,11 @@ const translations = {
     weak: "Faible",
     moderate: "Modéré",
     strong: "Fort",
-    editPasswordNote: "Les champs de mot de passe sont facultatifs pour la modification.",
+    editPasswordNote:
+      "Les champs de mot de passe sont facultatifs pour la modification.",
     viewUser: "Voir l'Utilisateur",
+    success: "Succès !",
+    error: "Erreur",
   },
   rw: {
     userManagement: "Gucunga Abakoresha",
@@ -679,7 +800,8 @@ const translations = {
     hosts: "Abatunze Inzu",
     managers: "Abagenzuzi",
     users: "Abakoresha",
-    searchUsers: "Shakisha abakoresha ukurikije izina, imeri cyangwa telefone...",
+    searchUsers:
+      "Shakisha abakoresha ukurikije izina, imeri cyangwa telefone...",
     allRoles: "Imirimo Yose",
     allStatus: "Ihagaze Ryose",
     user: "Umukoresha",
@@ -737,24 +859,22 @@ const translations = {
     strong: "Rikomeye",
     editPasswordNote: "Amagambo y'ibanga ntabwo ari ngombwa mugihe uhindura.",
     viewUser: "Reba Umukoresha",
-  }
+    success: "Byakunze!",
+    error: "Ikosa",
+  },
 };
 
 // Helper function to get language from cookies
-const getLanguageFromCookies = (): 'en' | 'fr' | 'rw' => {
-  const lang = Cookies.get('language') as 'en' | 'fr' | 'rw';
-  return lang || 'en';
-};
-
-// Helper function to get translations based on cookie language
-export const getTranslations = () => {
-  const lang = getLanguageFromCookies();
-  return translations[lang];
+const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
+  const lang = Cookies.get("language") as "en" | "fr" | "rw";
+  return lang || "en";
 };
 
 export const UserManagement: React.FC = () => {
   // Get language from cookies
-  const [lang, setLang] = useState<'en' | 'fr' | 'rw'>(getLanguageFromCookies());
+  const [lang, setLang] = useState<"en" | "fr" | "rw">(
+    getLanguageFromCookies(),
+  );
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -765,24 +885,31 @@ export const UserManagement: React.FC = () => {
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [, setIsDeleteModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
-  // Status Modal state
-  const [statusModal, setStatusModal] = useState<{
+  // Success/Error modal states (matching booking management)
+  const [successModal, setSuccessModal] = useState<{
     isOpen: boolean;
-    type: "success" | "error" | "info" | "confirm";
     title: string;
     message: string;
     details?: string;
-    onConfirm?: () => void;
-    confirmText?: string;
-    cancelText?: string;
   }>({
     isOpen: false,
-    type: "success",
+    title: "",
+    message: "",
+    details: "",
+  });
+
+  const [errorModal, setErrorModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    details?: string;
+  }>({
+    isOpen: false,
     title: "",
     message: "",
     details: "",
@@ -852,8 +979,7 @@ export const UserManagement: React.FC = () => {
       const response = await API.get("/auth");
       if (response.data.success) {
         const userData = response.data.users || response.data.data || [];
-        
-        // Sanitize user data to ensure required fields exist
+
         const sanitizedUsers = userData.map((user: any) => ({
           id: user.id || user._id || `user_${Math.random()}`,
           name: user.name || user.fullName || "Unknown User",
@@ -875,19 +1001,26 @@ export const UserManagement: React.FC = () => {
             membersCount: 1,
           },
         }));
-        
+
         setUsers(sanitizedUsers);
         setFilteredUsers(sanitizedUsers);
       } else {
-        showStatusModal("error", "Error", response.data.message || "Failed to fetch users");
+        setErrorModal({
+          isOpen: true,
+          title: "Error",
+          message: response.data.message || "Failed to fetch users",
+        });
       }
     } catch (error: any) {
       console.error("Error fetching users:", error);
-      showStatusModal(
-        "error",
-        "Error",
-        error.response?.data?.message || "Failed to fetch users. Please try again."
-      );
+      setErrorModal({
+        isOpen: true,
+        title: "Error",
+        message:
+          error.response?.data?.message ||
+          "Failed to fetch users. Please try again.",
+        details: error instanceof Error ? error.message : undefined,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -934,35 +1067,16 @@ export const UserManagement: React.FC = () => {
     const managers = users.filter((u) => u.role === "manager").length;
     const userCount = users.filter((u) => u.role === "user").length;
 
-    setStats({ total, active, inactive, admins, hosts, managers, users: userCount });
-  }, [users]);
-
-  // Show status modal
-  const showStatusModal = (
-    type: "success" | "error" | "info" | "confirm",
-    title: string,
-    message: string,
-    details?: string,
-    onConfirm?: () => void,
-    confirmText?: string,
-    cancelText?: string
-  ) => {
-    setStatusModal({
-      isOpen: true,
-      type,
-      title,
-      message,
-      details,
-      onConfirm,
-      confirmText,
-      cancelText,
+    setStats({
+      total,
+      active,
+      inactive,
+      admins,
+      hosts,
+      managers,
+      users: userCount,
     });
-  };
-
-  // Close status modal
-  const closeStatusModal = () => {
-    setStatusModal((prev) => ({ ...prev, isOpen: false }));
-  };
+  }, [users]);
 
   // Validation functions
   const validateEmail = (email: string): boolean => {
@@ -990,52 +1104,6 @@ export const UserManagement: React.FC = () => {
     if (score <= 2) return "weak";
     if (score <= 4) return "moderate";
     return "strong";
-  };
-
-  const getPasswordStrengthColor = (
-    strength: "weak" | "moderate" | "strong" | null,
-  ): string => {
-    if (!strength) return "#e5e7eb";
-    switch (strength) {
-      case "weak":
-        return "#ef4444";
-      case "moderate":
-        return "#f59e0b";
-      case "strong":
-        return "#22c55e";
-    }
-  };
-
-  const getPasswordStrengthLabel = (
-    strength: "weak" | "moderate" | "strong" | null,
-  ): string => {
-    if (!strength) return "";
-    switch (strength) {
-      case "weak":
-        return t.weak;
-      case "moderate":
-        return t.moderate;
-      case "strong":
-        return t.strong;
-    }
-  };
-
-  const getPasswordStrengthIcon = (
-    strength: "weak" | "moderate" | "strong" | null,
-  ) => {
-    if (!strength) return null;
-    switch (strength) {
-      case "weak":
-        return <WarningIcon className="w-4 h-4" style={{ color: "#ef4444" }} />;
-      case "moderate":
-        return (
-          <SecurityIcon className="w-4 h-4" style={{ color: "#f59e0b" }} />
-        );
-      case "strong":
-        return (
-          <VerifiedIcon className="w-4 h-4" style={{ color: "#22c55e" }} />
-        );
-    }
   };
 
   const validateForm = (): boolean => {
@@ -1135,35 +1203,36 @@ export const UserManagement: React.FC = () => {
       });
 
       if (response.data.success) {
-        showStatusModal(
-          "success",
-          "✅ " + t.userCreated,
-          t.userCreated,
-          `Name: ${formData.name}\nEmail: ${formData.email}`
-        );
+        setSuccessModal({
+          isOpen: true,
+          title: "✅ " + t.success,
+          message: t.userCreated,
+          details: `Name: ${formData.name}\nEmail: ${formData.email}`,
+        });
         await fetchUsers();
         resetForm();
         setIsCreateModalOpen(false);
       } else {
-        showStatusModal(
-          "error",
-          "❌ " + t.createFailed,
-          response.data.message || t.createFailed
-        );
+        setErrorModal({
+          isOpen: true,
+          title: "❌ " + t.error,
+          message: response.data.message || t.createFailed,
+        });
       }
     } catch (error: any) {
       console.error("Create user error:", error);
-      showStatusModal(
-        "error",
-        "❌ " + t.createFailed,
-        error.response?.data?.message || t.createFailed
-      );
+      setErrorModal({
+        isOpen: true,
+        title: "❌ " + t.error,
+        message: error.response?.data?.message || t.createFailed,
+        details: error instanceof Error ? error.message : undefined,
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleEditUser = async (e: React.FormEvent) => {
+  const handleUpdateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm() || !selectedUser) return;
 
@@ -1178,7 +1247,6 @@ export const UserManagement: React.FC = () => {
         isActive: formData.isActive,
       };
 
-      // Only include password if provided
       if (formData.password) {
         updateData.password = formData.password;
         updateData.confirmPassword = formData.confirmPassword;
@@ -1187,30 +1255,31 @@ export const UserManagement: React.FC = () => {
       const response = await API.put(`/auth/${selectedUser.id}`, updateData);
 
       if (response.data.success) {
-        showStatusModal(
-          "success",
-          "✅ " + t.userUpdated,
-          t.userUpdated,
-          `Name: ${formData.name}\nEmail: ${formData.email}`
-        );
+        setSuccessModal({
+          isOpen: true,
+          title: "✅ " + t.success,
+          message: t.userUpdated,
+          details: `Name: ${formData.name}\nEmail: ${formData.email}`,
+        });
         await fetchUsers();
         resetForm();
         setIsEditModalOpen(false);
         setSelectedUser(null);
       } else {
-        showStatusModal(
-          "error",
-          "❌ " + t.updateFailed,
-          response.data.message || t.updateFailed
-        );
+        setErrorModal({
+          isOpen: true,
+          title: "❌ " + t.error,
+          message: response.data.message || t.updateFailed,
+        });
       }
     } catch (error: any) {
       console.error("Update user error:", error);
-      showStatusModal(
-        "error",
-        "❌ " + t.updateFailed,
-        error.response?.data?.message || t.updateFailed
-      );
+      setErrorModal({
+        isOpen: true,
+        title: "❌ " + t.error,
+        message: error.response?.data?.message || t.updateFailed,
+        details: error instanceof Error ? error.message : undefined,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -1219,84 +1288,83 @@ export const UserManagement: React.FC = () => {
   const handleDeleteUser = async () => {
     if (!selectedUser) return;
 
+    setIsSubmitting(true);
     try {
       const response = await API.delete(`/auth/${selectedUser.id}`);
 
       if (response.data.success) {
-        showStatusModal(
-          "success",
-          "🗑️ " + t.userDeleted,
-          t.userDeleted,
-          `User: ${selectedUser.name}`
-        );
+        setSuccessModal({
+          isOpen: true,
+          title: "🗑️ " + t.success,
+          message: t.userDeleted,
+          details: `User: ${selectedUser.name}`,
+        });
         await fetchUsers();
-        setIsDeleteModalOpen(false);
         setSelectedUser(null);
+        setIsDeleteModalOpen(false);
+        setSelectedUsers((prev) => prev.filter((id) => id !== selectedUser.id));
       } else {
-        showStatusModal(
-          "error",
-          "❌ " + t.deleteFailed,
-          response.data.message || t.deleteFailed
-        );
+        setErrorModal({
+          isOpen: true,
+          title: "❌ " + t.error,
+          message: response.data.message || t.deleteFailed,
+        });
       }
     } catch (error: any) {
       console.error("Delete user error:", error);
-      showStatusModal(
-        "error",
-        "❌ " + t.deleteFailed,
-        error.response?.data?.message || t.deleteFailed
-      );
+      setErrorModal({
+        isOpen: true,
+        title: "❌ " + t.error,
+        message: error.response?.data?.message || t.deleteFailed,
+        details: error instanceof Error ? error.message : undefined,
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleBulkDelete = async () => {
     if (selectedUsers.length === 0) {
-      showStatusModal("info", "Info", "Please select users to delete");
+      setErrorModal({
+        isOpen: true,
+        title: "Info",
+        message: "Please select users to delete",
+      });
       return;
     }
 
-    showStatusModal(
-      "confirm",
-      "⚠️ Confirm Bulk Delete",
-      `Are you sure you want to delete ${selectedUsers.length} users?`,
-      "This action cannot be undone.",
-      async () => {
-        setIsSubmitting(true);
-        try {
-          const response = await API.delete("/auth/bulk", {
-            data: { userIds: selectedUsers },
-          });
+    try {
+      setIsSubmitting(true);
+      const response = await API.delete("/auth/bulk", {
+        data: { userIds: selectedUsers },
+      });
 
-          if (response.data.success) {
-            showStatusModal(
-              "success",
-              "🗑️ " + selectedUsers.length + " " + t.usersDeleted,
-              selectedUsers.length + " " + t.usersDeleted
-            );
-            await fetchUsers();
-            setSelectedUsers([]);
-          } else {
-            showStatusModal(
-              "error",
-              "❌ " + t.deleteFailed,
-              response.data.message || t.deleteFailed
-            );
-          }
-        } catch (error: any) {
-          console.error("Bulk delete error:", error);
-          showStatusModal(
-            "error",
-            "❌ " + t.deleteFailed,
-            error.response?.data?.message || t.deleteFailed
-          );
-        } finally {
-          setIsSubmitting(false);
-          closeStatusModal();
-        }
-      },
-      t.delete,
-      t.cancel
-    );
+      if (response.data.success) {
+        setSuccessModal({
+          isOpen: true,
+          title: "🗑️ " + t.success,
+          message: selectedUsers.length + " " + t.usersDeleted,
+        });
+        await fetchUsers();
+        setSelectedUsers([]);
+      } else {
+        setErrorModal({
+          isOpen: true,
+          title: "❌ " + t.error,
+          message: response.data.message || t.deleteFailed,
+        });
+      }
+    } catch (error: any) {
+      console.error("Bulk delete error:", error);
+      setErrorModal({
+        isOpen: true,
+        title: "❌ " + t.error,
+        message: error.response?.data?.message || t.deleteFailed,
+        details: error instanceof Error ? error.message : undefined,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Reset form
@@ -1341,30 +1409,23 @@ export const UserManagement: React.FC = () => {
     setIsViewModalOpen(true);
   };
 
-  // Open delete confirmation
+  // Open delete confirmation - using ConfirmModal
   const openDeleteModal = (user: User) => {
     setSelectedUser(user);
-    showStatusModal(
-      "confirm",
-      "⚠️ " + t.deleteUser,
-      `${t.deleteConfirmation} "${user.name || 'Unknown User'}"?`,
-      t.actionUndone,
-      handleDeleteUser,
-      t.delete,
-      t.cancel
-    );
+    setIsDeleteModalOpen(true);
   };
 
   // Handle form field changes
-  const handleInputChange = (field: keyof UserFormData, value: string | boolean) => {
+  const handleInputChange = (
+    field: keyof UserFormData,
+    value: string | boolean,
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
 
-    // Clear errors for this field
     if (errors[field as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
 
-    // Email validation
     if (field === "email" && typeof value === "string") {
       if (value.length > 0) {
         setIsEmailValid(validateEmail(value));
@@ -1373,7 +1434,6 @@ export const UserManagement: React.FC = () => {
       }
     }
 
-    // Phone validation
     if (field === "phone" && typeof value === "string") {
       if (value.length > 0) {
         setIsPhoneValid(validatePhone(value));
@@ -1382,7 +1442,6 @@ export const UserManagement: React.FC = () => {
       }
     }
 
-    // Password strength check
     if (field === "password" && typeof value === "string") {
       const strength = checkPasswordStrength(value);
       setPasswordStrength(strength);
@@ -1400,7 +1459,6 @@ export const UserManagement: React.FC = () => {
       }
     }
 
-    // Confirm password check
     if (field === "confirmPassword" && typeof value === "string") {
       if (formData.password && formData.password !== value) {
         setErrors((prev) => ({
@@ -1447,7 +1505,9 @@ export const UserManagement: React.FC = () => {
 
   // Get status badge color
   const getStatusColor = (isActive: boolean): string => {
-    return isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800";
+    return isActive
+      ? "bg-green-100 text-green-800"
+      : "bg-gray-100 text-gray-800";
   };
 
   // Modal variants
@@ -1465,17 +1525,22 @@ export const UserManagement: React.FC = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Status Modal */}
-      <StatusModal
-        isOpen={statusModal.isOpen}
-        onClose={closeStatusModal}
-        type={statusModal.type}
-        title={statusModal.title}
-        message={statusModal.message}
-        details={statusModal.details}
-        onConfirm={statusModal.onConfirm}
-        confirmText={statusModal.confirmText}
-        cancelText={statusModal.cancelText}
+      {/* Success Modal */}
+      <SuccessModal
+        isOpen={successModal.isOpen}
+        onClose={() => setSuccessModal({ ...successModal, isOpen: false })}
+        title={successModal.title}
+        message={successModal.message}
+        details={successModal.details}
+      />
+
+      {/* Error Modal */}
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        onClose={() => setErrorModal({ ...errorModal, isOpen: false })}
+        title={errorModal.title}
+        message={errorModal.message}
+        details={errorModal.details}
       />
 
       {/* View User Modal */}
@@ -1488,6 +1553,37 @@ export const UserManagement: React.FC = () => {
         user={selectedUser}
       />
 
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedUser(null);
+        }}
+        onConfirm={handleDeleteUser}
+        title={t.deleteUser}
+        message={`${t.deleteConfirmation} "${selectedUser?.name || "Unknown User"}"?`}
+        confirmText={t.delete}
+        cancelText={t.cancel}
+        isSubmitting={isSubmitting}
+        type="danger"
+        icon={<DeleteIcon className="w-10 h-10" />}
+      />
+
+      {/* Confirm Bulk Delete Modal */}
+      <ConfirmModal
+        isOpen={selectedUsers.length > 0 && isSubmitting ? false : false}
+        onClose={() => {}}
+        onConfirm={handleBulkDelete}
+        title="⚠️ Confirm Bulk Delete"
+        message={`Are you sure you want to delete ${selectedUsers.length} users?`}
+        confirmText={t.delete}
+        cancelText={t.cancel}
+        isSubmitting={isSubmitting}
+        type="danger"
+        icon={<DeleteIcon className="w-10 h-10" />}
+      />
+
       {/* Header */}
       <div className="mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -1496,9 +1592,7 @@ export const UserManagement: React.FC = () => {
               <PersonIcon className="w-7 h-7 text-[#FF385C]" />
               {t.userManagement}
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              {t.manageUsers}
-            </p>
+            <p className="text-sm text-gray-500 mt-1">{t.manageUsers}</p>
           </div>
           <div className="flex items-center gap-2">
             {selectedUsers.length > 0 && (
@@ -1532,7 +1626,9 @@ export const UserManagement: React.FC = () => {
               disabled={isLoading}
               className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors flex items-center gap-2 disabled:opacity-50"
             >
-              <RefreshIcon className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+              <RefreshIcon
+                className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
+              />
             </motion.button>
           </div>
         </div>
@@ -1705,7 +1801,10 @@ export const UserManagement: React.FC = () => {
                 <tbody className="divide-y divide-gray-200">
                   {filteredUsers.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                      <td
+                        colSpan={7}
+                        className="px-4 py-8 text-center text-gray-500"
+                      >
                         <PersonIcon className="w-12 h-12 mx-auto text-gray-300 mb-2" />
                         <p>{t.noUsers}</p>
                         <p className="text-sm">{t.adjustFilters}</p>
@@ -1743,8 +1842,12 @@ export const UserManagement: React.FC = () => {
                           </div>
                         </td>
                         <td className="px-4 py-3 hidden md:table-cell">
-                          <p className="text-sm text-gray-600">{safeUserHelpers.getDisplayEmail(user)}</p>
-                          <p className="text-xs text-gray-400">{safeUserHelpers.getDisplayPhone(user)}</p>
+                          <p className="text-sm text-gray-600">
+                            {safeUserHelpers.getDisplayEmail(user)}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            {safeUserHelpers.getDisplayPhone(user)}
+                          </p>
                         </td>
                         <td className="px-4 py-3">
                           <span
@@ -1771,11 +1874,16 @@ export const UserManagement: React.FC = () => {
                         </td>
                         <td className="px-4 py-3 hidden lg:table-cell">
                           <p className="text-sm text-gray-600">
-                            {user.createdAt ? new Date(user.createdAt).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                            }) : "N/A"}
+                            {user.createdAt
+                              ? new Date(user.createdAt).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                  },
+                                )
+                              : "N/A"}
                           </p>
                         </td>
                         <td className="px-4 py-3">
@@ -1784,22 +1892,22 @@ export const UserManagement: React.FC = () => {
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
                               onClick={() => openViewModal(user)}
-                              className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                              className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                               title={t.viewUser}
                             >
-                              <ViewAgenda className="w-4 h-4" />
+                              <VisibilityIcon className="w-4 h-4" />
                             </motion.button>
                             <motion.button
-                              whileHover={{ scale: 1.1 }}
+                              whileHover={{ scale: 1.1, rotate: 5 }}
                               whileTap={{ scale: 0.9 }}
                               onClick={() => openEditModal(user)}
-                              className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                               title={t.editUser}
                             >
                               <EditIcon className="w-4 h-4" />
                             </motion.button>
                             <motion.button
-                              whileHover={{ scale: 1.1 }}
+                              whileHover={{ scale: 1.1, rotate: 5 }}
                               whileTap={{ scale: 0.9 }}
                               onClick={() => openDeleteModal(user)}
                               className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -1817,7 +1925,8 @@ export const UserManagement: React.FC = () => {
             </div>
             <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
               <p className="text-sm text-gray-500">
-                {t.showing} {filteredUsers.length} {t.of} {users.length} {t.usersCount}
+                {t.showing} {filteredUsers.length} {t.of} {users.length}{" "}
+                {t.usersCount}
               </p>
             </div>
           </>
@@ -1886,7 +1995,9 @@ export const UserManagement: React.FC = () => {
                           handleInputChange("name", e.target.value)
                         }
                         className={`w-full pl-10 pr-3 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400 ${
-                          formData.name.length >= 2 && !errors.name ? "border-green-500" : ""
+                          formData.name.length >= 2 && !errors.name
+                            ? "border-green-500"
+                            : ""
                         }`}
                         placeholder="John Doe"
                       />
@@ -1898,7 +2009,9 @@ export const UserManagement: React.FC = () => {
                       <p className="text-xs text-red-500 mt-1">{errors.name}</p>
                     )}
                     {formData.name.length >= 2 && !errors.name && (
-                      <p className="text-xs text-green-500 mt-1">✓ Valid name</p>
+                      <p className="text-xs text-green-500 mt-1">
+                        ✓ Valid name
+                      </p>
                     )}
                   </div>
 
@@ -1912,10 +2025,10 @@ export const UserManagement: React.FC = () => {
                         isEmailValid === true
                           ? "border-green-500"
                           : isEmailValid === false
-                          ? "border-red-500"
-                          : errors.email
-                          ? "border-red-500"
-                          : "border-gray-300"
+                            ? "border-red-500"
+                            : errors.email
+                              ? "border-red-500"
+                              : "border-gray-300"
                       } bg-white focus-within:border-[#FF385C] transition-colors`}
                     >
                       <EmailIcon
@@ -1923,8 +2036,8 @@ export const UserManagement: React.FC = () => {
                           isEmailValid === true
                             ? "text-green-500"
                             : isEmailValid === false
-                            ? "text-red-500"
-                            : "text-gray-400"
+                              ? "text-red-500"
+                              : "text-gray-400"
                         }`}
                       />
                       <input
@@ -1965,10 +2078,10 @@ export const UserManagement: React.FC = () => {
                         isPhoneValid === true
                           ? "border-green-500"
                           : isPhoneValid === false
-                          ? "border-red-500"
-                          : errors.phone
-                          ? "border-red-500"
-                          : "border-gray-300"
+                            ? "border-red-500"
+                            : errors.phone
+                              ? "border-red-500"
+                              : "border-gray-300"
                       } bg-white focus-within:border-[#FF385C] transition-colors`}
                     >
                       <PhoneIcon
@@ -1976,8 +2089,8 @@ export const UserManagement: React.FC = () => {
                           isPhoneValid === true
                             ? "text-green-500"
                             : isPhoneValid === false
-                            ? "text-red-500"
-                            : "text-gray-400"
+                              ? "text-red-500"
+                              : "text-gray-400"
                         }`}
                       />
                       <input
@@ -2015,10 +2128,13 @@ export const UserManagement: React.FC = () => {
                     </label>
                     <div
                       className={`relative rounded-lg border ${
-                        errors.password ? "border-red-500" : 
-                        formData.password.length >= 8 && passwordStrength !== "weak" && passwordStrength !== null
-                          ? "border-green-500"
-                          : "border-gray-300"
+                        errors.password
+                          ? "border-red-500"
+                          : formData.password.length >= 8 &&
+                              passwordStrength !== "weak" &&
+                              passwordStrength !== null
+                            ? "border-green-500"
+                            : "border-gray-300"
                       } bg-white focus-within:border-[#FF385C] transition-colors`}
                     >
                       <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -2043,9 +2159,11 @@ export const UserManagement: React.FC = () => {
                           <VisibilityIcon className="w-5 h-5" />
                         )}
                       </button>
-                      {formData.password.length >= 8 && passwordStrength !== "weak" && passwordStrength !== null && (
-                        <CheckCircleIcon className="absolute right-12 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
-                      )}
+                      {formData.password.length >= 8 &&
+                        passwordStrength !== "weak" &&
+                        passwordStrength !== null && (
+                          <CheckCircleIcon className="absolute right-12 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-500" />
+                        )}
                     </div>
                     {errors.password && (
                       <p className="text-xs text-red-500 mt-1">
@@ -2064,10 +2182,14 @@ export const UserManagement: React.FC = () => {
                                   passwordStrength === "weak"
                                     ? "33%"
                                     : passwordStrength === "moderate"
-                                    ? "66%"
-                                    : "100%",
+                                      ? "66%"
+                                      : "100%",
                                 backgroundColor:
-                                  getPasswordStrengthColor(passwordStrength),
+                                  passwordStrength === "weak"
+                                    ? "#ef4444"
+                                    : passwordStrength === "moderate"
+                                      ? "#f59e0b"
+                                      : "#22c55e",
                               }}
                               initial={{ width: 0 }}
                               animate={{
@@ -2075,20 +2197,38 @@ export const UserManagement: React.FC = () => {
                                   passwordStrength === "weak"
                                     ? "33%"
                                     : passwordStrength === "moderate"
-                                    ? "66%"
-                                    : "100%",
+                                      ? "66%"
+                                      : "100%",
                               }}
                             />
                           </div>
                           <div
                             className="flex items-center gap-1 text-xs font-medium"
                             style={{
-                              color: getPasswordStrengthColor(passwordStrength),
+                              color:
+                                passwordStrength === "weak"
+                                  ? "#ef4444"
+                                  : passwordStrength === "moderate"
+                                    ? "#f59e0b"
+                                    : "#22c55e",
                             }}
                           >
-                            {getPasswordStrengthIcon(passwordStrength)}
+                            {passwordStrength === "weak" && (
+                              <WarningIcon className="w-3 h-3" />
+                            )}
+                            {passwordStrength === "moderate" && (
+                              <SecurityIcon className="w-3 h-3" />
+                            )}
+                            {passwordStrength === "strong" && (
+                              <VerifiedIcon className="w-3 h-3" />
+                            )}
                             <span>
-                              {t.strength}: {getPasswordStrengthLabel(passwordStrength)}
+                              {t.strength}:{" "}
+                              {passwordStrength === "weak"
+                                ? t.weak
+                                : passwordStrength === "moderate"
+                                  ? t.moderate
+                                  : t.strong}
                             </span>
                           </div>
                         </div>
@@ -2106,10 +2246,10 @@ export const UserManagement: React.FC = () => {
                         errors.confirmPassword
                           ? "border-red-500"
                           : formData.confirmPassword &&
-                            formData.password === formData.confirmPassword &&
-                            formData.confirmPassword.length > 0
-                          ? "border-green-500"
-                          : "border-gray-300"
+                              formData.password === formData.confirmPassword &&
+                              formData.confirmPassword.length > 0
+                            ? "border-green-500"
+                            : "border-gray-300"
                       } bg-white focus-within:border-[#FF385C] transition-colors`}
                     >
                       <LockIcon
@@ -2200,7 +2340,7 @@ export const UserManagement: React.FC = () => {
                         onChange={(e) =>
                           handleInputChange(
                             "isActive",
-                            e.target.value === "active"
+                            e.target.value === "active",
                           )
                         }
                         className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
@@ -2312,7 +2452,7 @@ export const UserManagement: React.FC = () => {
                   </motion.button>
                 </div>
 
-                <form onSubmit={handleEditUser} className="p-6">
+                <form onSubmit={handleUpdateUser} className="p-6">
                   {/* Name */}
                   <div className="mb-4">
                     <label className="block text-sm font-medium mb-1.5 text-gray-700">
@@ -2331,7 +2471,9 @@ export const UserManagement: React.FC = () => {
                           handleInputChange("name", e.target.value)
                         }
                         className={`w-full pl-10 pr-3 py-2.5 rounded-lg outline-none text-sm bg-white text-gray-900 placeholder-gray-400 ${
-                          formData.name.length >= 2 && !errors.name ? "border-green-500" : ""
+                          formData.name.length >= 2 && !errors.name
+                            ? "border-green-500"
+                            : ""
                         }`}
                         placeholder="John Doe"
                       />
@@ -2343,7 +2485,9 @@ export const UserManagement: React.FC = () => {
                       <p className="text-xs text-red-500 mt-1">{errors.name}</p>
                     )}
                     {formData.name.length >= 2 && !errors.name && (
-                      <p className="text-xs text-green-500 mt-1">✓ Valid name</p>
+                      <p className="text-xs text-green-500 mt-1">
+                        ✓ Valid name
+                      </p>
                     )}
                   </div>
 
@@ -2357,10 +2501,10 @@ export const UserManagement: React.FC = () => {
                         isEmailValid === true
                           ? "border-green-500"
                           : isEmailValid === false
-                          ? "border-red-500"
-                          : errors.email
-                          ? "border-red-500"
-                          : "border-gray-300"
+                            ? "border-red-500"
+                            : errors.email
+                              ? "border-red-500"
+                              : "border-gray-300"
                       } bg-white focus-within:border-[#FF385C] transition-colors`}
                     >
                       <EmailIcon
@@ -2368,8 +2512,8 @@ export const UserManagement: React.FC = () => {
                           isEmailValid === true
                             ? "text-green-500"
                             : isEmailValid === false
-                            ? "text-red-500"
-                            : "text-gray-400"
+                              ? "text-red-500"
+                              : "text-gray-400"
                         }`}
                       />
                       <input
@@ -2410,10 +2554,10 @@ export const UserManagement: React.FC = () => {
                         isPhoneValid === true
                           ? "border-green-500"
                           : isPhoneValid === false
-                          ? "border-red-500"
-                          : errors.phone
-                          ? "border-red-500"
-                          : "border-gray-300"
+                            ? "border-red-500"
+                            : errors.phone
+                              ? "border-red-500"
+                              : "border-gray-300"
                       } bg-white focus-within:border-[#FF385C] transition-colors`}
                     >
                       <PhoneIcon
@@ -2421,8 +2565,8 @@ export const UserManagement: React.FC = () => {
                           isPhoneValid === true
                             ? "text-green-500"
                             : isPhoneValid === false
-                            ? "text-red-500"
-                            : "text-gray-400"
+                              ? "text-red-500"
+                              : "text-gray-400"
                         }`}
                       />
                       <input
@@ -2489,7 +2633,7 @@ export const UserManagement: React.FC = () => {
                         onChange={(e) =>
                           handleInputChange(
                             "isActive",
-                            e.target.value === "active"
+                            e.target.value === "active",
                           )
                         }
                         className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"

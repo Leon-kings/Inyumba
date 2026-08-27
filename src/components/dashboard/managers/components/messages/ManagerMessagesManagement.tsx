@@ -1,10 +1,9 @@
-// /* eslint-disable @typescript-eslint/no-unused-vars */
 // /* eslint-disable react-hooks/exhaustive-deps */
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 // /* eslint-disable react-hooks/set-state-in-effect */
 // import React, { useState, useEffect } from "react";
 // import { motion, AnimatePresence } from "framer-motion";
-// import { toast } from "react-toastify";
+
 // import "react-toastify/dist/ReactToastify.css";
 // import Cookies from "js-cookie";
 // import axios from "axios";
@@ -25,6 +24,284 @@
 // import ArchiveIcon from "@mui/icons-material/Archive";
 // import UnarchiveIcon from "@mui/icons-material/Unarchive";
 // import SendIcon from "@mui/icons-material/Send";
+// import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+// import ErrorIcon from "@mui/icons-material/Error";
+
+// // ============================================================
+// // MODAL COMPONENTS
+// // ============================================================
+
+// // Success Modal
+// interface SuccessModalProps {
+//   isOpen: boolean;
+//   onClose: () => void;
+//   title: string;
+//   message: string;
+//   details?: string;
+// }
+
+// const SuccessModal: React.FC<SuccessModalProps> = ({
+//   isOpen,
+//   onClose,
+//   title,
+//   message,
+//   details,
+// }) => {
+//   if (!isOpen) return null;
+
+//   return (
+//     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+//       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+//         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 to-green-600" />
+//         <div className="p-6">
+//           <div className="flex items-center justify-center mb-4">
+//             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center relative">
+//               <div className="absolute inset-0 rounded-full border-4 border-green-200 animate-ping opacity-75" />
+//               <CheckCircleIcon className="w-10 h-10 text-green-600 relative z-10" />
+//             </div>
+//           </div>
+//           <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+//             {title}
+//           </h3>
+//           <p className="text-gray-600 text-center mb-2">{message}</p>
+//           {details && (
+//             <p className="text-sm text-gray-400 text-center mb-6">{details}</p>
+//           )}
+//           <button
+//             onClick={onClose}
+//             className="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+//           >
+//             Got it!
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// // Error Modal
+// interface ErrorModalProps {
+//   isOpen: boolean;
+//   onClose: () => void;
+//   title: string;
+//   message: string;
+//   details?: string;
+// }
+
+// const ErrorModal: React.FC<ErrorModalProps> = ({
+//   isOpen,
+//   onClose,
+//   title,
+//   message,
+//   details,
+// }) => {
+//   if (!isOpen) return null;
+
+//   return (
+//     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+//       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+//         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-400 to-red-600" />
+//         <div className="p-6">
+//           <div className="flex items-center justify-center mb-4">
+//             <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center relative">
+//               <div className="absolute inset-0 rounded-full border-4 border-red-200 animate-ping opacity-75" />
+//               <ErrorIcon className="w-10 h-10 text-red-600 relative z-10" />
+//             </div>
+//           </div>
+//           <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+//             {title}
+//           </h3>
+//           <p className="text-gray-600 text-center mb-2">{message}</p>
+//           {details && (
+//             <p className="text-sm text-gray-400 text-center mb-6">{details}</p>
+//           )}
+//           <button
+//             onClick={onClose}
+//             className="w-full px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+//           >
+//             Try Again
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// // Info Modal
+// interface InfoModalProps {
+//   isOpen: boolean;
+//   onClose: () => void;
+//   title: string;
+//   message: string;
+//   details?: string;
+// }
+
+// const InfoModal: React.FC<InfoModalProps> = ({
+//   isOpen,
+//   onClose,
+//   title,
+//   message,
+//   details,
+// }) => {
+//   if (!isOpen) return null;
+
+//   return (
+//     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+//       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+//         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 to-blue-600" />
+//         <div className="p-6">
+//           <div className="flex items-center justify-center mb-4">
+//             <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center relative">
+//               <div className="absolute inset-0 rounded-full border-4 border-blue-200 animate-ping opacity-75" />
+//               <MessageIcon className="w-10 h-10 text-blue-600 relative z-10" />
+//             </div>
+//           </div>
+//           <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+//             {title}
+//           </h3>
+//           <p className="text-gray-600 text-center mb-2">{message}</p>
+//           {details && (
+//             <p className="text-sm text-gray-400 text-center mb-6">{details}</p>
+//           )}
+//           <button
+//             onClick={onClose}
+//             className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+//           >
+//             Got it!
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// // Confirm Modal
+// interface ConfirmModalProps {
+//   isOpen: boolean;
+//   onClose: () => void;
+//   onConfirm: () => void;
+//   title: string;
+//   message: string;
+//   confirmText?: string;
+//   cancelText?: string;
+//   icon?: React.ReactNode;
+//   isSubmitting?: boolean;
+//   type?: "danger" | "warning" | "info" | "success";
+// }
+
+// const ConfirmModal: React.FC<ConfirmModalProps> = ({
+//   isOpen,
+//   onClose,
+//   onConfirm,
+//   title,
+//   message,
+//   confirmText = "Confirm",
+//   cancelText = "Cancel",
+//   icon,
+//   isSubmitting = false,
+//   type = "warning",
+// }) => {
+//   if (!isOpen) return null;
+
+//   const getColors = () => {
+//     switch (type) {
+//       case "danger":
+//         return {
+//           iconBg: "bg-red-100",
+//           iconColor: "text-red-600",
+//           iconBorder: "border-red-200",
+//           buttonBg: "bg-gradient-to-r from-red-500 to-red-600",
+//           buttonHover: "hover:shadow-lg",
+//         };
+//       case "warning":
+//         return {
+//           iconBg: "bg-yellow-100",
+//           iconColor: "text-yellow-600",
+//           iconBorder: "border-yellow-200",
+//           buttonBg: "bg-gradient-to-r from-yellow-500 to-yellow-600",
+//           buttonHover: "hover:shadow-lg",
+//         };
+//       case "success":
+//         return {
+//           iconBg: "bg-green-100",
+//           iconColor: "text-green-600",
+//           iconBorder: "border-green-200",
+//           buttonBg: "bg-gradient-to-r from-green-500 to-green-600",
+//           buttonHover: "hover:shadow-lg",
+//         };
+//       default:
+//         return {
+//           iconBg: "bg-blue-100",
+//           iconColor: "text-blue-600",
+//           iconBorder: "border-blue-200",
+//           buttonBg: "bg-gradient-to-r from-blue-500 to-blue-600",
+//           buttonHover: "hover:shadow-lg",
+//         };
+//     }
+//   };
+
+//   const colors = getColors();
+
+//   return (
+//     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+//       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
+//         <div
+//           className={`absolute top-0 left-0 right-0 h-1 ${colors.buttonBg}`}
+//         />
+//         <div className="p-6">
+//           <div className="flex items-center justify-center mb-4">
+//             <div
+//               className={`w-20 h-20 ${colors.iconBg} rounded-full flex items-center justify-center relative`}
+//             >
+//               <div
+//                 className={`absolute inset-0 rounded-full border-4 ${colors.iconBorder} animate-ping opacity-75`}
+//               />
+//               <div className={`${colors.iconColor} relative z-10`}>
+//                 {icon ||
+//                   (type === "danger" ? (
+//                     <DeleteIcon className="w-10 h-10" />
+//                   ) : type === "warning" ? (
+//                     <ErrorIcon className="w-10 h-10" />
+//                   ) : type === "success" ? (
+//                     <CheckCircleIcon className="w-10 h-10" />
+//                   ) : (
+//                     <MessageIcon className="w-10 h-10" />
+//                   ))}
+//               </div>
+//             </div>
+//           </div>
+//           <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+//             {title}
+//           </h3>
+//           <p className="text-gray-600 text-center mb-6">{message}</p>
+//           <div className="flex gap-3">
+//             <button
+//               onClick={onClose}
+//               disabled={isSubmitting}
+//               className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+//             >
+//               {cancelText}
+//             </button>
+//             <button
+//               onClick={onConfirm}
+//               disabled={isSubmitting}
+//               className={`flex-1 px-4 py-2.5 ${colors.buttonBg} text-white rounded-xl font-medium ${colors.buttonHover} transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2`}
+//             >
+//               {isSubmitting ? (
+//                 <>
+//                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+//                   Loading...
+//                 </>
+//               ) : (
+//                 confirmText
+//               )}
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
 
 // // API Configuration
 // const API_URL = "https://rene-inyumba-nodejs.onrender.com/contact";
@@ -172,6 +449,9 @@
 //     pleaseFixErrors: "Please fix the errors above",
 //     managerAccess: "Manager Access",
 //     managerViewOnly: "You have view and reply access to messages",
+//     success: "Success!",
+//     error: "Error",
+//     confirm: "Confirm",
 //   },
 //   fr: {
 //     messageManagement: "Gestion des Messages",
@@ -265,7 +545,11 @@
 //     allFieldsValid: "Tous les champs sont valides !",
 //     pleaseFixErrors: "Veuillez corriger les erreurs ci-dessus",
 //     managerAccess: "Accès Manager",
-//     managerViewOnly: "Vous avez un accès en visualisation et réponse aux messages",
+//     managerViewOnly:
+//       "Vous avez un accès en visualisation et réponse aux messages",
+//     success: "Succès !",
+//     error: "Erreur",
+//     confirm: "Confirmer",
 //   },
 //   rw: {
 //     messageManagement: "Gucunga Ubutumwa",
@@ -361,6 +645,9 @@
 //     pleaseFixErrors: "Kosora amakosa hejuru",
 //     managerAccess: "Uburenganzira bwa Manager",
 //     managerViewOnly: "Ufite uburenganzira bwo kureba no gusubiza ubutumwa",
+//     success: "Byakunze!",
+//     error: "Ikosa",
+//     confirm: "Emeza",
 //   },
 // };
 
@@ -490,6 +777,44 @@
 //   const [lang, setLang] = useState<"en" | "fr" | "rw">(
 //     getLanguageFromCookies(),
 //   );
+
+//   // Success/Error/Info modal states
+//   const [successModal, setSuccessModal] = useState<{
+//     isOpen: boolean;
+//     title: string;
+//     message: string;
+//     details?: string;
+//   }>({
+//     isOpen: false,
+//     title: "",
+//     message: "",
+//     details: "",
+//   });
+
+//   const [errorModal, setErrorModal] = useState<{
+//     isOpen: boolean;
+//     title: string;
+//     message: string;
+//     details?: string;
+//   }>({
+//     isOpen: false,
+//     title: "",
+//     message: "",
+//     details: "",
+//   });
+
+//   const [infoModal, setInfoModal] = useState<{
+//     isOpen: boolean;
+//     title: string;
+//     message: string;
+//     details?: string;
+//   }>({
+//     isOpen: false,
+//     title: "",
+//     message: "",
+//     details: "",
+//   });
+
 //   const [messages, setMessages] = useState<Message[]>([]);
 //   const [filteredMessages, setFilteredMessages] = useState<Message[]>([]);
 //   const [searchTerm, setSearchTerm] = useState("");
@@ -500,10 +825,30 @@
 //   // Modal states
 //   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 //   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
-//   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+//   const [, setIsDeleteModalOpen] = useState(false);
 //   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
 //   const [replyContent, setReplyContent] = useState("");
 //   const [selectedStatus, setSelectedStatus] = useState<string>("");
+
+//   // Confirm Modal state
+//   const [confirmModal, setConfirmModal] = useState<{
+//     isOpen: boolean;
+//     title: string;
+//     message: string;
+//     onConfirm: () => void;
+//     confirmText?: string;
+//     cancelText?: string;
+//     type?: "danger" | "warning" | "info" | "success";
+//     icon?: React.ReactNode;
+//   }>({
+//     isOpen: false,
+//     title: "",
+//     message: "",
+//     onConfirm: () => {},
+//     confirmText: "Confirm",
+//     cancelText: "Cancel",
+//     type: "warning",
+//   });
 
 //   // Loading states
 //   const [isLoading, setIsLoading] = useState(false);
@@ -522,6 +867,44 @@
 //   });
 
 //   const t = translations[lang];
+
+//   const showSuccessModal = (
+//     title: string,
+//     message: string,
+//     details?: string,
+//   ) => {
+//     setSuccessModal({ isOpen: true, title, message, details });
+//   };
+
+//   const showErrorModal = (title: string, message: string, details?: string) => {
+//     setErrorModal({ isOpen: true, title, message, details });
+//   };
+
+
+//   const showConfirmModal = (
+//     title: string,
+//     message: string,
+//     onConfirm: () => void,
+//     confirmText?: string,
+//     cancelText?: string,
+//     type?: "danger" | "warning" | "info" | "success",
+//     icon?: React.ReactNode,
+//   ) => {
+//     setConfirmModal({
+//       isOpen: true,
+//       title,
+//       message,
+//       onConfirm,
+//       confirmText: confirmText || t.confirm || "Confirm",
+//       cancelText: cancelText || t.cancel || "Cancel",
+//       type: type || "warning",
+//       icon,
+//     });
+//   };
+
+//   const closeConfirmModal = () => {
+//     setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+//   };
 
 //   // Fetch messages from API using axios
 //   const fetchMessages = async () => {
@@ -554,8 +937,11 @@
 //         transformContactToMessage(contact),
 //       );
 //       setMessages(transformedMessages);
-//     } catch (error) {
-//       toast.error(`❌ ${t.fetchError}`);
+//     } catch {
+//       showErrorModal(
+//         t.error || "Error",
+//         t.fetchError || "Failed to load messages",
+//       );
 //     } finally {
 //       setIsFetching(false);
 //     }
@@ -717,11 +1103,19 @@
 //       );
 //       setMessages(updatedMessages);
 
-//       toast.success(`✅ ${t.messageDeleted}`);
+//       showSuccessModal(
+//         t.success || "Success!",
+//         t.messageDeleted || "Message deleted successfully!",
+//         `Message from ${selectedMessage.senderName} has been removed`,
+//       );
 //       setIsDeleteModalOpen(false);
 //       setSelectedMessage(null);
-//     } catch (error) {
-//       toast.error(`❌ ${t.deleteFailed}`);
+//       closeConfirmModal();
+//     } catch {
+//       showErrorModal(
+//         t.error || "Error",
+//         t.deleteFailed || "Failed to delete message",
+//       );
 //     } finally {
 //       setIsLoading(false);
 //     }
@@ -729,17 +1123,20 @@
 
 //   const handleSendReply = async () => {
 //     if (!selectedMessage || !replyContent.trim()) {
-//       toast.warning("⚠️ Please enter a reply");
+//       showErrorModal(t.error || "Error", "Please enter a reply");
 //       return;
 //     }
 
 //     setIsSubmitting(true);
 
 //     try {
-//       const response = await axios.put(`${API_URL}/${selectedMessage._id}/reply`, {
-//         replyMessage: replyContent,
-//         status: selectedStatus || "replied",
-//       });
+//       const response = await axios.put(
+//         `${API_URL}/${selectedMessage._id}/reply`,
+//         {
+//           replyMessage: replyContent,
+//           status: selectedStatus || "replied",
+//         },
+//       );
 
 //       const updatedContact = response.data;
 //       const updatedMessage = transformContactToMessage(updatedContact);
@@ -749,12 +1146,19 @@
 //       );
 //       setMessages(updatedMessages);
 
-//       toast.success(`✅ ${t.replySent}`);
+//       showSuccessModal(
+//         t.success || "Success!",
+//         t.replySent || "Reply sent successfully!",
+//         `Reply sent to ${selectedMessage.senderName}`,
+//       );
 //       setIsReplyModalOpen(false);
 //       setSelectedMessage(null);
 //       setReplyContent("");
-//     } catch (error) {
-//       toast.error(`❌ ${t.replyFailed}`);
+//     } catch {
+//       showErrorModal(
+//         t.error || "Error",
+//         t.replyFailed || "Failed to send reply",
+//       );
 //     } finally {
 //       setIsSubmitting(false);
 //     }
@@ -777,9 +1181,15 @@
 //       );
 //       setMessages(updatedMessages);
 
-//       toast.success(`✅ ${t.statusUpdated}`);
-//     } catch (error) {
-//       toast.error(`❌ ${t.statusUpdateFailed}`);
+//       showSuccessModal(
+//         t.success || "Success!",
+//         t.statusUpdated || "Message status updated successfully!",
+//       );
+//     } catch {
+//       showErrorModal(
+//         t.error || "Error",
+//         t.statusUpdateFailed || "Failed to update message status",
+//       );
 //     }
 //   };
 
@@ -814,7 +1224,7 @@
 //         m._id === messageId ? updatedMessage : m,
 //       );
 //       setMessages(updatedMessages);
-//     } catch (error) {
+//     } catch {
 //       // Silent fail for mark as read
 //     }
 //   };
@@ -837,7 +1247,15 @@
 
 //   const openDeleteModal = (message: Message) => {
 //     setSelectedMessage(message);
-//     setIsDeleteModalOpen(true);
+//     showConfirmModal(
+//       "⚠️ " + t.deleteMessage || "Delete Message",
+//       `${t.deleteConfirmation || "Are you sure you want to delete this message?"} ${t.actionUndone || "This action cannot be undone."}`,
+//       handleDeleteMessage,
+//       t.delete || "Delete",
+//       t.cancel || "Cancel",
+//       "danger",
+//       <DeleteIcon className="w-10 h-10" />,
+//     );
 //   };
 
 //   // Modal variants
@@ -866,6 +1284,47 @@
 
 //   return (
 //     <div className="p-6 bg-gray-50 min-h-screen">
+//       {/* Success Modal */}
+//       <SuccessModal
+//         isOpen={successModal.isOpen}
+//         onClose={() => setSuccessModal({ ...successModal, isOpen: false })}
+//         title={successModal.title}
+//         message={successModal.message}
+//         details={successModal.details}
+//       />
+
+//       {/* Error Modal */}
+//       <ErrorModal
+//         isOpen={errorModal.isOpen}
+//         onClose={() => setErrorModal({ ...errorModal, isOpen: false })}
+//         title={errorModal.title}
+//         message={errorModal.message}
+//         details={errorModal.details}
+//       />
+
+//       {/* Info Modal */}
+//       <InfoModal
+//         isOpen={infoModal.isOpen}
+//         onClose={() => setInfoModal({ ...infoModal, isOpen: false })}
+//         title={infoModal.title}
+//         message={infoModal.message}
+//         details={infoModal.details}
+//       />
+
+//       {/* Confirm Modal */}
+//       <ConfirmModal
+//         isOpen={confirmModal.isOpen}
+//         onClose={closeConfirmModal}
+//         onConfirm={confirmModal.onConfirm}
+//         title={confirmModal.title}
+//         message={confirmModal.message}
+//         confirmText={confirmModal.confirmText}
+//         cancelText={confirmModal.cancelText}
+//         isSubmitting={isLoading}
+//         type={confirmModal.type}
+//         icon={confirmModal.icon}
+//       />
+
 //       {/* Manager Access Notice */}
 //       <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center gap-3">
 //         <MessageIcon className="text-blue-600 w-5 h-5" />
@@ -1158,7 +1617,7 @@
 //                             e.stopPropagation();
 //                             handleToggleStar(message._id);
 //                           }}
-//                           className="p-1.5 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
+//                           className={`p-1.5 rounded-lg transition-colors ${message.isStarred ? "text-yellow-400 hover:bg-yellow-50" : "text-gray-400 hover:bg-yellow-50"}`}
 //                           title={t.toggleStar}
 //                         >
 //                           {message.isStarred ? (
@@ -1174,7 +1633,7 @@
 //                             e.stopPropagation();
 //                             handleToggleFlag(message._id);
 //                           }}
-//                           className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+//                           className={`p-1.5 rounded-lg transition-colors ${message.isFlagged ? "text-red-400 hover:bg-red-50" : "text-gray-400 hover:bg-red-50"}`}
 //                           title={t.toggleFlag}
 //                         >
 //                           {message.isFlagged ? (
@@ -1596,96 +2055,21 @@
 //           </>
 //         )}
 //       </AnimatePresence>
-
-//       {/* Delete Confirmation Modal */}
-//       <AnimatePresence>
-//         {isDeleteModalOpen && selectedMessage && (
-//           <>
-//             <motion.div
-//               variants={overlayVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-//               onClick={() => {
-//                 setIsDeleteModalOpen(false);
-//                 setSelectedMessage(null);
-//               }}
-//             />
-//             <motion.div
-//               variants={modalVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-//             >
-//               <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative">
-//                 <div className="p-6">
-//                   <div className="flex items-center justify-center mb-4">
-//                     <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-//                       <DeleteIcon className="w-8 h-8 text-red-600" />
-//                     </div>
-//                   </div>
-//                   <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">
-//                     {t.deleteMessage}
-//                   </h3>
-//                   <p className="text-gray-500 text-center mb-6">
-//                     {t.deleteConfirmation}
-//                     <br />
-//                     <span className="text-sm text-gray-400">
-//                       {t.actionUndone}
-//                     </span>
-//                   </p>
-//                   <div className="flex gap-3">
-//                     <motion.button
-//                       whileHover={{ scale: 1.02 }}
-//                       whileTap={{ scale: 0.98 }}
-//                       onClick={() => {
-//                         setIsDeleteModalOpen(false);
-//                         setSelectedMessage(null);
-//                       }}
-//                       className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-//                     >
-//                       {t.cancel}
-//                     </motion.button>
-//                     <motion.button
-//                       whileHover={{ scale: 1.02 }}
-//                       whileTap={{ scale: 0.98 }}
-//                       onClick={handleDeleteMessage}
-//                       disabled={isLoading}
-//                       className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors ${
-//                         isLoading
-//                           ? "bg-gray-400 cursor-not-allowed"
-//                           : "bg-red-600 hover:bg-red-700"
-//                       }`}
-//                     >
-//                       {isLoading ? (
-//                         <span className="flex items-center justify-center gap-2">
-//                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-//                           {t.deleting}
-//                         </span>
-//                       ) : (
-//                         t.delete
-//                       )}
-//                     </motion.button>
-//                   </div>
-//                 </div>
-//               </div>
-//             </motion.div>
-//           </>
-//         )}
-//       </AnimatePresence>
 //     </div>
 //   );
 // };
 
 
+
+
+
+
+
+
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 import axios from "axios";
@@ -1709,8 +2093,26 @@ import SendIcon from "@mui/icons-material/Send";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 
+// API Configuration
+const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
+const API = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Add token interceptor
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // ============================================================
-// MODAL COMPONENTS
+// MODAL COMPONENTS (Booking Management Style)
 // ============================================================
 
 // Success Modal
@@ -1732,32 +2134,62 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 to-green-600" />
-        <div className="p-6">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center relative">
-              <div className="absolute inset-0 rounded-full border-4 border-green-200 animate-ping opacity-75" />
-              <CheckCircleIcon className="w-10 h-10 text-green-600 relative z-10" />
-            </div>
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
-            {title}
-          </h3>
-          <p className="text-gray-600 text-center mb-2">{message}</p>
-          {details && (
-            <p className="text-sm text-gray-400 text-center mb-6">{details}</p>
-          )}
-          <button
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1 },
+              exit: { opacity: 0 },
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300]"
             onClick={onClose}
-            className="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+          />
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, scale: 0.8, y: 30 },
+              visible: { opacity: 1, scale: 1, y: 0 },
+              exit: { opacity: 0, scale: 0.8, y: 30 },
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 z-[301] flex items-center justify-center p-4"
           >
-            Got it!
-          </button>
-        </div>
-      </div>
-    </div>
+            <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 to-green-600" />
+              <div className="p-6">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center relative">
+                    <div className="absolute inset-0 rounded-full border-4 border-green-200 animate-ping opacity-75" />
+                    <CheckCircleIcon className="w-10 h-10 text-green-600 relative z-10" />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+                  {title}
+                </h3>
+                <p className="text-gray-600 text-center mb-2">{message}</p>
+                {details && (
+                  <p className="text-sm text-gray-400 text-center mb-6">{details}</p>
+                )}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={onClose}
+                  className="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+                >
+                  Got it!
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 };
 
@@ -1780,80 +2212,62 @@ const ErrorModal: React.FC<ErrorModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-400 to-red-600" />
-        <div className="p-6">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center relative">
-              <div className="absolute inset-0 rounded-full border-4 border-red-200 animate-ping opacity-75" />
-              <ErrorIcon className="w-10 h-10 text-red-600 relative z-10" />
-            </div>
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
-            {title}
-          </h3>
-          <p className="text-gray-600 text-center mb-2">{message}</p>
-          {details && (
-            <p className="text-sm text-gray-400 text-center mb-6">{details}</p>
-          )}
-          <button
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1 },
+              exit: { opacity: 0 },
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300]"
             onClick={onClose}
-            className="w-full px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+          />
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, scale: 0.8, y: 30 },
+              visible: { opacity: 1, scale: 1, y: 0 },
+              exit: { opacity: 0, scale: 0.8, y: 30 },
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 z-[301] flex items-center justify-center p-4"
           >
-            Try Again
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Info Modal
-interface InfoModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title: string;
-  message: string;
-  details?: string;
-}
-
-const InfoModal: React.FC<InfoModalProps> = ({
-  isOpen,
-  onClose,
-  title,
-  message,
-  details,
-}) => {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 to-blue-600" />
-        <div className="p-6">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center relative">
-              <div className="absolute inset-0 rounded-full border-4 border-blue-200 animate-ping opacity-75" />
-              <MessageIcon className="w-10 h-10 text-blue-600 relative z-10" />
+            <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-400 to-red-600" />
+              <div className="p-6">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center relative">
+                    <div className="absolute inset-0 rounded-full border-4 border-red-200 animate-ping opacity-75" />
+                    <ErrorIcon className="w-10 h-10 text-red-600 relative z-10" />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+                  {title}
+                </h3>
+                <p className="text-gray-600 text-center mb-2">{message}</p>
+                {details && (
+                  <p className="text-sm text-gray-400 text-center mb-6">{details}</p>
+                )}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={onClose}
+                  className="w-full px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+                >
+                  Try Again
+                </motion.button>
+              </div>
             </div>
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
-            {title}
-          </h3>
-          <p className="text-gray-600 text-center mb-2">{message}</p>
-          {details && (
-            <p className="text-sm text-gray-400 text-center mb-6">{details}</p>
-          )}
-          <button
-            onClick={onClose}
-            className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
-          >
-            Got it!
-          </button>
-        </div>
-      </div>
-    </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 };
 
@@ -1925,72 +2339,96 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   const colors = getColors();
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-in fade-in zoom-in duration-300">
-        <div
-          className={`absolute top-0 left-0 right-0 h-1 ${colors.buttonBg}`}
-        />
-        <div className="p-6">
-          <div className="flex items-center justify-center mb-4">
-            <div
-              className={`w-20 h-20 ${colors.iconBg} rounded-full flex items-center justify-center relative`}
-            >
-              <div
-                className={`absolute inset-0 rounded-full border-4 ${colors.iconBorder} animate-ping opacity-75`}
-              />
-              <div className={`${colors.iconColor} relative z-10`}>
-                {icon ||
-                  (type === "danger" ? (
-                    <DeleteIcon className="w-10 h-10" />
-                  ) : type === "warning" ? (
-                    <ErrorIcon className="w-10 h-10" />
-                  ) : type === "success" ? (
-                    <CheckCircleIcon className="w-10 h-10" />
-                  ) : (
-                    <MessageIcon className="w-10 h-10" />
-                  ))}
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1 },
+              exit: { opacity: 0 },
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300]"
+            onClick={onClose}
+          />
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, scale: 0.8, y: 30 },
+              visible: { opacity: 1, scale: 1, y: 0 },
+              exit: { opacity: 0, scale: 0.8, y: 30 },
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 z-[301] flex items-center justify-center p-4"
+          >
+            <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative overflow-hidden">
+              <div className={`absolute top-0 left-0 right-0 h-1 ${colors.buttonBg}`} />
+              <div className="p-6">
+                <div className="flex items-center justify-center mb-4">
+                  <div className={`w-20 h-20 ${colors.iconBg} rounded-full flex items-center justify-center relative`}>
+                    <div className={`absolute inset-0 rounded-full border-4 ${colors.iconBorder} animate-ping opacity-75`} />
+                    <div className={`${colors.iconColor} relative z-10`}>
+                      {icon || (
+                        type === "danger" ? (
+                          <DeleteIcon className="w-10 h-10" />
+                        ) : type === "warning" ? (
+                          <ErrorIcon className="w-10 h-10" />
+                        ) : type === "success" ? (
+                          <CheckCircleIcon className="w-10 h-10" />
+                        ) : (
+                          <MessageIcon className="w-10 h-10" />
+                        )
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">{title}</h3>
+                <p className="text-gray-600 text-center mb-6">{message}</p>
+                <div className="flex gap-3">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={onClose}
+                    disabled={isSubmitting}
+                    className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  >
+                    {cancelText}
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={onConfirm}
+                    disabled={isSubmitting}
+                    className={`flex-1 px-4 py-2.5 ${colors.buttonBg} text-white rounded-xl font-medium ${colors.buttonHover} transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2`}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      confirmText
+                    )}
+                  </motion.button>
+                </div>
               </div>
             </div>
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
-            {title}
-          </h3>
-          <p className="text-gray-600 text-center mb-6">{message}</p>
-          <div className="flex gap-3">
-            <button
-              onClick={onClose}
-              disabled={isSubmitting}
-              className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
-            >
-              {cancelText}
-            </button>
-            <button
-              onClick={onConfirm}
-              disabled={isSubmitting}
-              className={`flex-1 px-4 py-2.5 ${colors.buttonBg} text-white rounded-xl font-medium ${colors.buttonHover} transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2`}
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Loading...
-                </>
-              ) : (
-                confirmText
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 };
 
-// API Configuration
-const API_URL = "https://rene-inyumba-nodejs.onrender.com/contact";
+// ============================================================
+// CONTACT MODEL - Matches Backend Contact Schema
+// ============================================================
 
-// Types - Updated to match the contact model
 interface Contact {
-  id?: string;
   _id: string;
   name: string;
   email: string;
@@ -2003,10 +2441,6 @@ interface Contact {
   replyMessage: string | null;
   createdAt: string;
   updatedAt: string;
-  contactWithStatus?: string;
-  notificationMessage?: string;
-  messagePreview?: string;
-  responseTime?: string | null;
 }
 
 // Extended type for UI purposes
@@ -2018,25 +2452,17 @@ interface Message extends Contact {
   isRead: boolean;
   isFlagged: boolean;
   isStarred: boolean;
-  category:
-    | "general"
-    | "support"
-    | "booking"
-    | "payment"
-    | "complaint"
-    | "feedback"
-    | "other";
+  category: "general" | "support" | "booking" | "payment" | "complaint" | "feedback" | "other";
   priority: "low" | "medium" | "high" | "urgent";
   labels: string[];
   tags: string[];
   repliedBy?: string;
-  attachments?: any[];
-  recipientEmail?: string;
-  recipientId?: string;
-  senderId?: string;
 }
 
-// Translations
+// ============================================================
+// TRANSLATIONS
+// ============================================================
+
 const translations = {
   en: {
     messageManagement: "Message Management",
@@ -2045,7 +2471,6 @@ const translations = {
     pending: "Pending",
     read: "Read",
     replied: "Replied",
-    resolved: "Resolved",
     archived: "Archived",
     flagged: "Flagged",
     starred: "Starred",
@@ -2103,8 +2528,6 @@ const translations = {
     unarchive: "Unarchive",
     labels: "Labels",
     tags: "Tags",
-    addLabel: "Add Label",
-    addTag: "Add Tag",
     general: "General",
     support: "Support",
     booking: "Booking",
@@ -2122,18 +2545,16 @@ const translations = {
     recipient: "Recipient",
     content: "Content",
     attachmentsLabel: "Attachments",
-    noImage: "No image attached",
-    viewImage: "View Image",
     loading: "Loading...",
     fetchError: "Failed to load messages",
     replyTo: "Reply to",
-    allFieldsValid: "All fields are valid!",
-    pleaseFixErrors: "Please fix the errors above",
     managerAccess: "Manager Access",
     managerViewOnly: "You have view and reply access to messages",
     success: "Success!",
     error: "Error",
     confirm: "Confirm",
+    allFieldsValid: "All fields are valid!",
+    pleaseFixErrors: "Please fix the errors above",
   },
   fr: {
     messageManagement: "Gestion des Messages",
@@ -2142,7 +2563,6 @@ const translations = {
     pending: "En Attente",
     read: "Lu",
     replied: "Répondu",
-    resolved: "Résolu",
     archived: "Archivé",
     flagged: "Signalé",
     starred: "Favori",
@@ -2200,8 +2620,6 @@ const translations = {
     unarchive: "Désarchiver",
     labels: "Étiquettes",
     tags: "Tags",
-    addLabel: "Ajouter une Étiquette",
-    addTag: "Ajouter un Tag",
     general: "Général",
     support: "Support",
     booking: "Réservation",
@@ -2219,19 +2637,16 @@ const translations = {
     recipient: "Destinataire",
     content: "Contenu",
     attachmentsLabel: "Pièces Jointes",
-    noImage: "Aucune image jointe",
-    viewImage: "Voir l'Image",
     loading: "Chargement...",
     fetchError: "Échec du chargement des messages",
     replyTo: "Répondre à",
-    allFieldsValid: "Tous les champs sont valides !",
-    pleaseFixErrors: "Veuillez corriger les erreurs ci-dessus",
     managerAccess: "Accès Manager",
-    managerViewOnly:
-      "Vous avez un accès en visualisation et réponse aux messages",
+    managerViewOnly: "Vous avez un accès en visualisation et réponse aux messages",
     success: "Succès !",
     error: "Erreur",
     confirm: "Confirmer",
+    allFieldsValid: "Tous les champs sont valides !",
+    pleaseFixErrors: "Veuillez corriger les erreurs ci-dessus",
   },
   rw: {
     messageManagement: "Gucunga Ubutumwa",
@@ -2240,12 +2655,10 @@ const translations = {
     pending: "Bitegereje",
     read: "Byasomwe",
     replied: "Byasubijwe",
-    resolved: "Byakemutse",
     archived: "Byabitswe",
     flagged: "Byashyizwe ikimenyetso",
     starred: "Byakunzwe",
-    searchMessages:
-      "Shakisha ukurikije izina, imeri cyangwa ibiri mu butumwa...",
+    searchMessages: "Shakisha ukurikije izina, imeri cyangwa ibiri mu butumwa...",
     allStatus: "Ihagaze Ryose",
     allCategories: "Ibyiciro Byose",
     allPriorities: "Iby'ibanze Byose",
@@ -2299,8 +2712,6 @@ const translations = {
     unarchive: "Kuraho mu bibitswe",
     labels: "Ibyiciro",
     tags: "Ibimenyetso",
-    addLabel: "Ongeraho Icyiciro",
-    addTag: "Ongeraho Ikimenyetso",
     general: "Rusange",
     support: "Ubufasha",
     booking: "Icyemezo",
@@ -2318,22 +2729,23 @@ const translations = {
     recipient: "Uwakiriye",
     content: "Ibirimo",
     attachmentsLabel: "Ibishushanyo",
-    noImage: "Nta shusho yashyizweho",
-    viewImage: "Reba Ishusho",
     loading: "Birakoreshwa...",
     fetchError: "Kubura ubutumwa birananiranye",
     replyTo: "Subiza kuri",
-    allFieldsValid: "Ibice byose birimo amakuru akwiye!",
-    pleaseFixErrors: "Kosora amakosa hejuru",
     managerAccess: "Uburenganzira bwa Manager",
     managerViewOnly: "Ufite uburenganzira bwo kureba no gusubiza ubutumwa",
     success: "Byakunze!",
     error: "Ikosa",
     confirm: "Emeza",
+    allFieldsValid: "Ibice byose birimo amakuru akwiye!",
+    pleaseFixErrors: "Kosora amakosa hejuru",
   },
 };
 
-// Helper function to get language from cookies
+// ============================================================
+// HELPER FUNCTIONS
+// ============================================================
+
 const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
   const lang = Cookies.get("language") as "en" | "fr" | "rw";
   return lang || "en";
@@ -2342,59 +2754,28 @@ const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
 // Helper function to transform contact to message
 const transformContactToMessage = (contact: Contact): Message => {
   const messageText = contact.message || "";
-
   const msgLower = messageText.toLowerCase();
 
   // Determine category
   let category: Message["category"] = "general";
-
-  if (
-    msgLower.includes("support") ||
-    msgLower.includes("help") ||
-    msgLower.includes("assist")
-  ) {
+  if (msgLower.includes("support") || msgLower.includes("help") || msgLower.includes("assist")) {
     category = "support";
-  } else if (
-    msgLower.includes("book") ||
-    msgLower.includes("reserv") ||
-    msgLower.includes("housing") ||
-    msgLower.includes("house")
-  ) {
+  } else if (msgLower.includes("book") || msgLower.includes("reserv") || msgLower.includes("housing") || msgLower.includes("house")) {
     category = "booking";
-  } else if (
-    msgLower.includes("pay") ||
-    msgLower.includes("momo") ||
-    msgLower.includes("money")
-  ) {
+  } else if (msgLower.includes("pay") || msgLower.includes("momo") || msgLower.includes("money")) {
     category = "payment";
-  } else if (
-    msgLower.includes("complaint") ||
-    msgLower.includes("issue") ||
-    msgLower.includes("problem") ||
-    msgLower.includes("report")
-  ) {
+  } else if (msgLower.includes("complaint") || msgLower.includes("issue") || msgLower.includes("problem") || msgLower.includes("report")) {
     category = "complaint";
-  } else if (
-    msgLower.includes("feedback") ||
-    msgLower.includes("suggest") ||
-    msgLower.includes("great") ||
-    msgLower.includes("good")
-  ) {
+  } else if (msgLower.includes("feedback") || msgLower.includes("suggest") || msgLower.includes("great") || msgLower.includes("good")) {
     category = "feedback";
   }
 
   // Determine priority
   let priority: Message["priority"] = "medium";
-
   if (contact.status === "pending") {
     priority = "high";
   }
-
-  if (
-    msgLower.includes("urgent") ||
-    msgLower.includes("emergency") ||
-    msgLower.includes("immediate")
-  ) {
+  if (msgLower.includes("urgent") || msgLower.includes("emergency") || msgLower.includes("immediate")) {
     priority = "urgent";
   }
 
@@ -2402,30 +2783,22 @@ const transformContactToMessage = (contact: Contact): Message => {
   const labels: string[] = [];
   const tags: string[] = [];
 
-  if (
-    msgLower.includes("housing") ||
-    msgLower.includes("house") ||
-    msgLower.includes("apartment")
-  ) {
+  if (msgLower.includes("housing") || msgLower.includes("house") || msgLower.includes("apartment")) {
     labels.push("housing");
     tags.push("accommodation");
   }
-
   if (msgLower.includes("student")) {
     tags.push("student");
   }
-
   if (msgLower.includes("landlord") || msgLower.includes("host")) {
     tags.push("landlord");
   }
-
   if (msgLower.includes("payment") || msgLower.includes("momo")) {
     labels.push("payment");
     tags.push("payment");
   }
 
   return {
-    id: contact._id,
     _id: contact._id,
     name: contact.name,
     email: contact.email,
@@ -2438,7 +2811,6 @@ const transformContactToMessage = (contact: Contact): Message => {
     replyMessage: contact.replyMessage || null,
     createdAt: contact.createdAt,
     updatedAt: contact.updatedAt,
-
     senderName: contact.name,
     senderEmail: contact.email,
     content: messageText,
@@ -2454,13 +2826,14 @@ const transformContactToMessage = (contact: Contact): Message => {
   };
 };
 
-export const ManagerMessageManagement: React.FC = () => {
-  // Get language from cookies
-  const [lang, setLang] = useState<"en" | "fr" | "rw">(
-    getLanguageFromCookies(),
-  );
+// ============================================================
+// MAIN COMPONENT - ManagerMessageManagement
+// ============================================================
 
-  // Success/Error/Info modal states
+export const ManagerMessageManagement: React.FC = () => {
+  const [lang, setLang] = useState<"en" | "fr" | "rw">(getLanguageFromCookies());
+
+  // Success/Error modal states
   const [successModal, setSuccessModal] = useState<{
     isOpen: boolean;
     title: string;
@@ -2485,18 +2858,6 @@ export const ManagerMessageManagement: React.FC = () => {
     details: "",
   });
 
-  const [infoModal, setInfoModal] = useState<{
-    isOpen: boolean;
-    title: string;
-    message: string;
-    details?: string;
-  }>({
-    isOpen: false,
-    title: "",
-    message: "",
-    details: "",
-  });
-
   const [messages, setMessages] = useState<Message[]>([]);
   const [filteredMessages, setFilteredMessages] = useState<Message[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -2507,7 +2868,6 @@ export const ManagerMessageManagement: React.FC = () => {
   // Modal states
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
-  const [, setIsDeleteModalOpen] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [replyContent, setReplyContent] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
@@ -2550,18 +2910,13 @@ export const ManagerMessageManagement: React.FC = () => {
 
   const t = translations[lang];
 
-  const showSuccessModal = (
-    title: string,
-    message: string,
-    details?: string,
-  ) => {
+  const showSuccessModal = (title: string, message: string, details?: string) => {
     setSuccessModal({ isOpen: true, title, message, details });
   };
 
   const showErrorModal = (title: string, message: string, details?: string) => {
     setErrorModal({ isOpen: true, title, message, details });
   };
-
 
   const showConfirmModal = (
     title: string,
@@ -2592,7 +2947,7 @@ export const ManagerMessageManagement: React.FC = () => {
   const fetchMessages = async () => {
     setIsFetching(true);
     try {
-      const response = await axios.get(API_URL);
+      const response = await API.get("/contact");
       const data = response.data;
 
       let contacts: Contact[] = [];
@@ -2606,9 +2961,7 @@ export const ManagerMessageManagement: React.FC = () => {
         } else if (data.contacts && Array.isArray(data.contacts)) {
           contacts = data.contacts;
         } else {
-          const possibleArrays = Object.values(data).filter((val) =>
-            Array.isArray(val),
-          );
+          const possibleArrays = Object.values(data).filter((val) => Array.isArray(val));
           if (possibleArrays.length > 0) {
             contacts = possibleArrays[0];
           }
@@ -2619,10 +2972,12 @@ export const ManagerMessageManagement: React.FC = () => {
         transformContactToMessage(contact),
       );
       setMessages(transformedMessages);
-    } catch {
+    } catch (error) {
+      console.error("Error fetching messages:", error);
       showErrorModal(
         t.error || "Error",
         t.fetchError || "Failed to load messages",
+        error instanceof Error ? error.message : undefined,
       );
     } finally {
       setIsFetching(false);
@@ -2778,11 +3133,9 @@ export const ManagerMessageManagement: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await axios.delete(`${API_URL}/${selectedMessage._id}`);
+      await API.delete(`/contact/${selectedMessage._id}`);
 
-      const updatedMessages = messages.filter(
-        (m) => m._id !== selectedMessage._id,
-      );
+      const updatedMessages = messages.filter((m) => m._id !== selectedMessage._id);
       setMessages(updatedMessages);
 
       showSuccessModal(
@@ -2790,13 +3143,14 @@ export const ManagerMessageManagement: React.FC = () => {
         t.messageDeleted || "Message deleted successfully!",
         `Message from ${selectedMessage.senderName} has been removed`,
       );
-      setIsDeleteModalOpen(false);
       setSelectedMessage(null);
       closeConfirmModal();
-    } catch {
+    } catch (error) {
+      console.error("Error deleting message:", error);
       showErrorModal(
         t.error || "Error",
         t.deleteFailed || "Failed to delete message",
+        error instanceof Error ? error.message : undefined,
       );
     } finally {
       setIsLoading(false);
@@ -2812,13 +3166,10 @@ export const ManagerMessageManagement: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await axios.put(
-        `${API_URL}/${selectedMessage._id}/reply`,
-        {
-          replyMessage: replyContent,
-          status: selectedStatus || "replied",
-        },
-      );
+      const response = await API.put(`/contact/${selectedMessage._id}/reply`, {
+        replyMessage: replyContent,
+        status: selectedStatus || "replied",
+      });
 
       const updatedContact = response.data;
       const updatedMessage = transformContactToMessage(updatedContact);
@@ -2836,22 +3187,21 @@ export const ManagerMessageManagement: React.FC = () => {
       setIsReplyModalOpen(false);
       setSelectedMessage(null);
       setReplyContent("");
-    } catch {
+    } catch (error) {
+      console.error("Error sending reply:", error);
       showErrorModal(
         t.error || "Error",
         t.replyFailed || "Failed to send reply",
+        error instanceof Error ? error.message : undefined,
       );
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleUpdateStatus = async (
-    messageId: string,
-    newStatus: Message["status"],
-  ) => {
+  const handleUpdateStatus = async (messageId: string, newStatus: Message["status"]) => {
     try {
-      const response = await axios.put(`${API_URL}/${messageId}/status`, {
+      const response = await API.put(`/contact/${messageId}/status`, {
         status: newStatus,
       });
 
@@ -2867,10 +3217,12 @@ export const ManagerMessageManagement: React.FC = () => {
         t.success || "Success!",
         t.statusUpdated || "Message status updated successfully!",
       );
-    } catch {
+    } catch (error) {
+      console.error("Error updating status:", error);
       showErrorModal(
         t.error || "Error",
         t.statusUpdateFailed || "Failed to update message status",
+        error instanceof Error ? error.message : undefined,
       );
     }
   };
@@ -2897,8 +3249,7 @@ export const ManagerMessageManagement: React.FC = () => {
 
   const handleMarkAsRead = async (messageId: string) => {
     try {
-      const response = await axios.put(`${API_URL}/${messageId}/read`);
-
+      const response = await API.put(`/contact/${messageId}/read`);
       const updatedContact = response.data;
       const updatedMessage = transformContactToMessage(updatedContact);
 
@@ -2906,8 +3257,9 @@ export const ManagerMessageManagement: React.FC = () => {
         m._id === messageId ? updatedMessage : m,
       );
       setMessages(updatedMessages);
-    } catch {
+    } catch (error) {
       // Silent fail for mark as read
+      console.error("Error marking as read:", error);
     }
   };
 
@@ -2930,7 +3282,7 @@ export const ManagerMessageManagement: React.FC = () => {
   const openDeleteModal = (message: Message) => {
     setSelectedMessage(message);
     showConfirmModal(
-      "⚠️ " + t.deleteMessage || "Delete Message",
+      "⚠️ " + (t.deleteMessage || "Delete Message"),
       `${t.deleteConfirmation || "Are you sure you want to delete this message?"} ${t.actionUndone || "This action cannot be undone."}`,
       handleDeleteMessage,
       t.delete || "Delete",
@@ -2984,15 +3336,6 @@ export const ManagerMessageManagement: React.FC = () => {
         details={errorModal.details}
       />
 
-      {/* Info Modal */}
-      <InfoModal
-        isOpen={infoModal.isOpen}
-        onClose={() => setInfoModal({ ...infoModal, isOpen: false })}
-        title={infoModal.title}
-        message={infoModal.message}
-        details={infoModal.details}
-      />
-
       {/* Confirm Modal */}
       <ConfirmModal
         isOpen={confirmModal.isOpen}
@@ -3016,7 +3359,7 @@ export const ManagerMessageManagement: React.FC = () => {
         </div>
       </div>
 
-      {/* Header - Removed Compose button */}
+      {/* Header */}
       <div className="mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -3039,52 +3382,31 @@ export const ManagerMessageManagement: React.FC = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
-        <motion.div
-          whileHover={{ y: -2 }}
-          className="bg-white rounded-xl p-3 shadow-sm border border-gray-200"
-        >
+        <motion.div whileHover={{ y: -2 }} className="bg-white rounded-xl p-3 shadow-sm border border-gray-200">
           <p className="text-xs text-gray-500">{t.total}</p>
           <p className="text-xl font-bold text-gray-900">{stats.total}</p>
         </motion.div>
-        <motion.div
-          whileHover={{ y: -2 }}
-          className="bg-yellow-50 rounded-xl p-3 shadow-sm border border-yellow-200"
-        >
+        <motion.div whileHover={{ y: -2 }} className="bg-yellow-50 rounded-xl p-3 shadow-sm border border-yellow-200">
           <p className="text-xs text-yellow-600">{t.pending}</p>
           <p className="text-xl font-bold text-yellow-700">{stats.pending}</p>
         </motion.div>
-        <motion.div
-          whileHover={{ y: -2 }}
-          className="bg-blue-50 rounded-xl p-3 shadow-sm border border-blue-200"
-        >
+        <motion.div whileHover={{ y: -2 }} className="bg-blue-50 rounded-xl p-3 shadow-sm border border-blue-200">
           <p className="text-xs text-blue-600">{t.read}</p>
           <p className="text-xl font-bold text-blue-700">{stats.read}</p>
         </motion.div>
-        <motion.div
-          whileHover={{ y: -2 }}
-          className="bg-green-50 rounded-xl p-3 shadow-sm border border-green-200"
-        >
+        <motion.div whileHover={{ y: -2 }} className="bg-green-50 rounded-xl p-3 shadow-sm border border-green-200">
           <p className="text-xs text-green-600">{t.replied}</p>
           <p className="text-xl font-bold text-green-700">{stats.replied}</p>
         </motion.div>
-        <motion.div
-          whileHover={{ y: -2 }}
-          className="bg-gray-50 rounded-xl p-3 shadow-sm border border-gray-200"
-        >
+        <motion.div whileHover={{ y: -2 }} className="bg-gray-50 rounded-xl p-3 shadow-sm border border-gray-200">
           <p className="text-xs text-gray-500">{t.archived}</p>
           <p className="text-xl font-bold text-gray-900">{stats.archived}</p>
         </motion.div>
-        <motion.div
-          whileHover={{ y: -2 }}
-          className="bg-red-50 rounded-xl p-3 shadow-sm border border-red-200"
-        >
+        <motion.div whileHover={{ y: -2 }} className="bg-red-50 rounded-xl p-3 shadow-sm border border-red-200">
           <p className="text-xs text-red-600">{t.flagged}</p>
           <p className="text-xl font-bold text-red-700">{stats.flagged}</p>
         </motion.div>
-        <motion.div
-          whileHover={{ y: -2 }}
-          className="bg-purple-50 rounded-xl p-3 shadow-sm border border-purple-200"
-        >
+        <motion.div whileHover={{ y: -2 }} className="bg-purple-50 rounded-xl p-3 shadow-sm border border-purple-200">
           <p className="text-xs text-purple-600">{t.starred}</p>
           <p className="text-xl font-bold text-purple-700">{stats.starred}</p>
         </motion.div>
@@ -3189,10 +3511,7 @@ export const ManagerMessageManagement: React.FC = () => {
             <tbody className="divide-y divide-gray-200">
               {filteredMessages.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan={7}
-                    className="px-4 py-8 text-center text-gray-500"
-                  >
+                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
                     <MessageIcon className="w-12 h-12 mx-auto text-gray-300 mb-2" />
                     <p>{t.noMessages}</p>
                     <p className="text-sm">{t.adjustFilters}</p>
@@ -3218,9 +3537,7 @@ export const ManagerMessageManagement: React.FC = () => {
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p
-                            className={`text-sm ${!message.isRead ? "font-semibold text-gray-900" : "text-gray-900"}`}
-                          >
+                          <p className={`text-sm ${!message.isRead ? "font-semibold text-gray-900" : "text-gray-900"}`}>
                             {message.subject}
                           </p>
                           <p className="text-xs text-gray-500 truncate md:hidden">
@@ -3230,31 +3547,21 @@ export const ManagerMessageManagement: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-4 py-3 hidden md:table-cell">
-                      <p className="text-sm text-gray-600">
-                        {message.senderName}
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        {message.senderEmail}
-                      </p>
+                      <p className="text-sm text-gray-600">{message.senderName}</p>
+                      <p className="text-xs text-gray-400">{message.senderEmail}</p>
                     </td>
                     <td className="px-4 py-3 hidden lg:table-cell">
-                      <span
-                        className={`px-2 py-0.5 text-xs rounded-full ${getCategoryColor(message.category)}`}
-                      >
+                      <span className={`px-2 py-0.5 text-xs rounded-full ${getCategoryColor(message.category)}`}>
                         {message.category}
                       </span>
                     </td>
                     <td className="px-4 py-3 hidden lg:table-cell">
-                      <span
-                        className={`px-2 py-0.5 text-xs rounded-full ${getPriorityColor(message.priority)}`}
-                      >
+                      <span className={`px-2 py-0.5 text-xs rounded-full ${getPriorityColor(message.priority)}`}>
                         {message.priority}
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`px-2 py-0.5 text-xs rounded-full ${getStatusColor(message.status)}`}
-                      >
+                      <span className={`px-2 py-0.5 text-xs rounded-full ${getStatusColor(message.status)}`}>
                         {getStatusLabel(message.status)}
                       </span>
                       {!message.isRead && (
@@ -3262,12 +3569,10 @@ export const ManagerMessageManagement: React.FC = () => {
                       )}
                     </td>
                     <td className="px-4 py-3 hidden lg:table-cell">
-                      <p className="text-sm text-gray-600">
-                        {formatDate(message.createdAt)}
-                      </p>
+                      <p className="text-sm text-gray-600">{formatDate(message.createdAt)}</p>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center justify-center gap-1">
+                      <div className="flex items-center justify-center gap-1 flex-nowrap">
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
@@ -3346,8 +3651,7 @@ export const ManagerMessageManagement: React.FC = () => {
         </div>
         <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
           <p className="text-sm text-gray-500">
-            {t.showing} {filteredMessages.length} {t.of} {messages.length}{" "}
-            {t.messages}
+            {t.showing} {filteredMessages.length} {t.of} {messages.length} {t.messages}
           </p>
         </div>
       </div>
@@ -3375,9 +3679,7 @@ export const ManagerMessageManagement: React.FC = () => {
                 <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl z-10">
                   <div className="flex items-center gap-2">
                     <MessageIcon className="text-[#FF385C] w-5 h-5" />
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      {t.messageDetails}
-                    </h2>
+                    <h2 className="text-xl font-semibold text-gray-900">{t.messageDetails}</h2>
                   </div>
                   <div className="flex items-center gap-2">
                     <motion.button
@@ -3418,63 +3720,39 @@ export const ManagerMessageManagement: React.FC = () => {
                 <div className="p-6 space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs font-medium text-gray-500">
-                        {t.senderName}
-                      </label>
-                      <p className="text-sm font-medium text-gray-900 mt-1">
-                        {selectedMessage.senderName}
-                      </p>
+                      <label className="text-xs font-medium text-gray-500">{t.senderName}</label>
+                      <p className="text-sm font-medium text-gray-900 mt-1">{selectedMessage.senderName}</p>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500">
-                        {t.senderEmail}
-                      </label>
-                      <p className="text-sm font-medium text-gray-900 mt-1">
-                        {selectedMessage.senderEmail}
-                      </p>
+                      <label className="text-xs font-medium text-gray-500">{t.senderEmail}</label>
+                      <p className="text-sm font-medium text-gray-900 mt-1">{selectedMessage.senderEmail}</p>
                     </div>
                   </div>
 
                   {selectedMessage.ipAddress && (
                     <div>
-                      <label className="text-xs font-medium text-gray-500">
-                        IP Address
-                      </label>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {selectedMessage.ipAddress}
-                      </p>
+                      <label className="text-xs font-medium text-gray-500">IP Address</label>
+                      <p className="text-sm text-gray-600 mt-1">{selectedMessage.ipAddress}</p>
                     </div>
                   )}
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="text-xs font-medium text-gray-500">
-                        {t.subject}
-                      </label>
-                      <p className="text-sm font-medium text-gray-900 mt-1">
-                        {selectedMessage.subject}
-                      </p>
+                      <label className="text-xs font-medium text-gray-500">{t.subject}</label>
+                      <p className="text-sm font-medium text-gray-900 mt-1">{selectedMessage.subject}</p>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500">
-                        {t.category}
-                      </label>
+                      <label className="text-xs font-medium text-gray-500">{t.category}</label>
                       <p className="mt-1">
-                        <span
-                          className={`px-2 py-0.5 text-xs rounded-full ${getCategoryColor(selectedMessage.category)}`}
-                        >
+                        <span className={`px-2 py-0.5 text-xs rounded-full ${getCategoryColor(selectedMessage.category)}`}>
                           {selectedMessage.category}
                         </span>
                       </p>
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-gray-500">
-                        {t.priority}
-                      </label>
+                      <label className="text-xs font-medium text-gray-500">{t.priority}</label>
                       <p className="mt-1">
-                        <span
-                          className={`px-2 py-0.5 text-xs rounded-full ${getPriorityColor(selectedMessage.priority)}`}
-                        >
+                        <span className={`px-2 py-0.5 text-xs rounded-full ${getPriorityColor(selectedMessage.priority)}`}>
                           {selectedMessage.priority}
                         </span>
                       </p>
@@ -3482,46 +3760,31 @@ export const ManagerMessageManagement: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="text-xs font-medium text-gray-500">
-                      {t.messageContent}
-                    </label>
+                    <label className="text-xs font-medium text-gray-500">{t.messageContent}</label>
                     <div className="mt-1 p-4 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                        {selectedMessage.message}
-                      </p>
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedMessage.message}</p>
                     </div>
                   </div>
 
-                  {selectedMessage.labels &&
-                    selectedMessage.labels.length > 0 && (
-                      <div>
-                        <label className="text-xs font-medium text-gray-500">
-                          {t.labels}
-                        </label>
-                        <div className="mt-1 flex flex-wrap gap-1">
-                          {selectedMessage.labels.map((label) => (
-                            <span
-                              key={label}
-                              className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs"
-                            >
-                              {label}
-                            </span>
-                          ))}
-                        </div>
+                  {selectedMessage.labels && selectedMessage.labels.length > 0 && (
+                    <div>
+                      <label className="text-xs font-medium text-gray-500">{t.labels}</label>
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {selectedMessage.labels.map((label) => (
+                          <span key={label} className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs">
+                            {label}
+                          </span>
+                        ))}
                       </div>
-                    )}
+                    </div>
+                  )}
 
                   {selectedMessage.tags && selectedMessage.tags.length > 0 && (
                     <div>
-                      <label className="text-xs font-medium text-gray-500">
-                        {t.tags}
-                      </label>
+                      <label className="text-xs font-medium text-gray-500">{t.tags}</label>
                       <div className="mt-1 flex flex-wrap gap-1">
                         {selectedMessage.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full text-xs"
-                          >
+                          <span key={tag} className="px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full text-xs">
                             #{tag}
                           </span>
                         ))}
@@ -3531,17 +3794,12 @@ export const ManagerMessageManagement: React.FC = () => {
 
                   {selectedMessage.replyMessage && (
                     <div className="border-t border-gray-200 pt-4 mt-4">
-                      <label className="text-xs font-medium text-gray-500">
-                        {t.replyLabel}
-                      </label>
+                      <label className="text-xs font-medium text-gray-500">{t.replyLabel}</label>
                       <div className="mt-1 p-3 bg-green-50 rounded-lg border border-green-200">
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                          {selectedMessage.replyMessage}
-                        </p>
+                        <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedMessage.replyMessage}</p>
                         {selectedMessage.repliedBy && (
                           <p className="text-xs text-gray-500 mt-2">
-                            Replied by: {selectedMessage.repliedBy} on{" "}
-                            {formatDate(selectedMessage.repliedAt || "")}
+                            Replied by: {selectedMessage.repliedBy} on {formatDate(selectedMessage.repliedAt || "")}
                           </p>
                         )}
                       </div>
@@ -3565,14 +3823,8 @@ export const ManagerMessageManagement: React.FC = () => {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => {
-                        const newStatus =
-                          selectedMessage.status === "archived"
-                            ? "read"
-                            : "archived";
-                        handleUpdateStatus(
-                          selectedMessage._id,
-                          newStatus as Message["status"],
-                        );
+                        const newStatus = selectedMessage.status === "archived" ? "read" : "archived";
+                        handleUpdateStatus(selectedMessage._id, newStatus as Message["status"]);
                         setIsViewModalOpen(false);
                       }}
                       className="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
@@ -3582,9 +3834,7 @@ export const ManagerMessageManagement: React.FC = () => {
                       ) : (
                         <ArchiveIcon className="w-4 h-4" />
                       )}
-                      {selectedMessage.status === "archived"
-                        ? t.unarchive
-                        : t.archive}
+                      {selectedMessage.status === "archived" ? t.unarchive : t.archive}
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.02 }}
@@ -3657,19 +3907,13 @@ export const ManagerMessageManagement: React.FC = () => {
                 <div className="p-6 space-y-4">
                   <div className="p-3 bg-gray-50 rounded-lg">
                     <p className="text-sm text-gray-500">
-                      <span className="font-medium text-gray-700">From:</span>{" "}
-                      {selectedMessage.senderName} (
-                      {selectedMessage.senderEmail})
+                      <span className="font-medium text-gray-700">From:</span> {selectedMessage.senderName} ({selectedMessage.senderEmail})
                     </p>
-                    <p className="text-sm text-gray-700 mt-1 line-clamp-2">
-                      {selectedMessage.message}
-                    </p>
+                    <p className="text-sm text-gray-700 mt-1 line-clamp-2">{selectedMessage.message}</p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      {t.updateStatus}
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.updateStatus}</label>
                     <select
                       value={selectedStatus}
                       onChange={(e) => setSelectedStatus(e.target.value)}
@@ -3683,9 +3927,7 @@ export const ManagerMessageManagement: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      {t.replyLabel}
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.replyLabel}</label>
                     <textarea
                       value={replyContent}
                       onChange={(e) => setReplyContent(e.target.value)}

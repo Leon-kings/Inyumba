@@ -6,6 +6,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
+import axios from "axios";
 
 // Material-UI Icons
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -370,6 +371,9 @@ const formatCurrencyFull = (value: number): string => {
   return `RWF ${value.toLocaleString()}`;
 };
 
+// Base URL for API
+const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
+
 export const Dashboard: React.FC = () => {
   // Get language from cookies
   const [lang, setLang] = useState<"en" | "fr" | "rw">(
@@ -386,17 +390,13 @@ export const Dashboard: React.FC = () => {
 
   const t = translations[lang];
 
-  // Fetch user statistics from API
+  // Fetch user statistics from API using axios
   const fetchUserStats = async () => {
     try {
-      const response = await fetch(
-        "https://rene-inyumba-nodejs.onrender.com/auth/stats",
+      const response = await axios.get<UserStats>(
+        `${API_BASE_URL}/auth/stats`
       );
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data: UserStats = await response.json();
-      setUserStats(data);
+      setUserStats(response.data);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to fetch user statistics";
@@ -406,17 +406,13 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  // Fetch booking stats from API
+  // Fetch booking stats from API using axios
   const fetchBookingStats = async () => {
     try {
-      const response = await fetch(
-        "https://rene-inyumba-nodejs.onrender.com/bookings/stats",
+      const response = await axios.get<BookingStats>(
+        `${API_BASE_URL}/bookings/stats`
       );
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data: BookingStats = await response.json();
-      setBookingStats(data);
+      setBookingStats(response.data);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to fetch booking stats";
@@ -426,17 +422,13 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  // Fetch houses from API
+  // Fetch houses from API using axios
   const fetchHouses = async () => {
     try {
-      const response = await fetch(
-        "https://rene-inyumba-nodejs.onrender.com/houses",
+      const response = await axios.get<HouseApiResponse>(
+        `${API_BASE_URL}/houses`
       );
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data: HouseApiResponse = await response.json();
-      setHouseData(data);
+      setHouseData(response.data);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to fetch houses";
@@ -482,7 +474,19 @@ export const Dashboard: React.FC = () => {
     return () => clearInterval(interval);
   }, [lang]);
 
-  // Generate stats from API data
+  // Calculate total revenue from monthly bookings
+  const calculateTotalRevenue = (): number => {
+    if (!bookingStats || !bookingStats.data.monthlyBookings) {
+      return 0;
+    }
+    // Sum up all revenue from monthly bookings
+    return bookingStats.data.monthlyBookings.reduce(
+      (sum, item) => sum + (item.revenue || 0),
+      0
+    );
+  };
+
+  // Generate stats from API data - using calculated revenue from monthly bookings
   const getStatsFromApi = () => {
     if (!userStats || !bookingStats || !houseData) {
       return [
@@ -520,7 +524,8 @@ export const Dashboard: React.FC = () => {
     const totalUsers = userStats.statistics.totalUsers;
     const totalHouses = houseData.pagination.total;
     const totalBookings = bookingStats.data.total;
-    const totalRevenue = bookingStats.data.totalRevenue;
+    // Calculate total revenue from monthly bookings
+    const totalRevenue = calculateTotalRevenue();
 
     // Calculate changes (using dummy values since we don't have historical data)
     const userChange = totalUsers > 0 ? 12.5 : 0;
@@ -682,8 +687,6 @@ export const Dashboard: React.FC = () => {
       return { month, users };
     });
   };
-
-  // Get user role distribution for pie chart
 
   // Generate recent activities from API data
   const getRecentActivitiesFromApi = () => {
@@ -868,6 +871,9 @@ export const Dashboard: React.FC = () => {
     return value;
   };
 
+  // Calculate total revenue for display
+  const totalRevenue = calculateTotalRevenue();
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Page Header */}
@@ -969,8 +975,8 @@ export const Dashboard: React.FC = () => {
                 {t.revenueTrend}
               </h3>
               <span className="text-sm text-green-500 font-medium">
-                {bookingStats && bookingStats.data.totalRevenue > 0
-                  ? formatCurrency(bookingStats.data.totalRevenue)
+                {totalRevenue > 0
+                  ? formatCurrency(totalRevenue)
                   : "RWF 0"}
               </span>
             </div>

@@ -1,1851 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-// /* eslint-disable react-hooks/set-state-in-effect */
-// import React, { useState, useEffect } from "react";
-// import { motion, AnimatePresence } from "framer-motion";
-// import { toast } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
-// import Cookies from "js-cookie";
-
-// // Material-UI Icons
-// import SupportAgentIcon from "@mui/icons-material/SupportAgent";
-// import CloseIcon from "@mui/icons-material/Close";
-// import SearchIcon from "@mui/icons-material/Search";
-// import RefreshIcon from "@mui/icons-material/Refresh";
-// import DeleteIcon from "@mui/icons-material/Delete";
-// import VisibilityIcon from "@mui/icons-material/Visibility";
-// import ImageIcon from "@mui/icons-material/Image";
-// import ClearIcon from "@mui/icons-material/Clear";
-// import AssignmentIcon from "@mui/icons-material/Assignment";
-// import ChatIcon from "@mui/icons-material/Chat";
-// import AddIcon from "@mui/icons-material/Add";
-// import { Close, Send } from "@mui/icons-material";
-// import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-// import ErrorIcon from "@mui/icons-material/Error";
-
-// // Types - Updated to match the request model
-// interface RequestImage {
-//   public_id: string | null;
-//   url: string | null;
-//   format: string | null;
-// }
-
-// interface RequestNotification {
-//   notificationId: string;
-//   type: string | null;
-//   message: string | null;
-//   targetRoles: ("admin" | "user" | "host")[];
-//   createdAt: string;
-// }
-
-// interface Request {
-//   _id: string;
-//   name: string;
-//   email: string;
-//   message: string;
-//   language: string;
-//   image: RequestImage;
-//   status: "Pending" | "Approved" | "Rejected" | "Completed";
-//   adminReply: string;
-//   userId: string | null;
-//   notificationId: string | null;
-//   notifications: RequestNotification[];
-//   lastNotification: {
-//     type: string | null;
-//     message: string | null;
-//     status: "new" | "read" | "archived";
-//     createdAt: string | null;
-//   } | null;
-//   createdAt: string;
-//   updatedAt: string;
-//   hasNotification?: boolean;
-// }
-
-// // Extended type for UI purposes
-// interface RequestUI extends Request {
-//   // UI-specific fields
-//   response: string;
-//   respondedBy: string;
-//   statusLabel: string;
-//   statusColor: string;
-//   displayImage?: {
-//     name: string;
-//     size: number;
-//     type: string;
-//     dataUrl: string;
-//   };
-// }
-
-// // Request Form Data
-// interface RequestFormData {
-//   name: string;
-//   email: string;
-//   message: string;
-//   language: string;
-// }
-
-// // Form validation errors
-// interface FormErrors {
-//   name?: string;
-//   email?: string;
-//   message?: string;
-// }
-
-// // Translations
-// const translations = {
-//   en: {
-//     requestManagement: "My Support Requests",
-//     manageRequests: "Create and manage your support requests",
-//     total: "Total",
-//     pending: "Pending",
-//     approved: "Approved",
-//     rejected: "Rejected",
-//     completed: "Completed",
-//     searchRequests: "Search by name, email, or message...",
-//     allStatus: "All Status",
-//     request: "Request",
-//     requester: "Requester",
-//     message: "Message",
-//     status: "Status",
-//     submitted: "Submitted",
-//     actions: "Actions",
-//     noRequests: "No requests found",
-//     adjustFilters: "Try adjusting your search or filters",
-//     showing: "Showing",
-//     of: "of",
-//     requests: "requests",
-//     viewRequest: "View Request",
-//     respond: "Respond",
-//     deleteRequest: "Delete Request",
-//     deleteConfirmation: "Are you sure you want to delete this request?",
-//     actionUndone: "This action cannot be undone.",
-//     cancel: "Cancel",
-//     delete: "Delete",
-//     deleting: "Deleting...",
-//     requestDeleted: "Request deleted successfully!",
-//     deleteFailed: "Failed to delete request",
-//     statusUpdated: "Request status updated successfully!",
-//     statusUpdateFailed: "Failed to update request status",
-//     responseSent: "Response sent successfully!",
-//     responseFailed: "Failed to send response",
-//     requestDetails: "Request Details",
-//     requesterName: "Requester Name",
-//     requesterEmail: "Requester Email",
-//     requestMessage: "Request Message",
-//     attachedImage: "Attached Image",
-//     responseLabel: "Response",
-//     sendResponse: "Send Response",
-//     updateStatus: "Update Status",
-//     selectStatus: "Select Status",
-//     responsePlaceholder: "Type your response here...",
-//     noImage: "No image attached",
-//     viewImage: "View Image",
-//     close: "Close",
-//     send: "Send",
-//     sending: "Sending...",
-//     loading: "Loading...",
-//     fetchError: "Failed to load requests",
-//     replyTo: "Reply to",
-//     createdAt: "Created At",
-//     updatedAt: "Updated At",
-//     language: "Language",
-//     adminReply: "Admin Reply",
-//     statuses: {
-//       Pending: "Pending",
-//       Approved: "Approved",
-//       Rejected: "Rejected",
-//       Completed: "Completed",
-//     },
-//     filters: {
-//       all: "All Status",
-//       Pending: "Pending",
-//       Approved: "Approved",
-//       Rejected: "Rejected",
-//       Completed: "Completed",
-//     },
-//     noUserEmail: "No user email found. Please login again.",
-//     createRequest: "Create New Request",
-//     createRequestTitle: "Submit a Support Request",
-//     yourName: "Your Name",
-//     yourEmail: "Your Email",
-//     yourMessage: "Your Message",
-//     messagePlaceholder: "Describe your issue or request in detail...",
-//     submitting: "Submitting...",
-//     createSuccess: "Request created successfully!",
-//     createFailed: "Failed to create request",
-//     success: "Success",
-//     failure: "Failure",
-//     requestCreated: "Your support request has been created successfully.",
-//     requestCreatedDetails: "Our team will review your request and get back to you shortly.",
-//     requestFailed: "Failed to create your support request.",
-//     requestFailedDetails: "Please try again or contact support directly if the issue persists.",
-//     nameRequired: "Name is required",
-//     emailRequired: "Email is required",
-//     emailInvalid: "Please enter a valid email",
-//     messageMinLength: "Message must be at least 10 characters",
-//     messageMaxLength: "Message cannot exceed 1000 characters",
-//     pleaseFixErrors: "Please fix the errors above",
-//   },
-//   fr: {
-//     requestManagement: "Mes Demandes de Support",
-//     manageRequests: "Créer et gérer vos demandes de support",
-//     total: "Total",
-//     pending: "En Attente",
-//     approved: "Approuvé",
-//     rejected: "Rejeté",
-//     completed: "Terminé",
-//     searchRequests: "Rechercher par nom, email ou message...",
-//     allStatus: "Tous les Statuts",
-//     request: "Demande",
-//     requester: "Demandeur",
-//     message: "Message",
-//     status: "Statut",
-//     submitted: "Soumis",
-//     actions: "Actions",
-//     noRequests: "Aucune demande trouvée",
-//     adjustFilters: "Essayez d'ajuster votre recherche ou vos filtres",
-//     showing: "Affichage",
-//     of: "de",
-//     requests: "demandes",
-//     viewRequest: "Voir la Demande",
-//     respond: "Répondre",
-//     deleteRequest: "Supprimer la Demande",
-//     deleteConfirmation: "Êtes-vous sûr de vouloir supprimer cette demande ?",
-//     actionUndone: "Cette action est irréversible.",
-//     cancel: "Annuler",
-//     delete: "Supprimer",
-//     deleting: "Suppression...",
-//     requestDeleted: "Demande supprimée avec succès !",
-//     deleteFailed: "Échec de la suppression de la demande",
-//     statusUpdated: "Statut de la demande mis à jour avec succès !",
-//     statusUpdateFailed: "Échec de la mise à jour du statut",
-//     responseSent: "Réponse envoyée avec succès !",
-//     responseFailed: "Échec de l'envoi de la réponse",
-//     requestDetails: "Détails de la Demande",
-//     requesterName: "Nom du Demandeur",
-//     requesterEmail: "Email du Demandeur",
-//     requestMessage: "Message de la Demande",
-//     attachedImage: "Image Jointe",
-//     responseLabel: "Réponse",
-//     sendResponse: "Envoyer la Réponse",
-//     updateStatus: "Mettre à Jour le Statut",
-//     selectStatus: "Sélectionner le Statut",
-//     responsePlaceholder: "Tapez votre réponse ici...",
-//     noImage: "Aucune image jointe",
-//     viewImage: "Voir l'Image",
-//     close: "Fermer",
-//     send: "Envoyer",
-//     sending: "Envoi en cours...",
-//     loading: "Chargement...",
-//     fetchError: "Échec du chargement des demandes",
-//     replyTo: "Répondre à",
-//     createdAt: "Créé le",
-//     updatedAt: "Mis à jour le",
-//     language: "Langue",
-//     adminReply: "Réponse Admin",
-//     statuses: {
-//       Pending: "En Attente",
-//       Approved: "Approuvé",
-//       Rejected: "Rejeté",
-//       Completed: "Terminé",
-//     },
-//     filters: {
-//       all: "Tous les Statuts",
-//       Pending: "En Attente",
-//       Approved: "Approuvé",
-//       Rejected: "Rejeté",
-//       Completed: "Terminé",
-//     },
-//     noUserEmail: "Aucun email utilisateur trouvé. Veuillez vous reconnecter.",
-//     createRequest: "Créer une Nouvelle Demande",
-//     createRequestTitle: "Soumettre une Demande de Support",
-//     yourName: "Votre Nom",
-//     yourEmail: "Votre Email",
-//     yourMessage: "Votre Message",
-//     messagePlaceholder: "Décrivez votre problème ou demande en détail...",
-//     submitting: "Soumission en cours...",
-//     createSuccess: "Demande créée avec succès !",
-//     createFailed: "Échec de la création de la demande",
-//     success: "Succès",
-//     failure: "Échec",
-//     requestCreated: "Votre demande de support a été créée avec succès.",
-//     requestCreatedDetails: "Notre équipe examinera votre demande et vous répondra sous peu.",
-//     requestFailed: "Échec de la création de votre demande de support.",
-//     requestFailedDetails: "Veuillez réessayer ou contacter le support directement si le problème persiste.",
-//     nameRequired: "Le nom est requis",
-//     emailRequired: "L'email est requis",
-//     emailInvalid: "Veuillez entrer un email valide",
-//     messageMinLength: "Le message doit contenir au moins 10 caractères",
-//     messageMaxLength: "Le message ne peut pas dépasser 1000 caractères",
-//     pleaseFixErrors: "Veuillez corriger les erreurs ci-dessus",
-//   },
-//   rw: {
-//     requestManagement: "Ibyifuzo Byanjye",
-//     manageRequests: "Kurema no gucunga ibyifuzo byawe",
-//     total: "Yose",
-//     pending: "Bitegereje",
-//     approved: "Byemewe",
-//     rejected: "Byangijwe",
-//     completed: "Byarangiye",
-//     searchRequests: "Shakisha ukurikije izina, imeri cyangwa ubutumwa...",
-//     allStatus: "Ihagaze Ryose",
-//     request: "Icyifuzo",
-//     requester: "Usabye",
-//     message: "Ubutumwa",
-//     status: "Ihagaze",
-//     submitted: "Byoherejwe",
-//     actions: "Ibikorwa",
-//     noRequests: "Nta cyifuzo cyabonetse",
-//     adjustFilters: "Gerageza guhindura uburyo ushakisha cyangwa amatungo",
-//     showing: "Bereka",
-//     of: "muri",
-//     requests: "ibyifuzo",
-//     viewRequest: "Reba Icyifuzo",
-//     respond: "Subiza",
-//     deleteRequest: "Kuraho Icyifuzo",
-//     deleteConfirmation: "Uri kwizera ko ushaka gukuraho iki cyifuzo?",
-//     actionUndone: "Iki gikorwa ntikishobora guhindurwa.",
-//     cancel: "Reka",
-//     delete: "Kuraho",
-//     deleting: "Birakurwaho...",
-//     requestDeleted: "Icyifuzo cyakuweho neza!",
-//     deleteFailed: "Kuraho icyifuzo birananiranye",
-//     statusUpdated: "Ihagaze ry'icyifuzo ryavuguruwe neza!",
-//     statusUpdateFailed: "Kuvugurura ihagaze birananiranye",
-//     responseSent: "Igisubizo cyoherejwe neza!",
-//     responseFailed: "Kohereza igisubizo birananiranye",
-//     requestDetails: "Ibisobanuro by'Icyifuzo",
-//     requesterName: "Izina ry'Usabye",
-//     requesterEmail: "Imeri y'Usabye",
-//     requestMessage: "Ubutumwa bw'Icyifuzo",
-//     attachedImage: "Ishusho Yashyizweho",
-//     responseLabel: "Igisubizo",
-//     sendResponse: "Ohereza Igisubizo",
-//     updateStatus: "Vugurura Ihagaze",
-//     selectStatus: "Hitamo Ihagaze",
-//     responsePlaceholder: "Andika igisubizo cyawe hano...",
-//     noImage: "Nta shusho yashyizweho",
-//     viewImage: "Reba Ishusho",
-//     close: "Funga",
-//     send: "Ohereza",
-//     sending: "Biremereza...",
-//     loading: "Birakoreshwa...",
-//     fetchError: "Kubura ibyifuzo birananiranye",
-//     replyTo: "Subiza kuri",
-//     createdAt: "Byakozwe",
-//     updatedAt: "Byavuguruwe",
-//     language: "Ururimi",
-//     adminReply: "Igisubizo cy'Admin",
-//     statuses: {
-//       Pending: "Bitegereje",
-//       Approved: "Byemewe",
-//       Rejected: "Byangijwe",
-//       Completed: "Byarangiye",
-//     },
-//     filters: {
-//       all: "Ihagaze Ryose",
-//       Pending: "Bitegereje",
-//       Approved: "Byemewe",
-//       Rejected: "Byangijwe",
-//       Completed: "Byarangiye",
-//     },
-//     noUserEmail: "Nta imeri y'umukoresha yabonetse. Nyamuneka winjire undi munsi.",
-//     createRequest: "Kurema Icyifuzo Gishya",
-//     createRequestTitle: "Ohereza Icyifuzo cy'Ubufasha",
-//     yourName: "Izina Ryawe",
-//     yourEmail: "Imeri Yawe",
-//     yourMessage: "Ubutumwa Bwawe",
-//     messagePlaceholder: "Sobanura ikibazo cyawe cyangwa icyifuzo mu buryo bwihariye...",
-//     submitting: "Birakoherezwa...",
-//     createSuccess: "Icyifuzo cyakozwe neza!",
-//     createFailed: "Kurema icyifuzo birananiranye",
-//     success: "Byakunze",
-//     failure: "Byananiwe",
-//     requestCreated: "Icyifuzo cyawe cyoherejwe neza.",
-//     requestCreatedDetails: "Itsinda ryacu rizasuzuma icyifuzo cyawe kikagusubiza vuba.",
-//     requestFailed: "Kohereza icyifuzo cyawe byananiwe.",
-//     requestFailedDetails: "Gerageza undi munsi cyangwa uvuge n'ubufasha mu buryo butaziguye niba ikibazo kigikomeza.",
-//     nameRequired: "Izina rirasabwa",
-//     emailRequired: "Imeri irasabwa",
-//     emailInvalid: "Andika imeri ikwiye",
-//     messageMinLength: "Ubutumwa bugomba kuba ibinyuguti 10 byibuze",
-//     messageMaxLength: "Ubutumwa ntibugomba kurenga ibinyuguti 1000",
-//     pleaseFixErrors: "Kosora amakosa hejuru",
-//   },
-// };
-
-// // Helper function to get language from cookies
-// const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
-//   const lang = Cookies.get("language") as "en" | "fr" | "rw";
-//   return lang || "en";
-// };
-
-// // Helper function to get user email from localStorage
-// const getUserEmailFromStorage = (): string => {
-//   // First try to get from user object (set during login)
-//   try {
-//     const userStr = localStorage.getItem("user");
-//     if (userStr) {
-//       const user = JSON.parse(userStr);
-//       if (user.email) {
-//         return user.email;
-//       }
-//     }
-//   } catch (e) {
-//     console.error("Error parsing user from localStorage:", e);
-//   }
-
-//   // Try individual keys as fallback
-//   const keys = ["userEmail", "email"];
-//   for (const key of keys) {
-//     const value = localStorage.getItem(key);
-//     if (value) {
-//       return value;
-//     }
-//   }
-
-//   return "";
-// };
-
-// // Helper function to get user name from localStorage
-// const getUserNameFromStorage = (): string => {
-//   try {
-//     const userStr = localStorage.getItem("user");
-//     if (userStr) {
-//       const user = JSON.parse(userStr);
-//       if (user.name) {
-//         return user.name;
-//       }
-//     }
-//   } catch (e) {
-//     console.error("Error parsing user from localStorage:", e);
-//   }
-//   return "";
-// };
-
-// // API Base URL
-// const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
-
-// // Helper function to transform request to UI format
-// const transformRequestToUI = (request: Request): RequestUI => {
-//   const statusColors: Record<string, string> = {
-//     Pending: "bg-yellow-100 text-yellow-800",
-//     Approved: "bg-green-100 text-green-800",
-//     Rejected: "bg-red-100 text-red-800",
-//     Completed: "bg-blue-100 text-blue-800",
-//   };
-
-//   const statusLabels: Record<string, string> = {
-//     Pending: "Pending",
-//     Approved: "Approved",
-//     Rejected: "Rejected",
-//     Completed: "Completed",
-//   };
-
-//   // Check if there's an image URL
-//   let displayImage = undefined;
-//   if (request.image && request.image.url) {
-//     displayImage = {
-//       name: request.image.public_id || "image",
-//       size: 0,
-//       type: request.image.format || "image/jpeg",
-//       dataUrl: request.image.url,
-//     };
-//   }
-
-//   return {
-//     ...request,
-//     response: request.adminReply || "",
-//     respondedBy: "Admin",
-//     statusLabel: statusLabels[request.status] || request.status,
-//     statusColor: statusColors[request.status] || "bg-gray-100 text-gray-800",
-//     displayImage,
-//   };
-// };
-
-// export const UserRequestManagement: React.FC = () => {
-//   // Get language from cookies
-//   const [lang, setLang] = useState<"en" | "fr" | "rw">(
-//     getLanguageFromCookies(),
-//   );
-//   const [requests, setRequests] = useState<RequestUI[]>([]);
-//   const [filteredRequests, setFilteredRequests] = useState<RequestUI[]>([]);
-//   const [searchTerm, setSearchTerm] = useState("");
-//   const [filterStatus, setFilterStatus] = useState<string>("all");
-
-//   // Modal states
-//   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-//   const [isRespondModalOpen, setIsRespondModalOpen] = useState(false);
-//   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-//   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-//   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-//   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
-//   const [selectedRequest, setSelectedRequest] = useState<RequestUI | null>(
-//     null,
-//   );
-//   const [responseText, setResponseText] = useState("");
-//   const [selectedStatus, setSelectedStatus] = useState<string>("");
-//   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-//   const [successMessage, setSuccessMessage] = useState("");
-//   const [successDetails, setSuccessDetails] = useState("");
-//   const [errorMessage, setErrorMessage] = useState("");
-//   const [errorDetails, setErrorDetails] = useState("");
-
-//   // Create form state
-//   const [createFormData, setCreateFormData] = useState<RequestFormData>({
-//     name: "",
-//     email: "",
-//     message: "",
-//     language: "en",
-//   });
-
-//   // Form validation errors
-//   const [formErrors, setFormErrors] = useState<FormErrors>({});
-
-//   // Loading states
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [isSubmitting, setIsSubmitting] = useState(false);
-//   const [isFetching, setIsFetching] = useState(true);
-
-//   // Statistics
-//   const [stats, setStats] = useState({
-//     total: 0,
-//     Pending: 0,
-//     Approved: 0,
-//     Rejected: 0,
-//     Completed: 0,
-//   });
-
-//   const t = translations[lang];
-
-//   // Get user email from localStorage
-//   const userEmail = getUserEmailFromStorage();
-//   const userName = getUserNameFromStorage();
-
-//   // Initialize form with user data
-//   useEffect(() => {
-//     if (userName) {
-//       setCreateFormData(prev => ({ ...prev, name: userName }));
-//     }
-//     if (userEmail) {
-//       setCreateFormData(prev => ({ ...prev, email: userEmail }));
-//     }
-//   }, [userName, userEmail]);
-
-//   // Validate create form
-//   const validateCreateForm = (): boolean => {
-//     const errors: FormErrors = {};
-//     let isValid = true;
-
-//     if (!createFormData.name || createFormData.name.trim().length < 2) {
-//       errors.name = t.nameRequired;
-//       isValid = false;
-//     }
-
-//     if (!createFormData.email) {
-//       errors.email = t.emailRequired;
-//       isValid = false;
-//     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(createFormData.email)) {
-//       errors.email = t.emailInvalid;
-//       isValid = false;
-//     }
-
-//     if (!createFormData.message || createFormData.message.trim().length < 10) {
-//       errors.message = t.messageMinLength;
-//       isValid = false;
-//     } else if (createFormData.message.trim().length > 1000) {
-//       errors.message = t.messageMaxLength;
-//       isValid = false;
-//     }
-
-//     setFormErrors(errors);
-//     return isValid;
-//   };
-
-//   // Handle create form field changes
-//   const handleCreateFormChange = (field: keyof RequestFormData, value: string) => {
-//     setCreateFormData((prev) => ({
-//       ...prev,
-//       [field]: value,
-//     }));
-//     // Clear error for this field
-//     if (field !== 'language' && formErrors[field as keyof FormErrors]) {
-//       setFormErrors((prev) => ({ ...prev, [field as keyof FormErrors]: undefined }));
-//     }
-//   };
-
-//   // Fetch requests by user email - GET /requests/email/:email
-//   const fetchRequests = async () => {
-//     setIsFetching(true);
-//     try {
-//       const currentEmail = getUserEmailFromStorage();
-
-//       if (!currentEmail) {
-//         toast.error(`❌ ${t.noUserEmail}`);
-//         setIsFetching(false);
-//         return;
-//       }
-
-//       const response = await fetch(`${API_BASE_URL}/requests/email/${encodeURIComponent(currentEmail)}`);
-
-//       if (!response.ok) {
-//         if (response.status === 404) {
-//           setRequests([]);
-//           setIsFetching(false);
-//           return;
-//         }
-//         throw new Error(`HTTP error! status: ${response.status}`);
-//       }
-
-//       const data = await response.json();
-
-//       // Handle both array and single object responses
-//       let requestsData: Request[] = [];
-//       if (Array.isArray(data)) {
-//         requestsData = data;
-//       } else if (data && typeof data === "object") {
-//         if (data._id) {
-//           requestsData = [data];
-//         } else if (data.data && Array.isArray(data.data)) {
-//           requestsData = data.data;
-//         } else if (data.requests && Array.isArray(data.requests)) {
-//           requestsData = data.requests;
-//         } else {
-//           const possibleArrays = Object.values(data).filter((val) =>
-//             Array.isArray(val),
-//           );
-//           if (possibleArrays.length > 0) {
-//             requestsData = possibleArrays[0];
-//           }
-//         }
-//       }
-
-//       const transformedRequests = requestsData.map((req: Request) =>
-//         transformRequestToUI(req),
-//       );
-//       setRequests(transformedRequests);
-//     } catch (error) {
-//       console.error("Error fetching requests:", error);
-//       toast.error(`❌ ${t.fetchError}`);
-//     } finally {
-//       setIsFetching(false);
-//     }
-//   };
-
-//   // Create new request
-//   const handleCreateRequest = async () => {
-//     if (!validateCreateForm()) {
-//       toast.warning(`⚠️ ${t.pleaseFixErrors}`);
-//       return;
-//     }
-
-//     setIsSubmitting(true);
-
-//     try {
-//       const requestData = {
-//         name: createFormData.name,
-//         email: createFormData.email,
-//         message: createFormData.message,
-//         language: createFormData.language || "en",
-//       };
-
-//       const response = await fetch(`${API_BASE_URL}/requests`, {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify(requestData),
-//       });
-
-//       if (!response.ok) {
-//         const errorData = await response.json();
-//         throw new Error(errorData.message || "Failed to create request");
-//       }
-
-//       const newRequest = await response.json();
-//       const transformedRequest = transformRequestToUI(newRequest);
-
-//       setRequests((prev) => [transformedRequest, ...prev]);
-
-//       // Show success modal
-//       setSuccessMessage(t.requestCreated);
-//       setSuccessDetails(t.requestCreatedDetails);
-//       setIsSuccessModalOpen(true);
-
-//       // Reset form
-//       setCreateFormData({
-//         name: userName || "",
-//         email: userEmail || "",
-//         message: "",
-//         language: "en",
-//       });
-//       setFormErrors({});
-//       setIsCreateModalOpen(false);
-
-//     } catch (error) {
-//       console.error("Create request error:", error);
-//       // Show error modal
-//       setErrorMessage(t.requestFailed);
-//       setErrorDetails(t.requestFailedDetails);
-//       setIsErrorModalOpen(true);
-//     } finally {
-//       setIsSubmitting(false);
-//     }
-//   };
-
-//   // Listen for language changes in cookies
-//   useEffect(() => {
-//     const handleCookieChange = () => {
-//       const newLang = getLanguageFromCookies();
-//       if (newLang !== lang) {
-//         setLang(newLang);
-//       }
-//     };
-
-//     const interval = setInterval(handleCookieChange, 1000);
-//     return () => clearInterval(interval);
-//   }, [lang]);
-
-//   // Initial fetch
-//   useEffect(() => {
-//     fetchRequests();
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, []);
-
-//   // Filter requests
-//   useEffect(() => {
-//     let filtered = [...requests];
-
-//     if (searchTerm) {
-//       const term = searchTerm.toLowerCase();
-//       filtered = filtered.filter(
-//         (req) =>
-//           req.name.toLowerCase().includes(term) ||
-//           req.email.toLowerCase().includes(term) ||
-//           req.message.toLowerCase().includes(term),
-//       );
-//     }
-
-//     if (filterStatus !== "all") {
-//       filtered = filtered.filter((req) => req.status === filterStatus);
-//     }
-
-//     setFilteredRequests(filtered);
-//   }, [requests, searchTerm, filterStatus]);
-
-//   // Update statistics
-//   useEffect(() => {
-//     const total = requests.length;
-//     const Pending = requests.filter((r) => r.status === "Pending").length;
-//     const Approved = requests.filter((r) => r.status === "Approved").length;
-//     const Rejected = requests.filter((r) => r.status === "Rejected").length;
-//     const Completed = requests.filter((r) => r.status === "Completed").length;
-
-//     setStats({ total, Pending, Approved, Rejected, Completed });
-//   }, [requests]);
-
-//   // Get status badge color
-//   const getStatusColor = (status: string): string => {
-//     switch (status) {
-//       case "Pending":
-//         return "bg-yellow-100 text-yellow-800";
-//       case "Approved":
-//         return "bg-green-100 text-green-800";
-//       case "Rejected":
-//         return "bg-red-100 text-red-800";
-//       case "Completed":
-//         return "bg-blue-100 text-blue-800";
-//       default:
-//         return "bg-gray-100 text-gray-800";
-//     }
-//   };
-
-//   // Get status label
-//   const getStatusLabel = (status: string): string => {
-//     switch (status) {
-//       case "Pending":
-//         return t.statuses.Pending;
-//       case "Approved":
-//         return t.statuses.Approved;
-//       case "Rejected":
-//         return t.statuses.Rejected;
-//       case "Completed":
-//         return t.statuses.Completed;
-//       default:
-//         return status;
-//     }
-//   };
-
-//   // Format date
-//   const formatDate = (dateString: string): string => {
-//     return new Date(dateString).toLocaleDateString("en-US", {
-//       year: "numeric",
-//       month: "short",
-//       day: "numeric",
-//       hour: "2-digit",
-//       minute: "2-digit",
-//     });
-//   };
-
-//   const handleSendResponse = async () => {
-//     if (!selectedRequest || !responseText.trim()) {
-//       toast.warning("⚠️ Please enter a response");
-//       return;
-//     }
-
-//     setIsSubmitting(true);
-
-//     try {
-//       const response = await fetch(`${API_BASE_URL}/requests/${selectedRequest._id}`, {
-//         method: "PUT",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({
-//           adminReply: responseText,
-//           status: selectedStatus || selectedRequest.status,
-//         }),
-//       });
-
-//       if (!response.ok) {
-//         throw new Error(`HTTP error! status: ${response.status}`);
-//       }
-
-//       const updatedRequest = await response.json();
-//       const transformedRequest = transformRequestToUI(updatedRequest);
-
-//       const updatedRequests = requests.map((r) =>
-//         r._id === selectedRequest._id ? transformedRequest : r,
-//       );
-//       setRequests(updatedRequests);
-
-//       toast.success(`✅ ${t.responseSent}`);
-//       setIsRespondModalOpen(false);
-//       setSelectedRequest(null);
-//       setResponseText("");
-//       setSelectedStatus("");
-//     } catch (error) {
-//       toast.error(`❌ ${t.responseFailed}`);
-//       console.error("Response send error:", error);
-//     } finally {
-//       setIsSubmitting(false);
-//     }
-//   };
-
-//   const handleDeleteRequest = async () => {
-//     if (!selectedRequest) return;
-
-//     setIsLoading(true);
-
-//     try {
-//       const response = await fetch(`${API_BASE_URL}/requests/${selectedRequest._id}`, {
-//         method: "DELETE",
-//       });
-
-//       if (!response.ok) {
-//         throw new Error(`HTTP error! status: ${response.status}`);
-//       }
-
-//       setRequests(requests.filter((r) => r._id !== selectedRequest._id));
-//       toast.success(`🗑️ ${t.requestDeleted}`);
-//       setIsDeleteModalOpen(false);
-//       setSelectedRequest(null);
-//     } catch (error) {
-//       toast.error(`❌ ${t.deleteFailed}`);
-//       console.error("Delete request error:", error);
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   // Open modals
-//   const openViewModal = (request: RequestUI) => {
-//     setSelectedRequest(request);
-//     setIsViewModalOpen(true);
-//   };
-
-//   const openRespondModal = (request: RequestUI) => {
-//     setSelectedRequest(request);
-//     setResponseText(request.adminReply || "");
-//     setSelectedStatus(request.status);
-//     setIsRespondModalOpen(true);
-//   };
-
-//   const openDeleteModal = (request: RequestUI) => {
-//     setSelectedRequest(request);
-//     setIsDeleteModalOpen(true);
-//   };
-
-//   // Modal variants
-//   const modalVariants = {
-//     hidden: { opacity: 0, scale: 0.8, y: 30 },
-//     visible: { opacity: 1, scale: 1, y: 0 },
-//     exit: { opacity: 0, scale: 0.8, y: 30 },
-//   };
-
-//   const overlayVariants = {
-//     hidden: { opacity: 0 },
-//     visible: { opacity: 1 },
-//     exit: { opacity: 0 },
-//   };
-
-//   if (isFetching) {
-//     return (
-//       <div className="p-6 bg-gray-50 min-h-screen flex items-center justify-center">
-//         <div className="text-center">
-//           <div className="w-12 h-12 border-4 border-[#FF385C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-//           <p className="text-gray-500">{t.loading}</p>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="p-6 bg-gray-50 min-h-screen">
-//       {/* Header */}
-//       <div className="mb-6">
-//         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-//           <div>
-//             <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-//               <SupportAgentIcon className="w-7 h-7 text-[#FF385C]" />
-//               {t.requestManagement}
-//             </h1>
-//             <p className="text-sm text-gray-500 mt-1">{t.manageRequests}</p>
-//             {userEmail && (
-//               <p className="text-xs text-gray-400 mt-1">Requests for: {userEmail}</p>
-//             )}
-//           </div>
-//           <div className="flex items-center gap-2">
-//             <button
-//               onClick={fetchRequests}
-//               className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-//               disabled={isLoading}
-//             >
-//               <RefreshIcon
-//                 className={`w-5 h-5 ${isLoading ? "animate-spin" : ""}`}
-//               />
-//             </button>
-//             <motion.button
-//               whileHover={{ scale: 1.02 }}
-//               whileTap={{ scale: 0.98 }}
-//               onClick={() => setIsCreateModalOpen(true)}
-//               className="px-4 py-2 bg-[#FF385C] text-white rounded-lg font-medium hover:bg-[#E31C5F] transition-colors flex items-center gap-2 text-sm"
-//             >
-//               <AddIcon className="w-4 h-4" />
-//               {t.createRequest}
-//             </motion.button>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Stats Cards */}
-//       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
-//         <motion.div
-//           whileHover={{ y: -2 }}
-//           className="bg-white rounded-xl p-4 shadow-sm border border-gray-200"
-//         >
-//           <p className="text-xs text-gray-500">{t.total}</p>
-//           <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-//         </motion.div>
-//         <motion.div
-//           whileHover={{ y: -2 }}
-//           className="bg-yellow-50 rounded-xl p-4 shadow-sm border border-yellow-200"
-//         >
-//           <p className="text-xs text-yellow-600">{t.pending}</p>
-//           <p className="text-2xl font-bold text-yellow-700">{stats.Pending}</p>
-//         </motion.div>
-//         <motion.div
-//           whileHover={{ y: -2 }}
-//           className="bg-green-50 rounded-xl p-4 shadow-sm border border-green-200"
-//         >
-//           <p className="text-xs text-green-600">{t.approved}</p>
-//           <p className="text-2xl font-bold text-green-700">{stats.Approved}</p>
-//         </motion.div>
-//         <motion.div
-//           whileHover={{ y: -2 }}
-//           className="bg-red-50 rounded-xl p-4 shadow-sm border border-red-200"
-//         >
-//           <p className="text-xs text-red-600">{t.rejected}</p>
-//           <p className="text-2xl font-bold text-red-700">{stats.Rejected}</p>
-//         </motion.div>
-//         <motion.div
-//           whileHover={{ y: -2 }}
-//           className="bg-blue-50 rounded-xl p-4 shadow-sm border border-blue-200"
-//         >
-//           <p className="text-xs text-blue-600">{t.completed}</p>
-//           <p className="text-2xl font-bold text-blue-700">{stats.Completed}</p>
-//         </motion.div>
-//       </div>
-
-//       {/* Filters */}
-//       <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 mb-6">
-//         <div className="flex flex-col sm:flex-row gap-3">
-//           <div className="flex-1 relative">
-//             <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-//             <input
-//               type="text"
-//               placeholder={t.searchRequests}
-//               value={searchTerm}
-//               onChange={(e) => setSearchTerm(e.target.value)}
-//               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
-//             />
-//           </div>
-//           <div className="flex gap-2">
-//             <select
-//               value={filterStatus}
-//               onChange={(e) => setFilterStatus(e.target.value)}
-//               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
-//             >
-//               <option value="all">{t.filters.all}</option>
-//               <option value="Pending">{t.filters.Pending}</option>
-//               <option value="Approved">{t.filters.Approved}</option>
-//               <option value="Rejected">{t.filters.Rejected}</option>
-//               <option value="Completed">{t.filters.Completed}</option>
-//             </select>
-//             <button
-//               onClick={() => {
-//                 setSearchTerm("");
-//                 setFilterStatus("all");
-//               }}
-//               className="px-3 py-2 text-gray-600 hover:text-gray-900 transition-colors"
-//             >
-//               <ClearIcon className="w-5 h-5" />
-//             </button>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Requests Table */}
-//       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-//         <div className="overflow-x-auto">
-//           <table className="w-full">
-//             <thead className="bg-gray-50 border-b border-gray-200">
-//               <tr>
-//                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                   {t.request}
-//                 </th>
-//                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-//                   {t.requester}
-//                 </th>
-//                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                   {t.status}
-//                 </th>
-//                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-//                   {t.submitted}
-//                 </th>
-//                 <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                   {t.actions}
-//                 </th>
-//               </tr>
-//             </thead>
-//             <tbody className="divide-y divide-gray-200">
-//               {filteredRequests.length === 0 ? (
-//                 <tr>
-//                   <td
-//                     colSpan={5}
-//                     className="px-4 py-8 text-center text-gray-500"
-//                   >
-//                     <SupportAgentIcon className="w-12 h-12 mx-auto text-gray-300 mb-2" />
-//                     <p>{t.noRequests}</p>
-//                     <p className="text-sm">{t.adjustFilters}</p>
-//                   </td>
-//                 </tr>
-//               ) : (
-//                 filteredRequests.map((request) => (
-//                   <motion.tr
-//                     key={request._id}
-//                     initial={{ opacity: 0 }}
-//                     animate={{ opacity: 1 }}
-//                     className="hover:bg-gray-50 transition-colors"
-//                   >
-//                     <td className="px-4 py-3">
-//                       <div className="flex items-center gap-3">
-//                         <div className="w-10 h-10 rounded-full bg-[#FF385C] text-white flex items-center justify-center font-semibold text-sm flex-shrink-0">
-//                           {request.name.charAt(0).toUpperCase()}
-//                         </div>
-//                         <div>
-//                           <p className="font-medium text-gray-900 text-sm line-clamp-1">
-//                             {request.name}
-//                           </p>
-//                           <p className="text-xs text-gray-500 md:hidden line-clamp-1">
-//                             {request.message}
-//                           </p>
-//                         </div>
-//                       </div>
-//                     </td>
-//                     <td className="px-4 py-3 hidden md:table-cell">
-//                       <p className="text-sm text-gray-600 line-clamp-1">
-//                         {request.message}
-//                       </p>
-//                       {request.image && request.image.url && (
-//                         <div className="flex items-center gap-1 mt-1">
-//                           <ImageIcon className="w-3 h-3 text-gray-400" />
-//                           <span className="text-xs text-gray-400">
-//                             {request.image.public_id || "Image"}
-//                           </span>
-//                         </div>
-//                       )}
-//                     </td>
-//                     <td className="px-4 py-3">
-//                       <span
-//                         className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
-//                           request.status,
-//                         )}`}
-//                       >
-//                         {getStatusLabel(request.status)}
-//                       </span>
-//                     </td>
-//                     <td className="px-4 py-3 hidden lg:table-cell">
-//                       <p className="text-sm text-gray-600">
-//                         {formatDate(request.createdAt)}
-//                       </p>
-//                     </td>
-//                     <td className="px-4 py-3">
-//                       <div className="flex items-center justify-center gap-1">
-//                         <motion.button
-//                           whileHover={{ scale: 1.1 }}
-//                           whileTap={{ scale: 0.9 }}
-//                           onClick={() => openViewModal(request)}
-//                           className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-//                           title={t.viewRequest}
-//                         >
-//                           <VisibilityIcon className="w-4 h-4" />
-//                         </motion.button>
-//                         {request.status === "Pending" && (
-//                           <motion.button
-//                             whileHover={{ scale: 1.1 }}
-//                             whileTap={{ scale: 0.9 }}
-//                             onClick={() => openRespondModal(request)}
-//                             className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-//                             title={t.respond}
-//                           >
-//                             <ChatIcon className="w-4 h-4" />
-//                           </motion.button>
-//                         )}
-//                         <motion.button
-//                           whileHover={{ scale: 1.1 }}
-//                           whileTap={{ scale: 0.9 }}
-//                           onClick={() => openDeleteModal(request)}
-//                           className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-//                           title={t.deleteRequest}
-//                         >
-//                           <DeleteIcon className="w-4 h-4" />
-//                         </motion.button>
-//                       </div>
-//                     </td>
-//                   </motion.tr>
-//                 ))
-//               )}
-//             </tbody>
-//           </table>
-//         </div>
-//         <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
-//           <p className="text-sm text-gray-500">
-//             {t.showing} {filteredRequests.length} {t.of} {requests.length}{" "}
-//             {t.requests}
-//           </p>
-//         </div>
-//       </div>
-
-//       {/* Create Request Modal */}
-//       <AnimatePresence>
-//         {isCreateModalOpen && (
-//           <>
-//             <motion.div
-//               variants={overlayVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-//               onClick={() => setIsCreateModalOpen(false)}
-//             />
-//             <motion.div
-//               variants={modalVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-//             >
-//               <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white relative">
-//                 <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl z-10">
-//                   <div className="flex items-center gap-2">
-//                     <SupportAgentIcon className="text-[#FF385C] w-5 h-5" />
-//                     <h2 className="text-xl font-semibold text-gray-900">
-//                       {t.createRequestTitle}
-//                     </h2>
-//                   </div>
-//                   <motion.button
-//                     whileHover={{ rotate: 90, scale: 1.1 }}
-//                     whileTap={{ scale: 0.9 }}
-//                     onClick={() => setIsCreateModalOpen(false)}
-//                     className="p-1 rounded-full transition-colors hover:bg-gray-100 text-gray-500"
-//                   >
-//                     <CloseIcon className="w-5 h-5" />
-//                   </motion.button>
-//                 </div>
-
-//                 <div className="p-6 space-y-4">
-//                   {/* Name Field */}
-//                   <div>
-//                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
-//                       {t.yourName} <span className="text-red-500">*</span>
-//                     </label>
-//                     <input
-//                       type="text"
-//                       value={createFormData.name}
-//                       onChange={(e) => handleCreateFormChange("name", e.target.value)}
-//                       className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                         formErrors.name ? "border-red-500" : "border-gray-300"
-//                       }`}
-//                       placeholder="Enter your full name"
-//                     />
-//                     {formErrors.name && (
-//                       <p className="mt-1 text-xs text-red-500">{formErrors.name}</p>
-//                     )}
-//                   </div>
-
-//                   {/* Email Field */}
-//                   <div>
-//                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
-//                       {t.yourEmail} <span className="text-red-500">*</span>
-//                     </label>
-//                     <input
-//                       type="email"
-//                       value={createFormData.email}
-//                       onChange={(e) => handleCreateFormChange("email", e.target.value)}
-//                       className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-//                         formErrors.email ? "border-red-500" : "border-gray-300"
-//                       }`}
-//                       placeholder="Enter your email address"
-//                     />
-//                     {formErrors.email && (
-//                       <p className="mt-1 text-xs text-red-500">{formErrors.email}</p>
-//                     )}
-//                   </div>
-
-//                   {/* Language Field */}
-//                   <div>
-//                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
-//                       {t.language}
-//                     </label>
-//                     <select
-//                       value={createFormData.language}
-//                       onChange={(e) => handleCreateFormChange("language", e.target.value)}
-//                       className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
-//                     >
-//                       <option value="en">English</option>
-//                       <option value="fr">Français</option>
-//                       <option value="rw">Kinyarwanda</option>
-//                     </select>
-//                   </div>
-
-//                   {/* Message Field */}
-//                   <div>
-//                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
-//                       {t.yourMessage} <span className="text-red-500">*</span>
-//                     </label>
-//                     <textarea
-//                       value={createFormData.message}
-//                       onChange={(e) => handleCreateFormChange("message", e.target.value)}
-//                       rows={5}
-//                       className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm resize-none ${
-//                         formErrors.message ? "border-red-500" : "border-gray-300"
-//                       }`}
-//                       placeholder={t.messagePlaceholder}
-//                     />
-//                     <div className="flex justify-between mt-1">
-//                       {formErrors.message ? (
-//                         <p className="text-xs text-red-500">{formErrors.message}</p>
-//                       ) : (
-//                         <p className="text-xs text-gray-400">
-//                           {createFormData.message.length}/1000 characters
-//                         </p>
-//                       )}
-//                     </div>
-//                   </div>
-
-//                   <div className="flex gap-3 pt-4 border-t border-gray-200">
-//                     <motion.button
-//                       whileHover={{ scale: 1.02 }}
-//                       whileTap={{ scale: 0.98 }}
-//                       onClick={handleCreateRequest}
-//                       disabled={isSubmitting}
-//                       className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors flex items-center justify-center gap-2 ${
-//                         isSubmitting
-//                           ? "bg-gray-400 cursor-not-allowed"
-//                           : "bg-[#FF385C] hover:bg-[#E31C5F]"
-//                       }`}
-//                     >
-//                       {isSubmitting ? (
-//                         <>
-//                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-//                           {t.submitting}
-//                         </>
-//                       ) : (
-//                         <>
-//                           <Send className="w-4 h-4" />
-//                           {t.send}
-//                         </>
-//                       )}
-//                     </motion.button>
-//                     <motion.button
-//                       whileHover={{ scale: 1.02 }}
-//                       whileTap={{ scale: 0.98 }}
-//                       onClick={() => setIsCreateModalOpen(false)}
-//                       className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-//                     >
-//                       {t.cancel}
-//                     </motion.button>
-//                   </div>
-//                 </div>
-//               </div>
-//             </motion.div>
-//           </>
-//         )}
-//       </AnimatePresence>
-
-//       {/* Success Modal */}
-//       <AnimatePresence>
-//         {isSuccessModalOpen && (
-//           <>
-//             <motion.div
-//               variants={overlayVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200]"
-//               onClick={() => setIsSuccessModalOpen(false)}
-//             />
-//             <motion.div
-//               variants={modalVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-0 z-[201] flex items-center justify-center p-4"
-//             >
-//               <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative">
-//                 <div className="p-6">
-//                   <div className="flex items-center justify-center mb-4">
-//                     <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-//                       <CheckCircleIcon className="w-10 h-10 text-green-600" />
-//                     </div>
-//                   </div>
-//                   <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">
-//                     {t.success}
-//                   </h3>
-//                   <p className="text-gray-700 text-center mb-2">
-//                     {successMessage}
-//                   </p>
-//                   <p className="text-sm text-gray-500 text-center mb-6">
-//                     {successDetails}
-//                   </p>
-//                   <motion.button
-//                     whileHover={{ scale: 1.02 }}
-//                     whileTap={{ scale: 0.98 }}
-//                     onClick={() => {
-//                       setIsSuccessModalOpen(false);
-//                       fetchRequests();
-//                     }}
-//                     className="w-full px-4 py-2.5 bg-[#FF385C] text-white rounded-lg font-medium hover:bg-[#E31C5F] transition-colors"
-//                   >
-//                     {t.close}
-//                   </motion.button>
-//                 </div>
-//               </div>
-//             </motion.div>
-//           </>
-//         )}
-//       </AnimatePresence>
-
-//       {/* Error Modal */}
-//       <AnimatePresence>
-//         {isErrorModalOpen && (
-//           <>
-//             <motion.div
-//               variants={overlayVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200]"
-//               onClick={() => setIsErrorModalOpen(false)}
-//             />
-//             <motion.div
-//               variants={modalVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-0 z-[201] flex items-center justify-center p-4"
-//             >
-//               <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative">
-//                 <div className="p-6">
-//                   <div className="flex items-center justify-center mb-4">
-//                     <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-//                       <ErrorIcon className="w-10 h-10 text-red-600" />
-//                     </div>
-//                   </div>
-//                   <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">
-//                     {t.failure}
-//                   </h3>
-//                   <p className="text-gray-700 text-center mb-2">
-//                     {errorMessage}
-//                   </p>
-//                   <p className="text-sm text-gray-500 text-center mb-6">
-//                     {errorDetails}
-//                   </p>
-//                   <div className="flex gap-3">
-//                     <motion.button
-//                       whileHover={{ scale: 1.02 }}
-//                       whileTap={{ scale: 0.98 }}
-//                       onClick={() => {
-//                         setIsErrorModalOpen(false);
-//                         setIsCreateModalOpen(true);
-//                       }}
-//                       className="flex-1 px-4 py-2.5 bg-[#FF385C] text-white rounded-lg font-medium hover:bg-[#E31C5F] transition-colors"
-//                     >
-//                       Try Again
-//                     </motion.button>
-//                     <motion.button
-//                       whileHover={{ scale: 1.02 }}
-//                       whileTap={{ scale: 0.98 }}
-//                       onClick={() => setIsErrorModalOpen(false)}
-//                       className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-//                     >
-//                       {t.close}
-//                     </motion.button>
-//                   </div>
-//                 </div>
-//               </div>
-//             </motion.div>
-//           </>
-//         )}
-//       </AnimatePresence>
-
-//       {/* View Request Modal */}
-//       <AnimatePresence>
-//         {isViewModalOpen && selectedRequest && (
-//           <>
-//             <motion.div
-//               variants={overlayVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-//               onClick={() => setIsViewModalOpen(false)}
-//             />
-//             <motion.div
-//               variants={modalVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-//             >
-//               <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white relative">
-//                 <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl z-10">
-//                   <div className="flex items-center gap-2">
-//                     <AssignmentIcon className="text-[#FF385C] w-5 h-5" />
-//                     <h2 className="text-xl font-semibold text-gray-900">
-//                       {t.requestDetails}
-//                     </h2>
-//                   </div>
-//                   <motion.button
-//                     whileHover={{ rotate: 90, scale: 1.1 }}
-//                     whileTap={{ scale: 0.9 }}
-//                     onClick={() => setIsViewModalOpen(false)}
-//                     className="p-1 rounded-full transition-colors hover:bg-gray-100 text-gray-500"
-//                   >
-//                     <CloseIcon className="w-5 h-5" />
-//                   </motion.button>
-//                 </div>
-
-//                 <div className="p-6 space-y-4">
-//                   {/* Requester Info */}
-//                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                     <div>
-//                       <label className="text-xs font-medium text-gray-500">
-//                         {t.requesterName}
-//                       </label>
-//                       <p className="text-sm font-medium text-gray-900 mt-1">
-//                         {selectedRequest.name}
-//                       </p>
-//                     </div>
-//                     <div>
-//                       <label className="text-xs font-medium text-gray-500">
-//                         {t.requesterEmail}
-//                       </label>
-//                       <p className="text-sm font-medium text-gray-900 mt-1">
-//                         {selectedRequest.email}
-//                       </p>
-//                     </div>
-//                   </div>
-
-//                   {/* Status */}
-//                   <div>
-//                     <label className="text-xs font-medium text-gray-500">
-//                       {t.status}
-//                     </label>
-//                     <div className="mt-1">
-//                       <span
-//                         className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
-//                           selectedRequest.status,
-//                         )}`}
-//                       >
-//                         {getStatusLabel(selectedRequest.status)}
-//                       </span>
-//                     </div>
-//                   </div>
-
-//                   {/* Message */}
-//                   <div>
-//                     <label className="text-xs font-medium text-gray-500">
-//                       {t.requestMessage}
-//                     </label>
-//                     <div className="mt-1 p-3 bg-gray-50 rounded-lg">
-//                       <p className="text-sm text-gray-700 whitespace-pre-wrap">
-//                         {selectedRequest.message}
-//                       </p>
-//                     </div>
-//                   </div>
-
-//                   {/* Image */}
-//                   {selectedRequest.image && selectedRequest.image.url && (
-//                     <div>
-//                       <label className="text-xs font-medium text-gray-500">
-//                         {t.attachedImage}
-//                       </label>
-//                       <div className="mt-2">
-//                         <button
-//                           onClick={() => setIsImageModalOpen(true)}
-//                           className="relative rounded-lg overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow"
-//                         >
-//                           <img
-//                             src={selectedRequest.image.url}
-//                             alt={
-//                               selectedRequest.image.public_id || "Request image"
-//                             }
-//                             className="max-h-48 object-contain cursor-pointer"
-//                           />
-//                           <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-//                             {selectedRequest.image.public_id || "Image"}
-//                           </div>
-//                         </button>
-//                       </div>
-//                     </div>
-//                   )}
-
-//                   {/* Admin Reply */}
-//                   {selectedRequest.adminReply && (
-//                     <div>
-//                       <label className="text-xs font-medium text-gray-500">
-//                         {t.adminReply}
-//                       </label>
-//                       <div className="mt-1 p-3 bg-green-50 rounded-lg border border-green-200">
-//                         <p className="text-sm text-gray-700 whitespace-pre-wrap">
-//                           {selectedRequest.adminReply}
-//                         </p>
-//                       </div>
-//                     </div>
-//                   )}
-
-//                   {/* Dates */}
-//                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
-//                     <div>
-//                       <label className="text-xs font-medium text-gray-500">
-//                         {t.createdAt}
-//                       </label>
-//                       <p className="text-sm text-gray-900 mt-1">
-//                         {formatDate(selectedRequest.createdAt)}
-//                       </p>
-//                     </div>
-//                     <div>
-//                       <label className="text-xs font-medium text-gray-500">
-//                         {t.updatedAt}
-//                       </label>
-//                       <p className="text-sm text-gray-900 mt-1">
-//                         {formatDate(selectedRequest.updatedAt)}
-//                       </p>
-//                     </div>
-//                   </div>
-
-//                   <div className="flex gap-3 pt-4 border-t border-gray-200">
-//                     {selectedRequest.status === "Pending" && (
-//                       <motion.button
-//                         whileHover={{ scale: 1.02 }}
-//                         whileTap={{ scale: 0.98 }}
-//                         onClick={() => {
-//                           setIsViewModalOpen(false);
-//                           openRespondModal(selectedRequest);
-//                         }}
-//                         className="flex-1 px-4 py-2.5 bg-[#FF385C] text-white rounded-lg font-medium hover:bg-[#E31C5F] transition-colors flex items-center justify-center gap-2"
-//                       >
-//                         <ChatIcon className="w-4 h-4" />
-//                         {t.respond}
-//                       </motion.button>
-//                     )}
-//                     <motion.button
-//                       whileHover={{ scale: 1.02 }}
-//                       whileTap={{ scale: 0.98 }}
-//                       onClick={() => setIsViewModalOpen(false)}
-//                       className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-//                     >
-//                       {t.close}
-//                     </motion.button>
-//                   </div>
-//                 </div>
-//               </div>
-//             </motion.div>
-//           </>
-//         )}
-//       </AnimatePresence>
-
-//       {/* Respond Modal */}
-//       <AnimatePresence>
-//         {isRespondModalOpen && selectedRequest && (
-//           <>
-//             <motion.div
-//               variants={overlayVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-//               onClick={() => setIsRespondModalOpen(false)}
-//             />
-//             <motion.div
-//               variants={modalVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-//             >
-//               <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white relative">
-//                 <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl z-10">
-//                   <div className="flex items-center gap-2">
-//                     <ChatIcon className="text-[#FF385C] w-5 h-5" />
-//                     <h2 className="text-xl font-semibold text-gray-900">
-//                       {t.replyTo} {selectedRequest.name}
-//                     </h2>
-//                   </div>
-//                   <motion.button
-//                     whileHover={{ rotate: 90, scale: 1.1 }}
-//                     whileTap={{ scale: 0.9 }}
-//                     onClick={() => setIsRespondModalOpen(false)}
-//                     className="p-1 rounded-full transition-colors hover:bg-gray-100 text-gray-500"
-//                   >
-//                     <CloseIcon className="w-5 h-5" />
-//                   </motion.button>
-//                 </div>
-
-//                 <div className="p-6 space-y-4">
-//                   {/* Requester Info */}
-//                   <div className="p-3 bg-gray-50 rounded-lg">
-//                     <p className="text-sm text-gray-500">
-//                       <span className="font-medium text-gray-700">From:</span>{" "}
-//                       {selectedRequest.name} ({selectedRequest.email})
-//                     </p>
-//                     <p className="text-sm text-gray-700 mt-1">
-//                       <span className="font-medium text-gray-700">
-//                         Message:
-//                       </span>{" "}
-//                       {selectedRequest.message}
-//                     </p>
-//                   </div>
-
-//                   {/* Status Update */}
-//                   <div>
-//                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
-//                       {t.updateStatus}
-//                     </label>
-//                     <select
-//                       value={selectedStatus}
-//                       onChange={(e) => setSelectedStatus(e.target.value)}
-//                       className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
-//                     >
-//                       <option value="Pending">{t.statuses.Pending}</option>
-//                       <option value="Approved">{t.statuses.Approved}</option>
-//                       <option value="Rejected">{t.statuses.Rejected}</option>
-//                       <option value="Completed">{t.statuses.Completed}</option>
-//                     </select>
-//                   </div>
-
-//                   {/* Response Text */}
-//                   <div>
-//                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
-//                       {t.responseLabel}
-//                     </label>
-//                     <textarea
-//                       value={responseText}
-//                       onChange={(e) => setResponseText(e.target.value)}
-//                       rows={5}
-//                       className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm resize-none"
-//                       placeholder={t.responsePlaceholder}
-//                     />
-//                   </div>
-
-//                   <div className="flex gap-3 pt-4 border-t border-gray-200">
-//                     <motion.button
-//                       whileHover={{ scale: 1.02 }}
-//                       whileTap={{ scale: 0.98 }}
-//                       onClick={handleSendResponse}
-//                       disabled={isSubmitting || !responseText.trim()}
-//                       className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors flex items-center justify-center gap-2 ${
-//                         isSubmitting || !responseText.trim()
-//                           ? "bg-gray-400 cursor-not-allowed"
-//                           : "bg-[#FF385C] hover:bg-[#E31C5F]"
-//                       }`}
-//                     >
-//                       {isSubmitting ? (
-//                         <>
-//                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-//                           {t.sending}
-//                         </>
-//                       ) : (
-//                         <>
-//                           <Send className="w-4 h-4" />
-//                           {t.send}
-//                         </>
-//                       )}
-//                     </motion.button>
-//                     <motion.button
-//                       whileHover={{ scale: 1.02 }}
-//                       whileTap={{ scale: 0.98 }}
-//                       onClick={() => setIsRespondModalOpen(false)}
-//                       className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-//                     >
-//                       {t.cancel}
-//                     </motion.button>
-//                   </div>
-//                 </div>
-//               </div>
-//             </motion.div>
-//           </>
-//         )}
-//       </AnimatePresence>
-
-//       {/* Delete Confirmation Modal */}
-//       <AnimatePresence>
-//         {isDeleteModalOpen && selectedRequest && (
-//           <>
-//             <motion.div
-//               variants={overlayVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-//               onClick={() => {
-//                 setIsDeleteModalOpen(false);
-//                 setSelectedRequest(null);
-//               }}
-//             />
-//             <motion.div
-//               variants={modalVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-//             >
-//               <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative">
-//                 <div className="p-6">
-//                   <div className="flex items-center justify-center mb-4">
-//                     <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-//                       <DeleteIcon className="w-8 h-8 text-red-600" />
-//                     </div>
-//                   </div>
-//                   <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">
-//                     {t.deleteRequest}
-//                   </h3>
-//                   <p className="text-gray-500 text-center mb-6">
-//                     {t.deleteConfirmation}
-//                     <br />
-//                     <span className="text-sm text-gray-400">
-//                       {t.actionUndone}
-//                     </span>
-//                   </p>
-//                   <div className="flex gap-3">
-//                     <motion.button
-//                       whileHover={{ scale: 1.02 }}
-//                       whileTap={{ scale: 0.98 }}
-//                       onClick={() => {
-//                         setIsDeleteModalOpen(false);
-//                         setSelectedRequest(null);
-//                       }}
-//                       className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-//                     >
-//                       {t.cancel}
-//                     </motion.button>
-//                     <motion.button
-//                       whileHover={{ scale: 1.02 }}
-//                       whileTap={{ scale: 0.98 }}
-//                       onClick={handleDeleteRequest}
-//                       disabled={isLoading}
-//                       className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors ${
-//                         isLoading
-//                           ? "bg-gray-400 cursor-not-allowed"
-//                           : "bg-red-600 hover:bg-red-700"
-//                       }`}
-//                     >
-//                       {isLoading ? (
-//                         <span className="flex items-center justify-center gap-2">
-//                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-//                           {t.deleting}
-//                         </span>
-//                       ) : (
-//                         t.delete
-//                       )}
-//                     </motion.button>
-//                   </div>
-//                 </div>
-//               </div>
-//             </motion.div>
-//           </>
-//         )}
-//       </AnimatePresence>
-
-//       {/* Image Preview Modal */}
-//       <AnimatePresence>
-//         {isImageModalOpen && selectedRequest?.image?.url && (
-//           <>
-//             <motion.div
-//               initial={{ opacity: 0 }}
-//               animate={{ opacity: 1 }}
-//               exit={{ opacity: 0 }}
-//               className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200]"
-//               onClick={() => setIsImageModalOpen(false)}
-//             />
-//             <motion.div
-//               initial={{ opacity: 0, scale: 0.9 }}
-//               animate={{ opacity: 1, scale: 1 }}
-//               exit={{ opacity: 0, scale: 0.9 }}
-//               className="fixed inset-0 z-[201] flex items-center justify-center p-4"
-//             >
-//               <div className="relative max-w-4xl max-h-[90vh]">
-//                 <button
-//                   onClick={() => setIsImageModalOpen(false)}
-//                   className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors"
-//                 >
-//                   <Close className="w-8 h-8" />
-//                 </button>
-//                 <img
-//                   src={selectedRequest.image.url}
-//                   alt={selectedRequest.image.public_id || "Request image"}
-//                   className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
-//                 />
-//                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white text-sm px-4 py-2 rounded-lg">
-//                   {selectedRequest.image.public_id || "Image"}
-//                   {selectedRequest.image.format &&
-//                     ` (${selectedRequest.image.format})`}
-//                 </div>
-//               </div>
-//             </motion.div>
-//           </>
-//         )}
-//       </AnimatePresence>
-//     </div>
-//   );
-// };
-
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
+import axios, { AxiosError } from "axios";
 
 // Material-UI Icons
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
@@ -1858,7 +17,6 @@ import ImageIcon from "@mui/icons-material/Image";
 import ClearIcon from "@mui/icons-material/Clear";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import ChatIcon from "@mui/icons-material/Chat";
-import AddIcon from "@mui/icons-material/Add";
 import { Close, Send } from "@mui/icons-material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
@@ -2113,7 +271,7 @@ interface Request {
   message: string;
   language: string;
   image: RequestImage;
-  status: "Pending" | "Approved" | "Rejected" | "Completed";
+  status: "pending" | "approved" | "rejected" | "completed";
   adminReply: string;
   userId: string | null;
   notificationId: string | null;
@@ -2144,31 +302,16 @@ interface RequestUI extends Request {
   };
 }
 
-// Request Form Data
-interface RequestFormData {
-  name: string;
-  email: string;
-  message: string;
-  language: string;
-}
-
-// Form validation errors
-interface FormErrors {
-  name?: string;
-  email?: string;
-  message?: string;
-}
-
 // Translations
 const translations = {
   en: {
     requestManagement: "My Support Requests",
-    manageRequests: "Create and manage your support requests",
+    manageRequests: "View and manage your support requests",
     total: "Total",
-    pending: "Pending",
-    approved: "Approved",
-    rejected: "Rejected",
-    completed: "Completed",
+    pending: "pending",
+    approved: "approved",
+    rejected: "rejected",
+    completed: "completed",
     searchRequests: "Search by name, email, or message...",
     allStatus: "All Status",
     request: "Request",
@@ -2219,48 +362,27 @@ const translations = {
     language: "Language",
     adminReply: "Admin Reply",
     statuses: {
-      Pending: "Pending",
-      Approved: "Approved",
-      Rejected: "Rejected",
-      Completed: "Completed",
+      pending: "pending",
+      approved: "approved",
+      rejected: "rejected",
+      completed: "completed",
     },
     filters: {
       all: "All Status",
-      Pending: "Pending",
-      Approved: "Approved",
-      Rejected: "Rejected",
-      Completed: "Completed",
+      pending: "pending",
+      approved: "approved",
+      rejected: "rejected",
+      completed: "completed",
     },
     noUserEmail: "No user email found. Please login again.",
-    createRequest: "Create New Request",
-    createRequestTitle: "Submit a Support Request",
-    yourName: "Your Name",
-    yourEmail: "Your Email",
-    yourMessage: "Your Message",
-    messagePlaceholder: "Describe your issue or request in detail...",
-    submitting: "Submitting...",
-    createSuccess: "Request created successfully!",
-    createFailed: "Failed to create request",
     success: "Success",
     failure: "Failure",
-    requestCreated: "Your support request has been created successfully.",
-    requestCreatedDetails:
-      "Our team will review your request and get back to you shortly.",
-    requestFailed: "Failed to create your support request.",
-    requestFailedDetails:
-      "Please try again or contact support directly if the issue persists.",
-    nameRequired: "Name is required",
-    emailRequired: "Email is required",
-    emailInvalid: "Please enter a valid email",
-    messageMinLength: "Message must be at least 10 characters",
-    messageMaxLength: "Message cannot exceed 1000 characters",
-    pleaseFixErrors: "Please fix the errors above",
     confirm: "Confirm",
     error: "Error",
   },
   fr: {
     requestManagement: "Mes Demandes de Support",
-    manageRequests: "Créer et gérer vos demandes de support",
+    manageRequests: "Voir et gérer vos demandes de support",
     total: "Total",
     pending: "En Attente",
     approved: "Approuvé",
@@ -2316,48 +438,27 @@ const translations = {
     language: "Langue",
     adminReply: "Réponse Admin",
     statuses: {
-      Pending: "En Attente",
-      Approved: "Approuvé",
-      Rejected: "Rejeté",
-      Completed: "Terminé",
+      pending: "En Attente",
+      approved: "Approuvé",
+      rejected: "Rejeté",
+      completed: "Terminé",
     },
     filters: {
       all: "Tous les Statuts",
-      Pending: "En Attente",
-      Approved: "Approuvé",
-      Rejected: "Rejeté",
-      Completed: "Terminé",
+      pending: "En Attente",
+      approved: "Approuvé",
+      rejected: "Rejeté",
+      completed: "Terminé",
     },
     noUserEmail: "Aucun email utilisateur trouvé. Veuillez vous reconnecter.",
-    createRequest: "Créer une Nouvelle Demande",
-    createRequestTitle: "Soumettre une Demande de Support",
-    yourName: "Votre Nom",
-    yourEmail: "Votre Email",
-    yourMessage: "Votre Message",
-    messagePlaceholder: "Décrivez votre problème ou demande en détail...",
-    submitting: "Soumission en cours...",
-    createSuccess: "Demande créée avec succès !",
-    createFailed: "Échec de la création de la demande",
     success: "Succès",
     failure: "Échec",
-    requestCreated: "Votre demande de support a été créée avec succès.",
-    requestCreatedDetails:
-      "Notre équipe examinera votre demande et vous répondra sous peu.",
-    requestFailed: "Échec de la création de votre demande de support.",
-    requestFailedDetails:
-      "Veuillez réessayer ou contacter le support directement si le problème persiste.",
-    nameRequired: "Le nom est requis",
-    emailRequired: "L'email est requis",
-    emailInvalid: "Veuillez entrer un email valide",
-    messageMinLength: "Le message doit contenir au moins 10 caractères",
-    messageMaxLength: "Le message ne peut pas dépasser 1000 caractères",
-    pleaseFixErrors: "Veuillez corriger les erreurs ci-dessus",
     confirm: "Confirmer",
     error: "Erreur",
   },
   rw: {
     requestManagement: "Ibyifuzo Byanjye",
-    manageRequests: "Kurema no gucunga ibyifuzo byawe",
+    manageRequests: "Reba kandi ucunge ibyifuzo byawe",
     total: "Yose",
     pending: "Bitegereje",
     approved: "Byemewe",
@@ -2413,44 +514,22 @@ const translations = {
     language: "Ururimi",
     adminReply: "Igisubizo cy'Admin",
     statuses: {
-      Pending: "Bitegereje",
-      Approved: "Byemewe",
-      Rejected: "Byangijwe",
-      Completed: "Byarangiye",
+      pending: "Bitegereje",
+      approved: "Byemewe",
+      rejected: "Byangijwe",
+      completed: "Byarangiye",
     },
     filters: {
       all: "Ihagaze Ryose",
-      Pending: "Bitegereje",
-      Approved: "Byemewe",
-      Rejected: "Byangijwe",
-      Completed: "Byarangiye",
+      pending: "Bitegereje",
+      approved: "Byemewe",
+      rejected: "Byangijwe",
+      completed: "Byarangiye",
     },
     noUserEmail:
       "Nta imeri y'umukoresha yabonetse. Nyamuneka winjire undi munsi.",
-    createRequest: "Kurema Icyifuzo Gishya",
-    createRequestTitle: "Ohereza Icyifuzo cy'Ubufasha",
-    yourName: "Izina Ryawe",
-    yourEmail: "Imeri Yawe",
-    yourMessage: "Ubutumwa Bwawe",
-    messagePlaceholder:
-      "Sobanura ikibazo cyawe cyangwa icyifuzo mu buryo bwihariye...",
-    submitting: "Birakoherezwa...",
-    createSuccess: "Icyifuzo cyakozwe neza!",
-    createFailed: "Kurema icyifuzo birananiranye",
     success: "Byakunze",
     failure: "Byananiwe",
-    requestCreated: "Icyifuzo cyawe cyoherejwe neza.",
-    requestCreatedDetails:
-      "Itsinda ryacu rizasuzuma icyifuzo cyawe kikagusubiza vuba.",
-    requestFailed: "Kohereza icyifuzo cyawe byananiwe.",
-    requestFailedDetails:
-      "Gerageza undi munsi cyangwa uvuge n'ubufasha mu buryo butaziguye niba ikibazo kigikomeza.",
-    nameRequired: "Izina rirasabwa",
-    emailRequired: "Imeri irasabwa",
-    emailInvalid: "Andika imeri ikwiye",
-    messageMinLength: "Ubutumwa bugomba kuba ibinyuguti 10 byibuze",
-    messageMaxLength: "Ubutumwa ntibugomba kurenga ibinyuguti 1000",
-    pleaseFixErrors: "Kosora amakosa hejuru",
     confirm: "Emeza",
     error: "Ikosa",
   },
@@ -2487,39 +566,31 @@ const getUserEmailFromStorage = (): string => {
   return "";
 };
 
-// Helper function to get user name from localStorage
-const getUserNameFromStorage = (): string => {
-  try {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      const user = JSON.parse(userStr);
-      if (user.name) {
-        return user.name;
-      }
-    }
-  } catch {
-    // Silently handle error
-  }
-  return "";
-};
-
 // API Base URL
 const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
+
+// Create axios instance
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 // Helper function to transform request to UI format
 const transformRequestToUI = (request: Request): RequestUI => {
   const statusColors: Record<string, string> = {
-    Pending: "bg-yellow-100 text-yellow-800",
-    Approved: "bg-green-100 text-green-800",
-    Rejected: "bg-red-100 text-red-800",
-    Completed: "bg-blue-100 text-blue-800",
+    pending: "bg-yellow-100 text-yellow-800",
+    approved: "bg-green-100 text-green-800",
+    rejected: "bg-red-100 text-red-800",
+    completed: "bg-blue-100 text-blue-800",
   };
 
   const statusLabels: Record<string, string> = {
-    Pending: "Pending",
-    Approved: "Approved",
-    Rejected: "Rejected",
-    Completed: "Completed",
+    pending: "pending",
+    approved: "approved",
+    rejected: "rejected",
+    completed: "completed",
   };
 
   let displayImage = undefined;
@@ -2582,7 +653,6 @@ export const UserRequestManagement: React.FC = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isRespondModalOpen, setIsRespondModalOpen] = useState(false);
   const [, setIsDeleteModalOpen] = useState(false);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<RequestUI | null>(
     null,
   );
@@ -2610,17 +680,6 @@ export const UserRequestManagement: React.FC = () => {
     type: "warning",
   });
 
-  // Create form state
-  const [createFormData, setCreateFormData] = useState<RequestFormData>({
-    name: "",
-    email: "",
-    message: "",
-    language: "en",
-  });
-
-  // Form validation errors
-  const [formErrors, setFormErrors] = useState<FormErrors>({});
-
   // Loading states
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -2629,17 +688,16 @@ export const UserRequestManagement: React.FC = () => {
   // Statistics
   const [stats, setStats] = useState({
     total: 0,
-    Pending: 0,
-    Approved: 0,
-    Rejected: 0,
-    Completed: 0,
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+    completed: 0,
   });
 
   const t = translations[lang];
 
   // Get user email from localStorage
   const userEmail = getUserEmailFromStorage();
-  const userName = getUserNameFromStorage();
 
   const showSuccessModal = (
     title: string,
@@ -2678,63 +736,6 @@ export const UserRequestManagement: React.FC = () => {
     setConfirmModal((prev) => ({ ...prev, isOpen: false }));
   };
 
-  // Initialize form with user data
-  useEffect(() => {
-    if (userName) {
-      setCreateFormData((prev) => ({ ...prev, name: userName }));
-    }
-    if (userEmail) {
-      setCreateFormData((prev) => ({ ...prev, email: userEmail }));
-    }
-  }, [userName, userEmail]);
-
-  // Validate create form
-  const validateCreateForm = (): boolean => {
-    const errors: FormErrors = {};
-    let isValid = true;
-
-    if (!createFormData.name || createFormData.name.trim().length < 2) {
-      errors.name = t.nameRequired;
-      isValid = false;
-    }
-
-    if (!createFormData.email) {
-      errors.email = t.emailRequired;
-      isValid = false;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(createFormData.email)) {
-      errors.email = t.emailInvalid;
-      isValid = false;
-    }
-
-    if (!createFormData.message || createFormData.message.trim().length < 10) {
-      errors.message = t.messageMinLength;
-      isValid = false;
-    } else if (createFormData.message.trim().length > 1000) {
-      errors.message = t.messageMaxLength;
-      isValid = false;
-    }
-
-    setFormErrors(errors);
-    return isValid;
-  };
-
-  // Handle create form field changes
-  const handleCreateFormChange = (
-    field: keyof RequestFormData,
-    value: string,
-  ) => {
-    setCreateFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-    if (field !== "language" && formErrors[field as keyof FormErrors]) {
-      setFormErrors((prev) => ({
-        ...prev,
-        [field as keyof FormErrors]: undefined,
-      }));
-    }
-  };
-
   // Fetch requests by user email - GET /requests/email/:email
   const fetchRequests = async () => {
     setIsFetching(true);
@@ -2750,20 +751,17 @@ export const UserRequestManagement: React.FC = () => {
         return;
       }
 
-      const response = await fetch(
-        `${API_BASE_URL}/requests/email/${encodeURIComponent(currentEmail)}`,
+      const response = await api.get(
+        `/requests/email/${encodeURIComponent(currentEmail)}`,
       );
 
-      if (!response.ok) {
-        if (response.status === 404) {
-          setRequests([]);
-          setIsFetching(false);
-          return;
-        }
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (response.status === 404) {
+        setRequests([]);
+        setIsFetching(false);
+        return;
       }
 
-      const data = await response.json();
+      const data = response.data;
 
       let requestsData: Request[] = [];
       if (Array.isArray(data)) {
@@ -2789,79 +787,18 @@ export const UserRequestManagement: React.FC = () => {
         transformRequestToUI(req),
       );
       setRequests(transformedRequests);
-    } catch {
-      showErrorModal(
-        t.error || "Error",
-        t.fetchError || "Failed to load requests",
-      );
+    } catch (error) {
+      const err = error as AxiosError;
+      if (err.response?.status === 404) {
+        setRequests([]);
+      } else {
+        showErrorModal(
+          t.error || "Error",
+          t.fetchError || "Failed to load requests",
+        );
+      }
     } finally {
       setIsFetching(false);
-    }
-  };
-
-  // Create new request
-  const handleCreateRequest = async () => {
-    if (!validateCreateForm()) {
-      showErrorModal(
-        t.error || "Error",
-        t.pleaseFixErrors || "Please fix the errors above",
-      );
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const requestData = {
-        name: createFormData.name,
-        email: createFormData.email,
-        message: createFormData.message,
-        language: createFormData.language || "en",
-      };
-
-      const response = await fetch(`${API_BASE_URL}/requests`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create request");
-      }
-
-      const newRequest = await response.json();
-      const transformedRequest = transformRequestToUI(newRequest);
-
-      setRequests((prev) => [transformedRequest, ...prev]);
-
-      showSuccessModal(
-        t.success || "Success",
-        t.requestCreated ||
-          "Your support request has been created successfully.",
-        t.requestCreatedDetails ||
-          "Our team will review your request and get back to you shortly.",
-      );
-
-      setCreateFormData({
-        name: userName || "",
-        email: userEmail || "",
-        message: "",
-        language: "en",
-      });
-      setFormErrors({});
-      setIsCreateModalOpen(false);
-    } catch {
-      showErrorModal(
-        t.failure || "Failure",
-        t.requestFailed || "Failed to create your support request.",
-        t.requestFailedDetails ||
-          "Please try again or contact support directly if the issue persists.",
-      );
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -2907,24 +844,24 @@ export const UserRequestManagement: React.FC = () => {
   // Update statistics
   useEffect(() => {
     const total = requests.length;
-    const Pending = requests.filter((r) => r.status === "Pending").length;
-    const Approved = requests.filter((r) => r.status === "Approved").length;
-    const Rejected = requests.filter((r) => r.status === "Rejected").length;
-    const Completed = requests.filter((r) => r.status === "Completed").length;
+    const pending = requests.filter((r) => r.status === "pending").length;
+    const approved = requests.filter((r) => r.status === "approved").length;
+    const rejected = requests.filter((r) => r.status === "rejected").length;
+    const completed = requests.filter((r) => r.status === "completed").length;
 
-    setStats({ total, Pending, Approved, Rejected, Completed });
+    setStats({ total, pending, approved, rejected, completed });
   }, [requests]);
 
   // Get status badge color
   const getStatusColor = (status: string): string => {
     switch (status) {
-      case "Pending":
+      case "pending":
         return "bg-yellow-100 text-yellow-800";
-      case "Approved":
+      case "approved":
         return "bg-green-100 text-green-800";
-      case "Rejected":
+      case "rejected":
         return "bg-red-100 text-red-800";
-      case "Completed":
+      case "completed":
         return "bg-blue-100 text-blue-800";
       default:
         return "bg-gray-100 text-gray-800";
@@ -2934,14 +871,14 @@ export const UserRequestManagement: React.FC = () => {
   // Get status label
   const getStatusLabel = (status: string): string => {
     switch (status) {
-      case "Pending":
-        return t.statuses.Pending;
-      case "Approved":
-        return t.statuses.Approved;
-      case "Rejected":
-        return t.statuses.Rejected;
-      case "Completed":
-        return t.statuses.Completed;
+      case "pending":
+        return t.statuses.pending;
+      case "approved":
+        return t.statuses.approved;
+      case "rejected":
+        return t.statuses.rejected;
+      case "completed":
+        return t.statuses.completed;
       default:
         return status;
     }
@@ -2967,25 +904,12 @@ export const UserRequestManagement: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/requests/${selectedRequest._id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            adminReply: responseText,
-            status: selectedStatus || selectedRequest.status,
-          }),
-        },
-      );
+      const response = await api.put(`/requests/${selectedRequest._id}`, {
+        adminReply: responseText,
+        status: selectedStatus || selectedRequest.status,
+      });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const updatedRequest = await response.json();
+      const updatedRequest = response.data;
       const transformedRequest = transformRequestToUI(updatedRequest);
 
       const updatedRequests = requests.map((r) =>
@@ -3018,16 +942,7 @@ export const UserRequestManagement: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/requests/${selectedRequest._id}`,
-        {
-          method: "DELETE",
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      await api.delete(`/requests/${selectedRequest._id}`);
 
       setRequests(requests.filter((r) => r._id !== selectedRequest._id));
 
@@ -3158,15 +1073,6 @@ export const UserRequestManagement: React.FC = () => {
                 className={`w-5 h-5 ${isLoading ? "animate-spin" : ""}`}
               />
             </button>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setIsCreateModalOpen(true)}
-              className="px-4 py-2 bg-[#FF385C] text-white rounded-lg font-medium hover:bg-[#E31C5F] transition-colors flex items-center gap-2 text-sm"
-            >
-              <AddIcon className="w-4 h-4" />
-              {t.createRequest}
-            </motion.button>
           </div>
         </div>
       </div>
@@ -3185,28 +1091,28 @@ export const UserRequestManagement: React.FC = () => {
           className="bg-yellow-50 rounded-xl p-4 shadow-sm border border-yellow-200"
         >
           <p className="text-xs text-yellow-600">{t.pending}</p>
-          <p className="text-2xl font-bold text-yellow-700">{stats.Pending}</p>
+          <p className="text-2xl font-bold text-yellow-700">{stats.pending}</p>
         </motion.div>
         <motion.div
           whileHover={{ y: -2 }}
           className="bg-green-50 rounded-xl p-4 shadow-sm border border-green-200"
         >
           <p className="text-xs text-green-600">{t.approved}</p>
-          <p className="text-2xl font-bold text-green-700">{stats.Approved}</p>
+          <p className="text-2xl font-bold text-green-700">{stats.approved}</p>
         </motion.div>
         <motion.div
           whileHover={{ y: -2 }}
           className="bg-red-50 rounded-xl p-4 shadow-sm border border-red-200"
         >
           <p className="text-xs text-red-600">{t.rejected}</p>
-          <p className="text-2xl font-bold text-red-700">{stats.Rejected}</p>
+          <p className="text-2xl font-bold text-red-700">{stats.rejected}</p>
         </motion.div>
         <motion.div
           whileHover={{ y: -2 }}
           className="bg-blue-50 rounded-xl p-4 shadow-sm border border-blue-200"
         >
           <p className="text-xs text-blue-600">{t.completed}</p>
-          <p className="text-2xl font-bold text-blue-700">{stats.Completed}</p>
+          <p className="text-2xl font-bold text-blue-700">{stats.completed}</p>
         </motion.div>
       </div>
 
@@ -3230,10 +1136,10 @@ export const UserRequestManagement: React.FC = () => {
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
             >
               <option value="all">{t.filters.all}</option>
-              <option value="Pending">{t.filters.Pending}</option>
-              <option value="Approved">{t.filters.Approved}</option>
-              <option value="Rejected">{t.filters.Rejected}</option>
-              <option value="Completed">{t.filters.Completed}</option>
+              <option value="pending">{t.filters.pending}</option>
+              <option value="approved">{t.filters.approved}</option>
+              <option value="rejected">{t.filters.rejected}</option>
+              <option value="completed">{t.filters.completed}</option>
             </select>
             <button
               onClick={() => {
@@ -3342,7 +1248,7 @@ export const UserRequestManagement: React.FC = () => {
                         >
                           <VisibilityIcon className="w-4 h-4" />
                         </motion.button>
-                        {request.status === "Pending" && (
+                        {request.status === "pending" && (
                           <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
@@ -3377,179 +1283,6 @@ export const UserRequestManagement: React.FC = () => {
           </p>
         </div>
       </div>
-
-      {/* Create Request Modal */}
-      <AnimatePresence>
-        {isCreateModalOpen && (
-          <>
-            <motion.div
-              variants={overlayVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-              onClick={() => setIsCreateModalOpen(false)}
-            />
-            <motion.div
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 z-[101] flex items-center justify-center p-4"
-            >
-              <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white relative">
-                <div className="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl z-10">
-                  <div className="flex items-center gap-2">
-                    <SupportAgentIcon className="text-[#FF385C] w-5 h-5" />
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      {t.createRequestTitle}
-                    </h2>
-                  </div>
-                  <motion.button
-                    whileHover={{ rotate: 90, scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setIsCreateModalOpen(false)}
-                    className="p-1 rounded-full transition-colors hover:bg-gray-100 text-gray-500"
-                  >
-                    <CloseIcon className="w-5 h-5" />
-                  </motion.button>
-                </div>
-
-                <div className="p-6 space-y-4">
-                  {/* Name Field */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      {t.yourName} <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={createFormData.name}
-                      onChange={(e) =>
-                        handleCreateFormChange("name", e.target.value)
-                      }
-                      className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                        formErrors.name ? "border-red-500" : "border-gray-300"
-                      }`}
-                      placeholder="Enter your full name"
-                    />
-                    {formErrors.name && (
-                      <p className="mt-1 text-xs text-red-500">
-                        {formErrors.name}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Email Field */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      {t.yourEmail} <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      value={createFormData.email}
-                      onChange={(e) =>
-                        handleCreateFormChange("email", e.target.value)
-                      }
-                      className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm ${
-                        formErrors.email ? "border-red-500" : "border-gray-300"
-                      }`}
-                      placeholder="Enter your email address"
-                    />
-                    {formErrors.email && (
-                      <p className="mt-1 text-xs text-red-500">
-                        {formErrors.email}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Language Field */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      {t.language}
-                    </label>
-                    <select
-                      value={createFormData.language}
-                      onChange={(e) =>
-                        handleCreateFormChange("language", e.target.value)
-                      }
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
-                    >
-                      <option value="en">English</option>
-                      <option value="fr">Français</option>
-                      <option value="rw">Kinyarwanda</option>
-                    </select>
-                  </div>
-
-                  {/* Message Field */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      {t.yourMessage} <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      value={createFormData.message}
-                      onChange={(e) =>
-                        handleCreateFormChange("message", e.target.value)
-                      }
-                      rows={5}
-                      className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm resize-none ${
-                        formErrors.message
-                          ? "border-red-500"
-                          : "border-gray-300"
-                      }`}
-                      placeholder={t.messagePlaceholder}
-                    />
-                    <div className="flex justify-between mt-1">
-                      {formErrors.message ? (
-                        <p className="text-xs text-red-500">
-                          {formErrors.message}
-                        </p>
-                      ) : (
-                        <p className="text-xs text-gray-400">
-                          {createFormData.message.length}/1000 characters
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 pt-4 border-t border-gray-200">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleCreateRequest}
-                      disabled={isSubmitting}
-                      className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-colors flex items-center justify-center gap-2 ${
-                        isSubmitting
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-[#FF385C] hover:bg-[#E31C5F]"
-                      }`}
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          {t.submitting}
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-4 h-4" />
-                          {t.send}
-                        </>
-                      )}
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => setIsCreateModalOpen(false)}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-                    >
-                      {t.cancel}
-                    </motion.button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
 
       {/* View Request Modal */}
       <AnimatePresence>
@@ -3696,7 +1429,7 @@ export const UserRequestManagement: React.FC = () => {
                   </div>
 
                   <div className="flex gap-3 pt-4 border-t border-gray-200">
-                    {selectedRequest.status === "Pending" && (
+                    {selectedRequest.status === "pending" && (
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
@@ -3788,10 +1521,10 @@ export const UserRequestManagement: React.FC = () => {
                       onChange={(e) => setSelectedStatus(e.target.value)}
                       className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm bg-white"
                     >
-                      <option value="Pending">{t.statuses.Pending}</option>
-                      <option value="Approved">{t.statuses.Approved}</option>
-                      <option value="Rejected">{t.statuses.Rejected}</option>
-                      <option value="Completed">{t.statuses.Completed}</option>
+                      <option value="pending">{t.statuses.pending}</option>
+                      <option value="approved">{t.statuses.approved}</option>
+                      <option value="rejected">{t.statuses.rejected}</option>
+                      <option value="completed">{t.statuses.completed}</option>
                     </select>
                   </div>
 
