@@ -1,4 +1,3 @@
-
 /* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
@@ -20425,2967 +20424,6 @@ interface HeroProps {
   onSearch?: (params: any) => void;
 }
 
-
-// export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
-//   const [language, setLanguage] = useState<"en" | "fr" | "rw">(
-//     getLanguageFromCookies(),
-//   );
-//   const t = getTranslations(language);
-
-//   // ===== Auth State =====
-//   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
-//     return !!localStorage.getItem("token");
-//   });
-//   const [isLoginRegisterOpen, setIsLoginRegisterOpen] = useState(false);
-//   const [loginRegisterMode, setLoginRegisterMode] = useState<
-//     "login" | "register"
-//   >("login");
-
-//   // ===== Houses State =====
-//   const [houses, setHouses] = useState<ApiHouse[]>([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState<string | null>(null);
-
-//   // ===== Price Categories =====
-//   const priceCategories = getPriceCategories(t);
-//   const [selectedPriceCategory, setSelectedPriceCategory] =
-//     useState<PriceCategory>("all");
-
-//   // ===== Search/Filter State =====
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const [selectedUniversity, setSelectedUniversity] = useState("");
-//   const [selectedDistrict, setSelectedDistrict] = useState("");
-//   const [selectedSector, setSelectedSector] = useState("");
-//   const [selectedCell, setSelectedCell] = useState("");
-//   const [selectedVillage, setSelectedVillage] = useState("");
-//   const [maxMinutesFromCampus, setMaxMinutesFromCampus] = useState<number>(30);
-//   const [isAdvancedSearchOpen, setIsAdvancedSearchOpen] = useState(false);
-//   const [minPrice, setMinPrice] = useState<number>(0);
-//   const [maxPrice, setMaxPrice] = useState<number>(200000);
-//   const [sortOption, setSortOption] = useState<string>("");
-//   const [filteredHouses, setFilteredHouses] = useState<ApiHouse[]>([]);
-
-//   // ===== Modal States =====
-//   const [isUniversityModalOpen, setIsUniversityModalOpen] = useState(false);
-//   const [isDistrictModalOpen, setIsDistrictModalOpen] = useState(false);
-//   const [isSectorModalOpen, setIsSectorModalOpen] = useState(false);
-//   const [isCellModalOpen, setIsCellModalOpen] = useState(false);
-//   const [isVillageModalOpen, setIsVillageModalOpen] = useState(false);
-//   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
-//   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-//   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-//   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-//   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-//   const [selectedHouse, setSelectedHouse] = useState<ApiHouse | null>(null);
-//   const [favorites, setFavorites] = useState<string[]>(() => {
-//     const saved = localStorage.getItem("favorites");
-//     return saved ? JSON.parse(saved) : [];
-//   });
-
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const itemsPerPage = 9;
-
-//   // ===== Booking State =====
-//   const [submitting, setSubmitting] = useState(false);
-//   const [currentStep, setCurrentStep] = useState(1);
-
-//   // ===== Store pending house for after login =====
-//   const [pendingHouse, setPendingHouse] = useState<ApiHouse | null>(null);
-//   // ===== Track if booking was just completed =====
-//   const [bookingJustCompleted, setBookingJustCompleted] = useState(false);
-//   // ===== Track pending booking ID for payment verification =====
-//   const [pendingBookingId, setPendingBookingId] = useState<string | null>(null);
-
-//   const [bookingData, setBookingData] = useState<BookingData>({
-//     step1: {
-//       fullName: "",
-//       email: "",
-//       phone: "",
-//       idNumber: "",
-//       university: "",
-//       studentId: "",
-//       purpose: "",
-//     },
-//     step2: {
-//       checkIn: "",
-//       checkOut: "",
-//       months: 1,
-//       guests: 1,
-//       specialRequests: "",
-//     },
-//     step3: {
-//       paymentMethod: "momo",
-//       momoNumber: "",
-//       screenshot: null,
-//       screenshotPreview: "",
-//       screenshotFile: null,
-//     },
-//   });
-
-//   // ============================================================
-//   // FETCH HOUSES FROM API
-//   // ============================================================
-
-//   useEffect(() => {
-//     const fetchHouses = async () => {
-//       try {
-//         setLoading(true);
-//         setError(null);
-//         const response = await API.get("/houses");
-
-//         if (response.data.success) {
-//           let housesData = response.data.data;
-
-//           if (language !== "en") {
-//             const translatedHouses = [];
-
-//             for (const house of housesData) {
-//               try {
-//                 const translatedHouse = {
-//                   ...house,
-//                   name: await translateContent(house.name, language),
-//                   description: await translateContent(
-//                     house.description,
-//                     language,
-//                   ),
-//                   university: await translateContent(
-//                     house.university,
-//                     language,
-//                   ),
-//                   location: {
-//                     ...house.location,
-//                     province: await translateContent(
-//                       house.location.province,
-//                       language,
-//                     ),
-//                     district: await translateContent(
-//                       house.location.district,
-//                       language,
-//                     ),
-//                     sector: await translateContent(
-//                       house.location.sector,
-//                       language,
-//                     ),
-//                     cell: await translateContent(house.location.cell, language),
-//                     village: await translateContent(
-//                       house.location.village,
-//                       language,
-//                     ),
-//                   },
-//                   amenities: await Promise.all(
-//                     house.amenities.map((amenity: string) =>
-//                       translateContent(amenity, language),
-//                     ),
-//                   ),
-//                   host: house.host || {
-//                     name: "",
-//                     email: "",
-//                     phone: "",
-//                     responseRate: 0,
-//                     responseTime: "",
-//                   },
-//                 };
-//                 translatedHouses.push(translatedHouse);
-//               } catch (err) {
-//                 translatedHouses.push({
-//                   ...house,
-//                   host: house.host || {
-//                     name: "",
-//                     email: "",
-//                     phone: "",
-//                     responseRate: 0,
-//                     responseTime: "",
-//                   },
-//                 });
-//               }
-//             }
-//             housesData = translatedHouses;
-//           } else {
-//             housesData = housesData.map((house: ApiHouse) => ({
-//               ...house,
-//               host: house.host || {
-//                 name: "",
-//                 email: "",
-//                 phone: "",
-//                 responseRate: 0,
-//                 responseTime: "",
-//               },
-//             }));
-//           }
-
-//           setHouses(housesData);
-//           setFilteredHouses(housesData);
-//         } else {
-//           setError("Failed to fetch houses");
-//           toast.error("Failed to load houses. Please try again.");
-//         }
-//       } catch (err) {
-//         setError("Failed to load houses. Please check your connection.");
-//         toast.error("Failed to load houses. Please try again.");
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchHouses();
-//   }, [language]);
-
-//   // ===== Booking Validation =====
-//   const isBookingStep1Valid = (): boolean => {
-//     const { fullName, email, phone } = bookingData.step1;
-//     return (
-//       fullName.trim().length >= 2 &&
-//       validateEmail(email) &&
-//       validatePhone(phone)
-//     );
-//   };
-
-//   const isBookingStep2Valid = (): boolean => {
-//     const { checkIn, checkOut, months, guests } = bookingData.step2;
-//     return (
-//       checkIn.length > 0 && checkOut.length > 0 && months > 0 && guests > 0
-//     );
-//   };
-
-//   const isBookingStep3Valid = (): boolean => {
-//     const { momoNumber, screenshotPreview } = bookingData.step3;
-//     return validatePhone(momoNumber) && screenshotPreview.length > 0;
-//   };
-
-//   // ===== Check login status =====
-//   useEffect(() => {
-//     const checkAuth = () => {
-//       const token = localStorage.getItem("token");
-//       setIsLoggedIn(!!token);
-//     };
-//     checkAuth();
-//     const handleStorageChange = () => checkAuth();
-//     window.addEventListener("storage", handleStorageChange);
-//     return () => window.removeEventListener("storage", handleStorageChange);
-//   }, []);
-
-//   // ===== Listen for language changes =====
-//   useEffect(() => {
-//     const handleCookieChange = () => {
-//       const newLang = getLanguageFromCookies();
-//       if (newLang !== language) {
-//         setLanguage(newLang);
-//       }
-//     };
-//     const interval = setInterval(handleCookieChange, 1000);
-//     return () => clearInterval(interval);
-//   }, [language]);
-
-//   // ============================================================
-//   // UPDATE HOUSE STATUS TO BOOKED - OPTIMIZED WITH TIMEOUT
-//   // ============================================================
-//   const updateHouseStatusToBooked = async (houseId: string): Promise<boolean> => {
-//     try {
-//       // Add timeout to prevent hanging
-//       const controller = new AbortController();
-//       const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-      
-//       const response = await API.put(`/houses/${houseId}/status`, {
-//         status: "booked",
-//       }, {
-//         signal: controller.signal
-//       });
-      
-//       clearTimeout(timeoutId);
-      
-//       if (response.data.success) {
-//         // Update local state immediately
-//         setHouses((prevHouses) =>
-//           prevHouses.map((h) =>
-//             h._id === houseId ? { ...h, status: "booked" } : h,
-//           ),
-//         );
-        
-//         setFilteredHouses((prevHouses) =>
-//           prevHouses.map((h) =>
-//             h._id === houseId ? { ...h, status: "booked" } : h,
-//           ),
-//         );
-        
-//         if (selectedHouse?._id === houseId) {
-//           setSelectedHouse((prev) => prev ? { ...prev, status: "booked" } : null);
-//         }
-        
-//         return true;
-//       }
-//       return false;
-//     } catch (error) {
-//       console.error('Error updating house status:', error);
-//       return false;
-//     }
-//   };
-
-//   // ============================================================
-//   // OPTIMIZED: Only update the specific house, not all houses
-//   // ============================================================
-//   const updateSingleHouseStatus = (houseId: string, status: string) => {
-//     setHouses((prevHouses) =>
-//       prevHouses.map((h) =>
-//         h._id === houseId ? { ...h, status: status } : h,
-//       ),
-//     );
-//     setFilteredHouses((prevHouses) =>
-//       prevHouses.map((h) =>
-//         h._id === houseId ? { ...h, status: status } : h,
-//       ),
-//     );
-//     if (selectedHouse?._id === houseId) {
-//       setSelectedHouse((prev) => prev ? { ...prev, status: status as any } : null);
-//     }
-//   };
-
-//   // ============================================================
-//   // POLL PAYMENT STATUS - WITH OPTIMIZED POLLING
-//   // ============================================================
-//   useEffect(() => {
-//     if (!pendingBookingId || !selectedHouse?._id) return;
-    
-//     let pollInterval: NodeJS.Timeout;
-//     let attempts = 0;
-//     const maxAttempts = 30; // Reduced from 60 to 30 (2.5 minutes)
-    
-//     const checkPaymentStatus = async () => {
-//       try {
-//         attempts++;
-        
-//         const response = await API.get(`/bookings/${pendingBookingId}/payment-status`);
-        
-//         if (response.data.success) {
-//           const { isVerified } = response.data.data;
-          
-//           if (isVerified) {
-//             toast.success("✅ Payment verified successfully!");
-//             clearInterval(pollInterval);
-//             setPendingBookingId(null);
-//             setBookingJustCompleted(false);
-            
-//             if (isSuccessModalOpen) {
-//               setIsSuccessModalOpen(false);
-//               setTimeout(() => {
-//                 setIsPropertyModalOpen(true);
-//               }, 300);
-//             }
-//           }
-          
-//           if (attempts >= maxAttempts) {
-//             clearInterval(pollInterval);
-//             setPendingBookingId(null);
-//             toast.warning('Payment verification is taking longer than expected. Your booking is confirmed.');
-//           }
-//         }
-//       } catch (error) {
-//         // Silent fail
-//       }
-//     };
-    
-//     pollInterval = setInterval(checkPaymentStatus, 5000);
-//     checkPaymentStatus();
-    
-//     return () => {
-//       clearInterval(pollInterval);
-//     };
-//   }, [pendingBookingId, selectedHouse?._id]);
-
-//   // ===== Filter houses =====
-//   useEffect(() => {
-//     let filtered = [...houses];
-
-//     if (selectedPriceCategory !== "all") {
-//       const category = priceCategories.find(
-//         (c) => c.id === selectedPriceCategory,
-//       );
-//       if (category) {
-//         filtered = filtered.filter(
-//           (h) =>
-//             h.pricePerMonth >= category.min && h.pricePerMonth <= category.max,
-//         );
-//       }
-//     }
-
-//     if (searchQuery.trim()) {
-//       const query = searchQuery.toLowerCase().trim();
-//       filtered = filtered.filter(
-//         (h) =>
-//           h.name.toLowerCase().includes(query) ||
-//           h.description?.toLowerCase().includes(query) ||
-//           h.university.toLowerCase().includes(query) ||
-//           h.location.district.toLowerCase().includes(query) ||
-//           h.location.sector.toLowerCase().includes(query) ||
-//           h.location.cell.toLowerCase().includes(query) ||
-//           h.location.village.toLowerCase().includes(query) ||
-//           h.location.province.toLowerCase().includes(query) ||
-//           h.houseId?.includes(query),
-//       );
-//     }
-
-//     if (selectedUniversity) {
-//       filtered = filtered.filter((h) => h.university === selectedUniversity);
-//     }
-
-//     if (selectedDistrict) {
-//       filtered = filtered.filter(
-//         (h) => h.location.district === selectedDistrict,
-//       );
-//     }
-
-//     if (selectedSector) {
-//       filtered = filtered.filter((h) => h.location.sector === selectedSector);
-//     }
-
-//     if (selectedCell) {
-//       filtered = filtered.filter((h) => h.location.cell === selectedCell);
-//     }
-
-//     if (selectedVillage) {
-//       filtered = filtered.filter((h) => h.location.village === selectedVillage);
-//     }
-
-//     if (minPrice > 0) {
-//       filtered = filtered.filter((h) => h.pricePerMonth >= minPrice);
-//     }
-//     if (maxPrice < 200000) {
-//       filtered = filtered.filter((h) => h.pricePerMonth <= maxPrice);
-//     }
-
-//     if (sortOption === "priceLowHigh") {
-//       filtered.sort((a, b) => a.pricePerMonth - b.pricePerMonth);
-//     } else if (sortOption === "priceHighLow") {
-//       filtered.sort((a, b) => b.pricePerMonth - a.pricePerMonth);
-//     } else if (sortOption === "ratingHighLow") {
-//       filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-//     }
-
-//     setFilteredHouses(filtered);
-//   }, [
-//     selectedPriceCategory,
-//     priceCategories,
-//     houses,
-//     searchQuery,
-//     selectedUniversity,
-//     selectedDistrict,
-//     selectedSector,
-//     selectedCell,
-//     selectedVillage,
-//     maxMinutesFromCampus,
-//     minPrice,
-//     maxPrice,
-//     sortOption,
-//   ]);
-
-//   // ===== Reset to page 1 when filters change =====
-//   useEffect(() => {
-//     setCurrentPage(1);
-//   }, [
-//     selectedPriceCategory,
-//     searchQuery,
-//     selectedUniversity,
-//     selectedDistrict,
-//     selectedSector,
-//     selectedCell,
-//     selectedVillage,
-//     maxMinutesFromCampus,
-//     minPrice,
-//     maxPrice,
-//     sortOption,
-//   ]);
-
-//   // ===== Save favorites =====
-//   useEffect(() => {
-//     localStorage.setItem("favorites", JSON.stringify(favorites));
-//   }, [favorites]);
-
-//   // ===== Body scroll lock =====
-//   useEffect(() => {
-//     const isAnyModalOpen =
-//       isPropertyModalOpen ||
-//       isImageModalOpen ||
-//       isBookingModalOpen ||
-//       isLoginRegisterOpen ||
-//       isUniversityModalOpen ||
-//       isDistrictModalOpen ||
-//       isSectorModalOpen ||
-//       isCellModalOpen ||
-//       isVillageModalOpen ||
-//       isSuccessModalOpen;
-
-//     if (isAnyModalOpen) {
-//       document.body.style.overflow = "hidden";
-//     } else {
-//       document.body.style.overflow = "auto";
-//     }
-//     return () => {
-//       document.body.style.overflow = "auto";
-//     };
-//   }, [
-//     isPropertyModalOpen,
-//     isImageModalOpen,
-//     isBookingModalOpen,
-//     isLoginRegisterOpen,
-//     isUniversityModalOpen,
-//     isDistrictModalOpen,
-//     isSectorModalOpen,
-//     isCellModalOpen,
-//     isVillageModalOpen,
-//     isSuccessModalOpen,
-//   ]);
-
-//   // ===== Booking Handlers =====
-//   const handleStep1Change = (field: string, value: string) => {
-//     setBookingData({
-//       ...bookingData,
-//       step1: { ...bookingData.step1, [field]: value },
-//     });
-//   };
-
-//   const handleStep2Change = (field: string, value: any) => {
-//     setBookingData({
-//       ...bookingData,
-//       step2: { ...bookingData.step2, [field]: value },
-//     });
-//   };
-
-//   const handleStep3Change = (field: string, value: any) => {
-//     setBookingData({
-//       ...bookingData,
-//       step3: { ...bookingData.step3, [field]: value },
-//     });
-//   };
-
-//   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const file = e.target.files?.[0];
-//     if (!file) return;
-
-//     if (file.size > 5 * 1024 * 1024) {
-//       toast.error("File size must be less than 5MB");
-//       return;
-//     }
-
-//     const reader = new FileReader();
-//     reader.onloadend = () => {
-//       const preview = reader.result as string;
-//       setBookingData({
-//         ...bookingData,
-//         step3: {
-//           ...bookingData.step3,
-//           screenshot: file,
-//           screenshotFile: file,
-//           screenshotPreview: preview,
-//         },
-//       });
-//     };
-//     reader.readAsDataURL(file);
-//   };
-
-//   const nextStep = () => {
-//     if (currentStep === 1 && !isBookingStep1Valid()) {
-//       toast.warning(
-//         t.pleaseFillAllFields || "Please fill in all required fields",
-//       );
-//       return;
-//     }
-//     if (currentStep === 2 && !isBookingStep2Valid()) {
-//       toast.warning(
-//         t.pleaseFillAllFields || "Please fill in all required fields",
-//       );
-//       return;
-//     }
-//     setCurrentStep(currentStep + 1);
-//   };
-
-//   const prevStep = () => {
-//     setCurrentStep(currentStep - 1);
-//   };
-
-//   // ============================================================
-//   // OPTIMIZED: Handle Submit Booking - Parallel API calls
-//   // ============================================================
-//   const handleSubmitBooking = async () => {
-//     if (currentStep !== 3) return;
-
-//     if (!isBookingStep3Valid()) {
-//       toast.warning(
-//         t.pleaseFillAllFields || "Please fill in all required fields",
-//       );
-//       return;
-//     }
-
-//     setSubmitting(true);
-//     setBookingJustCompleted(false);
-
-//     try {
-//       const serviceFee = calculateServiceFee(selectedHouse?.pricePerMonth || 0);
-
-//       const formData = new FormData();
-
-//       formData.append("fullName", bookingData.step1.fullName);
-//       formData.append("email", bookingData.step1.email);
-//       formData.append("phone", bookingData.step1.phone);
-//       formData.append("idNumber", bookingData.step1.idNumber || "");
-//       formData.append("university", bookingData.step1.university || "");
-//       formData.append("studentId", bookingData.step1.studentId || "");
-//       formData.append("purpose", bookingData.step1.purpose || "");
-
-//       formData.append("houseId", selectedHouse?._id || "");
-//       formData.append("houseName", selectedHouse?.name || "");
-//       formData.append("houseType", "House");
-//       formData.append("district", selectedHouse?.location.district || "");
-//       formData.append("sector", selectedHouse?.location.sector || "");
-//       formData.append("cell", selectedHouse?.location.cell || "");
-//       formData.append("village", selectedHouse?.location.village || "");
-
-//       const hostName = selectedHouse?.host?.name || "Not specified";
-//       const hostPhone = selectedHouse?.host?.phone || "Not specified";
-//       const hostEmail = selectedHouse?.host?.email || "Not specified";
-
-//       formData.append("ownerName", hostName);
-//       formData.append("ownerContact", hostPhone);
-//       formData.append("ownerEmail", hostEmail);
-
-//       formData.append(
-//         "hostData",
-//         JSON.stringify({
-//           name: hostName,
-//           phone: hostPhone,
-//           email: hostEmail,
-//           responseRate: selectedHouse?.host?.responseRate || 0,
-//           responseTime: selectedHouse?.host?.responseTime || "",
-//         }),
-//       );
-
-//       formData.append("checkIn", bookingData.step2.checkIn);
-//       formData.append("checkOut", bookingData.step2.checkOut);
-//       formData.append("months", String(bookingData.step2.months));
-//       formData.append("guests", String(bookingData.step2.guests));
-//       formData.append(
-//         "specialRequests",
-//         bookingData.step2.specialRequests || "",
-//       );
-
-//       formData.append("monthlyRent", String(selectedHouse?.pricePerMonth || 0));
-//       formData.append("serviceFee", String(serviceFee));
-//       formData.append("totalAmount", String(serviceFee));
-//       formData.append("paymentMethod", "momo");
-//       formData.append("momoNumber", bookingData.step3.momoNumber || "");
-
-//       if (bookingData.step3.screenshotFile) {
-//         formData.append("paymentScreenshot", bookingData.step3.screenshotFile);
-//       }
-
-//       // ✅ Create booking and update status in parallel for speed
-//       const houseId = selectedHouse?._id;
-      
-//       // Start both requests in parallel
-//       const [bookingResponse, statusResponse] = await Promise.all([
-//         API.post("/bookings", formData, {
-//           headers: {
-//             "Content-Type": "multipart/form-data",
-//           },
-//         }),
-//         houseId ? updateHouseStatusToBooked(houseId) : Promise.resolve(false)
-//       ]);
-
-//       if (bookingResponse.data.success) {
-//         const bookingId = bookingResponse.data.data._id;
-//         setPendingBookingId(bookingId);
-        
-//         // Update local state immediately
-//         if (houseId) {
-//           updateSingleHouseStatus(houseId, "booked");
-//         }
-        
-//         setBookingJustCompleted(true);
-//         setIsBookingModalOpen(false);
-//         setIsSuccessModalOpen(true);
-//         setCurrentStep(1);
-//         resetBookingData();
-//         toast.success("✅ Booking confirmed! House is now booked.");
-        
-//       } else {
-//         throw new Error(bookingResponse.data.message || "Failed to create booking");
-//       }
-//     } catch (error: any) {
-//       const errorMsg =
-//         error.response?.data?.message ||
-//         error.message ||
-//         "Failed to confirm booking";
-//       toast.error(`❌ ${t.bookingFailed || "Failed to confirm booking"}: ${errorMsg}`);
-//     } finally {
-//       setSubmitting(false);
-//     }
-//   };
-
-//   const resetBookingData = () => {
-//     setBookingData({
-//       step1: {
-//         fullName: "",
-//         email: "",
-//         phone: "",
-//         idNumber: "",
-//         university: "",
-//         studentId: "",
-//         purpose: "",
-//       },
-//       step2: {
-//         checkIn: "",
-//         checkOut: "",
-//         months: 1,
-//         guests: 1,
-//         specialRequests: "",
-//       },
-//       step3: {
-//         paymentMethod: "momo",
-//         momoNumber: "",
-//         screenshot: null,
-//         screenshotPreview: "",
-//         screenshotFile: null,
-//       },
-//     });
-//   };
-
-//   // ===== Handle Book Now Click =====
-//   const handleBookNow = (house: ApiHouse) => {
-//     if (house.status === 'booked') {
-//       toast.warning("This house is already booked!");
-//       return;
-//     }
-    
-//     if (isLoggedIn) {
-//       setSelectedHouse(house);
-//       setCurrentStep(1);
-//       resetBookingData();
-//       setIsBookingModalOpen(true);
-//     } else {
-//       setPendingHouse(house);
-//       setSelectedHouse(house);
-//       setIsPropertyModalOpen(false);
-//       setLoginRegisterMode("login");
-//       setIsLoginRegisterOpen(true);
-//     }
-//   };
-
-//   // ===== Handle Login Success =====
-//   const handleLoginSuccess = () => {
-//     setIsLoggedIn(true);
-//     setIsLoginRegisterOpen(false);
-    
-//     if (pendingHouse) {
-//       setTimeout(() => {
-//         setSelectedHouse(pendingHouse);
-//         setCurrentStep(1);
-//         resetBookingData();
-//         setIsBookingModalOpen(true);
-//         setPendingHouse(null);
-//       }, 300);
-//     }
-//   };
-
-//   // ===== Handle Success Modal Close =====
-//   const handleSuccessModalClose = () => {
-//     setIsSuccessModalOpen(false);
-    
-//     if (bookingJustCompleted && selectedHouse) {
-//       setTimeout(() => {
-//         setIsPropertyModalOpen(true);
-//         setBookingJustCompleted(false);
-//       }, 300);
-//     }
-//   };
-
-//   // ===== UI Handlers =====
-//   const totalPages = Math.ceil(filteredHouses.length / itemsPerPage);
-//   const paginatedHouses = filteredHouses.slice(
-//     (currentPage - 1) * itemsPerPage,
-//     currentPage * itemsPerPage,
-//   );
-
-//   const goToPage = (page: number) => {
-//     setCurrentPage(page);
-//     window.scrollTo({ top: 0, behavior: "smooth" });
-//   };
-
-//   const handleSearch = () => {
-//     const searchParams = {
-//       university: selectedUniversity,
-//       district: selectedDistrict,
-//       sector: selectedSector,
-//       cell: selectedCell,
-//       village: selectedVillage,
-//       maxMinutes: maxMinutesFromCampus,
-//       minPrice,
-//       maxPrice,
-//       sort: sortOption,
-//       priceCategory: selectedPriceCategory,
-//     };
-
-//     if (onSearch) {
-//       onSearch(searchParams);
-//     }
-
-//     toast.info(
-//       `🔍 ${t.search}: ${selectedUniversity || selectedDistrict || selectedSector || selectedCell || selectedVillage || "All locations in Rwanda"}`,
-//     );
-//     setIsUniversityModalOpen(false);
-//     setIsDistrictModalOpen(false);
-//     setIsSectorModalOpen(false);
-//     setIsCellModalOpen(false);
-//     setIsVillageModalOpen(false);
-//     setIsAdvancedSearchOpen(false);
-//   };
-
-//   const clearAllFilters = () => {
-//     setSearchQuery("");
-//     setSelectedPriceCategory("all");
-//     setSelectedUniversity("");
-//     setSelectedDistrict("");
-//     setSelectedSector("");
-//     setSelectedCell("");
-//     setSelectedVillage("");
-//     setMaxMinutesFromCampus(30);
-//     setMinPrice(0);
-//     setMaxPrice(200000);
-//     setSortOption("");
-//     setCurrentPage(1);
-//     toast.info("🧹 All filters cleared");
-//   };
-
-//   const toggleFavorite = (houseId: string) => {
-//     setFavorites((prev) => {
-//       if (prev.includes(houseId)) {
-//         toast.info(`💔 ${t.removeFavorite}`);
-//         return prev.filter((id) => id !== houseId);
-//       } else {
-//         toast.success(`❤️ ${t.addFavorite}`);
-//         return [...prev, houseId];
-//       }
-//     });
-//   };
-
-//   const openHouseModal = (house: ApiHouse) => {
-//     setSelectedHouse(house);
-//     setCurrentImageIndex(0);
-//     setIsPropertyModalOpen(true);
-//   };
-
-//   const closeHouseModal = () => {
-//     setIsPropertyModalOpen(false);
-//     if (!bookingJustCompleted) {
-//       setSelectedHouse(null);
-//     }
-//   };
-
-//   const openImageModal = (index: number) => {
-//     setCurrentImageIndex(index);
-//     setIsImageModalOpen(true);
-//   };
-
-//   const closeImageModal = () => {
-//     setIsImageModalOpen(false);
-//   };
-
-//   const getTranslatedType = (type: string) => {
-//     if (type === "Room") return t.room;
-//     if (type === "Apartment") return t.apartment;
-//     if (type === "House") return "House";
-//     return type;
-//   };
-
-//   const getLocationInfo = (house: ApiHouse) => {
-//     let location = `${house.location.village}, ${house.location.cell}, ${house.location.sector}, ${house.location.district} (${house.location.province})`;
-//     if (house.houseId) {
-//       location += ` • Code: ${house.houseId}`;
-//     }
-//     return location;
-//   };
-
-//   const getUniversityColor = (university: string) => {
-//     const colors: { [key: string]: string } = {
-//       "UR - CST (Science & Tech)": "bg-blue-100 text-blue-800",
-//       "UR - CBE (Business & Econ)": "bg-yellow-100 text-yellow-800",
-//       "UR - CMHS (Health Sciences)": "bg-red-100 text-red-800",
-//       "IPRC Kigali": "bg-orange-100 text-orange-800",
-//       "University of Kigali (UoK)": "bg-cyan-100 text-cyan-800",
-//       "Kigali Independent Univ. (ULK)": "bg-amber-100 text-amber-800",
-//       "Adventist Univ. (AUCA)": "bg-lime-100 text-lime-800",
-//       "Carnegie Mellon (CMU-Africa)": "bg-cyan-100 text-cyan-800",
-//       "African Leadership Univ. (ALU)": "bg-indigo-100 text-indigo-800",
-//       "JKUAT - Rwanda Campus": "bg-blue-100 text-blue-800",
-//       "Mount Kigali University": "bg-purple-100 text-purple-800",
-//       "UR - Huye Campus": "bg-purple-100 text-purple-800",
-//       "IPRC Huye": "bg-pink-100 text-pink-800",
-//       "Catholic Institute (ICK)": "bg-rose-100 text-rose-800",
-//       "University of Gitwe": "bg-emerald-100 text-emerald-800",
-//       "Catholic University of Rwanda": "bg-rose-100 text-rose-800",
-//       "ILPD (Law Institute)": "bg-amber-100 text-amber-800",
-//       "UR - CAVM (Agriculture)": "bg-green-100 text-green-800",
-//       "IPRC Musanze": "bg-orange-100 text-orange-800",
-//       "INES-Ruhengeri": "bg-blue-100 text-blue-800",
-//       "Univ. of Global Health Equity": "bg-sky-100 text-sky-800",
-//       "Univ. of Tech & Arts (UTAB)": "bg-violet-100 text-violet-800",
-//       "IPRC Tumba": "bg-fuchsia-100 text-fuchsia-800",
-//       "UR - CE (Education)": "bg-indigo-100 text-indigo-800",
-//       "UR - Nyagatare Campus": "bg-teal-100 text-teal-800",
-//       "IPRC Ngoma": "bg-rose-100 text-rose-800",
-//       "RICA (Conservation Agric.)": "bg-lime-100 text-lime-800",
-//       "Rwanda Military Academy": "bg-stone-100 text-stone-800",
-//       "IPRC Karongi": "bg-rose-100 text-rose-800",
-//       "IPRC Rusizi": "bg-teal-100 text-teal-800",
-//       "UTB (Tourism & Business)": "bg-slate-100 text-slate-800",
-//       "Kibogora Polytechnic": "bg-emerald-100 text-emerald-800",
-//     };
-//     return colors[university] || "bg-gray-100 text-gray-800";
-//   };
-
-//   const getStatusColor = (status: string) => {
-//     switch (status) {
-//       case "available":
-//         return "bg-green-100 text-green-800";
-//       case "booked":
-//         return "bg-red-100 text-red-800";
-//       case "pending":
-//         return "bg-yellow-100 text-yellow-800";
-//       default:
-//         return "bg-gray-100 text-gray-800";
-//     }
-//   };
-
-//   const getStatusText = (status: string) => {
-//     switch (status) {
-//       case "available":
-//         return t.statusAvailable;
-//       case "booked":
-//         return t.statusBooked;
-//       case "pending":
-//         return t.statusPending;
-//       default:
-//         return status;
-//     }
-//   };
-
-//   // Unique values for filters
-//   const uniqueUniversities = [...new Set(houses.map((h) => h.university))];
-
-//   const getSectorsForDistrict = (district: string): string[] => {
-//     if (!district) return [];
-//     return ALL_SECTORS[district] || [];
-//   };
-
-//   const getCellsForSector = (sector: string): string[] => {
-//     if (!sector) return [];
-//     return ALL_CELLS[sector] || [];
-//   };
-
-//   const getVillagesForCell = (cell: string): string[] => {
-//     if (!cell) return [];
-//     return ALL_VILLAGES[cell] || [];
-//   };
-
-//   const getCategoryCount = (categoryId: PriceCategory) => {
-//     if (categoryId === "all") return houses.length;
-//     const category = priceCategories.find((c) => c.id === categoryId);
-//     if (!category) return 0;
-//     return houses.filter(
-//       (h) => h.pricePerMonth >= category.min && h.pricePerMonth <= category.max,
-//     ).length;
-//   };
-
-//   const getServiceFee = (): number => {
-//     return calculateServiceFee(selectedHouse?.pricePerMonth || 0);
-//   };
-
-//   const getUssdCode = (): string => {
-//     const fee = getServiceFee();
-//     return `*182*8*1*6377827*${fee}#`;
-//   };
-
-//   // Animation variants
-//   const modalVariants = {
-//     hidden: { opacity: 0, scale: 0.8, y: 30 },
-//     visible: { opacity: 1, scale: 1, y: 0 },
-//     exit: { opacity: 0, scale: 0.8, y: 30 },
-//   };
-
-//   const overlayVariants = {
-//     hidden: { opacity: 0 },
-//     visible: { opacity: 1 },
-//     exit: { opacity: 0 },
-//   };
-
-//   // Loading state
-//   if (loading) {
-//     return (
-//       <div className="w-full mb-4 rounded-2xl">
-//         <div className="flex items-center justify-center min-h-[400px]">
-//           <div className="text-center">
-//             <div className="w-12 h-12 border-4 border-[#FF385C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-//             <p className="text-gray-500">{t.loading || "Loading houses..."}</p>
-//           </div>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   // Error state
-//   if (error) {
-//     return (
-//       <div className="w-full mb-4 rounded-2xl">
-//         <div className="flex items-center justify-center min-h-[400px]">
-//           <div className="text-center">
-//             <p className="text-red-500 mb-4">{error}</p>
-//             <button
-//               onClick={() => window.location.reload()}
-//               className="px-4 py-2 bg-[#FF385C] text-white rounded-lg hover:bg-[#E31C5F] transition-colors"
-//             >
-//               Retry
-//             </button>
-//           </div>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <>
-//       {/* Login/Register Modal */}
-//       <LoginRegisterModal
-//         isOpen={isLoginRegisterOpen}
-//         onClose={() => {
-//           setIsLoginRegisterOpen(false);
-//           setPendingHouse(null);
-//         }}
-//         onSuccess={handleLoginSuccess}
-//         defaultMode={loginRegisterMode}
-//       />
-
-//       {/* Selection Modals */}
-//       <SelectionModal
-//         isOpen={isUniversityModalOpen}
-//         onClose={() => setIsUniversityModalOpen(false)}
-//         onSelect={(value) => {
-//           setSelectedUniversity(value);
-//           setSearchQuery(value);
-//           setSelectedDistrict("");
-//           setSelectedSector("");
-//           setSelectedCell("");
-//           setSelectedVillage("");
-//           setCurrentPage(1);
-//           handleSearch();
-//         }}
-//         title={t.university}
-//         icon={<SchoolIcon className="w-5 h-5 text-[#FF385C]" />}
-//         items={uniqueUniversities}
-//         searchPlaceholder={t.searchByUniversity || "Search universities..."}
-//         selectedValue={selectedUniversity}
-//         searchQuery={searchQuery}
-//         setSearchQuery={setSearchQuery}
-//       />
-
-//       <SelectionModal
-//         isOpen={isDistrictModalOpen}
-//         onClose={() => setIsDistrictModalOpen(false)}
-//         onSelect={(value) => {
-//           setSelectedDistrict(value);
-//           setSelectedSector("");
-//           setSelectedCell("");
-//           setSelectedVillage("");
-//           setSearchQuery(value);
-//           setCurrentPage(1);
-//           handleSearch();
-//         }}
-//         title={t.district}
-//         icon={<LocationCityIcon className="w-5 h-5 text-[#FF385C]" />}
-//         items={ALL_DISTRICTS}
-//         searchPlaceholder={t.searchDestinations || "Search districts..."}
-//         selectedValue={selectedDistrict}
-//         searchQuery={searchQuery}
-//         setSearchQuery={setSearchQuery}
-//       />
-
-//       <SelectionModal
-//         isOpen={isSectorModalOpen}
-//         onClose={() => setIsSectorModalOpen(false)}
-//         onSelect={(value) => {
-//           setSelectedSector(value);
-//           setSelectedCell("");
-//           setSelectedVillage("");
-//           setSearchQuery(value);
-//           setCurrentPage(1);
-//           handleSearch();
-//         }}
-//         title={t.sector}
-//         icon={<ApartmentIcon className="w-5 h-5 text-[#FF385C]" />}
-//         items={getSectorsForDistrict(selectedDistrict)}
-//         searchPlaceholder={t.selectSector || "Search sectors..."}
-//         selectedValue={selectedSector}
-//         searchQuery={searchQuery}
-//         setSearchQuery={setSearchQuery}
-//       />
-
-//       <SelectionModal
-//         isOpen={isCellModalOpen}
-//         onClose={() => setIsCellModalOpen(false)}
-//         onSelect={(value) => {
-//           setSelectedCell(value);
-//           setSelectedVillage("");
-//           setSearchQuery(value);
-//           setCurrentPage(1);
-//           handleSearch();
-//         }}
-//         title={t.cell}
-//         icon={<DomainIcon className="w-5 h-5 text-[#FF385C]" />}
-//         items={getCellsForSector(selectedSector)}
-//         searchPlaceholder={t.selectCell || "Search cells..."}
-//         selectedValue={selectedCell}
-//         searchQuery={searchQuery}
-//         setSearchQuery={setSearchQuery}
-//       />
-
-//       <SelectionModal
-//         isOpen={isVillageModalOpen}
-//         onClose={() => setIsVillageModalOpen(false)}
-//         onSelect={(value) => {
-//           setSelectedVillage(value);
-//           setSearchQuery(value);
-//           setCurrentPage(1);
-//           handleSearch();
-//         }}
-//         title={t.village}
-//         icon={<HomeIcon className="w-5 h-5 text-[#FF385C]" />}
-//         items={getVillagesForCell(selectedCell)}
-//         searchPlaceholder={t.selectVillage || "Search villages..."}
-//         selectedValue={selectedVillage}
-//         searchQuery={searchQuery}
-//         setSearchQuery={setSearchQuery}
-//       />
-
-//       {/* Success Modal */}
-//       <AnimatePresence>
-//         {isSuccessModalOpen && selectedHouse && (
-//           <>
-//             <motion.div
-//               variants={overlayVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[500]"
-//               onClick={handleSuccessModalClose}
-//             />
-//             <motion.div
-//               variants={modalVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               className="fixed inset-2 sm:inset-4 z-[501] flex items-center justify-center"
-//               onClick={(e) => e.stopPropagation()}
-//             >
-//               <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-hidden shadow-2xl">
-//                 <div className="relative">
-//                   <button
-//                     onClick={handleSuccessModalClose}
-//                     className="absolute top-3 right-3 p-1.5 rounded-full hover:bg-gray-100 transition-colors text-gray-500"
-//                   >
-//                     <CloseIcon className="w-5 h-5" />
-//                   </button>
-//                 </div>
-//                 <div className="p-6 text-center">
-//                   <div className="w-20 h-20 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-4">
-//                     <svg className="w-12 h-12 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-//                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-//                     </svg>
-//                   </div>
-//                   <h3 className="text-xl font-bold text-gray-900 mb-2">
-//                     {t.bookingSubmitted || "Booking Submitted Successfully!"}
-//                   </h3>
-//                   <p className="text-sm text-gray-600 mb-4">
-//                     {t.waitingForPaymentVerification || 
-//                       "Your booking has been submitted. We're waiting for payment verification."}
-//                   </p>
-
-//                   <div className="bg-gray-50 rounded-lg p-4 mb-4 text-left">
-//                     <p className="text-sm font-medium text-gray-700 mb-2">
-//                       {t.paymentAmount || "Payment Amount"}:{" "}
-//                       <span className="text-[#FF385C] font-bold">
-//                         {formatCurrency(getServiceFee())}
-//                       </span>
-//                     </p>
-//                     <p className="text-sm font-medium text-gray-700">
-//                       {t.paymentStatus || "Payment Status"}:{" "}
-//                       <span className="text-yellow-600 font-medium">
-//                         ⏳ {t.statusPending || "Pending Verification"}
-//                       </span>
-//                     </p>
-//                     <p className="text-sm font-medium text-gray-700 mt-1">
-//                       {t.houseStatus || "House Status"}:{" "}
-//                       <span className="text-red-600 font-medium">
-//                         🏠 {t.statusBooked || "Booked"}
-//                       </span>
-//                     </p>
-//                   </div>
-
-//                   <p className="text-xs text-gray-500 mb-4">
-//                     {t.paymentPendingMessage ||
-//                       "Your payment is being verified. You'll be notified once confirmed. Check your dashboard for updates."}
-//                   </p>
-
-//                   <button
-//                     onClick={handleSuccessModalClose}
-//                     className="w-full mt-2 bg-[#FF385C] text-white py-2.5 rounded-lg font-medium hover:bg-[#E31C5F] transition-colors"
-//                   >
-//                     {t.viewHouseDetails || "View House Details"}
-//                   </button>
-//                 </div>
-//               </div>
-//             </motion.div>
-//           </>
-//         )}
-//       </AnimatePresence>
-
-//       <div className="w-full mb-4 rounded-2xl">
-//         {/* ===== PROJECT HEADER ===== */}
-//         <div className="bg-gradient-to-b from-white to-gray-50 py-8 md:py-12 border-b border-gray-200">
-//           <div className="container mx-auto px-4">
-//             <div className="text-center mb-6">
-//               <p className="text-base md:text-lg text-gray-600 max-w-3xl mx-auto px-4 leading-relaxed">
-//                 {language === "rw"
-//                   ? "GUKORA URUBUGA ABANYESHURI BA KAMINUZA BAZAJA BAJYAHO BAKABONA AMAZU YO GUKONDESHA KUBURYO BUBOREHEYE"
-//                   : language === "fr"
-//                     ? "Plateforme de location de maisons pour étudiants près des universités au Rwanda"
-//                     : "Student housing rental platform near universities in Rwanda"}
-//               </p>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* ===== SEARCH BAR ===== */}
-//         <div className="relative z-20 -mt-6 px-2 sm:px-4">
-//           <div className="max-w-4xl mx-auto">
-//             <motion.div
-//               initial={{ y: 20, opacity: 0 }}
-//               animate={{ y: 0, opacity: 1 }}
-//               transition={{ delay: 0.3 }}
-//               className="bg-white rounded-2xl shadow-2xl p-3 sm:p-4 md:p-5"
-//             >
-//               <div className="flex flex-wrap gap-2">
-//                 {/* University Button */}
-//                 <div className="flex-1 min-w-[120px]">
-//                   <button
-//                     onClick={() => {
-//                       setIsUniversityModalOpen(true);
-//                       setSearchQuery("");
-//                     }}
-//                     className="w-full text-left p-2 sm:p-3 rounded-xl transition-colors hover:bg-gray-50 border border-gray-200"
-//                   >
-//                     <div className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                       {t.university || "University"}
-//                     </div>
-//                     <div className="text-xs sm:text-sm md:text-base text-gray-700 truncate flex items-center gap-1">
-//                       <SchoolIcon className="w-3 h-3 sm:w-4 sm:h-4 text-[#FF385C]" />
-//                       {selectedUniversity ||
-//                         t.clickToSelect ||
-//                         "Click to select"}
-//                     </div>
-//                   </button>
-//                 </div>
-
-//                 {/* District Button */}
-//                 <div className="flex-1 min-w-[120px]">
-//                   <button
-//                     onClick={() => {
-//                       setIsDistrictModalOpen(true);
-//                       setSearchQuery("");
-//                     }}
-//                     className="w-full text-left p-2 sm:p-3 rounded-xl transition-colors hover:bg-gray-50 border border-gray-200"
-//                   >
-//                     <div className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                       {t.district || "District"}
-//                     </div>
-//                     <div className="text-xs sm:text-sm md:text-base text-gray-700 truncate flex items-center gap-1">
-//                       <LocationCityIcon className="w-3 h-3 sm:w-4 sm:h-4 text-[#FF385C]" />
-//                       {selectedDistrict ||
-//                         t.selectDistrict ||
-//                         "Select District"}
-//                     </div>
-//                   </button>
-//                 </div>
-
-//                 {/* Sector Button */}
-//                 <div className="flex-1 min-w-[120px]">
-//                   <button
-//                     onClick={() => {
-//                       if (!selectedDistrict) {
-//                         toast.info("Please select a district first");
-//                         setIsDistrictModalOpen(true);
-//                         return;
-//                       }
-//                       setIsSectorModalOpen(true);
-//                       setSearchQuery("");
-//                     }}
-//                     className="w-full text-left p-2 sm:p-3 rounded-xl transition-colors hover:bg-gray-50 border border-gray-200"
-//                   >
-//                     <div className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                       {t.sectorLabel || "Sector"}
-//                     </div>
-//                     <div className="text-xs sm:text-sm md:text-base text-gray-700 truncate flex items-center gap-1">
-//                       <ApartmentIcon className="w-3 h-3 sm:w-4 sm:h-4 text-[#FF385C]" />
-//                       {selectedSector || t.selectSector || "Select Sector"}
-//                     </div>
-//                   </button>
-//                 </div>
-
-//                 {/* Cell Button */}
-//                 <div className="flex-1 min-w-[120px]">
-//                   <button
-//                     onClick={() => {
-//                       if (!selectedSector) {
-//                         toast.info("Please select a sector first");
-//                         setIsSectorModalOpen(true);
-//                         return;
-//                       }
-//                       setIsCellModalOpen(true);
-//                       setSearchQuery("");
-//                     }}
-//                     className="w-full text-left p-2 sm:p-3 rounded-xl transition-colors hover:bg-gray-50 border border-gray-200"
-//                   >
-//                     <div className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                       {t.cellLabel2 || "Cell"}
-//                     </div>
-//                     <div className="text-xs sm:text-sm md:text-base text-gray-700 truncate flex items-center gap-1">
-//                       <DomainIcon className="w-3 h-3 sm:w-4 sm:h-4 text-[#FF385C]" />
-//                       {selectedCell || t.selectCell || "Select Cell"}
-//                     </div>
-//                   </button>
-//                 </div>
-
-//                 {/* Village Button */}
-//                 <div className="flex-1 min-w-[120px]">
-//                   <button
-//                     onClick={() => {
-//                       if (!selectedCell) {
-//                         toast.info("Please select a cell first");
-//                         setIsCellModalOpen(true);
-//                         return;
-//                       }
-//                       setIsVillageModalOpen(true);
-//                       setSearchQuery("");
-//                     }}
-//                     className="w-full text-left p-2 sm:p-3 rounded-xl transition-colors hover:bg-gray-50 border border-gray-200"
-//                   >
-//                     <div className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">
-//                       {t.villageLabel2 || "Village"}
-//                     </div>
-//                     <div className="text-xs sm:text-sm md:text-base text-gray-700 truncate flex items-center gap-1">
-//                       <HomeIcon className="w-3 h-3 sm:w-4 sm:h-4 text-[#FF385C]" />
-//                       {selectedVillage || t.selectVillage || "Select Village"}
-//                     </div>
-//                   </button>
-//                 </div>
-
-//                 <div className="flex gap-1">
-//                   <motion.button
-//                     whileHover={{ scale: 1.05 }}
-//                     whileTap={{ scale: 0.95 }}
-//                     onClick={handleSearch}
-//                     className="bg-[#FF385C] text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl font-medium hover:bg-[#E31C5F] transition-colors flex items-center justify-center gap-2 shadow-lg shadow-[#FF385C]/30 text-xs sm:text-sm"
-//                   >
-//                     <SearchIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-//                     <span className="hidden xs:inline">{t.search}</span>
-//                   </motion.button>
-//                   <button
-//                     onClick={() =>
-//                       setIsAdvancedSearchOpen(!isAdvancedSearchOpen)
-//                     }
-//                     className="bg-gray-100 text-gray-700 px-2 sm:px-3 py-2 sm:py-2.5 rounded-xl hover:bg-gray-200 transition-colors flex items-center justify-center"
-//                   >
-//                     <FilterListIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-//                   </button>
-//                 </div>
-//               </div>
-
-//               {/* Advanced Search */}
-//               <AnimatePresence>
-//                 {isAdvancedSearchOpen && (
-//                   <motion.div
-//                     initial={{ height: 0, opacity: 0 }}
-//                     animate={{ height: "auto", opacity: 1 }}
-//                     exit={{ height: 0, opacity: 0 }}
-//                     transition={{ duration: 0.3 }}
-//                     className="overflow-hidden"
-//                   >
-//                     <div className="border-t border-gray-200 mt-3 pt-3 grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
-//                       <div>
-//                         <label className="text-[10px] sm:text-xs font-medium text-gray-500">
-//                           {t.university}
-//                         </label>
-//                         <select
-//                           value={selectedUniversity}
-//                           onChange={(e) => {
-//                             setSelectedUniversity(e.target.value);
-//                             setCurrentPage(1);
-//                           }}
-//                           className="w-full mt-1 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#FF385C] bg-white"
-//                         >
-//                           <option value="">All Universities</option>
-//                           {uniqueUniversities.map((uni) => (
-//                             <option key={uni} value={uni}>
-//                               {uni}
-//                             </option>
-//                           ))}
-//                         </select>
-//                       </div>
-
-//                       <div>
-//                         <label className="text-[10px] sm:text-xs font-medium text-gray-500">
-//                           {t.district}
-//                         </label>
-//                         <select
-//                           value={selectedDistrict}
-//                           onChange={(e) => {
-//                             setSelectedDistrict(e.target.value);
-//                             setSelectedSector("");
-//                             setSelectedCell("");
-//                             setSelectedVillage("");
-//                             setCurrentPage(1);
-//                           }}
-//                           className="w-full mt-1 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#FF385C] bg-white"
-//                         >
-//                           <option value="">All Districts</option>
-//                           {ALL_DISTRICTS.map((d) => (
-//                             <option key={d} value={d}>
-//                               {d}
-//                             </option>
-//                           ))}
-//                         </select>
-//                       </div>
-
-//                       <div>
-//                         <label className="text-[10px] sm:text-xs font-medium text-gray-500">
-//                           {t.sector}
-//                         </label>
-//                         <select
-//                           value={selectedSector}
-//                           onChange={(e) => {
-//                             setSelectedSector(e.target.value);
-//                             setSelectedCell("");
-//                             setSelectedVillage("");
-//                             setCurrentPage(1);
-//                           }}
-//                           className="w-full mt-1 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#FF385C] bg-white"
-//                           disabled={!selectedDistrict}
-//                         >
-//                           <option value="">All Sectors</option>
-//                           {getSectorsForDistrict(selectedDistrict).map((s) => (
-//                             <option key={s} value={s}>
-//                               {s}
-//                             </option>
-//                           ))}
-//                         </select>
-//                       </div>
-
-//                       <div>
-//                         <label className="text-[10px] sm:text-xs font-medium text-gray-500">
-//                           {t.cell}
-//                         </label>
-//                         <select
-//                           value={selectedCell}
-//                           onChange={(e) => {
-//                             setSelectedCell(e.target.value);
-//                             setSelectedVillage("");
-//                             setCurrentPage(1);
-//                           }}
-//                           className="w-full mt-1 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#FF385C] bg-white"
-//                           disabled={!selectedSector}
-//                         >
-//                           <option value="">All Cells</option>
-//                           {getCellsForSector(selectedSector).map((c) => (
-//                             <option key={c} value={c}>
-//                               {c}
-//                             </option>
-//                           ))}
-//                         </select>
-//                       </div>
-
-//                       <div>
-//                         <label className="text-[10px] sm:text-xs font-medium text-gray-500">
-//                           {t.village}
-//                         </label>
-//                         <select
-//                           value={selectedVillage}
-//                           onChange={(e) => {
-//                             setSelectedVillage(e.target.value);
-//                             setCurrentPage(1);
-//                           }}
-//                           className="w-full mt-1 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-[#FF385C] bg-white"
-//                           disabled={!selectedCell}
-//                         >
-//                           <option value="">All Villages</option>
-//                           {getVillagesForCell(selectedCell).map((v) => (
-//                             <option key={v} value={v}>
-//                               {v}
-//                             </option>
-//                           ))}
-//                         </select>
-//                       </div>
-
-//                       <div>
-//                         <label className="text-[10px] sm:text-xs font-medium text-gray-500">
-//                           {t.minutesFromCampus}
-//                         </label>
-//                         <div className="flex items-center gap-2 mt-1">
-//                           <input
-//                             type="range"
-//                             min="0"
-//                             max="60"
-//                             value={maxMinutesFromCampus}
-//                             onChange={(e) =>
-//                               setMaxMinutesFromCampus(parseInt(e.target.value))
-//                             }
-//                             className="flex-1 accent-[#FF385C]"
-//                           />
-//                           <span className="text-xs sm:text-sm font-medium text-gray-700 min-w-[30px]">
-//                             {maxMinutesFromCampus}m
-//                           </span>
-//                         </div>
-//                       </div>
-
-//                       <div className="flex items-end gap-2">
-//                         <button
-//                           onClick={clearAllFilters}
-//                           className="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-100 text-gray-700 rounded-lg text-xs sm:text-sm font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-1"
-//                         >
-//                           <ClearIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-//                           <span className="hidden xs:inline">
-//                             {t.resetFilters}
-//                           </span>
-//                         </button>
-//                       </div>
-//                     </div>
-//                   </motion.div>
-//                 )}
-//               </AnimatePresence>
-//             </motion.div>
-//           </div>
-//         </div>
-
-//         {/* ===== PRICE CATEGORIES + HOUSES GRID ===== */}
-//         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 mt-6 sm:mt-8">
-//           <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
-//             {/* Left side: Houses Grid */}
-//             <div className="flex-1 min-w-0">
-//               <div className="relative mb-4 sm:mb-6">
-//                 <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
-//                 <input
-//                   type="text"
-//                   placeholder={t.searchProperties || "Search houses..."}
-//                   value={searchQuery}
-//                   onChange={(e) => setSearchQuery(e.target.value)}
-//                   className="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-xl focus:outline-none focus:border-[#FF385C] bg-white/80 backdrop-blur-sm"
-//                 />
-//               </div>
-
-//               <div>
-//                 <div className="flex flex-wrap justify-between items-center mb-4 sm:mb-6">
-//                   <div>
-//                     <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-900">
-//                       {filteredHouses.length} {t.popularHomes}
-//                     </h2>
-//                     {selectedUniversity && (
-//                       <p className="text-xs sm:text-sm text-gray-500 mt-1">
-//                         <SchoolIcon className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
-//                         {selectedUniversity}
-//                       </p>
-//                     )}
-//                     {selectedDistrict && (
-//                       <p className="text-xs sm:text-sm text-gray-500 mt-1">
-//                         <LocationCityIcon className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
-//                         {t.district}: {selectedDistrict}
-//                       </p>
-//                     )}
-//                     {selectedSector && (
-//                       <p className="text-xs sm:text-sm text-gray-500 mt-1">
-//                         {t.sectorLabel}: {selectedSector}
-//                       </p>
-//                     )}
-//                     {selectedCell && (
-//                       <p className="text-xs sm:text-sm text-gray-500 mt-1">
-//                         {t.cellLabel2}: {selectedCell}
-//                       </p>
-//                     )}
-//                     {selectedVillage && (
-//                       <p className="text-xs sm:text-sm text-gray-500 mt-1">
-//                         {t.villageLabel2}: {selectedVillage}
-//                       </p>
-//                     )}
-//                   </div>
-//                   <div className="flex items-center gap-2">
-//                     <span className="text-xs sm:text-sm text-gray-500">
-//                       <BookmarkIcon className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
-//                       {favorites.length} {t.favorites}
-//                     </span>
-//                   </div>
-//                 </div>
-
-//                 <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
-//                   {paginatedHouses.map((house) => (
-//                     <motion.div
-//                       key={house._id}
-//                       whileHover={{ y: -4 }}
-//                       transition={{ duration: 0.3 }}
-//                       className="group cursor-pointer"
-//                       onClick={() => openHouseModal(house)}
-//                     >
-//                       <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
-//                         <div className="relative aspect-[4/3] overflow-hidden">
-//                           <img
-//                             src={
-//                               house.images[0]?.url ||
-//                               house.images[0]?.secure_url ||
-//                               "https://via.placeholder.com/600x400?text=No+Image"
-//                             }
-//                             alt={house.name}
-//                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-//                           />
-//                           <div className="absolute top-2 right-2 flex gap-1">
-//                             <button
-//                               onClick={(e) => {
-//                                 e.stopPropagation();
-//                                 toggleFavorite(house._id);
-//                               }}
-//                               className="bg-white rounded-full p-1 sm:p-1.5 shadow-lg hover:scale-110 transition-transform"
-//                             >
-//                               {favorites.includes(house._id) ? (
-//                                 <FavoriteIcon className="w-3 h-3 sm:w-4 sm:h-4 text-[#FF385C]" />
-//                               ) : (
-//                                 <FavoriteBorderIcon className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
-//                               )}
-//                             </button>
-//                           </div>
-//                           <div className="absolute bottom-2 left-2 bg-black/70 text-white px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs">
-//                             {getTranslatedType("House")}
-//                           </div>
-//                           <div className="absolute top-2 left-2">
-//                             <span
-//                               className={`px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-xs font-medium ${getUniversityColor(house.university)}`}
-//                             >
-//                               {house.university}
-//                             </span>
-//                           </div>
-//                           {house.houseId && (
-//                             <div className="absolute bottom-2 right-2 bg-black/70 text-white px-1.5 sm:px-2 py-0.5 rounded text-[8px] sm:text-[10px]">
-//                               Code: {house.houseId}
-//                             </div>
-//                           )}
-//                           <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
-//                             <span
-//                               className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium ${getStatusColor(house.status)} shadow-lg`}
-//                             >
-//                               {getStatusText(house.status)}
-//                             </span>
-//                           </div>
-//                         </div>
-//                         <div className="p-2 sm:p-3 md:p-4">
-//                           <div className="flex items-start justify-between">
-//                             <div className="min-w-0 flex-1">
-//                               <h3 className="font-semibold text-gray-900 text-xs sm:text-sm line-clamp-1">
-//                                 {house.name}
-//                               </h3>
-//                               <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 truncate">
-//                                 <LocationOnIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3 inline mr-0.5" />
-//                                 {house.location.village},{" "}
-//                                 {house.location.sector}
-//                               </p>
-//                               <div className="flex items-center gap-1 sm:gap-2 mt-0.5 sm:mt-1">
-//                                 <span className="text-[10px] sm:text-xs text-gray-500">
-//                                   {house.bedrooms} {t.rooms}
-//                                 </span>
-//                                 <span className="text-[10px] sm:text-xs text-gray-300">
-//                                   •
-//                                 </span>
-//                                 <span className="text-[10px] sm:text-xs text-gray-500">
-//                                   {house.bathrooms} {t.bathrooms}
-//                                 </span>
-//                               </div>
-//                             </div>
-//                             <div className="flex flex-col items-end flex-shrink-0 ml-1 sm:ml-2">
-//                               <div className="flex items-center gap-0.5 sm:gap-1 text-xs sm:text-sm font-medium text-gray-700">
-//                                 <StarIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-yellow-400 fill-current" />
-//                                 {house.rating || 0}
-//                               </div>
-//                               <p className="text-[10px] sm:text-xs font-semibold text-[#FF385C]">
-//                                 {house.pricePerMonth.toLocaleString()} RWF
-//                               </p>
-//                             </div>
-//                           </div>
-//                           <div className="mt-1">
-//                             <span
-//                               className={`px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-xs font-medium ${getStatusColor(house.status)}`}
-//                             >
-//                               {getStatusText(house.status)}
-//                             </span>
-//                           </div>
-//                         </div>
-//                       </div>
-//                     </motion.div>
-//                   ))}
-//                 </div>
-
-//                 {/* Pagination */}
-//                 {totalPages > 1 && (
-//                   <motion.div
-//                     initial={{ opacity: 0, y: 10 }}
-//                     animate={{ opacity: 1, y: 0 }}
-//                     className="flex flex-wrap items-center justify-center gap-1 sm:gap-2 mt-6 sm:mt-8 md:mt-10"
-//                   >
-//                     <button
-//                       onClick={() => {
-//                         if (currentPage > 1) goToPage(currentPage - 1);
-//                       }}
-//                       disabled={currentPage === 1}
-//                       className={`flex items-center gap-0.5 sm:gap-1 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
-//                         currentPage === 1
-//                           ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-//                           : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105"
-//                       }`}
-//                     >
-//                       <ArrowBackIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-//                       <span className="hidden xs:inline">{t.prev}</span>
-//                     </button>
-
-//                     <div className="flex items-center gap-0.5 sm:gap-1">
-//                       {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-//                         (page) => {
-//                           if (
-//                             page === 1 ||
-//                             page === totalPages ||
-//                             Math.abs(page - currentPage) <= 1 ||
-//                             (page === 2 && currentPage > 3) ||
-//                             (page === totalPages - 1 &&
-//                               currentPage < totalPages - 2)
-//                           ) {
-//                             return (
-//                               <motion.button
-//                                 key={page}
-//                                 whileHover={{ scale: 1.1 }}
-//                                 whileTap={{ scale: 0.95 }}
-//                                 onClick={() => goToPage(page)}
-//                                 className={`w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 flex items-center justify-center rounded-lg text-xs sm:text-sm font-medium transition-all ${
-//                                   currentPage === page
-//                                     ? "bg-[#FF385C] text-white shadow-lg shadow-[#FF385C]/30"
-//                                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-//                                 }`}
-//                               >
-//                                 {page}
-//                               </motion.button>
-//                             );
-//                           }
-//                           if (page === 2 && currentPage > 3) {
-//                             return (
-//                               <span
-//                                 key="ellipsis-start"
-//                                 className="w-6 h-6 flex items-center justify-center text-gray-400"
-//                               >
-//                                 …
-//                               </span>
-//                             );
-//                           }
-//                           if (
-//                             page === totalPages - 1 &&
-//                             currentPage < totalPages - 2
-//                           ) {
-//                             return (
-//                               <span
-//                                 key="ellipsis-end"
-//                                 className="w-6 h-6 flex items-center justify-center text-gray-400"
-//                               >
-//                                 …
-//                               </span>
-//                             );
-//                           }
-//                           return null;
-//                         },
-//                       )}
-//                     </div>
-
-//                     <button
-//                       onClick={() => {
-//                         if (currentPage < totalPages) goToPage(currentPage + 1);
-//                       }}
-//                       disabled={currentPage === totalPages}
-//                       className={`flex items-center gap-0.5 sm:gap-1 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
-//                         currentPage === totalPages
-//                           ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-//                           : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105"
-//                       }`}
-//                     >
-//                       <span className="hidden xs:inline">{t.next}</span>
-//                       <ArrowForwardIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-//                     </button>
-//                   </motion.div>
-//                 )}
-
-//                 {filteredHouses.length === 0 && (
-//                   <div className="text-center py-8 sm:py-10 md:py-12">
-//                     <p className="text-gray-500 text-sm sm:text-base">
-//                       {t.noResults}
-//                     </p>
-//                   </div>
-//                 )}
-//               </div>
-//             </div>
-
-//             {/* Right side: Price Categories */}
-//             <div className="lg:w-64 xl:w-72 flex-shrink-0">
-//               <div className="sticky top-4">
-//                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4">
-//                   <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
-//                     <AttachMoneyIcon className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF385C]" />
-//                     {t.priceCategories}
-//                   </h3>
-//                   <div className="space-y-1.5">
-//                     {priceCategories.map((category) => (
-//                       <motion.button
-//                         key={category.id}
-//                         whileHover={{ x: 4 }}
-//                         whileTap={{ scale: 0.98 }}
-//                         onClick={() => {
-//                           setSelectedPriceCategory(category.id);
-//                           setCurrentPage(1);
-//                         }}
-//                         className={`w-full text-left px-3 py-2.5 rounded-lg transition-all flex items-center gap-3 ${
-//                           selectedPriceCategory === category.id
-//                             ? "bg-[#FF385C]/10 border-2 border-[#FF385C] shadow-sm"
-//                             : "hover:bg-gray-50 border-2 border-transparent"
-//                         }`}
-//                       >
-//                         <div
-//                           className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br ${category.color} flex items-center justify-center text-white flex-shrink-0`}
-//                         >
-//                           {React.cloneElement(
-//                             category.icon as React.ReactElement,
-//                           )}
-//                         </div>
-//                         <div className="flex-1 min-w-0">
-//                           <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">
-//                             {category.label}
-//                           </p>
-//                           <p className="text-[10px] sm:text-xs text-gray-500">
-//                             {category.range} • {getCategoryCount(category.id)}
-//                           </p>
-//                         </div>
-//                         {selectedPriceCategory === category.id && (
-//                           <CheckCircleIcon className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF385C] flex-shrink-0" />
-//                         )}
-//                       </motion.button>
-//                     ))}
-//                   </div>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* ============================================================
-//           PROPERTY DETAIL MODAL
-//           ============================================================ */}
-//         <AnimatePresence>
-//           {isPropertyModalOpen && selectedHouse && (
-//             <>
-//               <motion.div
-//                 variants={overlayVariants}
-//                 initial="hidden"
-//                 animate="visible"
-//                 exit="exit"
-//                 className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[300]"
-//                 onClick={closeHouseModal}
-//               />
-//               <motion.div
-//                 variants={modalVariants}
-//                 initial="hidden"
-//                 animate="visible"
-//                 exit="exit"
-//                 className="fixed inset-2 sm:inset-4 z-[301] flex items-center justify-center"
-//                 onClick={(e) => e.stopPropagation()}
-//               >
-//                 <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-2xl">
-//                   <div className="relative">
-//                     <div className="relative h-56 sm:h-40 md:h-50 lg:h-60 overflow-hidden bg-gray-900">
-//                       <img
-//                         src={
-//                           selectedHouse.images[currentImageIndex]?.url ||
-//                           selectedHouse.images[currentImageIndex]?.secure_url ||
-//                           "https://via.placeholder.com/600x400?text=No+Image"
-//                         }
-//                         alt={`${selectedHouse.name} - Image ${currentImageIndex + 1}`}
-//                         className="w-full h-full object-cover transition-transform duration-500"
-//                       />
-//                       <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/60 text-white px-3 py-1 rounded-full text-xs sm:text-sm">
-//                         {currentImageIndex + 1} / {selectedHouse.images.length}
-//                       </div>
-//                       {selectedHouse.images.length > 1 && (
-//                         <>
-//                           <button
-//                             onClick={() => {
-//                               setCurrentImageIndex((prev) =>
-//                                 prev === 0
-//                                   ? selectedHouse.images.length - 1
-//                                   : prev - 1,
-//                               );
-//                             }}
-//                             className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1.5 sm:p-2 rounded-full transition-all hover:scale-110"
-//                           >
-//                             <ArrowBackIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-//                           </button>
-//                           <button
-//                             onClick={() => {
-//                               setCurrentImageIndex((prev) =>
-//                                 prev === selectedHouse.images.length - 1
-//                                   ? 0
-//                                   : prev + 1,
-//                               );
-//                             }}
-//                             className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1.5 sm:p-2 rounded-full transition-all hover:scale-110"
-//                           >
-//                             <ArrowForwardIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-//                           </button>
-//                         </>
-//                       )}
-//                       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-//                         {selectedHouse.images.map((_, idx) => (
-//                           <button
-//                             key={idx}
-//                             onClick={() => setCurrentImageIndex(idx)}
-//                             className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all ${
-//                               idx === currentImageIndex
-//                                 ? "bg-white scale-125"
-//                                 : "bg-white/50 hover:bg-white/80"
-//                             }`}
-//                           />
-//                         ))}
-//                       </div>
-//                     </div>
-//                     <button
-//                       onClick={() => openImageModal(currentImageIndex)}
-//                       className="absolute bottom-3 right-3 bg-black/60 hover:bg-black/80 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs flex items-center gap-1 transition-colors"
-//                     >
-//                       <VisibilityIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-//                       <span className="hidden xs:inline">
-//                         {t.viewFullImage || "Full Screen"}
-//                       </span>
-//                     </button>
-//                     <div className="absolute top-4 left-3 flex flex-wrap gap-1">
-//                       <span
-//                         className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs font-medium ${getUniversityColor(selectedHouse.university)}`}
-//                       >
-//                         <SchoolIcon className="w-3 h-3 sm:w-4 sm:h-4 inline mr-0.5 sm:mr-1" />
-//                         <span className="hidden xs:inline">
-//                           {selectedHouse.university}
-//                         </span>
-//                       </span>
-//                       <span
-//                         className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs font-medium ${getStatusColor(selectedHouse.status)}`}
-//                       >
-//                         {getStatusText(selectedHouse.status)}
-//                       </span>
-//                     </div>
-//                     <button
-//                       onClick={closeHouseModal}
-//                       className="absolute top-3 right-3 bg-white/90 p-1.5 sm:p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
-//                     >
-//                       <CloseIcon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-800" />
-//                     </button>
-//                     <button
-//                       onClick={() => toggleFavorite(selectedHouse._id)}
-//                       className="absolute top-3 right-12 sm:right-14 bg-white/90 p-1.5 sm:p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
-//                     >
-//                       {favorites.includes(selectedHouse._id) ? (
-//                         <FavoriteIcon className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF385C]" />
-//                       ) : (
-//                         <FavoriteBorderIcon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-800" />
-//                       )}
-//                     </button>
-//                   </div>
-
-//                   <div className="p-3 sm:p-4 md:p-6 overflow-y-auto max-h-[calc(95vh-280px)] sm:max-h-[calc(90vh-300px)]">
-//                     <div className="flex flex-col md:flex-row items-start justify-between mb-3 sm:mb-4 gap-2">
-//                       <div>
-//                         <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900">
-//                           {selectedHouse.name}
-//                         </h3>
-//                         <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
-//                           <LocationOnIcon className="w-3 h-3 sm:w-4 sm:h-4 inline mr-0.5" />
-//                           {getLocationInfo(selectedHouse)}
-//                         </p>
-//                         <p className="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">
-//                           {selectedHouse.description}
-//                         </p>
-//                       </div>
-//                       <div className="flex items-center gap-0.5 sm:gap-1 text-base sm:text-lg font-medium text-gray-700 flex-shrink-0">
-//                         <StarIcon className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 fill-current" />
-//                         {selectedHouse.rating || 0}
-//                       </div>
-//                     </div>
-
-//                     <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
-//                       <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-purple-50 text-purple-700 rounded-full text-[10px] sm:text-xs font-medium">
-//                         <CalendarTodayIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 inline mr-0.5" />
-//                         {new Date(selectedHouse.createdAt).getFullYear()}
-//                       </span>
-//                       <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-green-50 text-green-700 rounded-full text-[10px] sm:text-xs font-medium">
-//                         <AttachMoneyIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 inline mr-0.5" />
-//                         {selectedHouse.pricePerMonth.toLocaleString()} RWF
-//                       </span>
-//                       <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-orange-50 text-orange-700 rounded-full text-[10px] sm:text-xs font-medium">
-//                         {getTranslatedType("House")}
-//                       </span>
-//                       <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] sm:text-xs font-medium">
-//                         <PersonIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 inline mr-0.5" />
-//                         {selectedHouse.maxGuests} guests
-//                       </span>
-//                     </div>
-
-//                     <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
-//                       <div className="bg-gray-50 rounded-lg p-2 sm:p-3">
-//                         <p className="text-[10px] sm:text-xs text-gray-500">
-//                           {t.province}
-//                         </p>
-//                         <p className="text-xs sm:text-sm font-semibold text-gray-900">
-//                           {selectedHouse.location.province}
-//                         </p>
-//                       </div>
-//                       <div className="bg-gray-50 rounded-lg p-2 sm:p-3">
-//                         <p className="text-[10px] sm:text-xs text-gray-500">
-//                           {t.district}
-//                         </p>
-//                         <p className="text-xs sm:text-sm font-semibold text-gray-900">
-//                           {selectedHouse.location.district}
-//                         </p>
-//                       </div>
-//                       <div className="bg-gray-50 rounded-lg p-2 sm:p-3">
-//                         <p className="text-[10px] sm:text-xs text-gray-500">
-//                           {t.sector}
-//                         </p>
-//                         <p className="text-xs sm:text-sm font-semibold text-gray-900">
-//                           {selectedHouse.location.sector}
-//                         </p>
-//                       </div>
-//                       <div className="bg-gray-50 rounded-lg p-2 sm:p-3">
-//                         <p className="text-[10px] sm:text-xs text-gray-500">
-//                           {t.cell}
-//                         </p>
-//                         <p className="text-xs sm:text-sm font-semibold text-gray-900">
-//                           {selectedHouse.location.cell}
-//                         </p>
-//                       </div>
-//                       <div className="bg-gray-50 rounded-lg p-2 sm:p-3 col-span-2">
-//                         <p className="text-[10px] sm:text-xs text-gray-500">
-//                           {t.village}
-//                         </p>
-//                         <p className="text-xs sm:text-sm font-semibold text-gray-900">
-//                           {selectedHouse.location.village}
-//                         </p>
-//                         {selectedHouse.houseId && (
-//                           <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5">
-//                             Code: {selectedHouse.houseId}
-//                           </p>
-//                         )}
-//                       </div>
-//                     </div>
-
-//                     <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-3 sm:mb-4">
-//                       <div className="bg-gray-50 rounded-lg p-2 sm:p-3">
-//                         <p className="text-[10px] sm:text-xs text-gray-500">
-//                           {t.rooms}
-//                         </p>
-//                         <p className="text-xs sm:text-sm font-semibold text-gray-900">
-//                           <BedIcon className="w-3 h-3 sm:w-4 sm:h-4 inline mr-0.5" />
-//                           {selectedHouse.bedrooms}
-//                         </p>
-//                       </div>
-//                       <div className="bg-gray-50 rounded-lg p-2 sm:p-3">
-//                         <p className="text-[10px] sm:text-xs text-gray-500">
-//                           {t.bathrooms}
-//                         </p>
-//                         <p className="text-xs sm:text-sm font-semibold text-gray-900">
-//                           <BathroomIcon className="w-3 h-3 sm:w-4 sm:h-4 inline mr-0.5" />
-//                           {selectedHouse.bathrooms}
-//                         </p>
-//                       </div>
-//                       <div className="bg-gray-50 rounded-lg p-2 sm:p-3">
-//                         <p className="text-[10px] sm:text-xs text-gray-500">
-//                           Max Guests
-//                         </p>
-//                         <p className="text-xs sm:text-sm font-semibold text-gray-900">
-//                           <PersonIcon className="w-3 h-3 sm:w-4 sm:h-4 inline mr-0.5" />
-//                           {selectedHouse.maxGuests}
-//                         </p>
-//                       </div>
-//                     </div>
-
-//                     <div className="border-t border-gray-200 pt-3 sm:pt-4 mt-3 sm:mt-4">
-//                       <h4 className="font-semibold text-xs sm:text-sm text-gray-900 mb-1.5 sm:mb-2">
-//                         {t.amenities}
-//                       </h4>
-//                       <div className="flex flex-wrap gap-1 sm:gap-2">
-//                         {selectedHouse.amenities?.map((amenity) => {
-//                           let icon = (
-//                             <CheckCircleIcon className="w-3 h-3 sm:w-4 sm:h-4 text-[#FF385C]" />
-//                           );
-//                           if (amenity === "Wifi" || amenity === "WiFi")
-//                             icon = (
-//                               <WifiIcon className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
-//                             );
-//                           if (amenity === "water")
-//                             icon = (
-//                               <KitchenIcon className="w-3 h-3 sm:w-4 sm:h-4 text-orange-500" />
-//                             );
-//                           if (amenity === "Parking")
-//                             icon = (
-//                               <LocalParkingIcon className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
-//                             );
-//                           if (amenity === "Security" || amenity === "AC")
-//                             icon = (
-//                               <SecurityIcon className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
-//                             );
-//                           return (
-//                             <span
-//                               key={amenity}
-//                               className="flex items-center gap-0.5 sm:gap-1 px-2 sm:px-3 py-0.5 sm:py-1 bg-gray-100 rounded-full text-[10px] sm:text-xs text-gray-700"
-//                             >
-//                               {icon}
-//                               {amenity}
-//                             </span>
-//                           );
-//                         })}
-//                       </div>
-//                     </div>
-
-//                     <div className="border-t border-gray-200 pt-3 sm:pt-4 mt-3 sm:mt-4">
-//                       <h4 className="font-semibold text-xs sm:text-sm text-gray-900 mb-1.5 sm:mb-2">
-//                         {t.owner || "Host Information"}
-//                       </h4>
-//                       <div className="bg-gray-50 rounded-lg p-3">
-//                         <p className="text-xs text-gray-500 mt-1">
-//                           {t.responseTime || "Response Time"}:{" "}
-//                           {selectedHouse.host.responseTime || "N/A"}
-//                         </p>
-//                       </div>
-//                     </div>
-
-//                     <div className="border-t border-gray-200 pt-3 sm:pt-4 mt-3 sm:mt-4">
-//                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-//                         <div>
-//                           <p className="text-[10px] sm:text-xs text-gray-500">
-//                             {t.price} ({t.priceInRWF})
-//                           </p>
-//                           <p className="text-base sm:text-lg md:text-2xl font-bold text-gray-900">
-//                             {selectedHouse.pricePerMonth.toLocaleString()} RWF
-//                             <span className="text-xs sm:text-sm font-normal text-gray-500">
-//                               {" "}
-//                               {t.perMonth}
-//                             </span>
-//                           </p>
-//                           <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5">
-//                             {t.serviceFee}:{" "}
-//                             {formatCurrency(
-//                               calculateServiceFee(selectedHouse.pricePerMonth),
-//                             )}
-//                           </p>
-//                         </div>
-//                         {selectedHouse.status === "available" && (
-//                           <motion.button
-//                             whileHover={{ scale: 1.05 }}
-//                             whileTap={{ scale: 0.95 }}
-//                             onClick={(e) => {
-//                               e.stopPropagation();
-//                               closeHouseModal();
-//                               handleBookNow(selectedHouse);
-//                             }}
-//                             className="w-full sm:w-auto bg-[#FF385C] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-[#E31C5F] transition-colors shadow-lg shadow-[#FF385C]/30 flex items-center justify-center gap-2 text-xs sm:text-sm md:text-base"
-//                           >
-//                             <LoginIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-//                             {t.bookNow || "Book Now"}
-//                           </motion.button>
-//                         )}
-//                         {selectedHouse.status === "booked" && (
-//                           <div className="w-full sm:w-auto bg-gray-400 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium flex items-center justify-center gap-2 text-xs sm:text-sm md:text-base cursor-not-allowed">
-//                             <CancelIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-//                             Already Booked
-//                           </div>
-//                         )}
-//                       </div>
-//                     </div>
-//                   </div>
-//                 </div>
-//               </motion.div>
-//             </>
-//           )}
-//         </AnimatePresence>
-
-//         {/* ============================================================
-//           IMAGE MODAL
-//           ============================================================ */}
-//         <AnimatePresence>
-//           {isImageModalOpen && selectedHouse && (
-//             <>
-//               <motion.div
-//                 variants={overlayVariants}
-//                 initial="hidden"
-//                 animate="visible"
-//                 exit="exit"
-//                 className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[400]"
-//                 onClick={closeImageModal}
-//               />
-//               <motion.div
-//                 variants={modalVariants}
-//                 initial="hidden"
-//                 animate="visible"
-//                 exit="exit"
-//                 className="fixed inset-0 z-[401] flex items-center justify-center p-2 sm:p-4"
-//                 onClick={(e) => e.stopPropagation()}
-//               >
-//                 <div className="relative max-w-5xl max-h-[90vh] w-full">
-//                   <button
-//                     onClick={closeImageModal}
-//                     className="absolute -top-8 sm:-top-12 right-0 text-white hover:text-gray-300 transition-colors z-10"
-//                   >
-//                     <CloseIcon className="w-6 h-6 sm:w-8 sm:h-8" />
-//                   </button>
-//                   <div className="relative w-full h-full flex items-center justify-center">
-//                     <img
-//                       src={
-//                         selectedHouse.images[currentImageIndex]?.url ||
-//                         selectedHouse.images[currentImageIndex]?.secure_url ||
-//                         "https://via.placeholder.com/600x400?text=No+Image"
-//                       }
-//                       alt={selectedHouse.name}
-//                       className="max-w-full max-h-[80vh] sm:max-h-[85vh] object-contain rounded-lg shadow-2xl"
-//                     />
-//                     {selectedHouse.images.length > 1 && (
-//                       <>
-//                         <button
-//                           onClick={() => {
-//                             setCurrentImageIndex((prev) =>
-//                               prev === 0
-//                                 ? selectedHouse.images.length - 1
-//                                 : prev - 1,
-//                             );
-//                           }}
-//                           className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1.5 sm:p-2 rounded-full transition-colors"
-//                         >
-//                           <ArrowBackIcon className="w-4 h-4 sm:w-6 sm:h-6" />
-//                         </button>
-//                         <button
-//                           onClick={() => {
-//                             setCurrentImageIndex((prev) =>
-//                               prev === selectedHouse.images.length - 1
-//                                 ? 0
-//                                 : prev + 1,
-//                             );
-//                           }}
-//                           className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-1.5 sm:p-2 rounded-full transition-colors"
-//                         >
-//                           <ArrowForwardIcon className="w-4 h-4 sm:w-6 sm:h-6" />
-//                         </button>
-//                       </>
-//                     )}
-//                     <div className="absolute bottom-2 sm:bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-2 sm:px-4 py-1 sm:py-2 rounded-lg flex flex-wrap items-center justify-center gap-1 sm:gap-3 text-[10px] sm:text-sm">
-//                       <span className="font-medium">{selectedHouse.name}</span>
-//                       <span className="text-gray-400 hidden xs:inline">|</span>
-//                       <span className="text-gray-300 hidden xs:inline">
-//                         {selectedHouse.location.village}
-//                       </span>
-//                       <span className="text-gray-400">|</span>
-//                       <span className="text-gray-300">
-//                         {currentImageIndex + 1} / {selectedHouse.images.length}
-//                       </span>
-//                     </div>
-//                   </div>
-//                 </div>
-//               </motion.div>
-//             </>
-//           )}
-//         </AnimatePresence>
-
-//         {/* ============================================================
-//           BOOKING MODAL
-//           ============================================================ */}
-//         <AnimatePresence>
-//           {isBookingModalOpen && selectedHouse && (
-//             <>
-//               <motion.div
-//                 variants={overlayVariants}
-//                 initial="hidden"
-//                 animate="visible"
-//                 exit="exit"
-//                 className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-//                 onClick={() => {
-//                   if (!submitting) {
-//                     setIsBookingModalOpen(false);
-//                     setCurrentStep(1);
-//                     resetBookingData();
-//                   }
-//                 }}
-//               />
-//               <motion.div
-//                 variants={modalVariants}
-//                 initial="hidden"
-//                 animate="visible"
-//                 exit="exit"
-//                 className="fixed inset-2 sm:inset-4 z-[101] flex items-center justify-center"
-//                 onClick={(e) => e.stopPropagation()}
-//               >
-//                 <div className="w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto rounded-xl sm:rounded-2xl shadow-2xl bg-white relative">
-//                   <div className="sticky top-0 px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 rounded-t-xl sm:rounded-t-2xl z-10">
-//                     <div className="flex items-center gap-1 sm:gap-2">
-//                       <svg
-//                         className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF385C]"
-//                         fill="none"
-//                         stroke="currentColor"
-//                         viewBox="0 0 24 24"
-//                       >
-//                         <path
-//                           strokeLinecap="round"
-//                           strokeLinejoin="round"
-//                           strokeWidth="2"
-//                           d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-//                         />
-//                       </svg>
-//                       <h2 className="text-sm sm:text-base md:text-xl font-semibold text-gray-900">
-//                         {t.bookThisHouse || "Book This House"}
-//                       </h2>
-//                     </div>
-//                     <motion.button
-//                       whileHover={{ rotate: 90, scale: 1.1 }}
-//                       whileTap={{ scale: 0.9 }}
-//                       onClick={() => {
-//                         if (!submitting) {
-//                           setIsBookingModalOpen(false);
-//                           setCurrentStep(1);
-//                           resetBookingData();
-//                         }
-//                       }}
-//                       className="p-0.5 sm:p-1 rounded-full transition-colors hover:bg-gray-100 text-gray-500"
-//                       disabled={submitting}
-//                     >
-//                       <CloseIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-//                     </motion.button>
-//                   </div>
-
-//                   {/* Progress Steps */}
-//                   <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 bg-gray-50 border-b border-gray-200">
-//                     <div className="flex items-center justify-between">
-//                       {[1, 2, 3].map((step) => (
-//                         <div key={step} className="flex items-center">
-//                           <div
-//                             className={`flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 rounded-full text-[10px] sm:text-xs md:text-sm font-medium ${
-//                               currentStep >= step
-//                                 ? "bg-[#FF385C] text-white"
-//                                 : "bg-gray-200 text-gray-500"
-//                             }`}
-//                           >
-//                             {step}
-//                           </div>
-//                           <span className="ml-0.5 sm:ml-1 md:ml-2 text-[8px] sm:text-[10px] md:text-sm font-medium text-gray-600 hidden xs:inline">
-//                             {step === 1 && t.personalInfo}
-//                             {step === 2 && t.bookingDetails}
-//                             {step === 3 && t.payment}
-//                           </span>
-//                           {step < 3 && (
-//                             <div
-//                               className={`w-4 sm:w-6 md:w-12 h-0.5 mx-0.5 sm:mx-1 md:mx-2 ${
-//                                 currentStep > step
-//                                   ? "bg-[#FF385C]"
-//                                   : "bg-gray-200"
-//                               }`}
-//                             ></div>
-//                           )}
-//                         </div>
-//                       ))}
-//                     </div>
-//                   </div>
-
-//                   <div className="p-3 sm:p-4 md:p-6 space-y-3 sm:space-y-4">
-//                     {/* Step 1: Personal Information */}
-//                     {currentStep === 1 && (
-//                       <div className="space-y-2 sm:space-y-3 md:space-y-4">
-//                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 md:gap-4">
-//                           <div>
-//                             <label className="block text-[10px] sm:text-xs md:text-sm font-medium text-gray-700 mb-0.5 sm:mb-1">
-//                               {t.fullName || "Full Name"}{" "}
-//                               <span className="text-red-500">*</span>
-//                             </label>
-//                             <div className="relative">
-//                               <input
-//                                 type="text"
-//                                 value={bookingData.step1.fullName}
-//                                 onChange={(e) =>
-//                                   handleStep1Change("fullName", e.target.value)
-//                                 }
-//                                 className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none ${
-//                                   bookingData.step1.fullName.length > 0 &&
-//                                   bookingData.step1.fullName.length < 2
-//                                     ? "border-red-500"
-//                                     : bookingData.step1.fullName.length >= 2
-//                                       ? "border-green-500"
-//                                       : "border-gray-300"
-//                                 }`}
-//                                 placeholder="John Doe"
-//                               />
-//                               {bookingData.step1.fullName.length >= 2 && (
-//                                 <CheckCircleIcon className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-green-500" />
-//                               )}
-//                               {bookingData.step1.fullName.length > 0 &&
-//                                 bookingData.step1.fullName.length < 2 && (
-//                                   <CancelIcon className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-red-500" />
-//                                 )}
-//                             </div>
-//                             {bookingData.step1.fullName.length > 0 &&
-//                               bookingData.step1.fullName.length < 2 && (
-//                                 <p className="text-xs text-red-500 mt-1">
-//                                   Name must be at least 2 characters
-//                                 </p>
-//                               )}
-//                           </div>
-//                           <div>
-//                             <label className="block text-[10px] sm:text-xs md:text-sm font-medium text-gray-700 mb-0.5 sm:mb-1">
-//                               {t.email || "Email"}{" "}
-//                               <span className="text-red-500">*</span>
-//                             </label>
-//                             <div className="relative">
-//                               <input
-//                                 type="email"
-//                                 value={bookingData.step1.email}
-//                                 onChange={(e) =>
-//                                   handleStep1Change("email", e.target.value)
-//                                 }
-//                                 className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none ${
-//                                   bookingData.step1.email.length > 0 &&
-//                                   !validateEmail(bookingData.step1.email)
-//                                     ? "border-red-500"
-//                                     : bookingData.step1.email.length > 0 &&
-//                                         validateEmail(bookingData.step1.email)
-//                                       ? "border-green-500"
-//                                       : "border-gray-300"
-//                                 }`}
-//                                 placeholder="john@example.com"
-//                               />
-//                               {bookingData.step1.email.length > 0 &&
-//                                 validateEmail(bookingData.step1.email) && (
-//                                   <CheckCircleIcon className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-green-500" />
-//                                 )}
-//                               {bookingData.step1.email.length > 0 &&
-//                                 !validateEmail(bookingData.step1.email) && (
-//                                   <CancelIcon className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-red-500" />
-//                                 )}
-//                             </div>
-//                             {bookingData.step1.email.length > 0 &&
-//                               !validateEmail(bookingData.step1.email) && (
-//                                 <p className="text-xs text-red-500 mt-1">
-//                                   {t.invalidEmail ||
-//                                     "Please enter a valid email"}
-//                                 </p>
-//                               )}
-//                           </div>
-//                         </div>
-//                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 md:gap-4">
-//                           <div>
-//                             <label className="block text-[10px] sm:text-xs md:text-sm font-medium text-gray-700 mb-0.5 sm:mb-1">
-//                               {t.phoneNumber || "Phone Number"}{" "}
-//                               <span className="text-red-500">*</span>
-//                             </label>
-//                             <div className="relative">
-//                               <input
-//                                 type="tel"
-//                                 value={bookingData.step1.phone}
-//                                 onChange={(e) =>
-//                                   handleStep1Change("phone", e.target.value)
-//                                 }
-//                                 className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none ${
-//                                   bookingData.step1.phone.length > 0 &&
-//                                   !validatePhone(bookingData.step1.phone)
-//                                     ? "border-red-500"
-//                                     : bookingData.step1.phone.length > 0 &&
-//                                         validatePhone(bookingData.step1.phone)
-//                                       ? "border-green-500"
-//                                       : "border-gray-300"
-//                                 }`}
-//                                 placeholder="+250788123456"
-//                               />
-//                               {bookingData.step1.phone.length > 0 &&
-//                                 validatePhone(bookingData.step1.phone) && (
-//                                   <CheckCircleIcon className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-green-500" />
-//                                 )}
-//                               {bookingData.step1.phone.length > 0 &&
-//                                 !validatePhone(bookingData.step1.phone) && (
-//                                   <CancelIcon className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-red-500" />
-//                                 )}
-//                             </div>
-//                             {bookingData.step1.phone.length > 0 &&
-//                               !validatePhone(bookingData.step1.phone) && (
-//                                 <p className="text-xs text-red-500 mt-1">
-//                                   {t.invalidPhone ||
-//                                     "Please enter a valid phone number"}
-//                                 </p>
-//                               )}
-//                           </div>
-//                           <div>
-//                             <label className="block text-[10px] sm:text-xs md:text-sm font-medium text-gray-700 mb-0.5 sm:mb-1">
-//                               {t.idNumber || "ID Number"}
-//                             </label>
-//                             <input
-//                               type="text"
-//                               value={bookingData.step1.idNumber}
-//                               onChange={(e) =>
-//                                 handleStep1Change("idNumber", e.target.value)
-//                               }
-//                               className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none"
-//                               placeholder="ID123456"
-//                             />
-//                           </div>
-//                         </div>
-//                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 md:gap-4">
-//                           <div>
-//                             <label className="block text-[10px] sm:text-xs md:text-sm font-medium text-gray-700 mb-0.5 sm:mb-1">
-//                               {t.university || "University"}
-//                             </label>
-//                             <input
-//                               type="text"
-//                               value={bookingData.step1.university}
-//                               onChange={(e) =>
-//                                 handleStep1Change("university", e.target.value)
-//                               }
-//                               className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none"
-//                               placeholder={t.university || "University"}
-//                             />
-//                           </div>
-//                           <div>
-//                             <label className="block text-[10px] sm:text-xs md:text-sm font-medium text-gray-700 mb-0.5 sm:mb-1">
-//                               {t.studentId || "Student ID"}
-//                             </label>
-//                             <input
-//                               type="text"
-//                               value={bookingData.step1.studentId}
-//                               onChange={(e) =>
-//                                 handleStep1Change("studentId", e.target.value)
-//                               }
-//                               className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none"
-//                               placeholder="STU12345"
-//                             />
-//                           </div>
-//                         </div>
-//                         <div>
-//                           <label className="block text-[10px] sm:text-xs md:text-sm font-medium text-gray-700 mb-0.5 sm:mb-1">
-//                             {t.purpose || "Purpose of Stay"}
-//                           </label>
-//                           <textarea
-//                             value={bookingData.step1.purpose}
-//                             onChange={(e) =>
-//                               handleStep1Change("purpose", e.target.value)
-//                             }
-//                             rows={2}
-//                             className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none resize-none"
-//                             placeholder="Study, internship, research..."
-//                           />
-//                         </div>
-//                       </div>
-//                     )}
-
-//                     {/* Step 2: Booking Details */}
-//                     {currentStep === 2 && (
-//                       <div className="space-y-2 sm:space-y-3 md:space-y-4">
-//                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 md:gap-4">
-//                           <div>
-//                             <label className="block text-[10px] sm:text-xs md:text-sm font-medium text-gray-700 mb-0.5 sm:mb-1">
-//                               {t.checkIn || "Check-in Date"}{" "}
-//                               <span className="text-red-500">*</span>
-//                             </label>
-//                             <input
-//                               type="date"
-//                               value={bookingData.step2.checkIn}
-//                               onChange={(e) =>
-//                                 handleStep2Change("checkIn", e.target.value)
-//                               }
-//                               className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none ${
-//                                 bookingData.step2.checkIn.length > 0
-//                                   ? "border-green-500"
-//                                   : "border-gray-300"
-//                               }`}
-//                             />
-//                           </div>
-//                           <div>
-//                             <label className="block text-[10px] sm:text-xs md:text-sm font-medium text-gray-700 mb-0.5 sm:mb-1">
-//                               {t.checkOut || "Check-out Date"}{" "}
-//                               <span className="text-red-500">*</span>
-//                             </label>
-//                             <input
-//                               type="date"
-//                               value={bookingData.step2.checkOut}
-//                               onChange={(e) => {
-//                                 const checkOut = e.target.value;
-//                                 const months =
-//                                   bookingData.step2.checkIn && checkOut
-//                                     ? Math.ceil(
-//                                         (new Date(checkOut).getTime() -
-//                                           new Date(
-//                                             bookingData.step2.checkIn,
-//                                           ).getTime()) /
-//                                           (1000 * 60 * 60 * 24 * 30),
-//                                       )
-//                                     : 1;
-//                                 setBookingData({
-//                                   ...bookingData,
-//                                   step2: {
-//                                     ...bookingData.step2,
-//                                     checkOut,
-//                                     months: months > 0 ? months : 1,
-//                                   },
-//                                 });
-//                               }}
-//                               className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none ${
-//                                 bookingData.step2.checkOut.length > 0
-//                                   ? "border-green-500"
-//                                   : "border-gray-300"
-//                               }`}
-//                             />
-//                           </div>
-//                         </div>
-//                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 md:gap-4">
-//                           <div>
-//                             <label className="block text-[10px] sm:text-xs md:text-sm font-medium text-gray-700 mb-0.5 sm:mb-1">
-//                               {t.months || "Months"}{" "}
-//                               <span className="text-red-500">*</span>
-//                             </label>
-//                             <input
-//                               type="number"
-//                               value={bookingData.step2.months}
-//                               onChange={(e) =>
-//                                 handleStep2Change(
-//                                   "months",
-//                                   parseInt(e.target.value) || 0,
-//                                 )
-//                               }
-//                               min="1"
-//                               className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none ${
-//                                 bookingData.step2.months > 0
-//                                   ? "border-green-500"
-//                                   : "border-gray-300"
-//                               }`}
-//                             />
-//                           </div>
-//                           <div>
-//                             <label className="block text-[10px] sm:text-xs md:text-sm font-medium text-gray-700 mb-0.5 sm:mb-1">
-//                               {t.guests || "Guests"}{" "}
-//                               <span className="text-red-500">*</span>
-//                             </label>
-//                             <input
-//                               type="number"
-//                               value={bookingData.step2.guests}
-//                               onChange={(e) =>
-//                                 handleStep2Change(
-//                                   "guests",
-//                                   parseInt(e.target.value) || 0,
-//                                 )
-//                               }
-//                               min="1"
-//                               max={selectedHouse.maxGuests || 10}
-//                               className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none ${
-//                                 bookingData.step2.guests > 0
-//                                   ? "border-green-500"
-//                                   : "border-gray-300"
-//                               }`}
-//                             />
-//                           </div>
-//                         </div>
-//                         <div>
-//                           <label className="block text-[10px] sm:text-xs md:text-sm font-medium text-gray-700 mb-0.5 sm:mb-1">
-//                             {t.specialRequests || "Special Requests"}
-//                           </label>
-//                           <textarea
-//                             value={bookingData.step2.specialRequests}
-//                             onChange={(e) =>
-//                               handleStep2Change(
-//                                 "specialRequests",
-//                                 e.target.value,
-//                               )
-//                             }
-//                             rows={2}
-//                             className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none resize-none"
-//                             placeholder="Any special requests..."
-//                           />
-//                         </div>
-
-//                         {/* Summary */}
-//                         <div className="bg-gray-50 rounded-lg p-2 sm:p-3 md:p-4">
-//                           <p className="text-[10px] sm:text-xs md:text-sm text-gray-600">
-//                             <span className="font-medium">
-//                               {t.monthlyRent || "Monthly Rent"}:
-//                             </span>{" "}
-//                             {formatCurrency(selectedHouse.pricePerMonth)}
-//                           </p>
-//                           <p className="text-[10px] sm:text-xs md:text-sm text-gray-600">
-//                             <span className="font-medium">
-//                               {t.months || "Months"}:
-//                             </span>{" "}
-//                             {bookingData.step2.months}
-//                           </p>
-//                           <p className="text-[10px] sm:text-xs md:text-sm text-gray-600">
-//                             <span className="font-medium">
-//                               {t.serviceFee || "Service Fee"}:
-//                             </span>{" "}
-//                             {formatCurrency(getServiceFee())}
-//                           </p>
-//                           <p className="text-[10px] sm:text-xs md:text-sm text-gray-600 font-semibold text-[#FF385C]">
-//                             <span className="font-medium">
-//                               {t.totalAmount || "Total Amount to Pay"}:
-//                             </span>{" "}
-//                             {formatCurrency(getServiceFee())}
-//                           </p>
-//                         </div>
-//                       </div>
-//                     )}
-
-//                     {/* Step 3: Payment */}
-//                     {currentStep === 3 && (
-//                       <div className="space-y-2 sm:space-y-3 md:space-y-4">
-//                         <div>
-//                           <label className="block text-[10px] sm:text-xs md:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-//                             {t.paymentMethod || "Payment Method"}{" "}
-//                             <span className="text-red-500">*</span>
-//                           </label>
-//                           <div className="p-2 sm:p-3 md:p-4 border-2 rounded-lg text-center transition-all bg-[#FF385C]/5 border-[#FF385C]">
-//                             <svg
-//                               className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 mx-auto text-[#FF385C] mb-0.5 sm:mb-1"
-//                               fill="currentColor"
-//                               viewBox="0 0 24 24"
-//                             >
-//                               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z" />
-//                             </svg>
-//                             <p className="text-xs sm:text-sm md:text-base font-medium">
-//                               {t.momo || "MOMO"}
-//                             </p>
-//                             <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">
-//                               {t.payWithMomo || "Pay with MOMO"}
-//                             </p>
-//                           </div>
-//                         </div>
-
-//                         <div>
-//                           <label className="block text-[10px] sm:text-xs md:text-sm font-medium text-gray-700 mb-0.5 sm:mb-1">
-//                             {t.momoNumber || "MOMO Number"}{" "}
-//                             <span className="text-red-500">*</span>
-//                           </label>
-//                           <div className="relative">
-//                             <input
-//                               type="tel"
-//                               value={bookingData.step3.momoNumber || ""}
-//                               onChange={(e) =>
-//                                 handleStep3Change("momoNumber", e.target.value)
-//                               }
-//                               className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none ${
-//                                 bookingData.step3.momoNumber.length > 0 &&
-//                                 !validatePhone(bookingData.step3.momoNumber)
-//                                   ? "border-red-500"
-//                                   : bookingData.step3.momoNumber.length > 0 &&
-//                                       validatePhone(
-//                                         bookingData.step3.momoNumber,
-//                                       )
-//                                     ? "border-green-500"
-//                                     : "border-gray-300"
-//                               }`}
-//                               placeholder="0788123456"
-//                             />
-//                             {bookingData.step3.momoNumber.length > 0 &&
-//                               validatePhone(bookingData.step3.momoNumber) && (
-//                                 <CheckCircleIcon className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-green-500" />
-//                               )}
-//                             {bookingData.step3.momoNumber.length > 0 &&
-//                               !validatePhone(bookingData.step3.momoNumber) && (
-//                                 <CancelIcon className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-red-500" />
-//                               )}
-//                           </div>
-//                           {bookingData.step3.momoNumber.length > 0 &&
-//                             !validatePhone(bookingData.step3.momoNumber) && (
-//                               <p className="text-xs text-red-500 mt-1">
-//                                 {t.invalidPhone ||
-//                                   "Please enter a valid phone number"}
-//                               </p>
-//                             )}
-//                         </div>
-
-//                         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 sm:p-3 md:p-4">
-//                           <p className="text-[10px] sm:text-xs md:text-sm font-medium text-yellow-800">
-//                             {t.paymentInfo || "Payment Information"}
-//                           </p>
-//                           <p className="text-[10px] sm:text-xs md:text-sm text-yellow-700 mt-0.5 sm:mt-1">
-//                             {t.momoPaymentInstructions ||
-//                               "Please pay using the USSD code below:"}
-//                           </p>
-//                           <div className="mt-1 sm:mt-2 p-1.5 sm:p-2 md:p-3 bg-white rounded border border-yellow-200">
-//                             <div className="text-center">
-//                               <p className="text-[10px] sm:text-xs md:text-sm text-gray-600 mb-0.5 sm:mb-1">
-//                                 {t.totalAmount || "Total Amount to Pay"}
-//                               </p>
-//                               <p className="font-bold text-[#FF385C] text-sm sm:text-base md:text-lg">
-//                                 {formatCurrency(getServiceFee())}
-//                               </p>
-//                               <p className="text-[10px] sm:text-xs md:text-sm text-gray-600 mb-0.5 sm:mb-1 mt-1 sm:mt-2">
-//                                 {t.ussdCode || "USSD Code"}
-//                               </p>
-//                               <p className="font-mono text-base sm:text-lg md:text-xl font-bold text-[#FF385C]">
-//                                 {getUssdCode()}
-//                               </p>
-//                               <a
-//                                 href={`tel:${getUssdCode().replace(/\*/g, "%2A").replace(/#/g, "%23")}`}
-//                                 className="inline-block mt-1 sm:mt-2 px-3 sm:px-4 md:px-6 py-1 sm:py-1.5 md:py-2 bg-[#FF385C] text-white rounded-lg text-[10px] sm:text-xs md:text-sm font-medium hover:bg-[#E31C5F] transition-colors"
-//                               >
-//                                 📞 {t.dialNow || "Dial Now"}
-//                               </a>
-//                             </div>
-//                           </div>
-//                         </div>
-
-//                         <div>
-//                           <label className="block text-[10px] sm:text-xs md:text-sm font-medium text-gray-700 mb-0.5 sm:mb-1">
-//                             {t.uploadPaymentProof ||
-//                               "Upload Payment Screenshot"}{" "}
-//                             <span className="text-red-500">*</span>
-//                           </label>
-//                           <div className="flex flex-wrap items-center gap-1 sm:gap-2 md:gap-4">
-//                             <input
-//                               type="file"
-//                               accept="image/*"
-//                               onChange={handleFileUpload}
-//                               className="hidden"
-//                               id="payment-screenshot"
-//                             />
-//                             <label
-//                               htmlFor="payment-screenshot"
-//                               className={`px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 border rounded-lg transition-colors cursor-pointer text-[10px] sm:text-xs md:text-sm flex items-center gap-0.5 sm:gap-1 md:gap-2 ${
-//                                 bookingData.step3.screenshotPreview
-//                                   ? "border-green-500 bg-green-50 text-green-700"
-//                                   : "border-gray-300 hover:bg-gray-50 text-gray-700"
-//                               }`}
-//                             >
-//                               <svg
-//                                 className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4"
-//                                 fill="none"
-//                                 stroke="currentColor"
-//                                 viewBox="0 0 24 24"
-//                               >
-//                                 <path
-//                                   strokeLinecap="round"
-//                                   strokeLinejoin="round"
-//                                   strokeWidth="2"
-//                                   d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-//                                 />
-//                               </svg>
-//                               {bookingData.step3.screenshotPreview
-//                                 ? "Change File"
-//                                 : t.chooseFile || "Choose File"}
-//                             </label>
-//                             {bookingData.step3.screenshotPreview && (
-//                               <div className="relative">
-//                                 <img
-//                                   src={bookingData.step3.screenshotPreview}
-//                                   alt="Payment Screenshot"
-//                                   className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 object-cover rounded-lg border border-green-500"
-//                                 />
-//                                 <button
-//                                   onClick={() => {
-//                                     setBookingData({
-//                                       ...bookingData,
-//                                       step3: {
-//                                         ...bookingData.step3,
-//                                         screenshot: null,
-//                                         screenshotFile: null,
-//                                         screenshotPreview: "",
-//                                       },
-//                                     });
-//                                   }}
-//                                   className="absolute -top-1 sm:-top-1.5 md:-top-2 -right-1 sm:-right-1.5 md:-right-2 bg-red-500 text-white rounded-full p-0.5 hover:bg-red-600"
-//                                 >
-//                                   <CancelIcon className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3" />
-//                                 </button>
-//                               </div>
-//                             )}
-//                           </div>
-//                           {!bookingData.step3.screenshotPreview && (
-//                             <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-xs text-red-500">
-//                               Please upload a payment confirmation screenshot
-//                             </p>
-//                           )}
-//                           <p className="mt-0.5 sm:mt-1 text-[10px] sm:text-xs text-gray-500">
-//                             {t.uploadPaymentProof ||
-//                               "Upload your payment confirmation screenshot"}
-//                           </p>
-//                         </div>
-//                       </div>
-//                     )}
-
-//                     {/* Navigation Buttons */}
-//                     <div className="flex flex-wrap gap-1 sm:gap-2 md:gap-3 pt-2 sm:pt-3 md:pt-4 border-t border-gray-200">
-//                       {currentStep > 1 && (
-//                         <motion.button
-//                           whileHover={{ scale: 1.02 }}
-//                           whileTap={{ scale: 0.98 }}
-//                           onClick={prevStep}
-//                           disabled={submitting}
-//                           className="px-3 sm:px-4 md:px-6 py-1 sm:py-1.5 md:py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors text-[10px] sm:text-xs md:text-sm"
-//                         >
-//                           {t.previous || "Previous"}
-//                         </motion.button>
-//                       )}
-//                       <motion.button
-//                         whileHover={{ scale: 1.02 }}
-//                         whileTap={{ scale: 0.98 }}
-//                         onClick={
-//                           currentStep === 3 ? handleSubmitBooking : nextStep
-//                         }
-//                         disabled={
-//                           submitting ||
-//                           (currentStep === 1 && !isBookingStep1Valid()) ||
-//                           (currentStep === 2 && !isBookingStep2Valid()) ||
-//                           (currentStep === 3 && !isBookingStep3Valid())
-//                         }
-//                         className={`flex-1 px-3 sm:px-4 md:px-6 py-1 sm:py-1.5 md:py-2.5 rounded-lg text-white font-medium transition-colors flex items-center justify-center gap-0.5 sm:gap-1 md:gap-2 text-[10px] sm:text-xs md:text-sm ${
-//                           submitting ||
-//                           (currentStep === 1 && !isBookingStep1Valid()) ||
-//                           (currentStep === 2 && !isBookingStep2Valid()) ||
-//                           (currentStep === 3 && !isBookingStep3Valid())
-//                             ? "bg-gray-400 cursor-not-allowed"
-//                             : "bg-[#FF385C] hover:bg-[#E31C5F]"
-//                         }`}
-//                       >
-//                         {submitting ? (
-//                           <>
-//                             <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-//                             {t.submitting || "Submitting..."}
-//                           </>
-//                         ) : currentStep === 3 ? (
-//                           <>
-//                             <CheckCircleIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4" />
-//                             {t.confirmBooking || "Confirm Booking"}
-//                           </>
-//                         ) : (
-//                           t.next || "Next"
-//                         )}
-//                       </motion.button>
-//                     </div>
-//                   </div>
-//                 </div>
-//               </motion.div>
-//             </>
-//           )}
-//         </AnimatePresence>
-//       </div>
-//     </>
-//   );
-// };
-
 export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
   const [language, setLanguage] = useState<"en" | "fr" | "rw">(
     getLanguageFromCookies(),
@@ -23494,14 +20532,14 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
       try {
         setLoading(true);
         setError(null);
-        
+
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 8000);
-        
+
         const response = await API.get("/houses?limit=27", {
-          signal: controller.signal
+          signal: controller.signal,
         });
-        
+
         clearTimeout(timeoutId);
 
         if (response.data.success) {
@@ -23652,41 +20690,49 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
   // ============================================================
   // UPDATE HOUSE STATUS TO BOOKED - OPTIMIZED WITH TIMEOUT
   // ============================================================
-  const updateHouseStatusToBooked = async (houseId: string): Promise<boolean> => {
+  const updateHouseStatusToBooked = async (
+    houseId: string,
+  ): Promise<boolean> => {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3000);
-      
-      const response = await API.put(`/houses/${houseId}/status`, {
-        status: "booked",
-      }, {
-        signal: controller.signal
-      });
-      
+
+      const response = await API.put(
+        `/houses/${houseId}/status`,
+        {
+          status: "booked",
+        },
+        {
+          signal: controller.signal,
+        },
+      );
+
       clearTimeout(timeoutId);
-      
+
       if (response.data.success) {
         setHouses((prevHouses) =>
           prevHouses.map((h) =>
             h._id === houseId ? { ...h, status: "booked" } : h,
           ),
         );
-        
+
         setFilteredHouses((prevHouses) =>
           prevHouses.map((h) =>
             h._id === houseId ? { ...h, status: "booked" } : h,
           ),
         );
-        
+
         if (selectedHouse?._id === houseId) {
-          setSelectedHouse((prev) => prev ? { ...prev, status: "booked" } : null);
+          setSelectedHouse((prev) =>
+            prev ? { ...prev, status: "booked" } : null,
+          );
         }
-        
+
         return true;
       }
       return false;
     } catch (error) {
-      console.error('Error updating house status:', error);
+      console.error("Error updating house status:", error);
       return false;
     }
   };
@@ -23696,17 +20742,15 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
   // ============================================================
   const updateSingleHouseStatus = (houseId: string, status: string) => {
     setHouses((prevHouses) =>
-      prevHouses.map((h) =>
-        h._id === houseId ? { ...h, status: status } : h,
-      ),
+      prevHouses.map((h) => (h._id === houseId ? { ...h, status: status } : h)),
     );
     setFilteredHouses((prevHouses) =>
-      prevHouses.map((h) =>
-        h._id === houseId ? { ...h, status: status } : h,
-      ),
+      prevHouses.map((h) => (h._id === houseId ? { ...h, status: status } : h)),
     );
     if (selectedHouse?._id === houseId) {
-      setSelectedHouse((prev) => prev ? { ...prev, status: status as any } : null);
+      setSelectedHouse((prev) =>
+        prev ? { ...prev, status: status as any } : null,
+      );
     }
   };
 
@@ -23715,20 +20759,22 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
   // ============================================================
   useEffect(() => {
     if (!pendingBookingId || !selectedHouse?._id) return;
-    
+
     let pollInterval: NodeJS.Timeout;
     let attempts = 0;
     const maxAttempts = 12;
-    
+
     const checkPaymentStatus = async () => {
       try {
         attempts++;
-        
-        const response = await API.get(`/bookings/${pendingBookingId}/payment-status`);
-        
+
+        const response = await API.get(
+          `/bookings/${pendingBookingId}/payment-status`,
+        );
+
         if (response.data.success) {
           const { isVerified } = response.data.data;
-          
+
           if (isVerified) {
             toast.success("✅ Payment verified successfully!");
             clearInterval(pollInterval);
@@ -23737,12 +20783,14 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
             setIsProcessingModalOpen(false);
             setIsSuccessModalOpen(true);
           }
-          
+
           if (attempts >= maxAttempts) {
             clearInterval(pollInterval);
             setPendingBookingId(null);
             setIsProcessingModalOpen(false);
-            toast.warning('Payment verification is taking longer. Your booking is confirmed.');
+            toast.warning(
+              "Payment verification is taking longer. Your booking is confirmed.",
+            );
             setIsSuccessModalOpen(true);
           }
         }
@@ -23750,10 +20798,10 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
         // Silent fail
       }
     };
-    
+
     pollInterval = setInterval(checkPaymentStatus, 5000);
     checkPaymentStatus();
-    
+
     return () => {
       clearInterval(pollInterval);
     };
@@ -23972,7 +21020,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
   };
 
   // ============================================================
-  // OPTIMIZED: Handle Submit Booking - Show Processing Modal
+  // UPDATED: Handle Submit Booking - Matches Booking Model
   // ============================================================
   const handleSubmitBooking = async () => {
     if (currentStep !== 3) return;
@@ -23986,7 +21034,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
 
     setSubmitting(true);
     setBookingJustCompleted(false);
-    
+
     // Show processing modal immediately
     setIsProcessingModalOpen(true);
     setProcessingMessage("📤 Submitting your booking...");
@@ -23994,23 +21042,26 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
     try {
       const serviceFee = calculateServiceFee(selectedHouse?.pricePerMonth || 0);
 
+      // Create FormData that matches the Booking schema
       const formData = new FormData();
 
-      formData.append("fullName", bookingData.step1.fullName);
-      formData.append("email", bookingData.step1.email);
-      formData.append("phone", bookingData.step1.phone);
-      formData.append("idNumber", bookingData.step1.idNumber || "");
-      formData.append("university", bookingData.step1.university || "");
-      formData.append("studentId", bookingData.step1.studentId || "");
-      formData.append("purpose", bookingData.step1.purpose || "");
+      // === Guest Information ===
+      formData.append("fullName", bookingData.step1.fullName.trim());
+      formData.append("email", bookingData.step1.email.trim().toLowerCase());
+      formData.append("phone", bookingData.step1.phone.trim());
+      formData.append("idNumber", bookingData.step1.idNumber?.trim() || "");
+      formData.append("university", bookingData.step1.university?.trim() || "");
+      formData.append("studentId", bookingData.step1.studentId?.trim() || "");
+      formData.append("purpose", bookingData.step1.purpose?.trim() || "");
 
+      // === House Information ===
       formData.append("houseId", selectedHouse?._id || "");
       formData.append("houseName", selectedHouse?.name || "");
       formData.append("houseType", "House");
-      formData.append("district", selectedHouse?.location.district || "");
-      formData.append("sector", selectedHouse?.location.sector || "");
-      formData.append("cell", selectedHouse?.location.cell || "");
-      formData.append("village", selectedHouse?.location.village || "");
+      formData.append("district", selectedHouse?.location?.district || "");
+      formData.append("sector", selectedHouse?.location?.sector || "");
+      formData.append("cell", selectedHouse?.location?.cell || "");
+      formData.append("village", selectedHouse?.location?.village || "");
 
       const hostName = selectedHouse?.host?.name || "Not specified";
       const hostPhone = selectedHouse?.host?.phone || "Not specified";
@@ -24020,32 +21071,31 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
       formData.append("ownerContact", hostPhone);
       formData.append("ownerEmail", hostEmail);
 
-      formData.append(
-        "hostData",
-        JSON.stringify({
-          name: hostName,
-          phone: hostPhone,
-          email: hostEmail,
-          responseRate: selectedHouse?.host?.responseRate || 0,
-          responseTime: selectedHouse?.host?.responseTime || "",
-        }),
-      );
-
+      // === Booking Details ===
       formData.append("checkIn", bookingData.step2.checkIn);
       formData.append("checkOut", bookingData.step2.checkOut);
       formData.append("months", String(bookingData.step2.months));
       formData.append("guests", String(bookingData.step2.guests));
       formData.append(
         "specialRequests",
-        bookingData.step2.specialRequests || "",
+        bookingData.step2.specialRequests?.trim() || "",
       );
 
+      // === Payment ===
       formData.append("monthlyRent", String(selectedHouse?.pricePerMonth || 0));
       formData.append("serviceFee", String(serviceFee));
       formData.append("totalAmount", String(serviceFee));
-      formData.append("paymentMethod", "momo");
-      formData.append("momoNumber", bookingData.step3.momoNumber || "");
+      formData.append(
+        "paymentMethod",
+        bookingData.step3.paymentMethod || "momo",
+      );
+      formData.append("momoNumber", bookingData.step3.momoNumber?.trim() || "");
 
+      // === Payment Status (Default values) ===
+      formData.append("paymentStatus", "pending");
+      formData.append("status", "pending");
+
+      // === Payment Screenshot (if uploaded) ===
       if (bookingData.step3.screenshotFile) {
         formData.append("paymentScreenshot", bookingData.step3.screenshotFile);
       }
@@ -24053,17 +21103,17 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
       setProcessingMessage("⏳ Processing your booking...");
 
       const houseId = selectedHouse?._id;
-      
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
-      
+
       const bookingResponse = await API.post("/bookings", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-        signal: controller.signal
+        signal: controller.signal,
       });
-      
+
       clearTimeout(timeoutId);
 
       setProcessingMessage("✅ Booking confirmed! Updating house status...");
@@ -24076,27 +21126,30 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
       if (bookingResponse.data.success) {
         const bookingId = bookingResponse.data.data._id;
         setPendingBookingId(bookingId);
-        
+
         setBookingJustCompleted(true);
         setIsBookingModalOpen(false);
         setCurrentStep(1);
         resetBookingData();
-        
+
         setProcessingMessage("✅ Booking successful! Verifying payment...");
-        
+
         toast.success("✅ Booking confirmed! House is now booked.");
-        
       } else {
-        throw new Error(bookingResponse.data.message || "Failed to create booking");
+        throw new Error(
+          bookingResponse.data.message || "Failed to create booking",
+        );
       }
     } catch (error: any) {
       setIsProcessingModalOpen(false);
-      
+
       const errorMsg =
         error.response?.data?.message ||
         error.message ||
         "Failed to confirm booking";
-      toast.error(`❌ ${t.bookingFailed || "Failed to confirm booking"}: ${errorMsg}`);
+      toast.error(
+        `❌ ${t.bookingFailed || "Failed to confirm booking"}: ${errorMsg}`,
+      );
     } finally {
       setSubmitting(false);
     }
@@ -24132,11 +21185,11 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
 
   // ===== Handle Book Now Click =====
   const handleBookNow = (house: ApiHouse) => {
-    if (house.status === 'booked') {
+    if (house.status === "booked") {
       toast.warning("This house is already booked!");
       return;
     }
-    
+
     if (isLoggedIn) {
       setSelectedHouse(house);
       setCurrentStep(1);
@@ -24155,7 +21208,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
     setIsLoginRegisterOpen(false);
-    
+
     if (pendingHouse) {
       setTimeout(() => {
         setSelectedHouse(pendingHouse);
@@ -24170,7 +21223,7 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
   // ===== Handle Success Modal Close =====
   const handleSuccessModalClose = () => {
     setIsSuccessModalOpen(false);
-    
+
     if (bookingJustCompleted && selectedHouse) {
       setTimeout(() => {
         setIsPropertyModalOpen(true);
@@ -24576,15 +21629,25 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
                 </div>
                 <div className="p-6 text-center">
                   <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-12 h-12 text-green-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">
                     {t.bookingSubmitted || "Booking Submitted Successfully!"}
                   </h3>
                   <p className="text-sm text-gray-600 mb-4">
-                    {t.waitingForPaymentVerification || 
+                    {t.waitingForPaymentVerification ||
                       "Your booking has been submitted. We're waiting for payment verification."}
                   </p>
 
@@ -24657,21 +21720,26 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
                     Processing Your Booking
                   </h3>
                   <p className="text-sm text-gray-600 mb-4">
-                    {processingMessage || "Please wait while we process your booking..."}
+                    {processingMessage ||
+                      "Please wait while we process your booking..."}
                   </p>
-                  
+
                   <div className="bg-gray-50 rounded-lg p-4 mb-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm text-gray-600">Status</span>
                       <span className="text-sm font-medium text-[#FF385C]">
-                        {processingMessage?.includes("✅") ? "Completed" : "Processing..."}
+                        {processingMessage?.includes("✅")
+                          ? "Completed"
+                          : "Processing..."}
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
+                      <div
                         className="bg-[#FF385C] h-2 rounded-full transition-all duration-500"
-                        style={{ 
-                          width: processingMessage?.includes("✅") ? "100%" : "60%"
+                        style={{
+                          width: processingMessage?.includes("✅")
+                            ? "100%"
+                            : "60%",
                         }}
                       ></div>
                     </div>
@@ -24682,15 +21750,21 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
 
                   <div className="flex gap-2 justify-center">
                     <div className="flex items-center gap-1 text-xs text-gray-500">
-                      <div className={`w-2 h-2 rounded-full ${processingMessage?.includes("📤") ? "bg-blue-500" : processingMessage?.includes("⏳") ? "bg-yellow-500" : processingMessage?.includes("✅") ? "bg-green-500" : "bg-gray-300"}`}></div>
+                      <div
+                        className={`w-2 h-2 rounded-full ${processingMessage?.includes("📤") ? "bg-blue-500" : processingMessage?.includes("⏳") ? "bg-yellow-500" : processingMessage?.includes("✅") ? "bg-green-500" : "bg-gray-300"}`}
+                      ></div>
                       Submitting
                     </div>
                     <div className="flex items-center gap-1 text-xs text-gray-500">
-                      <div className={`w-2 h-2 rounded-full ${processingMessage?.includes("⏳") ? "bg-yellow-500" : processingMessage?.includes("✅") ? "bg-green-500" : "bg-gray-300"}`}></div>
+                      <div
+                        className={`w-2 h-2 rounded-full ${processingMessage?.includes("⏳") ? "bg-yellow-500" : processingMessage?.includes("✅") ? "bg-green-500" : "bg-gray-300"}`}
+                      ></div>
                       Processing
                     </div>
                     <div className="flex items-center gap-1 text-xs text-gray-500">
-                      <div className={`w-2 h-2 rounded-full ${processingMessage?.includes("✅") ? "bg-green-500" : "bg-gray-300"}`}></div>
+                      <div
+                        className={`w-2 h-2 rounded-full ${processingMessage?.includes("✅") ? "bg-green-500" : "bg-gray-300"}`}
+                      ></div>
                       Complete
                     </div>
                   </div>
@@ -26179,25 +23253,25 @@ export const Hero: React.FC<HeroProps> = ({ onSearch }) => {
                         <div className="bg-gray-50 rounded-lg p-2 sm:p-3 md:p-4">
                           <p className="text-[10px] sm:text-xs md:text-sm text-gray-600">
                             <span className="font-medium">
-                              {t.monthlyRent || "Monthly Rent"}: 
+                              {t.monthlyRent || "Monthly Rent"}:
                             </span>{" "}
                             {formatCurrency(selectedHouse.pricePerMonth)}
                           </p>
                           <p className="text-[10px] sm:text-xs md:text-sm text-gray-600">
                             <span className="font-medium">
-                              {t.months || "Months"}: 
+                              {t.months || "Months"}:
                             </span>{" "}
                             {bookingData.step2.months}
                           </p>
                           <p className="text-[10px] sm:text-xs md:text-sm text-gray-600">
                             <span className="font-medium">
-                              {t.serviceFee || "Service Fee"}: 
+                              {t.serviceFee || "Service Fee"}:
                             </span>{" "}
                             {formatCurrency(getServiceFee())}
                           </p>
                           <p className="text-[10px] sm:text-xs md:text-sm text-gray-600 font-semibold text-[#FF385C]">
                             <span className="font-medium">
-                              {t.totalAmount || "Total Amount to Pay"}: 
+                              {t.totalAmount || "Total Amount to Pay"}:
                             </span>{" "}
                             {formatCurrency(getServiceFee())}
                           </p>

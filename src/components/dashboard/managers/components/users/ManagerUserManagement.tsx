@@ -1,8 +1,5 @@
-
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/immutability */
-/* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -29,14 +26,10 @@ import SecurityIcon from "@mui/icons-material/Security";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import InfoIcon from "@mui/icons-material/Info";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import {
-  CheckCircleOutlineRounded,
-  ErrorOutlineOutlined,
-  ViewAgenda,
-} from "@mui/icons-material";
+import ErrorIcon from "@mui/icons-material/Error";
+
 
 // API Configuration
 const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
@@ -91,6 +84,294 @@ interface UserFormData {
   role: ManagerAllowedRole;
   isActive: boolean;
 }
+
+// ============================================
+// CUSTOM MODAL COMPONENTS (Booking Management Style)
+// ============================================
+
+// Success Modal
+interface SuccessModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  message: string;
+  details?: string;
+}
+
+const SuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose, title, message, details }) => {
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1 },
+              exit: { opacity: 0 },
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300]"
+            onClick={onClose}
+          />
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, scale: 0.8, y: 30 },
+              visible: { opacity: 1, scale: 1, y: 0 },
+              exit: { opacity: 0, scale: 0.8, y: 30 },
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 z-[301] flex items-center justify-center p-4"
+          >
+            <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 to-green-600" />
+              <div className="p-6">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center relative">
+                    <div className="absolute inset-0 rounded-full border-4 border-green-200 animate-ping opacity-75" />
+                    <CheckCircleIcon className="w-10 h-10 text-green-600 relative z-10" />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">{title}</h3>
+                <p className="text-gray-600 text-center mb-2">{message}</p>
+                {details && <p className="text-sm text-gray-400 text-center mb-6">{details}</p>}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={onClose}
+                  className="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+                >
+                  Got it!
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
+
+// Error Modal
+interface ErrorModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  message: string;
+  details?: string;
+}
+
+const ErrorModal: React.FC<ErrorModalProps> = ({ isOpen, onClose, title, message, details }) => {
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1 },
+              exit: { opacity: 0 },
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300]"
+            onClick={onClose}
+          />
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, scale: 0.8, y: 30 },
+              visible: { opacity: 1, scale: 1, y: 0 },
+              exit: { opacity: 0, scale: 0.8, y: 30 },
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 z-[301] flex items-center justify-center p-4"
+          >
+            <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-400 to-red-600" />
+              <div className="p-6">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center relative">
+                    <div className="absolute inset-0 rounded-full border-4 border-red-200 animate-ping opacity-75" />
+                    <ErrorIcon className="w-10 h-10 text-red-600 relative z-10" />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">{title}</h3>
+                <p className="text-gray-600 text-center mb-2">{message}</p>
+                {details && <p className="text-sm text-gray-400 text-center mb-6">{details}</p>}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={onClose}
+                  className="w-full px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-medium hover:shadow-lg transition-all duration-200"
+                >
+                  Try Again
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
+
+// Confirm Modal
+interface ConfirmModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  icon?: React.ReactNode;
+  isSubmitting?: boolean;
+  type?: "danger" | "warning" | "info" | "success";
+}
+
+const ConfirmModal: React.FC<ConfirmModalProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmText = "Confirm",
+  cancelText = "Cancel",
+  icon,
+  isSubmitting = false,
+  type = "warning",
+}) => {
+  if (!isOpen) return null;
+
+  const getColors = () => {
+    switch (type) {
+      case "danger":
+        return {
+          iconBg: "bg-red-100",
+          iconColor: "text-red-600",
+          iconBorder: "border-red-200",
+          buttonBg: "bg-gradient-to-r from-red-500 to-red-600",
+          buttonHover: "hover:shadow-lg",
+        };
+      case "warning":
+        return {
+          iconBg: "bg-yellow-100",
+          iconColor: "text-yellow-600",
+          iconBorder: "border-yellow-200",
+          buttonBg: "bg-gradient-to-r from-yellow-500 to-yellow-600",
+          buttonHover: "hover:shadow-lg",
+        };
+      case "success":
+        return {
+          iconBg: "bg-green-100",
+          iconColor: "text-green-600",
+          iconBorder: "border-green-200",
+          buttonBg: "bg-gradient-to-r from-green-500 to-green-600",
+          buttonHover: "hover:shadow-lg",
+        };
+      default:
+        return {
+          iconBg: "bg-blue-100",
+          iconColor: "text-blue-600",
+          iconBorder: "border-blue-200",
+          buttonBg: "bg-gradient-to-r from-blue-500 to-blue-600",
+          buttonHover: "hover:shadow-lg",
+        };
+    }
+  };
+
+  const colors = getColors();
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1 },
+              exit: { opacity: 0 },
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300]"
+            onClick={onClose}
+          />
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, scale: 0.8, y: 30 },
+              visible: { opacity: 1, scale: 1, y: 0 },
+              exit: { opacity: 0, scale: 0.8, y: 30 },
+            }}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 z-[301] flex items-center justify-center p-4"
+          >
+            <div className="w-full max-w-md rounded-2xl shadow-2xl bg-white relative overflow-hidden">
+              <div className={`absolute top-0 left-0 right-0 h-1 ${colors.buttonBg}`} />
+              <div className="p-6">
+                <div className="flex items-center justify-center mb-4">
+                  <div className={`w-20 h-20 ${colors.iconBg} rounded-full flex items-center justify-center relative`}>
+                    <div className={`absolute inset-0 rounded-full border-4 ${colors.iconBorder} animate-ping opacity-75`} />
+                    <div className={`${colors.iconColor} relative z-10`}>
+                      {icon || (
+                        type === "danger" ? <DeleteIcon className="w-10 h-10" /> :
+                        type === "warning" ? <WarningIcon className="w-10 h-10" /> :
+                        type === "success" ? <CheckCircleIcon className="w-10 h-10" /> :
+                        <PersonIcon className="w-10 h-10" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">{title}</h3>
+                <p className="text-gray-600 text-center mb-6">{message}</p>
+                <div className="flex gap-3">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={onClose}
+                    disabled={isSubmitting}
+                    className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  >
+                    {cancelText}
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={onConfirm}
+                    disabled={isSubmitting}
+                    className={`flex-1 px-4 py-2.5 ${colors.buttonBg} text-white rounded-xl font-medium ${colors.buttonHover} transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2`}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      confirmText
+                    )}
+                  </motion.button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
 
 // Helper functions for safe user data access with translations
 const safeUserHelpers = {
@@ -170,212 +451,7 @@ const safeUserHelpers = {
   },
 };
 
-// Status Modal Component
-interface StatusModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  type: "success" | "error" | "info" | "confirm";
-  title: string;
-  message: string;
-  details?: string;
-  onConfirm?: () => void;
-  confirmText?: string;
-  cancelText?: string;
-}
-
-const StatusModal: React.FC<StatusModalProps> = ({
-  isOpen,
-  onClose,
-  type,
-  title,
-  message,
-  details,
-  onConfirm,
-  confirmText = "Confirm",
-  cancelText = "Cancel",
-}) => {
-  const getIcon = () => {
-    switch (type) {
-      case "success":
-        return (
-          <CheckCircleOutlineRounded className="w-16 h-16 text-green-500" />
-        );
-      case "error":
-        return <ErrorOutlineOutlined className="w-16 h-16 text-red-500" />;
-      case "info":
-        return <InfoIcon className="w-16 h-16 text-blue-500" />;
-      case "confirm":
-        return <WarningIcon className="w-16 h-16 text-yellow-500" />;
-    }
-  };
-
-  const getColors = () => {
-    switch (type) {
-      case "success":
-        return {
-          bg: "bg-green-50",
-          border: "border-green-200",
-          text: "text-green-800",
-          button: "bg-green-500 hover:bg-green-600",
-        };
-      case "error":
-        return {
-          bg: "bg-red-50",
-          border: "border-red-200",
-          text: "text-red-800",
-          button: "bg-red-500 hover:bg-red-600",
-        };
-      case "info":
-        return {
-          bg: "bg-blue-50",
-          border: "border-blue-200",
-          text: "text-blue-800",
-          button: "bg-blue-500 hover:bg-blue-600",
-        };
-      case "confirm":
-        return {
-          bg: "bg-yellow-50",
-          border: "border-yellow-200",
-          text: "text-yellow-800",
-          button: "bg-yellow-500 hover:bg-yellow-600",
-        };
-    }
-  };
-
-  const colors = getColors();
-
-  const modalVariants = {
-    hidden: { opacity: 0, scale: 0.8, y: 30 },
-    visible: { opacity: 1, scale: 1, y: 0 },
-    exit: { opacity: 0, scale: 0.8, y: 30 },
-  };
-
-  const overlayVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-    exit: { opacity: 0 },
-  };
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            variants={overlayVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200]"
-            onClick={onClose}
-          />
-          <motion.div
-            variants={modalVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            transition={{ duration: 0.4, type: "spring", stiffness: 300 }}
-            className="fixed inset-0 z-[201] flex items-center justify-center p-4"
-          >
-            <div
-              className={`w-full max-w-md rounded-2xl shadow-2xl border ${colors.border} ${colors.bg} relative overflow-hidden`}
-            >
-              <div className="relative z-10 p-6">
-                <div className="flex flex-col items-center text-center">
-                  {/* Icon */}
-                  <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ duration: 0.5, type: "spring" }}
-                    className="mb-4"
-                  >
-                    {getIcon()}
-                  </motion.div>
-
-                  {/* Title */}
-                  <motion.h3
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className={`text-2xl font-bold ${colors.text} mb-2`}
-                  >
-                    {title}
-                  </motion.h3>
-
-                  {/* Message */}
-                  <motion.p
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-gray-700 mb-4"
-                  >
-                    {message}
-                  </motion.p>
-
-                  {/* Details */}
-                  {details && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 }}
-                      className="bg-white/50 rounded-lg p-3 mb-4 w-full text-sm text-gray-600"
-                    >
-                      {details}
-                    </motion.div>
-                  )}
-
-                  {/* Buttons */}
-                  <div className="flex gap-3 w-full">
-                    {type === "confirm" ? (
-                      <>
-                        <motion.button
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.4 }}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={onClose}
-                          className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-                        >
-                          {cancelText}
-                        </motion.button>
-                        <motion.button
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.5 }}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={onConfirm}
-                          className={`flex-1 px-4 py-2.5 rounded-lg text-white font-medium transition-all ${colors.button} shadow-lg`}
-                        >
-                          {confirmText}
-                        </motion.button>
-                      </>
-                    ) : (
-                      <motion.button
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={onClose}
-                        className={`w-full px-6 py-2.5 rounded-lg text-white font-medium transition-all ${colors.button} shadow-lg`}
-                      >
-                        Got it
-                      </motion.button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
-  );
-};
-
-// View User Modal - Responsive with translations
+// View User Modal - Responsive with translations (STATISTICS REMOVED)
 interface ViewUserModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -468,7 +544,7 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
             transition={{ duration: 0.4, type: "spring", stiffness: 300 }}
             className="fixed inset-0 z-[151] flex items-center justify-center p-2 sm:p-4"
           >
-            <div className="w-full max-w-[95%] sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl 2xl:max-w-3xl rounded-2xl shadow-2xl bg-white relative overflow-hidden mx-2">
+            <div className="w-full max-w-[95%] sm:max-w-md md:max-w-lg rounded-2xl shadow-2xl bg-white relative overflow-hidden mx-2">
               <div className="sticky top-0 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between border-b border-gray-200 bg-white/95 backdrop-blur-sm rounded-t-2xl z-10">
                 <div className="flex items-center gap-2">
                   <PersonIcon className="text-[#FF385C] w-5 h-5" />
@@ -525,7 +601,7 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
                   </div>
                 </div>
 
-                {/* User Details Grid - Responsive */}
+                {/* User Details Grid - Responsive (STATISTICS REMOVED) */}
                 <div className="border-t border-gray-200 pt-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="flex justify-between py-2 border-b border-gray-100 sm:border-b-0">
@@ -599,46 +675,6 @@ const ViewUserModal: React.FC<ViewUserModalProps> = ({
                     )}
                   </div>
                 </div>
-
-                {/* Stats if available */}
-                {user.statistics && (
-                  <div className="mt-4 border-t border-gray-200 pt-4">
-                    <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                      {t.statistics || "Statistics"}
-                    </h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      <div className="bg-gray-50 rounded-lg p-2 text-center">
-                        <p className="text-xs text-gray-500">
-                          {t.totalIncome || "Total Income"}
-                        </p>
-                        <p className="text-sm font-bold text-gray-900">
-                          RWF{" "}
-                          {user.statistics.totalIncome?.toLocaleString() || "0"}
-                        </p>
-                      </div>
-                      <div className="bg-gray-50 rounded-lg p-2 text-center">
-                        <p className="text-xs text-gray-500">
-                          {t.totalExpenses || "Total Expenses"}
-                        </p>
-                        <p className="text-sm font-bold text-gray-900">
-                          RWF{" "}
-                          {user.statistics.totalExpenses?.toLocaleString() ||
-                            "0"}
-                        </p>
-                      </div>
-                      <div className="bg-gray-50 rounded-lg p-2 text-center">
-                        <p className="text-xs text-gray-500">
-                          {t.totalSavings || "Total Savings"}
-                        </p>
-                        <p className="text-sm font-bold text-gray-900">
-                          RWF{" "}
-                          {user.statistics.totalSavings?.toLocaleString() ||
-                            "0"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
 
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -743,6 +779,8 @@ const translations = {
     next: "Next",
     page: "Page",
     itemsPerPage: "Items per page",
+    success: "Success!",
+    error: "Error",
   },
   fr: {
     lang: "fr-FR",
@@ -830,6 +868,8 @@ const translations = {
     next: "Suivant",
     page: "Page",
     itemsPerPage: "Éléments par page",
+    success: "Succès !",
+    error: "Erreur",
   },
   rw: {
     lang: "rw-RW",
@@ -916,6 +956,8 @@ const translations = {
     next: "Ikurikira",
     page: "Urupapuro",
     itemsPerPage: "Ibintu ku rupapuro",
+    success: "Byakunze!",
+    error: "Ikosa",
   },
 };
 
@@ -923,12 +965,6 @@ const translations = {
 const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
   const lang = Cookies.get("language") as "en" | "fr" | "rw";
   return lang || "en";
-};
-
-// Helper function to get translations based on cookie language
-export const getTranslations = () => {
-  const lang = getLanguageFromCookies();
-  return translations[lang];
 };
 
 export const ManagerUserManagement: React.FC = () => {
@@ -951,24 +987,31 @@ export const ManagerUserManagement: React.FC = () => {
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [, setIsDeleteModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
-  // Status Modal state
-  const [statusModal, setStatusModal] = useState<{
+  // Success/Error modal states
+  const [successModal, setSuccessModal] = useState<{
     isOpen: boolean;
-    type: "success" | "error" | "info" | "confirm";
     title: string;
     message: string;
     details?: string;
-    onConfirm?: () => void;
-    confirmText?: string;
-    cancelText?: string;
   }>({
     isOpen: false,
-    type: "success",
+    title: "",
+    message: "",
+    details: "",
+  });
+
+  const [errorModal, setErrorModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    details?: string;
+  }>({
+    isOpen: false,
     title: "",
     message: "",
     details: "",
@@ -1071,20 +1114,21 @@ export const ManagerUserManagement: React.FC = () => {
         setTotalPages(total > 0 ? total : 1);
         setCurrentPage(1);
       } else {
-        showStatusModal(
-          "error",
-          "Error",
-          response.data.message || "Failed to fetch users",
-        );
+        setErrorModal({
+          isOpen: true,
+          title: t.error || "Error",
+          message: response.data.message || "Failed to fetch users",
+        });
       }
     } catch (error: any) {
       console.error("Error fetching users:", error);
-      showStatusModal(
-        "error",
-        "Error",
-        error.response?.data?.message ||
+      setErrorModal({
+        isOpen: true,
+        title: t.error || "Error",
+        message: error.response?.data?.message ||
           "Failed to fetch users. Please try again.",
-      );
+        details: error instanceof Error ? error.message : undefined,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -1147,33 +1191,6 @@ export const ManagerUserManagement: React.FC = () => {
 
     setStats({ total, active, inactive, hosts, users: userCount });
   }, [users]);
-
-  // Show status modal
-  const showStatusModal = (
-    type: "success" | "error" | "info" | "confirm",
-    title: string,
-    message: string,
-    details?: string,
-    onConfirm?: () => void,
-    confirmText?: string,
-    cancelText?: string,
-  ) => {
-    setStatusModal({
-      isOpen: true,
-      type,
-      title,
-      message,
-      details,
-      onConfirm,
-      confirmText,
-      cancelText,
-    });
-  };
-
-  // Close status modal
-  const closeStatusModal = () => {
-    setStatusModal((prev) => ({ ...prev, isOpen: false }));
-  };
 
   // Validation functions
   const validateEmail = (email: string): boolean => {
@@ -1346,35 +1363,36 @@ export const ManagerUserManagement: React.FC = () => {
       });
 
       if (response.data.success) {
-        showStatusModal(
-          "success",
-          "✅ " + t.userCreated,
-          t.userCreated,
-          `Name: ${formData.name}\nEmail: ${formData.email}\nRole: ${safeUserHelpers.getTranslatedRole(formData.role, t)}`,
-        );
+        setSuccessModal({
+          isOpen: true,
+          title: "✅ " + t.success,
+          message: t.userCreated,
+          details: `Name: ${formData.name}\nEmail: ${formData.email}\nRole: ${safeUserHelpers.getTranslatedRole(formData.role, t)}`,
+        });
         await fetchUsers();
         resetForm();
         setIsCreateModalOpen(false);
       } else {
-        showStatusModal(
-          "error",
-          "❌ " + t.createFailed,
-          response.data.message || t.createFailed,
-        );
+        setErrorModal({
+          isOpen: true,
+          title: "❌ " + t.error,
+          message: response.data.message || t.createFailed,
+        });
       }
     } catch (error: any) {
       console.error("Create user error:", error);
-      showStatusModal(
-        "error",
-        "❌ " + t.createFailed,
-        error.response?.data?.message || t.createFailed,
-      );
+      setErrorModal({
+        isOpen: true,
+        title: "❌ " + t.error,
+        message: error.response?.data?.message || t.createFailed,
+        details: error instanceof Error ? error.message : undefined,
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleEditUser = async (e: React.FormEvent) => {
+  const handleUpdateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm() || !selectedUser) return;
 
@@ -1398,30 +1416,31 @@ export const ManagerUserManagement: React.FC = () => {
       const response = await API.put(`/auth/${selectedUser.id}`, updateData);
 
       if (response.data.success) {
-        showStatusModal(
-          "success",
-          "✅ " + t.userUpdated,
-          t.userUpdated,
-          `Name: ${formData.name}\nEmail: ${formData.email}\nRole: ${safeUserHelpers.getTranslatedRole(formData.role, t)}`,
-        );
+        setSuccessModal({
+          isOpen: true,
+          title: "✅ " + t.success,
+          message: t.userUpdated,
+          details: `Name: ${formData.name}\nEmail: ${formData.email}\nRole: ${safeUserHelpers.getTranslatedRole(formData.role, t)}`,
+        });
         await fetchUsers();
         resetForm();
         setIsEditModalOpen(false);
         setSelectedUser(null);
       } else {
-        showStatusModal(
-          "error",
-          "❌ " + t.updateFailed,
-          response.data.message || t.updateFailed,
-        );
+        setErrorModal({
+          isOpen: true,
+          title: "❌ " + t.error,
+          message: response.data.message || t.updateFailed,
+        });
       }
     } catch (error: any) {
       console.error("Update user error:", error);
-      showStatusModal(
-        "error",
-        "❌ " + t.updateFailed,
-        error.response?.data?.message || t.updateFailed,
-      );
+      setErrorModal({
+        isOpen: true,
+        title: "❌ " + t.error,
+        message: error.response?.data?.message || t.updateFailed,
+        details: error instanceof Error ? error.message : undefined,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -1430,84 +1449,83 @@ export const ManagerUserManagement: React.FC = () => {
   const handleDeleteUser = async () => {
     if (!selectedUser) return;
 
+    setIsSubmitting(true);
     try {
       const response = await API.delete(`/auth/${selectedUser.id}`);
 
       if (response.data.success) {
-        showStatusModal(
-          "success",
-          "🗑️ " + t.userDeleted,
-          t.userDeleted,
-          `User: ${selectedUser.name}`,
-        );
+        setSuccessModal({
+          isOpen: true,
+          title: "🗑️ " + t.success,
+          message: t.userDeleted,
+          details: `User: ${selectedUser.name}`,
+        });
         await fetchUsers();
         setIsDeleteModalOpen(false);
         setSelectedUser(null);
+        setSelectedUsers((prev) => prev.filter((id) => id !== selectedUser.id));
       } else {
-        showStatusModal(
-          "error",
-          "❌ " + t.deleteFailed,
-          response.data.message || t.deleteFailed,
-        );
+        setErrorModal({
+          isOpen: true,
+          title: "❌ " + t.error,
+          message: response.data.message || t.deleteFailed,
+        });
       }
     } catch (error: any) {
       console.error("Delete user error:", error);
-      showStatusModal(
-        "error",
-        "❌ " + t.deleteFailed,
-        error.response?.data?.message || t.deleteFailed,
-      );
+      setErrorModal({
+        isOpen: true,
+        title: "❌ " + t.error,
+        message: error.response?.data?.message || t.deleteFailed,
+        details: error instanceof Error ? error.message : undefined,
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleBulkDelete = async () => {
     if (selectedUsers.length === 0) {
-      showStatusModal("info", "Info", "Please select users to delete");
+      setErrorModal({
+        isOpen: true,
+        title: "Info",
+        message: "Please select users to delete",
+      });
       return;
     }
 
-    showStatusModal(
-      "confirm",
-      "⚠️ Confirm Bulk Delete",
-      `Are you sure you want to delete ${selectedUsers.length} users?`,
-      "This action cannot be undone.",
-      async () => {
-        setIsSubmitting(true);
-        try {
-          const response = await API.delete("/auth/bulk", {
-            data: { userIds: selectedUsers },
-          });
+    setIsSubmitting(true);
+    try {
+      const response = await API.delete("/auth/bulk", {
+        data: { userIds: selectedUsers },
+      });
 
-          if (response.data.success) {
-            showStatusModal(
-              "success",
-              "🗑️ " + selectedUsers.length + " " + t.usersDeleted,
-              selectedUsers.length + " " + t.usersDeleted,
-            );
-            await fetchUsers();
-            setSelectedUsers([]);
-          } else {
-            showStatusModal(
-              "error",
-              "❌ " + t.deleteFailed,
-              response.data.message || t.deleteFailed,
-            );
-          }
-        } catch (error: any) {
-          console.error("Bulk delete error:", error);
-          showStatusModal(
-            "error",
-            "❌ " + t.deleteFailed,
-            error.response?.data?.message || t.deleteFailed,
-          );
-        } finally {
-          setIsSubmitting(false);
-          closeStatusModal();
-        }
-      },
-      t.delete,
-      t.cancel,
-    );
+      if (response.data.success) {
+        setSuccessModal({
+          isOpen: true,
+          title: "🗑️ " + t.success,
+          message: selectedUsers.length + " " + t.usersDeleted,
+        });
+        await fetchUsers();
+        setSelectedUsers([]);
+      } else {
+        setErrorModal({
+          isOpen: true,
+          title: "❌ " + t.error,
+          message: response.data.message || t.deleteFailed,
+        });
+      }
+    } catch (error: any) {
+      console.error("Bulk delete error:", error);
+      setErrorModal({
+        isOpen: true,
+        title: "❌ " + t.error,
+        message: error.response?.data?.message || t.deleteFailed,
+        details: error instanceof Error ? error.message : undefined,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Reset form
@@ -1533,7 +1551,11 @@ export const ManagerUserManagement: React.FC = () => {
   const openEditModal = (user: User) => {
     // Check if user role is allowed for manager to edit
     if (!safeUserHelpers.isRoleAllowed(user.role)) {
-      showStatusModal("error", "⚠️ " + t.notAuthorized, t.notAuthorized);
+      setErrorModal({
+        isOpen: true,
+        title: "⚠️ " + t.notAuthorized,
+        message: t.notAuthorized,
+      });
       return;
     }
 
@@ -1558,24 +1580,20 @@ export const ManagerUserManagement: React.FC = () => {
     setIsViewModalOpen(true);
   };
 
-  // Open delete confirmation - only if role is allowed
+  // Open delete confirmation - using ConfirmModal
   const openDeleteModal = (user: User) => {
     // Check if user role is allowed for manager to delete
     if (!safeUserHelpers.isRoleAllowed(user.role)) {
-      showStatusModal("error", "⚠️ " + t.notAuthorized, t.notAuthorized);
+      setErrorModal({
+        isOpen: true,
+        title: "⚠️ " + t.notAuthorized,
+        message: t.notAuthorized,
+      });
       return;
     }
 
     setSelectedUser(user);
-    showStatusModal(
-      "confirm",
-      "⚠️ " + t.deleteUser,
-      `${t.deleteConfirmation} "${user.name || "Unknown User"}"?`,
-      t.actionUndone,
-      handleDeleteUser,
-      t.delete,
-      t.cancel,
-    );
+    setIsDeleteModalOpen(true);
   };
 
   // Handle form field changes
@@ -1732,17 +1750,22 @@ export const ManagerUserManagement: React.FC = () => {
 
   return (
     <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
-      {/* Status Modal */}
-      <StatusModal
-        isOpen={statusModal.isOpen}
-        onClose={closeStatusModal}
-        type={statusModal.type}
-        title={statusModal.title}
-        message={statusModal.message}
-        details={statusModal.details}
-        onConfirm={statusModal.onConfirm}
-        confirmText={statusModal.confirmText}
-        cancelText={statusModal.cancelText}
+      {/* Success Modal */}
+      <SuccessModal
+        isOpen={successModal.isOpen}
+        onClose={() => setSuccessModal({ ...successModal, isOpen: false })}
+        title={successModal.title}
+        message={successModal.message}
+        details={successModal.details}
+      />
+
+      {/* Error Modal */}
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        onClose={() => setErrorModal({ ...errorModal, isOpen: false })}
+        title={errorModal.title}
+        message={errorModal.message}
+        details={errorModal.details}
       />
 
       {/* View User Modal */}
@@ -1754,6 +1777,23 @@ export const ManagerUserManagement: React.FC = () => {
         }}
         user={selectedUser}
         translations={t}
+      />
+
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedUser(null);
+        }}
+        onConfirm={handleDeleteUser}
+        title={t.deleteUser}
+        message={`${t.deleteConfirmation} "${selectedUser?.name || 'Unknown User'}"?`}
+        confirmText={t.delete}
+        cancelText={t.cancel}
+        isSubmitting={isSubmitting}
+        type="danger"
+        icon={<DeleteIcon className="w-10 h-10" />}
       />
 
       {/* Header */}
@@ -2052,16 +2092,16 @@ export const ManagerUserManagement: React.FC = () => {
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
                               onClick={() => openViewModal(user)}
-                              className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                              className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                               title={t.viewUser}
                             >
-                              <ViewAgenda className="w-4 h-4" />
+                              <VisibilityIcon className="w-4 h-4" />
                             </motion.button>
                             <motion.button
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
                               onClick={() => openEditModal(user)}
-                              className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                               title={t.editUser}
                             >
                               <EditIcon className="w-4 h-4" />
@@ -2654,7 +2694,7 @@ export const ManagerUserManagement: React.FC = () => {
                   </motion.button>
                 </div>
 
-                <form onSubmit={handleEditUser} className="p-6">
+                <form onSubmit={handleUpdateUser} className="p-6">
                   {/* Name */}
                   <div className="mb-4">
                     <label className="block text-sm font-medium mb-1.5 text-gray-700">
