@@ -735,7 +735,7 @@ export const FAQ: React.FC = () => {
       id: 19,
       question: "How can my university join?",
       answer:
-        'Contact our team through the "Contact Us" section or email us directly at inyumba@yahoo.fr. We\'ll schedule a meeting to discuss partnership opportunities and how we can support your students.',
+        'Contact our team through the "Contact Us" section or email us directly at inyumbarental@gmail.com. We\'ll schedule a meeting to discuss partnership opportunities and how we can support your students.',
       category: "university",
       icon: <SupportAgentIcon />,
     },

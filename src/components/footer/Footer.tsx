@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import axios from "axios";
 
 // Material-UI Icons
@@ -31,6 +31,7 @@ import {
   ErrorOutlineOutlined,
 } from "@mui/icons-material";
 import InfoIcon from "@mui/icons-material/Info";
+import { Link } from "react-router-dom";
 
 // API Configuration - Fixed
 const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
@@ -53,12 +54,14 @@ CONTACT_API.interceptors.response.use(
       return Promise.reject(error);
     } else if (error.request) {
       // Request made but no response
-      return Promise.reject(new Error("Network error - no response from server"));
+      return Promise.reject(
+        new Error("Network error - no response from server"),
+      );
     } else {
       // Request setup error
       return Promise.reject(new Error("Request configuration error"));
     }
-  }
+  },
 );
 
 // Google Maps location - Musanze, INES-Ruhengeri
@@ -278,7 +281,7 @@ const translations = {
     contactUs: "Contact Us",
     address: "Musanze, Northern Province, Rwanda",
     phone: "+250 780 414 088",
-    email: "inyumba@yahoo.fr",
+    email: "inyumbarental@gmail.com",
     followUs: "Follow Us",
     rights: "All rights reserved.",
     designedBy: "Designed by",
@@ -292,7 +295,8 @@ const translations = {
     visitUs: "Visit Us",
     backToTop: "Back to Top",
     contactTitle: "Contact Us",
-    contactSubtitle: "We'd love to hear from you! Send us a message and we'll respond as soon as possible.",
+    contactSubtitle:
+      "We'd love to hear from you! Send us a message and we'll respond as soon as possible.",
     contactName: "Full Name",
     contactNamePlaceholder: "Enter your full name",
     contactEmail: "Email Address",
@@ -302,7 +306,8 @@ const translations = {
     contactSend: "Send Message",
     contactSending: "Sending...",
     contactSuccess: "Message Sent Successfully!",
-    contactSuccessMessage: "Thank you for reaching out. We'll get back to you shortly.",
+    contactSuccessMessage:
+      "Thank you for reaching out. We'll get back to you shortly.",
     contactError: "Failed to send message",
     contactErrorRetry: "Please try again later.",
     contactClose: "Close",
@@ -315,10 +320,12 @@ const translations = {
     contactMessageMin: "Message must be at least 10 characters",
     contactMessageMax: "Message cannot exceed 1000 characters",
     successModalTitle: "🎉 Message Sent!",
-    successModalMessage: "Your message has been sent successfully. We'll get back to you soon!",
+    successModalMessage:
+      "Your message has been sent successfully. We'll get back to you soon!",
     successModalButton: "Got it",
     failModalTitle: "❌ Failed to Send",
-    failModalMessage: "We couldn't send your message. Please check your internet connection and try again.",
+    failModalMessage:
+      "We couldn't send your message. Please check your internet connection and try again.",
     failModalButton: "Try Again",
     nameRequired: "Name is required",
     nameMin: "Name must be at least 2 characters",
@@ -353,7 +360,7 @@ const translations = {
     contactUs: "Contactez-Nous",
     address: "Musanze, Province du Nord, Rwanda",
     phone: "+250 780 414 088",
-    email: "inyumba@yahoo.fr",
+    email: "inyumbarental@gmail.com",
     followUs: "Suivez-Nous",
     rights: "Tous droits réservés.",
     designedBy: "Conçu par",
@@ -367,7 +374,8 @@ const translations = {
     visitUs: "Visitez-Nous",
     backToTop: "Retour en Haut",
     contactTitle: "Contactez-Nous",
-    contactSubtitle: "Nous serions ravis de vous entendre! Envoyez-nous un message et nous vous répondrons dès que possible.",
+    contactSubtitle:
+      "Nous serions ravis de vous entendre! Envoyez-nous un message et nous vous répondrons dès que possible.",
     contactName: "Nom Complet",
     contactNamePlaceholder: "Entrez votre nom complet",
     contactEmail: "Adresse Email",
@@ -377,7 +385,8 @@ const translations = {
     contactSend: "Envoyer",
     contactSending: "Envoi en cours...",
     contactSuccess: "Message Envoyé avec Succès!",
-    contactSuccessMessage: "Merci de nous avoir contactés. Nous vous répondrons bientôt.",
+    contactSuccessMessage:
+      "Merci de nous avoir contactés. Nous vous répondrons bientôt.",
     contactError: "Échec de l'envoi du message",
     contactErrorRetry: "Veuillez réessayer plus tard.",
     contactClose: "Fermer",
@@ -390,10 +399,12 @@ const translations = {
     contactMessageMin: "Le message doit comporter au moins 10 caractères",
     contactMessageMax: "Le message ne peut pas dépasser 1000 caractères",
     successModalTitle: "🎉 Message Envoyé!",
-    successModalMessage: "Votre message a été envoyé avec succès. Nous vous répondrons bientôt!",
+    successModalMessage:
+      "Votre message a été envoyé avec succès. Nous vous répondrons bientôt!",
     successModalButton: "Terminé",
     failModalTitle: "❌ Échec de l'envoi",
-    failModalMessage: "Nous n'avons pas pu envoyer votre message. Veuillez vérifier votre connexion internet et réessayer.",
+    failModalMessage:
+      "Nous n'avons pas pu envoyer votre message. Veuillez vérifier votre connexion internet et réessayer.",
     failModalButton: "Réessayer",
     nameRequired: "Le nom est requis",
     nameMin: "Le nom doit contenir au moins 2 caractères",
@@ -428,7 +439,7 @@ const translations = {
     contactUs: "Twandikire",
     address: "Musanze, Intara y'Amajyaruguru, Rwanda",
     phone: "+250 780 414 088",
-    email: "inyumba@yahoo.fr",
+    email: "inyumbarental@gmail.com",
     followUs: "Dukurikire",
     rights: "Uburenganzira bwose buraharanwa.",
     designedBy: "Byakozwe na",
@@ -442,7 +453,8 @@ const translations = {
     visitUs: "Udukerere",
     backToTop: "Garuka Hejuru",
     contactTitle: "Twandikire",
-    contactSubtitle: "Twishimira kumva ubutumwa bwawe! Dutume ubutumwa tuzagusubiza vuba.",
+    contactSubtitle:
+      "Twishimira kumva ubutumwa bwawe! Dutume ubutumwa tuzagusubiza vuba.",
     contactName: "Izina Risoze",
     contactNamePlaceholder: "Andika izina ryawe ryose",
     contactEmail: "Adresi ya Email",
@@ -468,7 +480,8 @@ const translations = {
     successModalMessage: "Ubutumwa bwawe bwoherejwe neza. Tuzagusubiza vuba!",
     successModalButton: "Byakozwe",
     failModalTitle: "❌ Ntabwo Bwoherejwe",
-    failModalMessage: "Ntabwo twashoboye kohereza ubutumwa bwawe. Nyamuneka reba isanduku ya interineti hanyuma ongera ugerageze.",
+    failModalMessage:
+      "Ntabwo twashoboye kohereza ubutumwa bwawe. Nyamuneka reba isanduku ya interineti hanyuma ongera ugerageze.",
     failModalButton: "Ongera Ugerageze",
     nameRequired: "Izina rirasabwa",
     nameMin: "Izina rigomba kugira nibura inyuguti 2",
@@ -487,9 +500,9 @@ const translations = {
 };
 
 // Helper function to get language from cookies
-const getLanguageFromCookies = (): 'en' | 'fr' | 'rw' => {
-  const lang = Cookies.get('language') as 'en' | 'fr' | 'rw';
-  return lang || 'en';
+const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
+  const lang = Cookies.get("language") as "en" | "fr" | "rw";
+  return lang || "en";
 };
 
 const InyumbaLogo = ({
@@ -574,52 +587,23 @@ const InyumbaLogo = ({
         N
       </text>
 
-      <circle
-        r="58"
-        fill="none"
-        stroke="#1B4E91"
-        strokeWidth="7"
-      />
+      <circle r="58" fill="none" stroke="#1B4E91" strokeWidth="7" />
 
-      <polygon
-        points="0,-58 10,-10 0,-22 -10,-10"
-        fill="#1B4E91"
-      />
+      <polygon points="0,-58 10,-10 0,-22 -10,-10" fill="#1B4E91" />
 
-      <polygon
-        points="0,58 10,10 0,22 -10,10"
-        fill="#1B4E91"
-      />
+      <polygon points="0,58 10,10 0,22 -10,10" fill="#1B4E91" />
 
-      <polygon
-        points="-58,0 -10,-10 -22,0 -10,10"
-        fill="#1B4E91"
-      />
+      <polygon points="-58,0 -10,-10 -22,0 -10,10" fill="#1B4E91" />
 
-      <polygon
-        points="58,0 10,-10 22,0 10,10"
-        fill="#1B4E91"
-      />
+      <polygon points="58,0 10,-10 22,0 10,10" fill="#1B4E91" />
 
-      <polygon
-        points="-40,-40 -8,-12 -12,-8"
-        fill="#1B4E91"
-      />
+      <polygon points="-40,-40 -8,-12 -12,-8" fill="#1B4E91" />
 
-      <polygon
-        points="40,-40 8,-12 12,-8"
-        fill="#1B4E91"
-      />
+      <polygon points="40,-40 8,-12 12,-8" fill="#1B4E91" />
 
-      <polygon
-        points="-40,40 -8,12 -12,8"
-        fill="#1B4E91"
-      />
+      <polygon points="-40,40 -8,12 -12,8" fill="#1B4E91" />
 
-      <polygon
-        points="40,40 8,12 12,8"
-        fill="#1B4E91"
-      />
+      <polygon points="40,40 8,12 12,8" fill="#1B4E91" />
     </g>
 
     {/* Roof */}
@@ -633,22 +617,10 @@ const InyumbaLogo = ({
     />
 
     {/* Chimney */}
-    <rect
-      x="305"
-      y="175"
-      width="18"
-      height="55"
-      fill="#36B25A"
-    />
+    <rect x="305" y="175" width="18" height="55" fill="#36B25A" />
 
     {/* House */}
-    <rect
-      x="188"
-      y="215"
-      width="124"
-      height="90"
-      fill="#36B25A"
-    />
+    <rect x="188" y="215" width="124" height="90" fill="#36B25A" />
 
     {/* Animated Location Pin */}
     <motion.g
@@ -672,12 +644,7 @@ const InyumbaLogo = ({
         fill="#1B4E91"
       />
 
-      <circle
-        cx="250"
-        cy="255"
-        r="14"
-        fill="white"
-      />
+      <circle cx="250" cy="255" r="14" fill="white" />
     </motion.g>
 
     {/* Book */}
@@ -703,11 +670,7 @@ const InyumbaLogo = ({
       fill="#1B4E91"
     />
 
-    <path
-      d="M250 320 L250 362"
-      stroke="#FFFFFF"
-      strokeWidth="3"
-    />
+    <path d="M250 320 L250 362" stroke="#FFFFFF" strokeWidth="3" />
 
     {/* Text */}
     <text
@@ -751,7 +714,9 @@ const InyumbaLogo = ({
 
 export const Footer: React.FC = () => {
   // Get language from cookies
-  const [lang, setLang] = useState<'en' | 'fr' | 'rw'>(getLanguageFromCookies());
+  const [lang, setLang] = useState<"en" | "fr" | "rw">(
+    getLanguageFromCookies(),
+  );
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
@@ -759,9 +724,9 @@ export const Footer: React.FC = () => {
 
   // Contact form state
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
+    name: "",
+    email: "",
+    message: "",
   });
   const [errors, setErrors] = useState<{
     name?: string;
@@ -931,115 +896,111 @@ export const Footer: React.FC = () => {
   // };
 
   // Listen for language changes in cookies
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!validateForm()) {
-    setStatusModal({
-      isOpen: true,
-      type: "error",
-      title: "⚠️ Invalid Form",
-      message: "Please fix the errors before submitting.",
-      details: "Check all fields and try again.",
-    });
-    return;
-  }
-
-  setIsSubmitting(true);
-
-  try {
-    const response = await CONTACT_API.post("/contact", {
-      name: formData.name.trim(),
-      email: formData.email.trim().toLowerCase(),
-      message: formData.message.trim(),
-    });
-
-    console.log("📨 Contact API response:", response.data);
-
-    // Axios considers 2xx responses successful by default.
-    // So if the request reached here, the backend accepted it.
-    if (response.status >= 200 && response.status < 300) {
+    if (!validateForm()) {
       setStatusModal({
         isOpen: true,
-        type: "success",
-        title: t.successTitle,
-        message:
-          response.data?.message ||
-          t.success ||
-          "Your message was sent successfully.",
-        details: `Thank you, ${formData.name}! We'll get back to you soon.`,
+        type: "error",
+        title: "⚠️ Invalid Form",
+        message: "Please fix the errors before submitting.",
+        details: "Check all fields and try again.",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await CONTACT_API.post("/contact", {
+        name: formData.name.trim(),
+        email: formData.email.trim().toLowerCase(),
+        message: formData.message.trim(),
       });
 
-      setFormData({
-        name: "",
-        email: "",
-        message: "",
-      });
+      console.log("📨 Contact API response:", response.data);
 
-      setIsNameValid(null);
-      setIsEmailValid(null);
-      setIsMessageValid(null);
-      setIsFormValid(false);
-      setIsContactOpen(false);
-    } else {
+      // Axios considers 2xx responses successful by default.
+      // So if the request reached here, the backend accepted it.
+      if (response.status >= 200 && response.status < 300) {
+        setStatusModal({
+          isOpen: true,
+          type: "success",
+          title: t.successTitle,
+          message:
+            response.data?.message ||
+            t.success ||
+            "Your message was sent successfully.",
+          details: `Thank you, ${formData.name}! We'll get back to you soon.`,
+        });
+
+        setFormData({
+          name: "",
+          email: "",
+          message: "",
+        });
+
+        setIsNameValid(null);
+        setIsEmailValid(null);
+        setIsMessageValid(null);
+        setIsFormValid(false);
+        setIsContactOpen(false);
+      } else {
+        setStatusModal({
+          isOpen: true,
+          type: "error",
+          title: t.errorTitle,
+          message:
+            response.data?.message || t.fail || "Failed to send your message.",
+          details: "Please check your input and try again.",
+        });
+
+        setIsContactOpen(false);
+      }
+    } catch (error) {
+      let errorMessage = t.fail;
+      let errorDetails = "Please try again or contact support.";
+
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          console.error("❌ Contact API error:", error.response.data);
+
+          errorMessage =
+            error.response.data?.message || t.serverError || "Server error.";
+
+          errorDetails =
+            "We're experiencing technical issues. Please try again later.";
+        } else if (error.request) {
+          console.error("❌ No response from contact API:", error.request);
+
+          errorMessage = "Connection Error";
+          errorDetails =
+            "Unable to reach our servers. Please check your internet connection.";
+        } else {
+          console.error("❌ Contact request error:", error.message);
+
+          errorMessage = error.message || t.fail;
+        }
+      } else {
+        console.error("❌ Unexpected contact error:", error);
+      }
+
       setStatusModal({
         isOpen: true,
         type: "error",
         title: t.errorTitle,
-        message:
-          response.data?.message ||
-          t.fail ||
-          "Failed to send your message.",
-        details: "Please check your input and try again.",
+        message: errorMessage,
+        details: errorDetails,
       });
 
       setIsContactOpen(false);
+    } finally {
+      setIsSubmitting(false);
     }
-  } catch (error) {
-    let errorMessage = t.fail;
-    let errorDetails = "Please try again or contact support.";
+  };
 
-    if (axios.isAxiosError(error)) {
-      if (error.response) {
-        console.error("❌ Contact API error:", error.response.data);
-
-        errorMessage =
-          error.response.data?.message ||
-          t.serverError ||
-          "Server error.";
-
-        errorDetails =
-          "We're experiencing technical issues. Please try again later.";
-      } else if (error.request) {
-        console.error("❌ No response from contact API:", error.request);
-
-        errorMessage = "Connection Error";
-        errorDetails =
-          "Unable to reach our servers. Please check your internet connection.";
-      } else {
-        console.error("❌ Contact request error:", error.message);
-
-        errorMessage = error.message || t.fail;
-      }
-    } else {
-      console.error("❌ Unexpected contact error:", error);
-    }
-
-    setStatusModal({
-      isOpen: true,
-      type: "error",
-      title: t.errorTitle,
-      message: errorMessage,
-      details: errorDetails,
-    });
-
-    setIsContactOpen(false);
-  } finally {
-    setIsSubmitting(false);
-  }
-};
-  
   useEffect(() => {
     const handleCookieChange = () => {
       const newLang = getLanguageFromCookies();
@@ -1062,15 +1023,15 @@ export const Footer: React.FC = () => {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Handle back to top click
   const handleBackToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth',
+      behavior: "smooth",
     });
   };
 
@@ -1084,7 +1045,7 @@ export const Footer: React.FC = () => {
 
   const handleContactClick = () => {
     setIsContactOpen(true);
-    setFormData({ name: '', email: '', message: '' });
+    setFormData({ name: "", email: "", message: "" });
     setErrors({});
     setIsNameValid(null);
     setIsEmailValid(null);
@@ -1094,7 +1055,7 @@ export const Footer: React.FC = () => {
 
   const handleCloseContact = () => {
     setIsContactOpen(false);
-    setFormData({ name: '', email: '', message: '' });
+    setFormData({ name: "", email: "", message: "" });
     setErrors({});
     setIsNameValid(null);
     setIsEmailValid(null);
@@ -1278,44 +1239,62 @@ export const Footer: React.FC = () => {
           <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-400">{t.followUs}</span>
-              <div className="flex gap-2">
-                <a
-                  href="#"
-                  className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:bg-[#FF385C] hover:text-white transition-all duration-300"
+              <div className="mt-4 sm:mt-6 flex justify-center gap-3 sm:gap-4">
+                <Link
+                  to="https://web.facebook.com/profile.php?id=61593907921662"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
                 >
-                  <FacebookIcon className="w-4 h-4" />
-                </a>
-                <a
-                  href="#"
-                  className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:bg-[#FF385C] hover:text-white transition-all duration-300"
+                  <FacebookIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-blue-600 text-blue-600" />
+                </Link>
+
+                <Link
+                  to="https://www.instagram.com/inyumbarental/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
                 >
-                  <TwitterIcon className="w-4 h-4" />
-                </a>
-                <a
-                  href="#"
-                  className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:bg-[#FF385C] hover:text-white transition-all duration-300"
+                  <InstagramIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-pink-600 text-pink-600" />
+                </Link>
+
+                <Link
+                  to="https://x.com/inyumbarental"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Twitter"
                 >
-                  <InstagramIcon className="w-4 h-4" />
-                </a>
-                <a
-                  href="#"
-                  className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:bg-[#FF385C] hover:text-white transition-all duration-300"
+                  <TwitterIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-blue-600 text-indigo-400" />
+                </Link>
+
+                <Link
+                  to="https://www.youtube.com/channel/UCUe_TGKGrXPhit85u5u9bDA"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="YouTube"
                 >
-                  <LinkedInIcon className="w-4 h-4" />
-                </a>
-                <a
-                  href="#"
-                  className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:bg-[#FF385C] hover:text-white transition-all duration-300"
+                  <YouTubeIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-red-300 text-red-300" />
+                </Link>
+
+                <Link
+                  to="https://www.linkedin.com/in/inyumba-rental-998031432?utm_source=share_via&utm_content=profile&utm_medium=member_android"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn"
                 >
-                  <YouTubeIcon className="w-4 h-4" />
-                </a>
+                  <LinkedInIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-blue-300 text-red-300" />
+                </Link>
               </div>
             </div>
-            
+
             {/* Copyright and Designer Credit */}
             <div className="text-center">
               <div className="text-sm text-gray-50">
-               <span className='text-blue-400 font-bold'> © {currentYear}</span> {t.company}. {t.rights}
+                <span className="text-blue-400 font-bold">
+                  {" "}
+                  © {currentYear}
+                </span>{" "}
+                {t.company}. {t.rights}
               </div>
               <motion.div
                 initial={{ opacity: 0 }}
@@ -1712,7 +1691,11 @@ export const Footer: React.FC = () => {
 
                 {/* Modal Content - Styled like About page contact form */}
                 <div className="p-4 xs:p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
-                  <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+                  <form
+                    onSubmit={handleSubmit}
+                    className="space-y-4"
+                    noValidate
+                  >
                     {/* Name Field */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
@@ -1744,10 +1727,14 @@ export const Footer: React.FC = () => {
                         )}
                       </div>
                       {errors.name && (
-                        <p className="text-xs text-red-500 mt-1">{errors.name}</p>
+                        <p className="text-xs text-red-500 mt-1">
+                          {errors.name}
+                        </p>
                       )}
                       {isNameValid === true && (
-                        <p className="text-xs text-green-500 mt-1">✓ Valid name</p>
+                        <p className="text-xs text-green-500 mt-1">
+                          ✓ Valid name
+                        </p>
                       )}
                     </div>
 
@@ -1782,10 +1769,14 @@ export const Footer: React.FC = () => {
                         )}
                       </div>
                       {errors.email && (
-                        <p className="text-xs text-red-500 mt-1">{errors.email}</p>
+                        <p className="text-xs text-red-500 mt-1">
+                          {errors.email}
+                        </p>
                       )}
                       {isEmailValid === true && (
-                        <p className="text-xs text-green-500 mt-1">✓ Valid email address</p>
+                        <p className="text-xs text-green-500 mt-1">
+                          ✓ Valid email address
+                        </p>
                       )}
                     </div>
 
@@ -1819,10 +1810,14 @@ export const Footer: React.FC = () => {
                         </div>
                       </div>
                       {errors.message && (
-                        <p className="text-xs text-red-500 mt-1">{errors.message}</p>
+                        <p className="text-xs text-red-500 mt-1">
+                          {errors.message}
+                        </p>
                       )}
                       {isMessageValid === true && (
-                        <p className="text-xs text-green-500 mt-1">✓ Valid message</p>
+                        <p className="text-xs text-green-500 mt-1">
+                          ✓ Valid message
+                        </p>
                       )}
                       <p className="text-xs text-gray-400 mt-1">
                         {formData.message.length}/10 characters minimum

@@ -96,7 +96,7 @@ const translations = {
     errorMessage: "Please try again later.",
     address: "Musanze, Northern Province, Rwanda",
     phone: "+250 780 414 088",
-    emailAddress: "inyumba@yahoo.fr",
+    emailAddress: "inyumbarental@gmail.com",
     service1: "Verified House Listings",
     service1Desc:
       "All houses on our platform are verified to ensure quality, safety, and comfort for students.",
@@ -188,7 +188,7 @@ const translations = {
     errorMessage: "Veuillez réessayer plus tard.",
     address: "Musanze, Province du Nord, Rwanda",
     phone: "+250 780 414 088",
-    emailAddress: "inyumba@yahoo.fr",
+    emailAddress: "inyumbarental@gmail.com",
     service1: "Annonces Vérifiées",
     service1Desc:
       "Toutes les maisons sur notre plateforme sont vérifiées pour garantir qualité, sécurité et confort.",
@@ -280,7 +280,7 @@ const translations = {
     errorMessage: "Ongera ugerageze nyuma.",
     address: "Musanze, Intara y'Amajyaruguru, Rwanda",
     phone: "+250 780 414 088",
-    emailAddress: "inyumba@yahoo.fr",
+    emailAddress: "inyumbarental@gmail.com",
     service1: "Amazu Yemejwe",
     service1Desc:
       "Amazu yose kuri urubuga rwacu arajwemezwa kugira ngo habeho ubwiza n'umutekano.",
@@ -867,14 +867,6 @@ export const Services: React.FC = () => {
       ? services
       : services.filter((s) => s.category === selectedCategory);
 
-  const stats = [
-    { value: "5,000+", label: t.activeUsers, icon: <PeopleIcon /> },
-    { value: "2,134", label: t.successfulBookings, icon: <CheckCircleIcon /> },
-    { value: "156", label: t.verifiedHouses, icon: <HomeIcon /> },
-    { value: "48", label: t.activeLandlords, icon: <HandshakeIcon /> },
-    { value: "98%", label: t.satisfaction, icon: <StarIcon /> },
-  ];
-
   const steps = [
     {
       icon: "🔍",
@@ -965,32 +957,6 @@ export const Services: React.FC = () => {
                 fill="#F9FAFB"
               />
             </svg>
-          </div>
-        </section>
-
-        {/* Stats Section - Kept as is */}
-        <section className="py-12 bg-white border-b border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 sm:gap-6">
-              {stats.map((stat, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1, duration: 0.5 }}
-                  viewport={{ once: true }}
-                  className="text-center"
-                >
-                  <div className="w-12 h-12 bg-[#FF385C]/10 rounded-full flex items-center justify-center mx-auto mb-3 text-[#FF385C]">
-                    {stat.icon}
-                  </div>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {stat.value}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">{stat.label}</p>
-                </motion.div>
-              ))}
-            </div>
           </div>
         </section>
 

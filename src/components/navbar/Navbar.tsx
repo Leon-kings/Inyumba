@@ -44,9 +44,10 @@ import VerifiedIcon from "@mui/icons-material/Verified";
 import {
   CheckCircleOutlineRounded,
   ErrorOutlineOutlined,
+  LinkedIn,
 } from "@mui/icons-material";
 import InfoIcon from "@mui/icons-material/Info";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 // API Configuration
 const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
@@ -790,7 +791,8 @@ const StatusModal: React.FC<StatusModalProps> = ({
 
                   {/* Details */}
                   {details && (
-                    <motion.div                      initial={{ opacity: 0, y: 10 }}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
                       className="bg-white/50 rounded-lg p-2 sm:p-3 mb-3 sm:mb-4 w-full text-xs sm:text-sm text-gray-600"
@@ -1271,7 +1273,7 @@ export const Navbar = () => {
   // Fetch full user data from API
   const fetchUserData = async (id: string) => {
     try {
-      const response = await API.get(`/users/${id}`);
+      const response = await API.get(`/auth/${id}`);
       if (response.data.success && response.data.user) {
         const fullUserData = response.data.user;
         setUserData(fullUserData);
@@ -1367,14 +1369,25 @@ export const Navbar = () => {
     if (!strength) return null;
     switch (strength) {
       case "weak":
-        return <WarningIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: "#ef4444" }} />;
+        return (
+          <WarningIcon
+            className="w-3.5 h-3.5 sm:w-4 sm:h-4"
+            style={{ color: "#ef4444" }}
+          />
+        );
       case "moderate":
         return (
-          <SecurityIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: "#f59e0b" }} />
+          <SecurityIcon
+            className="w-3.5 h-3.5 sm:w-4 sm:h-4"
+            style={{ color: "#f59e0b" }}
+          />
         );
       case "strong":
         return (
-          <VerifiedIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: "#22c55e" }} />
+          <VerifiedIcon
+            className="w-3.5 h-3.5 sm:w-4 sm:h-4"
+            style={{ color: "#22c55e" }}
+          />
         );
     }
   };
@@ -1764,7 +1777,9 @@ export const Navbar = () => {
     {
       label: t.bookings,
       value: "2,134",
-      icon: <CalendarTodayIcon className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />,
+      icon: (
+        <CalendarTodayIcon className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
+      ),
       change: "+31%",
     },
   ];
@@ -1792,7 +1807,9 @@ export const Navbar = () => {
       user: "Host in Kigombe",
       action: "Updated house details and price",
       time: "3 hours ago",
-      icon: <SettingsIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500" />,
+      icon: (
+        <SettingsIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500" />
+      ),
     },
   ];
 
@@ -2027,7 +2044,9 @@ export const Navbar = () => {
                     onClick={handleDashboardNavigation}
                   >
                     {getDashboardIcon()}
-                    <span className="ml-1 hidden lg:inline">{getDashboardLabel()}</span>
+                    <span className="ml-1 hidden lg:inline">
+                      {getDashboardLabel()}
+                    </span>
                   </motion.button>
 
                   <motion.button
@@ -2219,7 +2238,10 @@ export const Navbar = () => {
                   transition={{ duration: 0.4, delay: 0.1 }}
                   className="overflow-y-auto max-h-[calc(90vh-80px)]"
                 >
-                  <form onSubmit={handleLogin} className="p-4 sm:p-5 md:p-6 relative z-10">
+                  <form
+                    onSubmit={handleLogin}
+                    className="p-4 sm:p-5 md:p-6 relative z-10"
+                  >
                     <div className="mb-3 sm:mb-4">
                       <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-1.5 text-gray-700">
                         {t.email}
@@ -2384,10 +2406,55 @@ export const Navbar = () => {
                       </button>
                     </p>
                     <div className="mt-4 sm:mt-6 flex justify-center gap-3 sm:gap-4">
-                      <FacebookIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-blue-600 text-blue-600" />
-                      <InstagramIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-pink-600 text-pink-600" />
-                      <TwitterIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-blue-600 text-indigo-400" />
-                      <YouTubeIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-red-300 text-red-300" />
+                      <Link
+                        to={
+                          "https://web.facebook.com/profile.php?id=61593907921662"
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Facebook"
+                      >
+                        <FacebookIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-blue-600 text-blue-600" />
+                      </Link>
+
+                      <Link
+                        to={"https://www.instagram.com/inyumbarental/"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Instagram"
+                      >
+                        <InstagramIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-pink-600 text-pink-600" />
+                      </Link>
+
+                      <Link
+                        to={"https://x.com/inyumbarental"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Twitter"
+                      >
+                        <TwitterIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-blue-600 text-indigo-400" />
+                      </Link>
+
+                      <Link
+                        to={
+                          "https://www.youtube.com/channel/UCUe_TGKGrXPhit85u5u9bDA"
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="YouTube"
+                      >
+                        <YouTubeIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-red-300 text-red-300" />
+                      </Link>
+                      <Link
+                        to={
+                          "https://www.linkedin.com/in/inyumba-rental-998031432?utm_source=share_via&utm_content=profile&utm_medium=member_android"
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="YouTube"
+                      >
+                        <LinkedIn className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-red-300 text-red-300" />
+                      </Link>
                     </div>
                   </form>
                 </motion.div>
@@ -2445,7 +2512,10 @@ export const Navbar = () => {
                   className="overflow-y-auto max-h-[calc(90vh-80px)] scroll-smooth"
                   ref={scrollContainerRef}
                 >
-                  <form onSubmit={handleRegister} className="p-4 sm:p-5 md:p-6 relative z-10">
+                  <form
+                    onSubmit={handleRegister}
+                    className="p-4 sm:p-5 md:p-6 relative z-10"
+                  >
                     <div className="mb-3 sm:mb-4" ref={fieldRefs.name}>
                       <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-1.5 text-gray-700">
                         {t.fullName}
@@ -2672,7 +2742,10 @@ export const Navbar = () => {
                         </div>
                       )}
                     </div>
-                    <div className="mb-4 sm:mb-5 md:mb-6" ref={fieldRefs.confirmPassword}>
+                    <div
+                      className="mb-4 sm:mb-5 md:mb-6"
+                      ref={fieldRefs.confirmPassword}
+                    >
                       <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-1.5 text-gray-700">
                         {t.confirmPassword}
                       </label>
@@ -2805,10 +2878,55 @@ export const Navbar = () => {
                       </button>
                     </p>
                     <div className="mt-4 sm:mt-6 flex justify-center gap-3 sm:gap-4">
-                      <FacebookIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-blue-600 text-blue-600" />
-                      <InstagramIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-pink-600 text-pink-600" />
-                      <TwitterIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-blue-600 text-indigo-400" />
-                      <YouTubeIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-red-300 text-red-300" />
+                      <Link
+                        to={
+                          "https://web.facebook.com/profile.php?id=61593907921662"
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Facebook"
+                      >
+                        <FacebookIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-blue-600 text-blue-600" />
+                      </Link>
+
+                      <Link
+                        to={"https://www.instagram.com/inyumbarental/"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Instagram"
+                      >
+                        <InstagramIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-pink-600 text-pink-600" />
+                      </Link>
+
+                      <Link
+                        to={"https://x.com/inyumbarental"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Twitter"
+                      >
+                        <TwitterIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-blue-600 text-indigo-400" />
+                      </Link>
+
+                      <Link
+                        to={
+                          "https://www.youtube.com/channel/UCUe_TGKGrXPhit85u5u9bDA"
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="YouTube"
+                      >
+                        <YouTubeIcon className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-red-300 text-red-300" />
+                      </Link>
+                      <Link
+                        to={
+                          "https://www.linkedin.com/in/inyumba-rental-998031432?utm_source=share_via&utm_content=profile&utm_medium=member_android"
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="YouTube"
+                      >
+                        <LinkedIn className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer transition-colors hover:text-red-300 text-red-300" />
+                      </Link>
                     </div>
                   </form>
                 </motion.div>
@@ -2941,31 +3059,41 @@ export const Navbar = () => {
                   <div className="border-t border-gray-200 pt-3 sm:pt-4 space-y-2 sm:space-y-3">
                     <div className="grid grid-cols-2 gap-2 sm:gap-3">
                       <div className="bg-gray-50 rounded-lg p-2 sm:p-3">
-                        <p className="text-[10px] sm:text-xs text-gray-500">Full Name</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500">
+                          Full Name
+                        </p>
                         <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">
                           {userName}
                         </p>
                       </div>
                       <div className="bg-gray-50 rounded-lg p-2 sm:p-3">
-                        <p className="text-[10px] sm:text-xs text-gray-500">Role</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500">
+                          Role
+                        </p>
                         <p className="text-xs sm:text-sm font-medium text-gray-900 capitalize">
                           {userRole}
                         </p>
                       </div>
                       <div className="bg-gray-50 rounded-lg p-2 sm:p-3 col-span-2">
-                        <p className="text-[10px] sm:text-xs text-gray-500">Email</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500">
+                          Email
+                        </p>
                         <p className="text-xs sm:text-sm font-medium text-gray-900 truncate break-all">
                           {userEmail}
                         </p>
                       </div>
                       <div className="bg-gray-50 rounded-lg p-2 sm:p-3 col-span-2">
-                        <p className="text-[10px] sm:text-xs text-gray-500">Phone</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500">
+                          Phone
+                        </p>
                         <p className="text-xs sm:text-sm font-medium text-gray-900">
                           {userPhone || "N/A"}
                         </p>
                       </div>
                       <div className="bg-gray-50 rounded-lg p-2 sm:p-3 col-span-2">
-                        <p className="text-[10px] sm:text-xs text-gray-500">Member Since</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500">
+                          Member Since
+                        </p>
                         <p className="text-xs sm:text-sm font-medium text-gray-900">
                           {formatDate(userCreatedAt)}
                         </p>
