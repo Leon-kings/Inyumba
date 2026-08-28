@@ -867,7 +867,7 @@ export const Help: React.FC = () => {
                     <p className="text-sm font-medium text-gray-900">
                       {t.emailSupport}
                     </p>
-                    <p className="text-sm text-gray-500">inyumba@yahoo.fr</p>
+                    <p className="text-sm text-gray-500">inyumbarental@gmail.com</p>
                   </div>
                 </div>
 

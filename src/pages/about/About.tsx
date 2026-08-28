@@ -1537,7 +1537,7 @@ export const About: React.FC = () => {
                       <div>
                         <p className="text-xs text-gray-500">{t.email}</p>
                         <p className="text-sm text-gray-900">
-                          inyumba@yahoo.fr
+                          inyumbarental@gmail.com
                         </p>
                       </div>
                     </div>
