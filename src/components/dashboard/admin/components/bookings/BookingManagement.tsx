@@ -444,7 +444,7 @@ const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
 };
 
 // API Base URL
-const API_URL = "https://rene-inyumba-nodejs.onrender.com/bookings";
+const API_URL = "https://inyumbaproject.eu1.hubfly.app/bookings";
 
 // Helper function to safely get booking data from API response
 const getBookingData = (response: any): Booking => {

@@ -280,7 +280,7 @@
 // };
 
 // // API Base URL
-// const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
+// const API_BASE_URL = "https://inyumbaproject.eu1.hubfly.app";
 
 // // Chart Colors
 // const COLORS = ["#FF385C", "#4F46E5", "#22C55E", "#F59E0B", "#8B5CF6"];
@@ -1354,7 +1354,7 @@ const getUserEmailFromStorage = (): string => {
 };
 
 // API Base URL
-const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
+const API_BASE_URL = "https://inyumbaproject.eu1.hubfly.app";
 
 // Chart Colors
 const COLORS = ["#FF385C", "#4F46E5", "#22C55E", "#F59E0B", "#8B5CF6"];

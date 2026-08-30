@@ -66,7 +66,7 @@ interface TeamMemberResponse {
 // ============================================
 // API CONFIGURATION
 // ============================================
-const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
+const API_BASE_URL = "https://inyumbaproject.eu1.hubfly.app";
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,

@@ -402,7 +402,7 @@ export const ManagersDashboard: React.FC = () => {
   const fetchUserStats = async () => {
     try {
       const response = await axios.get(
-        "https://rene-inyumba-nodejs.onrender.com/auth/stats",
+        "https://inyumbaproject.eu1.hubfly.app/auth/stats",
       );
       const data: UserStats = response.data;
       setUserStats(data);
@@ -418,7 +418,7 @@ export const ManagersDashboard: React.FC = () => {
   const fetchBookingStats = async () => {
     try {
       const response = await axios.get(
-        "https://rene-inyumba-nodejs.onrender.com/bookings/stats",
+        "https://inyumbaproject.eu1.hubfly.app/bookings/stats",
       );
       const data: BookingStats = response.data;
       setBookingStats(data);
@@ -434,7 +434,7 @@ export const ManagersDashboard: React.FC = () => {
   const fetchHouses = async () => {
     try {
       const response = await axios.get(
-        "https://rene-inyumba-nodejs.onrender.com/houses",
+        "https://inyumbaproject.eu1.hubfly.app/houses",
       );
       const data: HouseApiResponse = response.data;
       setHouseData(data);

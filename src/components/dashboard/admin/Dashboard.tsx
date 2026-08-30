@@ -372,7 +372,7 @@ const formatCurrencyFull = (value: number): string => {
 };
 
 // Base URL for API
-const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
+const API_BASE_URL = "https://inyumbaproject.eu1.hubfly.app";
 
 export const Dashboard: React.FC = () => {
   // Get language from cookies

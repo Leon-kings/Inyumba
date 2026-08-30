@@ -560,7 +560,7 @@ const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
 };
 
 // API Base URL
-const API_URL = "https://rene-inyumba-nodejs.onrender.com/contact";
+const API_URL = "https://inyumbaproject.eu1.hubfly.app/contact";
 
 // Helper function to transform contact to message
 const transformContactToMessage = (contact: Contact): Message => {

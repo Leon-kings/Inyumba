@@ -339,7 +339,7 @@ const getUserEmailFromStorage = (): string => {
 };
 
 // API Base URL
-const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
+const API_BASE_URL = "https://inyumbaproject.eu1.hubfly.app";
 
 // Create axios instance with default config
 const apiClient = axios.create({

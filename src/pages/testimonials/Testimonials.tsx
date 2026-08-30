@@ -220,7 +220,7 @@ export const Testimonials: React.FC = () => {
         setIsLoading(true);
 
         const response = await axios.get<ApiResponse>(
-          "https://rene-inyumba-nodejs.onrender.com/testimonials",
+          "https://inyumbaproject.eu1.hubfly.app/testimonials",
         );
 
         const result = response.data;

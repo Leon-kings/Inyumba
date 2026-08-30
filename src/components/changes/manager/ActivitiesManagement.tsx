@@ -358,7 +358,7 @@ const getUserPhone = (log: ActivityLog): string => {
 
 // Create axios instance with interceptors
 const api = axios.create({
-  baseURL: "https://rene-inyumba-nodejs.onrender.com",
+  baseURL: "https://inyumbaproject.eu1.hubfly.app",
   headers: {
     "Content-Type": "application/json",
   },
