@@ -32,8 +32,8 @@ import ErrorIcon from "@mui/icons-material/Error";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 
 // API endpoints
-const CONTACT_API_URL = 'https://rene-inyumba-nodejs.onrender.com/contact';
-const QUESTIONS_API_URL = 'https://rene-inyumba-nodejs.onrender.com/questions/submit';
+const CONTACT_API_URL = 'https://inyumbaproject.eu1.hubfly.app/contact';
+const QUESTIONS_API_URL = 'https://inyumbaproject.eu1.hubfly.app/questions/submit';
 
 // Translations
 const translations = {

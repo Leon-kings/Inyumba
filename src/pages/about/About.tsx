@@ -39,10 +39,10 @@ import {
 import InfoIcon from "@mui/icons-material/Info";
 
 // API Configuration
-const CONTACT_API_URL = "https://rene-inyumba-nodejs.onrender.com/contact";
-const TEAM_API_URL = "https://rene-inyumba-nodejs.onrender.com/team";
-const STATS_API_URL = "https://rene-inyumba-nodejs.onrender.com/auth/stats";
-const HOUSES_API_URL = "https://rene-inyumba-nodejs.onrender.com/houses";
+const CONTACT_API_URL = "https://inyumbaproject.eu1.hubfly.app/contact";
+const TEAM_API_URL = "https://inyumbaproject.eu1.hubfly.app/team";
+const STATS_API_URL = "https://inyumbaproject.eu1.hubfly.app/auth/stats";
+const HOUSES_API_URL = "https://inyumbaproject.eu1.hubfly.app/houses";
 const GOOGLE_TRANSLATE_API_URL = "https://translate.googleapis.com/translate_a/single";
 
 const CONTACT_API = axios.create({

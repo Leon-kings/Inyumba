@@ -1,3 +1,4 @@
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect, useCallback, useRef } from "react";
@@ -7,13 +8,12 @@ import Cookies from "js-cookie";
 import axios, { AxiosError } from "axios";
 
 // API Base URL
-const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
+const API_BASE_URL = "https://inyumbaproject.eu1.hubfly.app";
 
 // ============================================================
 // MODAL COMPONENTS
 // ============================================================
 
-// Success Modal
 interface SuccessModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -73,7 +73,6 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
   );
 };
 
-// Error Modal
 interface ErrorModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -133,7 +132,6 @@ const ErrorModal: React.FC<ErrorModalProps> = ({
   );
 };
 
-// Confirm Modal
 interface ConfirmModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -1036,7 +1034,7 @@ export const HostManagement: React.FC = () => {
     currency: "RWF",
     bedrooms: 1,
     bathrooms: 1,
-    guests: 2,
+    guests: 2, // ✅ This matches the model field name
     amenities: [] as string[],
     status: "pending" as House["status"],
     ownerName: userName || "",
@@ -1124,7 +1122,7 @@ export const HostManagement: React.FC = () => {
     }
   }, [t]);
 
-  // Live validation
+  // Live validation - ✅ Using 'guests' field
   const validateForm = useCallback(() => {
     const errors: Record<string, string> = {};
     const v = t.validation;
@@ -1186,7 +1184,7 @@ export const HostManagement: React.FC = () => {
       errors.bathrooms = "Bathrooms must be a whole number";
     }
 
-    // Guests - required, must be >= 1
+    // ✅ FIXED: Guests - required, must be >= 1 (using 'guests' field)
     if (propertyFormData.guests < 1) {
       errors.guests = v.maxGuestsMin;
     } else if (!Number.isInteger(propertyFormData.guests)) {
@@ -1216,7 +1214,7 @@ export const HostManagement: React.FC = () => {
     const hasCell = propertyFormData.location.cell?.trim().length > 0;
     const hasVillage = propertyFormData.location.village?.trim().length > 0;
     const hasPrice = propertyFormData.pricePerMonth > 0;
-    const hasGuests = propertyFormData.guests >= 1;
+    const hasGuests = propertyFormData.guests >= 1; // ✅ Using 'guests'
 
     const hasRequiredFields = hasName && hasHouseType && hasProvince && 
                              hasDistrict && hasSector && hasCell && 
@@ -1402,7 +1400,7 @@ export const HostManagement: React.FC = () => {
     validateForm();
   };
 
-  // Create FormData for API
+  // ✅ FIXED: Create FormData for API - matches Mongoose model
   const createFormData = (): FormData => {
     const formData = new FormData();
 
@@ -1416,9 +1414,9 @@ export const HostManagement: React.FC = () => {
     formData.append("pricePerMonth", String(propertyFormData.pricePerMonth || 0));
     formData.append("currency", propertyFormData.currency || "RWF");
 
-    // Capacity
+    // ✅ FIXED: Use 'guests' (matches Mongoose model)
     const guestValue = propertyFormData.guests || 1;
-    formData.append("guests", String(guestValue));
+    formData.append("guests", String(guestValue)); // ← This is correct!
     formData.append("bedrooms", String(propertyFormData.bedrooms || 0));
     formData.append("bathrooms", String(propertyFormData.bathrooms || 0));
 
@@ -1478,7 +1476,7 @@ export const HostManagement: React.FC = () => {
     const hasCell = propertyFormData.location.cell?.trim().length > 0;
     const hasVillage = propertyFormData.location.village?.trim().length > 0;
     const hasPrice = propertyFormData.pricePerMonth > 0;
-    const hasGuests = propertyFormData.guests >= 1;
+    const hasGuests = propertyFormData.guests >= 1; // ✅ Using 'guests'
     const hasImages = imageFiles.length + (selectedHouse?.images?.length || 0) >= 2;
 
     if (!isValid || !hasName || !hasHouseType || !hasProvince || !hasDistrict || 
@@ -1761,7 +1759,7 @@ export const HostManagement: React.FC = () => {
       currency: house.currency || "RWF",
       bedrooms: house.bedrooms || 1,
       bathrooms: house.bathrooms || 1,
-      guests: house.guests || 2,
+      guests: house.guests || 2, // ✅ Using 'guests'
       amenities: house.amenities || [],
       status: house.status || "pending",
       ownerName: house.ownerName || "",
@@ -2718,7 +2716,7 @@ export const HostManagement: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                       {renderInput(
                         t.maxGuests,
-                        "guests",
+                        "guests", // ✅ Field name is 'guests' but label shows 'Max Guests'
                         "number",
                         t.enterMaxGuests,
                         true,

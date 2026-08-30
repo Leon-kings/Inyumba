@@ -36,7 +36,7 @@ import {
 import InfoIcon from "@mui/icons-material/Info";
 
 // API Configuration
-const CONTACT_API_URL = "https://rene-inyumba-nodejs.onrender.com/contact";
+const CONTACT_API_URL = "https://inyumbaproject.eu1.hubfly.app/contact";
 
 const CONTACT_API = axios.create({
   baseURL: CONTACT_API_URL,

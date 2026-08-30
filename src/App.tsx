@@ -119,7 +119,7 @@
 // }
 
 // // API endpoints
-// const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
+// const API_BASE_URL = "https://inyumbaproject.eu1.hubfly.app";
 
 // // ============================================================
 // // NOTIFICATION ROUTERS ONLY - MATCHING BACKEND ROUTES
@@ -183,12 +183,11 @@
 //   testimonialNotificationDelete: (id: string) =>
 //     `${API_BASE_URL}/testimonials/notifications/${id}`,
 
-//   // QUESTION NOTIFICATION ROUTERS
-//   questionNotifications: `${API_BASE_URL}/questions/notifications`,
-//   questionNotificationsMy: `${API_BASE_URL}/questions/notifications/my`,
+//   // QUESTION NOTIFICATION ROUTERS - USING ONLY EMAIL ENDPOINT
+//   questionNotificationsByEmail: (email: string) =>
+//     `${API_BASE_URL}/questions/notifications/email/${email}`,
 //   questionNotificationRead: (id: string) =>
 //     `${API_BASE_URL}/questions/notifications/${id}/read`,
-//   questionNotificationMarkAllRead: `${API_BASE_URL}/questions/notifications/read-all`,
 //   questionNotificationDelete: (id: string) =>
 //     `${API_BASE_URL}/questions/notifications/${id}`,
 // };
@@ -337,13 +336,13 @@
 //   const bgColor = isSuccess
 //     ? "bg-green-50 border-green-200"
 //     : isInfo
-//       ? "bg-blue-50 border-blue-200"
-//       : "bg-red-50 border-red-200";
+//     ? "bg-blue-50 border-blue-200"
+//     : "bg-red-50 border-red-200";
 //   const buttonColor = isSuccess
 //     ? "bg-green-600"
 //     : isInfo
-//       ? "bg-blue-600"
-//       : "bg-red-600";
+//     ? "bg-blue-600"
+//     : "bg-red-600";
 
 //   return (
 //     <>
@@ -514,7 +513,7 @@
 //                           </span>
 //                           <span className="text-xs text-gray-400">
 //                             {new Date(
-//                               notification.createdAt,
+//                               notification.createdAt
 //                             ).toLocaleDateString("en-US", {
 //                               month: "short",
 //                               day: "numeric",
@@ -1042,18 +1041,13 @@
 //     }
 //   }, []);
 
-//   // Fetch question notifications
+//   // Fetch question notifications - using only email endpoint
 //   const fetchQuestionNotifications = useCallback(async (userData: UserData) => {
 //     try {
 //       const token = localStorage.getItem("token");
 //       if (!token) return [];
 
-//       let url = "";
-//       if (userData.role === "admin" || userData.role === "manager") {
-//         url = API_ENDPOINTS.questionNotifications;
-//       } else {
-//         url = API_ENDPOINTS.questionNotificationsMy;
-//       }
+//       const url = API_ENDPOINTS.questionNotificationsByEmail(userData.email);
 
 //       const response = await axios.get(url, {
 //         headers: { Authorization: `Bearer ${token}` },
@@ -1062,10 +1056,7 @@
 //       if (response.data?.success && Array.isArray(response.data.data)) {
 //         return response.data.data;
 //       }
-//       if (
-//         response.data?.success &&
-//         Array.isArray(response.data.notifications)
-//       ) {
+//       if (response.data?.success && Array.isArray(response.data.notifications)) {
 //         return response.data.notifications;
 //       }
 //       if (Array.isArray(response.data)) {
@@ -1127,11 +1118,15 @@
 //       }
 
 //       // Deduplicate by ID
-//       const uniqueRawNotifications = allNotifications.filter(
-//         (notif, index, self) =>
-//           index ===
-//           self.findIndex((n) => n._id === notif._id || n.id === notif.id),
-//       );
+//       const seenIds = new Set();
+//       const uniqueRawNotifications = allNotifications.filter((notif) => {
+//         const id = notif._id || notif.id;
+//         if (seenIds.has(id)) {
+//           return false;
+//         }
+//         seenIds.add(id);
+//         return true;
+//       });
 
 //       return uniqueRawNotifications;
 //     } catch (error) {
@@ -1285,21 +1280,40 @@
 //   }, []);
 
 //   // ============================================================
-//   // FETCH AND PROCESS ALL DATA
+//   // FETCH AND PROCESS ALL DATA WITH ENHANCED DEDUPLICATION
 //   // ============================================================
 //   const fetchAndProcessData = useCallback(async () => {
 //     try {
 //       const rawNotifications = await fetchAllNotifications();
 //       const processedNotifs = processNotifications(rawNotifications);
 
-//       const uniqueNotifications = processedNotifs.filter(
-//         (notif, index, self) =>
-//           index === self.findIndex((n) => n.id === notif.id),
-//       );
+//       // Enhanced deduplication - check by ID and by content
+//       const seenIds = new Set<string>();
+//       const seenContent = new Set<string>();
 
+//       const uniqueNotifications = processedNotifs.filter((notif) => {
+//         // 1. Check by ID first
+//         if (seenIds.has(notif.id)) {
+//           return false;
+//         }
+
+//         // 2. Check by content (title + message + source)
+//         // This catches duplicate content from different notification sources
+//         const contentKey = `${notif.title}|${notif.message}|${notif.source}`;
+
+//         if (seenContent.has(contentKey)) {
+//           return false;
+//         }
+
+//         seenIds.add(notif.id);
+//         seenContent.add(contentKey);
+//         return true;
+//       });
+
+//       // Sort by createdAt (newest first)
 //       uniqueNotifications.sort(
 //         (a, b) =>
-//           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+//           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
 //       );
 
 //       setNotifications(uniqueNotifications);
@@ -1327,7 +1341,7 @@
 //   const showStatusModal = (
 //     title: string,
 //     message: string,
-//     type: "success" | "error" | "info",
+//     type: "success" | "error" | "info"
 //   ) => {
 //     setStatusModal({
 //       isOpen: true,
@@ -1338,12 +1352,13 @@
 //   };
 
 //   // ============================================================
-//   // MARK NOTIFICATION AS READ
+//   // MARK NOTIFICATION AS READ - INDIVIDUAL
 //   // ============================================================
 //   const handleMarkAsRead = useCallback(
 //     async (id: string) => {
+//       // Optimistically update UI
 //       setNotifications((prev) =>
-//         prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
+//         prev.map((n) => (n.id === id ? { ...n, read: true } : n))
 //       );
 
 //       try {
@@ -1380,7 +1395,7 @@
 //             break;
 //           case "activity":
 //             // Activity notifications might not have a read endpoint
-//             // Just update locally
+//             // Just mark as read locally
 //             return;
 //           default:
 //             return;
@@ -1389,103 +1404,129 @@
 //         await axios.put(
 //           url,
 //           {},
-//           { headers: { Authorization: `Bearer ${token}` } },
+//           { headers: { Authorization: `Bearer ${token}` } }
 //         );
+
+//         // Refresh to ensure consistency
+//         await fetchAndProcessData();
 //       } catch (error) {
 //         console.error("Error marking notification as read:", error);
+//         // Revert optimistic update
 //         setNotifications((prev) =>
-//           prev.map((n) => (n.id === id ? { ...n, read: false } : n)),
+//           prev.map((n) => (n.id === id ? { ...n, read: false } : n))
 //         );
 //         showStatusModal(
 //           "Error",
 //           "Failed to mark notification as read",
-//           "error",
+//           "error"
 //         );
 //       }
 //     },
-//     [notifications],
+//     [notifications, fetchAndProcessData]
 //   );
 
 //   // ============================================================
-//   // MARK ALL NOTIFICATIONS AS READ
+//   // MARK ALL NOTIFICATIONS AS READ - ONE BY ONE
 //   // ============================================================
 //   const handleMarkAllAsRead = useCallback(async () => {
 //     const unreadIds = notifications.filter((n) => !n.read).map((n) => n.id);
 
+//     // Optimistically mark all as read in UI
 //     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
 
 //     try {
 //       const token = localStorage.getItem("token");
 //       if (!token) return;
 
-//       const sources: Notification["source"][] = [
-//         "user",
-//         "booking",
-//         "contact",
-//         "request",
-//         "house",
-//         "testimonial",
-//         "question",
-//       ];
-//       const promises = [];
+//       // Get all unread notifications
+//       const unreadNotifications = notifications.filter((n) => !n.read);
 
-//       for (const source of sources) {
-//         const sourceNotifs = notifications.filter(
-//           (n) => n.source === source && !n.read,
-//         );
+//       // Process each notification individually
+//       const markPromises = [];
+//       let successCount = 0;
 
-//         if (sourceNotifs.length > 0) {
-//           let url = "";
-//           switch (source) {
-//             case "user":
-//               url = API_ENDPOINTS.notificationBulkRead;
-//               break;
-//             case "booking":
-//               url = API_ENDPOINTS.bookingNotificationMarkAllRead;
-//               break;
-//             case "contact":
-//               url = API_ENDPOINTS.contactNotificationMarkAllRead;
-//               break;
-//             case "request":
-//               url = API_ENDPOINTS.requestNotificationMarkAllRead("all");
-//               break;
-//             case "house":
-//               url = API_ENDPOINTS.houseNotificationMarkAllRead;
-//               break;
-//             case "testimonial":
-//               url = `${API_ENDPOINTS.testimonials}/notifications/mark-all-read`;
-//               break;
-//             case "question":
-//               url = API_ENDPOINTS.questionNotificationMarkAllRead;
-//               break;
-//             default:
-//               continue;
-//           }
+//       for (const notification of unreadNotifications) {
+//         const source = notification.source;
+//         let url = "";
 
-//           promises.push(
-//             axios.put(
-//               url,
-//               {},
-//               { headers: { Authorization: `Bearer ${token}` } },
-//             ),
+//         switch (source) {
+//           case "user":
+//             url = API_ENDPOINTS.notificationRead(notification.id);
+//             break;
+//           case "booking":
+//             url = API_ENDPOINTS.bookingNotificationRead(notification.id);
+//             break;
+//           case "contact":
+//             url = API_ENDPOINTS.contactNotificationRead(notification.id);
+//             break;
+//           case "request":
+//             url = API_ENDPOINTS.requestNotificationRead(notification.id);
+//             break;
+//           case "house":
+//             url = API_ENDPOINTS.houseNotificationRead(notification.id);
+//             break;
+//           case "testimonial":
+//             url = API_ENDPOINTS.testimonialNotificationRead(notification.id);
+//             break;
+//           case "question":
+//             url = API_ENDPOINTS.questionNotificationRead(notification.id);
+//             break;
+//           case "activity":
+//             // Activity notifications might not have a read endpoint
+//             // Just mark as read locally
+//             successCount++;
+//             continue;
+//           default:
+//             continue;
+//         }
+
+//         if (url) {
+//           markPromises.push(
+//             axios
+//               .put(
+//                 url,
+//                 {},
+//                 { headers: { Authorization: `Bearer ${token}` } }
+//               )
+//               .then(() => successCount++)
+//               .catch((err) => {
+//                 console.error(
+//                   `Failed to mark notification ${notification.id} as read:`,
+//                   err
+//                 );
+//               })
 //           );
 //         }
 //       }
 
-//       await Promise.all(promises);
-//       showStatusModal("Success", "All notifications marked as read", "success");
+//       // Wait for all promises to settle
+//       await Promise.allSettled(markPromises);
+
+//       if (successCount > 0) {
+//         showStatusModal(
+//           "Success",
+//           `${successCount} notification(s) marked as read`,
+//           "success"
+//         );
+//       }
+
+//       // Refresh to get latest state
+//       await fetchAndProcessData();
 //     } catch (error) {
-//       console.error("Error marking all notifications as read:", error);
+//       console.error("Error marking notifications as read:", error);
+//       // Revert optimistically marked notifications
 //       setNotifications((prev) =>
-//         prev.map((n) => (unreadIds.includes(n.id) ? { ...n, read: false } : n)),
+//         prev.map((n) =>
+//           unreadIds.includes(n.id) ? { ...n, read: false } : n
+//         )
 //       );
 //       showStatusModal(
 //         "Error",
-//         "Failed to mark all notifications as read",
-//         "error",
+//         "Failed to mark some notifications as read",
+//         "error"
 //       );
 //     }
-//   }, [notifications]);
+//   }, [notifications, fetchAndProcessData]);
 
 //   // ============================================================
 //   // DELETE A SINGLE NOTIFICATION
@@ -1496,7 +1537,7 @@
 //         showStatusModal(
 //           "Permission Denied",
 //           "You do not have permission to delete notifications",
-//           "error",
+//           "error"
 //         );
 //         return;
 //       }
@@ -1527,10 +1568,8 @@
 //             const source = notification.source;
 //             let url = "";
 
-//             // Use the correct delete endpoint based on source
 //             switch (source) {
 //               case "activity":
-//                 // Activity notifications use the activity delete endpoint
 //                 url = API_ENDPOINTS.activityDelete(id);
 //                 break;
 //               case "user":
@@ -1578,14 +1617,14 @@
 //             showStatusModal(
 //               "Error",
 //               "Failed to delete notification. Please try again.",
-//               "error",
+//               "error"
 //             );
 //           }
 //         },
 //         type: "delete",
 //       });
 //     },
-//     [notifications, fetchAndProcessData, user],
+//     [notifications, fetchAndProcessData, user]
 //   );
 
 //   // ============================================================
@@ -1596,7 +1635,7 @@
 //       showStatusModal(
 //         "Permission Denied",
 //         "You do not have permission to delete notifications",
-//         "error",
+//         "error"
 //       );
 //       return;
 //     }
@@ -1618,7 +1657,6 @@
 //             return;
 //           }
 
-//           // Group notifications by source
 //           const groupedNotifications: Record<string, Notification[]> = {};
 //           notifications.forEach((n) => {
 //             const source = n.source;
@@ -1632,7 +1670,7 @@
 //           let deleteCount = 0;
 
 //           for (const [source, sourceNotifs] of Object.entries(
-//             groupedNotifications,
+//             groupedNotifications
 //           )) {
 //             for (const notif of sourceNotifs) {
 //               let url = "";
@@ -1676,14 +1714,13 @@
 //                   .catch((err) =>
 //                     console.error(
 //                       `Failed to delete ${source} notification ${notif.id}:`,
-//                       err,
-//                     ),
-//                   ),
+//                       err
+//                     )
+//                   )
 //               );
 //             }
 //           }
 
-//           // Optimistically clear all notifications
 //           setNotifications([]);
 
 //           await Promise.allSettled(deletePromises);
@@ -1692,7 +1729,7 @@
 //             showStatusModal(
 //               "Success",
 //               `${deleteCount} notification(s) deleted`,
-//               "success",
+//               "success"
 //             );
 //           }
 
@@ -1703,7 +1740,7 @@
 //           showStatusModal(
 //             "Error",
 //             "Failed to delete all notifications",
-//             "error",
+//             "error"
 //           );
 //         }
 //       },
@@ -2242,17 +2279,9 @@
 //   );
 // }
 
-
-
-
-
-
-// ============================================================
-// APP.TSX - NOTIFICATION COMPONENTS WITH ROUTERS ONLY
-// ============================================================
-
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Routes,
@@ -2292,7 +2321,6 @@ import {
   Info,
   LoginSharp,
   People,
-  QuestionAnswer,
   TextSnippet,
 } from "@mui/icons-material";
 
@@ -2368,13 +2396,13 @@ interface Notification {
 }
 
 // API endpoints
-const API_BASE_URL = "https://rene-inyumba-nodejs.onrender.com";
+const API_BASE_URL = "https://inyumbaproject.eu1.hubfly.app";
 
 // ============================================================
-// NOTIFICATION ROUTERS ONLY - MATCHING BACKEND ROUTES
+// FIXED: NOTIFICATION API ENDPOINTS - MATCHING BACKEND ROUTES
 // ============================================================
 const API_ENDPOINTS = {
-  // AUTH NOTIFICATION ROUTERS (from authRoutes.js)
+  // AUTH NOTIFICATION ROUTES
   notifications: `${API_BASE_URL}/auth/notifications`,
   notificationsByEmail: (email: string) =>
     `${API_BASE_URL}/auth/notifications/email/${email}`,
@@ -2385,10 +2413,10 @@ const API_ENDPOINTS = {
     `${API_BASE_URL}/auth/notifications/${id}`,
   notificationBulkDelete: `${API_BASE_URL}/auth/notifications/bulk`,
 
-  // ACTIVITY NOTIFICATION ROUTER (for activity notifications)
+  // ACTIVITY NOTIFICATION ROUTES
   activityDelete: (id: string) => `${API_BASE_URL}/auth/notifications/${id}`,
 
-  // BOOKING NOTIFICATION ROUTERS
+  // BOOKING NOTIFICATION ROUTES
   bookingNotifications: `${API_BASE_URL}/bookings/notifications`,
   bookingNotificationsByEmail: (email: string) =>
     `${API_BASE_URL}/bookings/notifications/email/${email}`,
@@ -2398,7 +2426,7 @@ const API_ENDPOINTS = {
   bookingNotificationDelete: (id: string) =>
     `${API_BASE_URL}/bookings/notifications/${id}`,
 
-  // CONTACT NOTIFICATION ROUTERS
+  // CONTACT NOTIFICATION ROUTES
   contactNotifications: `${API_BASE_URL}/contact/notifications`,
   contactNotificationsByEmail: (email: string) =>
     `${API_BASE_URL}/contact/notifications/${email}`,
@@ -2408,15 +2436,17 @@ const API_ENDPOINTS = {
   contactNotificationDelete: (id: string) =>
     `${API_BASE_URL}/contact/notifications/${id}`,
 
-  // HOUSE NOTIFICATION ROUTERS
+  // HOUSE NOTIFICATION ROUTES - Using :id (matches backend)
   houseNotifications: `${API_BASE_URL}/houses/notifications`,
+  houseUnreadCount: `${API_BASE_URL}/houses/notifications/unread-count`,
   houseNotificationRead: (id: string) =>
     `${API_BASE_URL}/houses/notifications/${id}/read`,
   houseNotificationMarkAllRead: `${API_BASE_URL}/houses/notifications/mark-all-read`,
   houseNotificationDelete: (id: string) =>
     `${API_BASE_URL}/houses/notifications/${id}`,
+  houseNotificationBulkDelete: `${API_BASE_URL}/houses/notifications/bulk`,
 
-  // REQUEST NOTIFICATION ROUTERS
+  // REQUEST NOTIFICATION ROUTES
   requestNotifications: `${API_BASE_URL}/requests/notifications`,
   requestNotificationRead: (id: string) =>
     `${API_BASE_URL}/requests/notifications/${id}/read`,
@@ -2425,14 +2455,14 @@ const API_ENDPOINTS = {
   requestNotificationDelete: (id: string) =>
     `${API_BASE_URL}/requests/notifications/${id}`,
 
-  // TESTIMONIAL NOTIFICATION ROUTERS
+  // TESTIMONIAL NOTIFICATION ROUTES
   testimonials: `${API_BASE_URL}/testimonials`,
   testimonialNotificationRead: (id: string) =>
     `${API_BASE_URL}/testimonials/notifications/${id}/read`,
   testimonialNotificationDelete: (id: string) =>
     `${API_BASE_URL}/testimonials/notifications/${id}`,
 
-  // QUESTION NOTIFICATION ROUTERS - USING ONLY EMAIL ENDPOINT
+  // QUESTION NOTIFICATION ROUTES
   questionNotificationsByEmail: (email: string) =>
     `${API_BASE_URL}/questions/notifications/email/${email}`,
   questionNotificationRead: (id: string) =>
@@ -2585,13 +2615,13 @@ const StatusModal = ({
   const bgColor = isSuccess
     ? "bg-green-50 border-green-200"
     : isInfo
-    ? "bg-blue-50 border-blue-200"
-    : "bg-red-50 border-red-200";
+      ? "bg-blue-50 border-blue-200"
+      : "bg-red-50 border-red-200";
   const buttonColor = isSuccess
     ? "bg-green-600"
     : isInfo
-    ? "bg-blue-600"
-    : "bg-red-600";
+      ? "bg-blue-600"
+      : "bg-red-600";
 
   return (
     <>
@@ -2762,7 +2792,7 @@ const NotificationsModal = ({
                           </span>
                           <span className="text-xs text-gray-400">
                             {new Date(
-                              notification.createdAt
+                              notification.createdAt,
                             ).toLocaleDateString("en-US", {
                               month: "short",
                               day: "numeric",
@@ -2860,7 +2890,7 @@ const Sidebar = ({
     { id: "messages", label: "Messages", icon: <EmailIcon /> },
     { id: "testimonials", label: "Testimonials", icon: <TextSnippet /> },
     { id: "logs", label: "Logs", icon: <LoginSharp /> },
-    { id: "question", label: "Question", icon: <QuestionAnswer /> },
+    { id: "question", label: "Question", icon: <QuestionAnswerIcon /> },
   ];
 
   // User Menu Items
@@ -2890,7 +2920,7 @@ const Sidebar = ({
     { id: "testimonials", label: "Testimonials", icon: <TextSnippet /> },
     { id: "requests", label: "Requests", icon: <TrendingUpIcon /> },
     { id: "logs", label: "Logs", icon: <LoginSharp /> },
-    { id: "question", label: "Question", icon: <QuestionAnswer /> },
+    { id: "question", label: "Question", icon: <QuestionAnswerIcon /> },
   ];
 
   const getMenuItems = () => {
@@ -3146,7 +3176,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   // FETCH NOTIFICATIONS FROM ALL SOURCES
   // ============================================================
 
-  // Fetch auth notifications (from authRoutes.js)
+  // Fetch auth notifications
   const fetchAuthNotifications = useCallback(async (userData: UserData) => {
     try {
       const token = localStorage.getItem("token");
@@ -3171,7 +3201,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       }
       return [];
     } catch (error) {
-      console.error("Error fetching auth notifications:", error);
       return [];
     }
   }, []);
@@ -3211,7 +3240,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       }
       return [];
     } catch (error) {
-      console.error("Error fetching booking notifications:", error);
       return [];
     }
   }, []);
@@ -3229,12 +3257,17 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       if (response.data?.success && Array.isArray(response.data.data)) {
         return response.data.data;
       }
+      if (
+        response.data?.success &&
+        Array.isArray(response.data.notifications)
+      ) {
+        return response.data.notifications;
+      }
       if (Array.isArray(response.data)) {
         return response.data;
       }
       return [];
     } catch (error) {
-      console.error("Error fetching house notifications:", error);
       return [];
     }
   }, []);
@@ -3262,7 +3295,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       }
       return [];
     } catch (error) {
-      console.error("Error fetching contact notifications:", error);
       return [];
     }
   }, []);
@@ -3285,12 +3317,11 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       }
       return [];
     } catch (error) {
-      console.error("Error fetching request notifications:", error);
       return [];
     }
   }, []);
 
-  // Fetch question notifications - using only email endpoint
+  // Fetch question notifications
   const fetchQuestionNotifications = useCallback(async (userData: UserData) => {
     try {
       const token = localStorage.getItem("token");
@@ -3305,7 +3336,10 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       if (response.data?.success && Array.isArray(response.data.data)) {
         return response.data.data;
       }
-      if (response.data?.success && Array.isArray(response.data.notifications)) {
+      if (
+        response.data?.success &&
+        Array.isArray(response.data.notifications)
+      ) {
         return response.data.notifications;
       }
       if (Array.isArray(response.data)) {
@@ -3313,7 +3347,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       }
       return [];
     } catch (error) {
-      console.error("Error fetching question notifications:", error);
       return [];
     }
   }, []);
@@ -3379,7 +3412,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
       return uniqueRawNotifications;
     } catch (error) {
-      console.error("Error fetching all notifications:", error);
       return [];
     }
   }, [
@@ -3541,13 +3573,10 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       const seenContent = new Set<string>();
 
       const uniqueNotifications = processedNotifs.filter((notif) => {
-        // 1. Check by ID first
         if (seenIds.has(notif.id)) {
           return false;
         }
 
-        // 2. Check by content (title + message + source)
-        // This catches duplicate content from different notification sources
         const contentKey = `${notif.title}|${notif.message}|${notif.source}`;
 
         if (seenContent.has(contentKey)) {
@@ -3562,7 +3591,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       // Sort by createdAt (newest first)
       uniqueNotifications.sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
 
       setNotifications(uniqueNotifications);
@@ -3571,7 +3600,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         notifications: rawNotifications,
       };
     } catch (error) {
-      console.error("Error fetching notification data:", error);
+      // Silent fail - no console logs
     }
   }, [fetchAllNotifications, processNotifications]);
 
@@ -3590,7 +3619,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const showStatusModal = (
     title: string,
     message: string,
-    type: "success" | "error" | "info"
+    type: "success" | "error" | "info",
   ) => {
     setStatusModal({
       isOpen: true,
@@ -3607,7 +3636,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     async (id: string) => {
       // Optimistically update UI
       setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+        prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
       );
 
       try {
@@ -3643,8 +3672,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             url = API_ENDPOINTS.questionNotificationRead(id);
             break;
           case "activity":
-            // Activity notifications might not have a read endpoint
-            // Just mark as read locally
             return;
           default:
             return;
@@ -3653,44 +3680,39 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         await axios.put(
           url,
           {},
-          { headers: { Authorization: `Bearer ${token}` } }
+          { headers: { Authorization: `Bearer ${token}` } },
         );
 
-        // Refresh to ensure consistency
         await fetchAndProcessData();
       } catch (error) {
-        console.error("Error marking notification as read:", error);
         // Revert optimistic update
         setNotifications((prev) =>
-          prev.map((n) => (n.id === id ? { ...n, read: false } : n))
+          prev.map((n) => (n.id === id ? { ...n, read: false } : n)),
         );
         showStatusModal(
           "Error",
           "Failed to mark notification as read",
-          "error"
+          "error",
         );
       }
     },
-    [notifications, fetchAndProcessData]
+    [notifications, fetchAndProcessData],
   );
 
   // ============================================================
-  // MARK ALL NOTIFICATIONS AS READ - ONE BY ONE
+  // MARK ALL NOTIFICATIONS AS READ
   // ============================================================
   const handleMarkAllAsRead = useCallback(async () => {
     const unreadIds = notifications.filter((n) => !n.read).map((n) => n.id);
 
-    // Optimistically mark all as read in UI
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
 
     try {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      // Get all unread notifications
       const unreadNotifications = notifications.filter((n) => !n.read);
 
-      // Process each notification individually
       const markPromises = [];
       let successCount = 0;
 
@@ -3721,8 +3743,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             url = API_ENDPOINTS.questionNotificationRead(notification.id);
             break;
           case "activity":
-            // Activity notifications might not have a read endpoint
-            // Just mark as read locally
             successCount++;
             continue;
           default:
@@ -3732,47 +3752,32 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         if (url) {
           markPromises.push(
             axios
-              .put(
-                url,
-                {},
-                { headers: { Authorization: `Bearer ${token}` } }
-              )
+              .put(url, {}, { headers: { Authorization: `Bearer ${token}` } })
               .then(() => successCount++)
-              .catch((err) => {
-                console.error(
-                  `Failed to mark notification ${notification.id} as read:`,
-                  err
-                );
-              })
+              .catch(() => {}),
           );
         }
       }
 
-      // Wait for all promises to settle
       await Promise.allSettled(markPromises);
 
       if (successCount > 0) {
         showStatusModal(
           "Success",
           `${successCount} notification(s) marked as read`,
-          "success"
+          "success",
         );
       }
 
-      // Refresh to get latest state
       await fetchAndProcessData();
     } catch (error) {
-      console.error("Error marking notifications as read:", error);
-      // Revert optimistically marked notifications
       setNotifications((prev) =>
-        prev.map((n) =>
-          unreadIds.includes(n.id) ? { ...n, read: false } : n
-        )
+        prev.map((n) => (unreadIds.includes(n.id) ? { ...n, read: false } : n)),
       );
       showStatusModal(
         "Error",
         "Failed to mark some notifications as read",
-        "error"
+        "error",
       );
     }
   }, [notifications, fetchAndProcessData]);
@@ -3786,7 +3791,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         showStatusModal(
           "Permission Denied",
           "You do not have permission to delete notifications",
-          "error"
+          "error",
         );
         return;
       }
@@ -3807,7 +3812,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             return;
           }
 
-          // Optimistically remove from UI
           setNotifications((prev) => prev.filter((n) => n.id !== id));
 
           try {
@@ -3854,8 +3858,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             showStatusModal("Success", "Notification deleted", "success");
             setTimeout(() => fetchAndProcessData(), 500);
           } catch (error: any) {
-            console.error("Error deleting notification:", error);
-
             if (error.response?.status === 404) {
               await fetchAndProcessData();
               return;
@@ -3866,14 +3868,14 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             showStatusModal(
               "Error",
               "Failed to delete notification. Please try again.",
-              "error"
+              "error",
             );
           }
         },
         type: "delete",
       });
     },
-    [notifications, fetchAndProcessData, user]
+    [notifications, fetchAndProcessData, user],
   );
 
   // ============================================================
@@ -3884,7 +3886,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       showStatusModal(
         "Permission Denied",
         "You do not have permission to delete notifications",
-        "error"
+        "error",
       );
       return;
     }
@@ -3919,7 +3921,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           let deleteCount = 0;
 
           for (const [source, sourceNotifs] of Object.entries(
-            groupedNotifications
+            groupedNotifications,
           )) {
             for (const notif of sourceNotifs) {
               let url = "";
@@ -3960,12 +3962,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     headers: { Authorization: `Bearer ${token}` },
                   })
                   .then(() => deleteCount++)
-                  .catch((err) =>
-                    console.error(
-                      `Failed to delete ${source} notification ${notif.id}:`,
-                      err
-                    )
-                  )
+                  .catch(() => {}),
               );
             }
           }
@@ -3978,18 +3975,17 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             showStatusModal(
               "Success",
               `${deleteCount} notification(s) deleted`,
-              "success"
+              "success",
             );
           }
 
           await fetchAndProcessData();
         } catch (error) {
-          console.error("Error deleting all notifications:", error);
           await fetchAndProcessData();
           showStatusModal(
             "Error",
             "Failed to delete all notifications",
-            "error"
+            "error",
           );
         }
       },
@@ -4033,14 +4029,13 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
       fetchAndProcessData();
 
-      const interval = setInterval(fetchAndProcessData, 15000);
+      const interval = setInterval(fetchAndProcessData, 30000);
 
       return () => {
         window.removeEventListener("resize", handleResize);
         clearInterval(interval);
       };
     } catch (error) {
-      console.error("Error in DashboardLayout:", error);
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       navigate("/");

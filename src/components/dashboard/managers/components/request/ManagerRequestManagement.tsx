@@ -19,7 +19,7 @@ import ChatIcon from "@mui/icons-material/Chat";
 import { Close, Send } from "@mui/icons-material";
 
 // API Configuration
-const API_URL = "https://rene-inyumba-nodejs.onrender.com/requests";
+const API_URL = "https://inyumbaproject.eu1.hubfly.app/requests";
 
 // Google Translate API utility
 const translateTextAPI = async (

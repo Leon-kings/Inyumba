@@ -24,7 +24,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 // API endpoint
-const API_URL = "https://rene-inyumba-nodejs.onrender.com/requests";
+const API_URL = "https://inyumbaproject.eu1.hubfly.app/requests";
 
 const translations = {
   en: {

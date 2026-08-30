@@ -558,7 +558,7 @@ const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
 };
 
 // API Base URL
-const API_URL = "https://rene-inyumba-nodejs.onrender.com/requests";
+const API_URL = "https://inyumbaproject.eu1.hubfly.app/requests";
 
 // Helper function to transform request to UI format
 const transformRequestToUI = (request: Request): RequestUI => {
