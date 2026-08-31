@@ -4523,7 +4523,6 @@
 //   );
 // }
 
-
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -4611,6 +4610,7 @@ import { ActivitiesManagement } from "./components/changes/manager/ActivitiesMan
 import { ActionsManagement } from "./components/changes/admin/ActionsManagementView";
 import { HostClientManagement } from "./components/dashboard/host/components/client/HostClientManagement";
 import { QuestionManagement } from "./components/dashboard/admin/components/question/QuestionManagement";
+import { ResetPassword } from "./components/verify/ResetPassword";
 
 // Types
 interface UserData {
@@ -5926,12 +5926,11 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         await axios.put(
           url,
           {},
-          { headers: { Authorization: `Bearer ${token}` } }
+          { headers: { Authorization: `Bearer ${token}` } },
         );
 
         // Refresh notifications after marking as read
         await fetchAndProcessData();
-
       } catch (error) {
         // Revert optimistic update
         setNotifications((prev) =>
@@ -6006,9 +6005,13 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           // Send empty body - ID is in URL params
           markPromises.push(
             axios
-              .put(url, {}, { 
-                headers: { Authorization: `Bearer ${token}` } 
-              })
+              .put(
+                url,
+                {},
+                {
+                  headers: { Authorization: `Bearer ${token}` },
+                },
+              )
               .then(() => successCount++)
               .catch(() => {}),
           );
@@ -6027,17 +6030,12 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           "success",
         );
       }
-
     } catch (error) {
       // Revert optimistic update
       setNotifications((prev) =>
         prev.map((n) => (unreadIds.includes(n.id) ? { ...n, read: false } : n)),
       );
-      showStatusModal(
-        "Error",
-        "Failed to mark notifications as read",
-        "error",
-      );
+      showStatusModal("Error", "Failed to mark notifications as read", "error");
     }
   }, [notifications, fetchAndProcessData]);
 
@@ -6464,6 +6462,7 @@ export default function App() {
           path="/verification/email/status"
           element={<VerificationPage />}
         />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Admin Routes */}
         <Route
