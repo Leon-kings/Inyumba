@@ -304,7 +304,7 @@ const translations = {
     success: "Success",
     error: "Error",
     messageToGuest: "Message to Guest",
-    noBookingsFound: "No clients have booked your properties yet",
+    noBookingsFound: "No house booked yet !",
     viewBooking: "View Booking",
     bookingDetails: "Booking Details",
     paymentInformation: "Payment Information",
@@ -768,7 +768,7 @@ export const HostClientManagement: React.FC = () => {
       if (transformedBookings.length === 0) {
         showInfoModal(
           t.info || "Info",
-          t.noBookingsFound || "No clients have booked your properties yet",
+          t.noBookingsFound || "No house booked yet!",
         );
       }
     } catch {
