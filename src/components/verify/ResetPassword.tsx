@@ -73,7 +73,7 @@ const resetPassword = async (data: {
   try {
     const response = await api.post<ResetPasswordResponse>(
       "/api/auth/reset-password",
-      data
+      data,
     );
     return response.data;
   } catch (error) {
@@ -90,8 +90,8 @@ const forgotPassword = async (data: {
 }): Promise<ForgotPasswordResponse> => {
   try {
     const response = await api.post<ForgotPasswordResponse>(
-      "/api/auth/forgot-password",
-      data
+      "/auth/forgot-password",
+      data,
     );
     return response.data;
   } catch (error) {
@@ -443,7 +443,8 @@ export const ResetPassword: React.FC = () => {
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isResending] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
@@ -461,7 +462,9 @@ export const ResetPassword: React.FC = () => {
     newPassword: false,
     confirmPassword: false,
   });
-  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
+    {},
+  );
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
 
   // Get token, code, and email from URL params
@@ -485,7 +488,7 @@ export const ResetPassword: React.FC = () => {
     // If token is present, try to extract email from it
     if (tokenParam && !emailParam) {
       try {
-        const tokenParts = tokenParam.split('.');
+        const tokenParts = tokenParam.split(".");
         if (tokenParts.length === 3) {
           const payload = JSON.parse(atob(tokenParts[1]));
           if (payload.email) {
@@ -493,7 +496,7 @@ export const ResetPassword: React.FC = () => {
           }
         }
       } catch (error) {
-        console.error("Could not decode token",error);
+        console.error("Could not decode token", error);
       }
     }
   }, [searchParams]);
@@ -509,9 +512,11 @@ export const ResetPassword: React.FC = () => {
     } else if (newPassword.length < 8) {
       errors.newPassword = "Password must be at least 8 characters";
     } else if (!/(?=.*[A-Z])/.test(newPassword)) {
-      errors.newPassword = "Password must contain at least one uppercase letter";
+      errors.newPassword =
+        "Password must contain at least one uppercase letter";
     } else if (!/(?=.*[a-z])/.test(newPassword)) {
-      errors.newPassword = "Password must contain at least one lowercase letter";
+      errors.newPassword =
+        "Password must contain at least one lowercase letter";
     } else if (!/(?=.*[0-9])/.test(newPassword)) {
       errors.newPassword = "Password must contain at least one number";
     }
@@ -544,16 +549,21 @@ export const ResetPassword: React.FC = () => {
   // ===========================
   const handleResetPassword = useCallback(async () => {
     if (!token) {
-      setErrorMessage("Invalid reset token. Please request a new password reset.");
+      setErrorMessage(
+        "Invalid reset token. Please request a new password reset.",
+      );
       setShowErrorModal(true);
       return;
     }
 
     const errors: ValidationErrors = {};
     if (!newPassword) errors.newPassword = "New password is required";
-    if (newPassword.length < 8) errors.newPassword = "Password must be at least 8 characters";
-    if (!confirmPassword) errors.confirmPassword = "Please confirm your password";
-    if (newPassword !== confirmPassword) errors.confirmPassword = "Passwords do not match";
+    if (newPassword.length < 8)
+      errors.newPassword = "Password must be at least 8 characters";
+    if (!confirmPassword)
+      errors.confirmPassword = "Please confirm your password";
+    if (newPassword !== confirmPassword)
+      errors.confirmPassword = "Passwords do not match";
 
     if (Object.keys(errors).length > 0) {
       setTouched({ newPassword: true, confirmPassword: true });
@@ -712,7 +722,9 @@ export const ResetPassword: React.FC = () => {
               transition={{ delay: 0.4 }}
               className="text-gray-500 text-sm mt-1"
             >
-              {token ? "Enter your new password below" : "Request a password reset"}
+              {token
+                ? "Enter your new password below"
+                : "Request a password reset"}
             </motion.p>
 
             {email && (
@@ -797,30 +809,60 @@ export const ResetPassword: React.FC = () => {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    {showPassword ? <VisibilityOff className="text-lg" /> : <Visibility className="text-lg" />}
+                    {showPassword ? (
+                      <VisibilityOff className="text-lg" />
+                    ) : (
+                      <Visibility className="text-lg" />
+                    )}
                   </button>
 
-                  {touched.newPassword && newPassword && !validationErrors.newPassword && (
-                    <CheckCircle className="absolute right-11 top-1/2 transform -translate-y-1/2 text-green-500 text-lg" />
-                  )}
+                  {touched.newPassword &&
+                    newPassword &&
+                    !validationErrors.newPassword && (
+                      <CheckCircle className="absolute right-11 top-1/2 transform -translate-y-1/2 text-green-500 text-lg" />
+                    )}
                 </div>
 
                 {/* Password requirements */}
                 <ul className="mt-1 text-xs space-y-1">
-                  <li className={`flex items-center gap-1 ${newPassword.length >= 8 ? "text-green-600" : "text-gray-400"}`}>
-                    {newPassword.length >= 8 ? <CheckCircle className="text-sm" /> : <span className="w-3 h-3 inline-block border border-gray-300 rounded-full mr-1" />}
+                  <li
+                    className={`flex items-center gap-1 ${newPassword.length >= 8 ? "text-green-600" : "text-gray-400"}`}
+                  >
+                    {newPassword.length >= 8 ? (
+                      <CheckCircle className="text-sm" />
+                    ) : (
+                      <span className="w-3 h-3 inline-block border border-gray-300 rounded-full mr-1" />
+                    )}
                     At least 8 characters
                   </li>
-                  <li className={`flex items-center gap-1 ${/(?=.*[A-Z])/.test(newPassword) ? "text-green-600" : "text-gray-400"}`}>
-                    {/(?=.*[A-Z])/.test(newPassword) ? <CheckCircle className="text-sm" /> : <span className="w-3 h-3 inline-block border border-gray-300 rounded-full mr-1" />}
+                  <li
+                    className={`flex items-center gap-1 ${/(?=.*[A-Z])/.test(newPassword) ? "text-green-600" : "text-gray-400"}`}
+                  >
+                    {/(?=.*[A-Z])/.test(newPassword) ? (
+                      <CheckCircle className="text-sm" />
+                    ) : (
+                      <span className="w-3 h-3 inline-block border border-gray-300 rounded-full mr-1" />
+                    )}
                     One uppercase letter
                   </li>
-                  <li className={`flex items-center gap-1 ${/(?=.*[a-z])/.test(newPassword) ? "text-green-600" : "text-gray-400"}`}>
-                    {/(?=.*[a-z])/.test(newPassword) ? <CheckCircle className="text-sm" /> : <span className="w-3 h-3 inline-block border border-gray-300 rounded-full mr-1" />}
+                  <li
+                    className={`flex items-center gap-1 ${/(?=.*[a-z])/.test(newPassword) ? "text-green-600" : "text-gray-400"}`}
+                  >
+                    {/(?=.*[a-z])/.test(newPassword) ? (
+                      <CheckCircle className="text-sm" />
+                    ) : (
+                      <span className="w-3 h-3 inline-block border border-gray-300 rounded-full mr-1" />
+                    )}
                     One lowercase letter
                   </li>
-                  <li className={`flex items-center gap-1 ${/(?=.*[0-9])/.test(newPassword) ? "text-green-600" : "text-gray-400"}`}>
-                    {/(?=.*[0-9])/.test(newPassword) ? <CheckCircle className="text-sm" /> : <span className="w-3 h-3 inline-block border border-gray-300 rounded-full mr-1" />}
+                  <li
+                    className={`flex items-center gap-1 ${/(?=.*[0-9])/.test(newPassword) ? "text-green-600" : "text-gray-400"}`}
+                  >
+                    {/(?=.*[0-9])/.test(newPassword) ? (
+                      <CheckCircle className="text-sm" />
+                    ) : (
+                      <span className="w-3 h-3 inline-block border border-gray-300 rounded-full mr-1" />
+                    )}
                     One number
                   </li>
                 </ul>
@@ -874,26 +916,33 @@ export const ResetPassword: React.FC = () => {
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    {showConfirmPassword ? <VisibilityOff className="text-lg" /> : <Visibility className="text-lg" />}
+                    {showConfirmPassword ? (
+                      <VisibilityOff className="text-lg" />
+                    ) : (
+                      <Visibility className="text-lg" />
+                    )}
                   </button>
 
-                  {touched.confirmPassword && confirmPassword && newPassword === confirmPassword && (
-                    <CheckCircle className="absolute right-11 top-1/2 transform -translate-y-1/2 text-green-500 text-lg" />
-                  )}
+                  {touched.confirmPassword &&
+                    confirmPassword &&
+                    newPassword === confirmPassword && (
+                      <CheckCircle className="absolute right-11 top-1/2 transform -translate-y-1/2 text-green-500 text-lg" />
+                    )}
                 </div>
 
                 <AnimatePresence>
-                  {touched.confirmPassword && validationErrors.confirmPassword && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="mt-1 text-sm text-red-500 flex items-center gap-1"
-                    >
-                      <WarningAmber className="text-sm" />
-                      {validationErrors.confirmPassword}
-                    </motion.p>
-                  )}
+                  {touched.confirmPassword &&
+                    validationErrors.confirmPassword && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="mt-1 text-sm text-red-500 flex items-center gap-1"
+                      >
+                        <WarningAmber className="text-sm" />
+                        {validationErrors.confirmPassword}
+                      </motion.p>
+                    )}
                 </AnimatePresence>
               </motion.div>
 
@@ -911,9 +960,11 @@ export const ResetPassword: React.FC = () => {
                       <div className="text-sm text-red-600">
                         Please fix the following errors:
                         <ul className="list-disc list-inside mt-1 space-y-0.5">
-                          {Object.values(validationErrors).map((error, index) => (
-                            <li key={index}>{error}</li>
-                          ))}
+                          {Object.values(validationErrors).map(
+                            (error, index) => (
+                              <li key={index}>{error}</li>
+                            ),
+                          )}
                         </ul>
                       </div>
                     </motion.div>
@@ -1079,4 +1130,3 @@ export const ResetPassword: React.FC = () => {
     </>
   );
 };
-
