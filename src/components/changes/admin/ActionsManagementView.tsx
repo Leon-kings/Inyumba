@@ -31,6 +31,10 @@
 //   Error as ErrorIcon,
 //   Schedule as ScheduleIcon,
 //   Public as PublicIcon,
+//   Delete as DeleteIcon,
+//   DeleteSweep as DeleteSweepIcon,
+//   CheckCircle as CheckCircleIcon,
+//   Warning as WarningIcon,
 // } from "@mui/icons-material";
 
 // // API Base URL
@@ -167,7 +171,7 @@
 //   const [loading, setLoading] = useState(true);
 //   const [error, setError] = useState<string | null>(null);
 //   const [page, setPage] = useState(0);
-//   const [rowsPerPage, setRowsPerPage] = useState(10);
+//   const [rowsPerPage, setRowsPerPage] = useState(20);
 //   const [selectedLog, setSelectedLog] = useState<ActivityLog | null>(null);
 //   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 //   const [filters, setFilters] = useState<FilterOptions>({
@@ -179,6 +183,25 @@
 //     totalActivities: 0,
 //     uniqueUsers: 0,
 //     actionsByType: {},
+//   });
+//   // State for delete functionality
+//   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+//   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+//   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+//   const [deleting, setDeleting] = useState(false);
+//   // State for success/failure modals
+//   const [resultModal, setResultModal] = useState<{
+//     open: boolean;
+//     type: "success" | "error";
+//     title: string;
+//     message: string;
+//     details?: string;
+//   }>({
+//     open: false,
+//     type: "success",
+//     title: "",
+//     message: "",
+//     details: "",
 //   });
 
 //   // Fetch logs using axios
@@ -205,6 +228,7 @@
 //       setLogs(activities);
 //       calculateStats(activities);
 //       applyFilters(activities, filters);
+//       setSelectedIds([]);
 //     } catch (err) {
 //       const errorMessage = axios.isAxiosError(err)
 //         ? err.response?.data?.message || err.message
@@ -335,6 +359,136 @@
 //     setSelectedLog(log);
 //     setDetailDialogOpen(true);
 //   };
+
+//   // Handle checkbox selection
+//   const handleSelect = (id: string) => {
+//     setSelectedIds((prev) =>
+//       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+//     );
+//   };
+
+//   const handleSelectAll = () => {
+//     const currentPageIds = filteredLogs
+//       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+//       .map((log) => log._id);
+//     const allSelected = currentPageIds.every((id) => selectedIds.includes(id));
+    
+//     if (allSelected) {
+//       setSelectedIds(selectedIds.filter((id) => !currentPageIds.includes(id)));
+//     } else {
+//       const newIds = [...selectedIds];
+//       currentPageIds.forEach((id) => {
+//         if (!newIds.includes(id)) newIds.push(id);
+//       });
+//       setSelectedIds(newIds);
+//     }
+//   };
+
+//   // Delete single activity
+//   const handleDeleteSingle = (id: string) => {
+//     setDeleteTarget(id);
+//     setDeleteConfirmOpen(true);
+//   };
+
+//   // Delete bulk activities
+//   const handleDeleteBulk = () => {
+//     if (selectedIds.length === 0) return;
+//     setDeleteTarget("bulk");
+//     setDeleteConfirmOpen(true);
+//   };
+
+//   // Show result modal
+//   const showResultModal = (
+//     type: "success" | "error",
+//     title: string,
+//     message: string,
+//     details?: string
+//   ) => {
+//     setResultModal({
+//       open: true,
+//       type,
+//       title,
+//       message,
+//       details,
+//     });
+//   };
+
+//   // Confirm delete
+// // Confirm delete
+// const confirmDelete = async () => {
+//   try {
+//     setDeleting(true);
+//     setError(null);
+
+//     let deletedCount = 0;
+//     let deletedIds: string[] = [];
+
+//     if (deleteTarget === "bulk") {
+//       // Bulk delete
+//       await api.delete("/auth/activities/bulk", {
+//         data: { ids: selectedIds },
+//       });
+//       deletedCount = selectedIds.length;
+//       deletedIds = selectedIds;
+      
+//       // Remove deleted items from state
+//       const remainingLogs = logs.filter((log) => !selectedIds.includes(log._id));
+//       setLogs(remainingLogs);
+//       calculateStats(remainingLogs);
+//       applyFilters(remainingLogs, filters);
+//       setSelectedIds([]);
+
+//       // Show success modal
+//       showResultModal(
+//         "success",
+//         "Bulk Delete Successful",
+//         `Successfully deleted ${deletedCount} activity log(s).`,
+//         `IDs: ${deletedIds.slice(0, 5).join(", ")}${deletedIds.length > 5 ? ` and ${deletedIds.length - 5} more` : ""}`
+//       );
+//     } else if (deleteTarget) {
+//       // Single delete
+//       await api.delete(`/auth/activities/${deleteTarget}`);
+//       deletedCount = 1;
+//       deletedIds = [deleteTarget];
+      
+//       const remainingLogs = logs.filter((log) => log._id !== deleteTarget);
+//       setLogs(remainingLogs);
+//       calculateStats(remainingLogs);
+//       applyFilters(remainingLogs, filters);
+//       setSelectedIds(selectedIds.filter((id) => id !== deleteTarget));
+
+//       // Show success modal
+//       showResultModal(
+//         "success",
+//         "Delete Successful",
+//         "Activity log has been deleted successfully.",
+//         `ID: ${deleteTarget}`
+//       );
+//     }
+
+//     setDeleteConfirmOpen(false);
+//     setDeleteTarget(null);
+//   } catch (err) {
+//     const errorMessage = axios.isAxiosError(err)
+//       ? err.response?.data?.message || err.message
+//       : "An error occurred while deleting logs";
+//     setError(errorMessage);
+    
+//     // Show error modal
+//     showResultModal(
+//       "error",
+//       "Delete Failed",
+//       errorMessage,
+//       axios.isAxiosError(err) && err.response?.data?.details 
+//         ? err.response.data.details 
+//         : "Please try again later."
+//     );
+    
+//     console.error("Error deleting logs:", err);
+//   } finally {
+//     setDeleting(false);
+//   }
+// };
 
 //   // Export logs as PDF
 //   const exportLogsPDF = () => {
@@ -641,6 +795,16 @@
 //               </div>
 //             </div>
 //             <div className="flex flex-wrap gap-3">
+//               {/* Bulk Delete Button */}
+//               {selectedIds.length > 0 && (
+//                 <button
+//                   onClick={handleDeleteBulk}
+//                   className="group inline-flex items-center gap-2.5 px-5 py-2.5 bg-gradient-to-r from-red-500 via-red-600 to-rose-600 text-white rounded-2xl hover:from-red-600 hover:via-red-700 hover:to-rose-700 hover:shadow-xl shadow-red-500/25 transition-all duration-300 text-sm font-medium"
+//                 >
+//                   <DeleteSweepIcon className="group-hover:scale-110 transition-transform duration-300" style={{ fontSize: "18px" }} />
+//                   Delete Selected ({selectedIds.length})
+//                 </button>
+//               )}
 //               <button
 //                 onClick={fetchLogs}
 //                 className="group inline-flex items-center gap-2.5 px-5 py-2.5 bg-white text-slate-700 border border-slate-200 rounded-2xl hover:bg-slate-50 hover:border-slate-300 hover:shadow-lg transition-all duration-300 text-sm font-medium"
@@ -826,6 +990,19 @@
 //             <table className="w-full border-collapse text-sm">
 //               <thead>
 //                 <tr className="bg-gradient-to-br from-slate-50/80 to-slate-100/50">
+//                   <th className="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+//                     <input
+//                       type="checkbox"
+//                       checked={
+//                         filteredLogs.length > 0 &&
+//                         filteredLogs
+//                           .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+//                           .every((log) => selectedIds.includes(log._id))
+//                       }
+//                       onChange={handleSelectAll}
+//                       className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+//                     />
+//                   </th>
 //                   <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
 //                     <div className="flex items-center gap-2">
 //                       <ScheduleIcon style={{ fontSize: "14px" }} />
@@ -854,14 +1031,14 @@
 //                     </div>
 //                   </th>
 //                   <th className="px-6 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">
-//                     Details
+//                     Actions
 //                   </th>
 //                 </tr>
 //               </thead>
 //               <tbody className="divide-y divide-slate-100">
 //                 {filteredLogs.length === 0 ? (
 //                   <tr>
-//                     <td colSpan={6} className="py-20 text-center">
+//                     <td colSpan={7} className="py-20 text-center">
 //                       <div className="flex flex-col items-center gap-3">
 //                         <div className="p-4 bg-slate-100 rounded-full">
 //                           <InfoIcon
@@ -886,8 +1063,16 @@
 //                         key={log._id}
 //                         className={`hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-transparent transition-all duration-300 group ${
 //                           index % 2 === 0 ? "bg-white/50" : "bg-slate-50/30"
-//                         }`}
+//                         } ${selectedIds.includes(log._id) ? "bg-blue-50/50" : ""}`}
 //                       >
+//                         <td className="px-4 py-4">
+//                           <input
+//                             type="checkbox"
+//                             checked={selectedIds.includes(log._id)}
+//                             onChange={() => handleSelect(log._id)}
+//                             className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+//                           />
+//                         </td>
 //                         <td className="px-6 py-4">
 //                           <div className="flex flex-col">
 //                             <span className="text-sm font-semibold text-slate-700">
@@ -949,13 +1134,22 @@
 //                           </code>
 //                         </td>
 //                         <td className="px-6 py-4 text-right">
-//                           <button
-//                             onClick={() => handleViewDetails(log)}
-//                             className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 hover:shadow-lg shadow-blue-500/25 transition-all duration-300 text-sm font-medium group"
-//                           >
-//                             <VisibilityIcon className="group-hover:scale-110 transition-transform duration-300" style={{ fontSize: "16px" }} />
-//                             View
-//                           </button>
+//                           <div className="flex items-center justify-end gap-2">
+//                             <button
+//                               onClick={() => handleViewDetails(log)}
+//                               className="inline-flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 hover:shadow-lg shadow-blue-500/25 transition-all duration-300 text-xs font-medium group"
+//                             >
+//                               <VisibilityIcon className="group-hover:scale-110 transition-transform duration-300" style={{ fontSize: "16px" }} />
+//                               View
+//                             </button>
+//                             <button
+//                               onClick={() => handleDeleteSingle(log._id)}
+//                               className="inline-flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 hover:shadow-lg shadow-red-500/25 transition-all duration-300 text-xs font-medium group"
+//                             >
+//                               <DeleteIcon className="group-hover:scale-110 transition-transform duration-300" style={{ fontSize: "16px" }} />
+//                               Delete
+//                             </button>
+//                           </div>
 //                         </td>
 //                       </tr>
 //                     ))
@@ -967,7 +1161,7 @@
 //           {/* Premium Pagination */}
 //           {filteredLogs.length > 0 && (
 //             <div className="px-6 py-4 flex flex-wrap justify-between items-center border-t border-slate-100 gap-3 bg-gradient-to-br from-slate-50/30 to-transparent backdrop-blur-sm">
-//               <div className="flex items-center gap-3">
+//               <div className="flex items-center gap-4">
 //                 <span className="text-sm text-slate-600 font-medium">Rows per page:</span>
 //                 <select
 //                   value={rowsPerPage}
@@ -979,6 +1173,9 @@
 //                   <option value={25}>25</option>
 //                   <option value={50}>50</option>
 //                 </select>
+//                 <span className="text-sm text-slate-500">
+//                   {selectedIds.length} selected
+//                 </span>
 //               </div>
 //               <div className="text-sm text-slate-600 font-medium">
 //                 <span className="text-slate-800">{filteredLogs.length}</span> total
@@ -1187,13 +1384,181 @@
 //             </div>
 
 //             {/* Modal Footer */}
-//             <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm px-8 py-5 border-t border-slate-100 flex justify-end">
+//             <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm px-8 py-5 border-t border-slate-100 flex justify-end gap-3">
+//               <button
+//                 onClick={() => handleDeleteSingle(selectedLog._id)}
+//                 className="px-8 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl hover:from-red-600 hover:to-red-700 hover:shadow-xl shadow-red-500/25 transition-all duration-300 text-sm font-semibold flex items-center gap-2"
+//               >
+//                 <DeleteIcon style={{ fontSize: "18px" }} />
+//                 Delete
+//               </button>
 //               <button
 //                 onClick={() => setDetailDialogOpen(false)}
 //                 className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl hover:from-blue-700 hover:to-blue-800 hover:shadow-xl shadow-blue-500/25 transition-all duration-300 text-sm font-semibold"
 //               >
 //                 Close
 //               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Delete Confirmation Dialog */}
+//       {deleteConfirmOpen && (
+//         <div
+//           className="fixed inset-0 bg-black/60 backdrop-blur-md flex justify-center items-center z-50 p-4 animate-in fade-in duration-300"
+//           onClick={() => {
+//             if (!deleting) {
+//               setDeleteConfirmOpen(false);
+//               setDeleteTarget(null);
+//             }
+//           }}
+//         >
+//           <div
+//             className="bg-white rounded-3xl max-w-md w-full shadow-2xl shadow-black/25 animate-in slide-in-from-bottom-10 duration-300"
+//             onClick={(e) => e.stopPropagation()}
+//           >
+//             <div className="p-8">
+//               <div className="flex items-center justify-center mb-6">
+//                 <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
+//                   <WarningIcon className="text-red-600" style={{ fontSize: "40px" }} />
+//                 </div>
+//               </div>
+//               <h3 className="text-2xl font-bold text-center text-slate-800 mb-3">
+//                 {deleteTarget === "bulk" ? "Bulk Delete" : "Delete Activity"}
+//               </h3>
+//               <p className="text-center text-slate-600 mb-6">
+//                 {deleteTarget === "bulk"
+//                   ? `Are you sure you want to delete ${selectedIds.length} selected activity log(s)? This action cannot be undone.`
+//                   : "Are you sure you want to delete this activity log? This action cannot be undone."}
+//               </p>
+//               {deleteTarget === "bulk" && selectedIds.length > 0 && (
+//                 <div className="bg-slate-50 rounded-xl p-4 mb-6 max-h-32 overflow-y-auto">
+//                   <p className="text-xs text-slate-500 font-medium mb-2">
+//                     Selected Items ({selectedIds.length}):
+//                   </p>
+//                   <div className="flex flex-wrap gap-1">
+//                     {selectedIds.slice(0, 10).map((id) => (
+//                       <span
+//                         key={id}
+//                         className="text-xs font-mono bg-white px-2 py-1 rounded border border-slate-200 text-slate-600"
+//                       >
+//                         {id.slice(0, 8)}...
+//                       </span>
+//                     ))}
+//                     {selectedIds.length > 10 && (
+//                       <span className="text-xs text-slate-400">
+//                         +{selectedIds.length - 10} more
+//                       </span>
+//                     )}
+//                   </div>
+//                 </div>
+//               )}
+//               <div className="flex gap-3">
+//                 <button
+//                   onClick={() => {
+//                     setDeleteConfirmOpen(false);
+//                     setDeleteTarget(null);
+//                   }}
+//                   disabled={deleting}
+//                   className="flex-1 px-6 py-3 bg-slate-100 text-slate-700 rounded-2xl hover:bg-slate-200 transition-all duration-200 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+//                 >
+//                   Cancel
+//                 </button>
+//                 <button
+//                   onClick={confirmDelete}
+//                   disabled={deleting}
+//                   className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl hover:from-red-600 hover:to-red-700 hover:shadow-xl shadow-red-500/25 transition-all duration-300 text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+//                 >
+//                   {deleting ? (
+//                     <>
+//                       <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+//                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+//                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+//                       </svg>
+//                       Deleting...
+//                     </>
+//                   ) : (
+//                     <>
+//                       <DeleteIcon style={{ fontSize: "18px" }} />
+//                       Delete
+//                     </>
+//                   )}
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Success/Error Result Modal */}
+//       {resultModal.open && (
+//         <div
+//           className="fixed inset-0 bg-black/60 backdrop-blur-md flex justify-center items-center z-50 p-4 animate-in fade-in duration-300"
+//           onClick={() => {
+//             if (!deleting) {
+//               setResultModal({ ...resultModal, open: false });
+//             }
+//           }}
+//         >
+//           <div
+//             className="bg-white rounded-3xl max-w-lg w-full shadow-2xl shadow-black/25 animate-in slide-in-from-bottom-10 duration-300"
+//             onClick={(e) => e.stopPropagation()}
+//           >
+//             <div className="p-8">
+//               <div className="flex items-center justify-center mb-6">
+//                 <div
+//                   className={`w-24 h-24 rounded-full flex items-center justify-center ${
+//                     resultModal.type === "success"
+//                       ? "bg-emerald-100"
+//                       : "bg-red-100"
+//                   }`}
+//                 >
+//                   {resultModal.type === "success" ? (
+//                     <CheckCircleIcon
+//                       className="text-emerald-600"
+//                       style={{ fontSize: "56px" }}
+//                     />
+//                   ) : (
+//                     <ErrorIcon
+//                       className="text-red-600"
+//                       style={{ fontSize: "56px" }}
+//                     />
+//                   )}
+//                 </div>
+//               </div>
+//               <h3
+//                 className={`text-2xl font-bold text-center mb-3 ${
+//                   resultModal.type === "success"
+//                     ? "text-emerald-800"
+//                     : "text-red-800"
+//                 }`}
+//               >
+//                 {resultModal.title}
+//               </h3>
+//               <p className="text-center text-slate-600 mb-4">
+//                 {resultModal.message}
+//               </p>
+//               {resultModal.details && (
+//                 <div className="bg-slate-50 rounded-xl p-4 mb-6 max-h-32 overflow-y-auto">
+//                   <p className="text-xs text-slate-500 font-medium mb-2">Details:</p>
+//                   <code className="text-xs font-mono text-slate-700 break-all">
+//                     {resultModal.details}
+//                   </code>
+//                 </div>
+//               )}
+//               <div className="flex gap-3">
+//                 <button
+//                   onClick={() => setResultModal({ ...resultModal, open: false })}
+//                   className={`flex-1 px-6 py-3 text-white rounded-2xl transition-all duration-300 text-sm font-semibold shadow-lg ${
+//                     resultModal.type === "success"
+//                       ? "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-emerald-500/25"
+//                       : "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-red-500/25"
+//                   }`}
+//                 >
+//                   {resultModal.type === "success" ? "Done" : "Close"}
+//                 </button>
+//               </div>
 //             </div>
 //           </div>
 //         </div>
@@ -1220,6 +1585,7 @@ import { format, parseISO, formatDistanceToNow } from "date-fns";
 import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import Cookies from "js-cookie";
 import {
   Search as SearchIcon,
   Refresh as RefreshIcon,
@@ -1253,6 +1619,37 @@ import {
 
 // API Base URL
 const API_BASE_URL = "https://inyumbaproject.eu1.hubfly.app";
+
+// MyMemory Translation API (no CORS issues)
+const translateText = async (text: string, targetLang: string): Promise<string> => {
+  if (!text || text.trim() === "") return text;
+  if (targetLang === "en") return text;
+  
+  // Map language codes for MyMemory API
+  const langMap: Record<string, string> = {
+    fr: "fr-FR",
+    rw: "rw-RW",
+  };
+  
+  try {
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${langMap[targetLang] || targetLang}`;
+    const response = await axios.get(url);
+    
+    if (response.data && response.data.responseData && response.data.responseData.translatedText) {
+      return response.data.responseData.translatedText;
+    }
+    return text;
+  } catch (error) {
+    console.error('Translation error:', error);
+    return text;
+  }
+};
+
+// Helper function to get language from cookies
+const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
+  const lang = Cookies.get("language") as "en" | "fr" | "rw";
+  return lang || "en";
+};
 
 // Types
 interface ActivityLog {
@@ -1290,6 +1687,205 @@ interface Stats {
   uniqueUsers: number;
   actionsByType: { [key: string]: number };
 }
+
+// Translations for static UI text
+const translations = {
+  en: {
+    title: "Activity Logs",
+    subtitle: "Real-time monitoring & analytics",
+    totalActivities: "Total Activities",
+    uniqueUsers: "Unique Users",
+    mostActive: "Most Active",
+    actionTypes: "Action Types",
+    last30Days: "Last 30 days",
+    activeUsers: "Active users",
+    occurrences: "occurrences",
+    differentTypes: "Different types",
+    searchPlaceholder: "Search logs by user, action, IP, description...",
+    allActions: "All Actions",
+    allTime: "All Time",
+    today: "Today",
+    thisWeek: "This Week",
+    thisMonth: "This Month",
+    clear: "Clear",
+    noLogsFound: "No logs found",
+    adjustFilters: "Try adjusting your filters or search terms",
+    rowsPerPage: "Rows per page",
+    selected: "selected",
+    totalLogs: "total logs",
+    previous: "Previous",
+    next: "Next",
+    showing: "Showing",
+    of: "of",
+    totalActivitiesCount: "total activities",
+    activityDetails: "Activity Details",
+    userInformation: "User Information",
+    name: "Name",
+    email: "Email",
+    role: "Role",
+    phone: "Phone",
+    userId: "User ID",
+    entityType: "Entity Type",
+    action: "Action",
+    description: "Description",
+    ipAddress: "IP Address",
+    userAgent: "User Agent",
+    createdAt: "Created At",
+    timeHappened: "Time Happened",
+    updatedAt: "Updated At",
+    delete: "Delete",
+    close: "Close",
+    view: "View",
+    refresh: "Refresh",
+    exportPDF: "Export PDF",
+    deleteSelected: "Delete Selected",
+    bulkDelete: "Bulk Delete",
+    deleteActivity: "Delete Activity",
+    confirmBulkDelete: "Are you sure you want to delete {count} selected activity log(s)? This action cannot be undone.",
+    confirmDelete: "Are you sure you want to delete this activity log? This action cannot be undone.",
+    selectedItems: "Selected Items",
+    cancel: "Cancel",
+    deleting: "Deleting...",
+    bulkDeleteSuccess: "Bulk Delete Successful",
+    bulkDeleteSuccessMessage: "Successfully deleted {count} activity log(s).",
+    deleteSuccess: "Delete Successful",
+    deleteSuccessMessage: "Activity log has been deleted successfully.",
+    deleteFailed: "Delete Failed",
+    tryAgainLater: "Please try again later.",
+    done: "Done",
+    requestSent: "Request Sent Successfully!",
+  },
+  fr: {
+    title: "Journal d'Activités",
+    subtitle: "Surveillance et analyses en temps réel",
+    totalActivities: "Total des Activités",
+    uniqueUsers: "Utilisateurs Uniques",
+    mostActive: "Plus Actif",
+    actionTypes: "Types d'Actions",
+    last30Days: "30 derniers jours",
+    activeUsers: "Utilisateurs actifs",
+    occurrences: "occurrences",
+    differentTypes: "Différents types",
+    searchPlaceholder: "Rechercher par utilisateur, action, IP, description...",
+    allActions: "Toutes les Actions",
+    allTime: "Tout le Temps",
+    today: "Aujourd'hui",
+    thisWeek: "Cette Semaine",
+    thisMonth: "Ce Mois",
+    clear: "Effacer",
+    noLogsFound: "Aucun journal trouvé",
+    adjustFilters: "Essayez d'ajuster vos filtres ou termes de recherche",
+    rowsPerPage: "Lignes par page",
+    selected: "sélectionnés",
+    totalLogs: "journaux au total",
+    previous: "Précédent",
+    next: "Suivant",
+    showing: "Affichage",
+    of: "sur",
+    totalActivitiesCount: "activités au total",
+    activityDetails: "Détails de l'Activité",
+    userInformation: "Informations Utilisateur",
+    name: "Nom",
+    email: "Email",
+    role: "Rôle",
+    phone: "Téléphone",
+    userId: "ID Utilisateur",
+    entityType: "Type d'Entité",
+    action: "Action",
+    description: "Description",
+    ipAddress: "Adresse IP",
+    userAgent: "Agent Utilisateur",
+    createdAt: "Créé le",
+    timeHappened: "Heure de l'Événement",
+    updatedAt: "Mis à Jour le",
+    delete: "Supprimer",
+    close: "Fermer",
+    view: "Voir",
+    refresh: "Rafraîchir",
+    exportPDF: "Exporter PDF",
+    deleteSelected: "Supprimer la Sélection",
+    bulkDelete: "Suppression en Masse",
+    deleteActivity: "Supprimer l'Activité",
+    confirmBulkDelete: "Êtes-vous sûr de vouloir supprimer {count} journal(s) d'activité sélectionné(s) ? Cette action est irréversible.",
+    confirmDelete: "Êtes-vous sûr de vouloir supprimer ce journal d'activité ? Cette action est irréversible.",
+    selectedItems: "Éléments Sélectionnés",
+    cancel: "Annuler",
+    deleting: "Suppression...",
+    bulkDeleteSuccess: "Suppression en Masse Réussie",
+    bulkDeleteSuccessMessage: "{count} journal(s) d'activité supprimé(s) avec succès.",
+    deleteSuccess: "Suppression Réussie",
+    deleteSuccessMessage: "Le journal d'activité a été supprimé avec succès.",
+    deleteFailed: "Échec de la Suppression",
+    tryAgainLater: "Veuillez réessayer plus tard.",
+    done: "Terminé",
+    requestSent: "Demande Envoyée avec Succès !",
+  },
+  rw: {
+    title: "Ibyakozwe",
+    subtitle: "Kugenzura no gusesengura mu gihe nyacyo",
+    totalActivities: "Ibikorwa Byose",
+    uniqueUsers: "Abakoresha Batandukanye",
+    mostActive: "Gikora Cyane",
+    actionTypes: "Ubwoko bw'Ibikorwa",
+    last30Days: "Iminsi 30 ishize",
+    activeUsers: "Abakoresha bakora",
+    occurrences: "inshuro",
+    differentTypes: "Ubwoko butandukanye",
+    searchPlaceholder: "Shakisha ukoresheje izina, ikorwa, IP, ibisobanuro...",
+    allActions: "Ibikorwa Byose",
+    allTime: "Igihe Cyose",
+    today: "Uyu Munsi",
+    thisWeek: "Iyi Ndugu",
+    thisMonth: "Uku Kwezi",
+    clear: "Hanagura",
+    noLogsFound: "Nta byakozwe biboneka",
+    adjustFilters: "Gerageza guhindura filtre cyangwa amagambo ushakisha",
+    rowsPerPage: "Imirongo ku rupapuro",
+    selected: "byahisijwe",
+    totalLogs: "ibikorwa byose",
+    previous: "Mbere",
+    next: "Ubutaha",
+    showing: "Kwerekana",
+    of: "muri",
+    totalActivitiesCount: "ibikorwa byose",
+    activityDetails: "Ibisobanuro by'Ikikorwa",
+    userInformation: "Amakuru y'Umukoresha",
+    name: "Izina",
+    email: "Imeri",
+    role: "Uruhushya",
+    phone: "Telefone",
+    userId: "Indangamuntu y'Umukoresha",
+    entityType: "Ubwoko bw'Ikintu",
+    action: "Ikorwa",
+    description: "Ibisobanuro",
+    ipAddress: "Aderesi IP",
+    userAgent: "Porogaramu",
+    createdAt: "Yakozwe ku",
+    timeHappened: "Igihe cyabaye",
+    updatedAt: "Yahinduwe ku",
+    delete: "Siba",
+    close: "Funga",
+    view: "Reba",
+    refresh: "Vugurura",
+    exportPDF: "Sohora PDF",
+    deleteSelected: "Siba Ibyahisijwe",
+    bulkDelete: "Siba Byinshi",
+    deleteActivity: "Siba Ikikorwa",
+    confirmBulkDelete: "Uri gushaka niba ushaka gusiba {count} ibikorwa byahisijwe? Iyi nkora ntishobora gusubizwa.",
+    confirmDelete: "Uri gushaka niba ushaka gusiba iki gikorwa? Iyi nkora ntishobora gusubizwa.",
+    selectedItems: "Ibyahisijwe",
+    cancel: "Hagarika",
+    deleting: "Birisibwa...",
+    bulkDeleteSuccess: "Kusiba Byinshi Byagenze Neza",
+    bulkDeleteSuccessMessage: "{count} ibikorwa byasibwe neza.",
+    deleteSuccess: "Kusiba Byagenze Neza",
+    deleteSuccessMessage: "Ikikorwa cyasibwe neza.",
+    deleteFailed: "Kusiba Ntibyagenze Neza",
+    tryAgainLater: "Ongera ugerageze nyuma.",
+    done: "Byakozwe",
+    requestSent: "Ubutumwa Bwoherejwe Neza!",
+  },
+};
 
 // Helper function to safely format dates
 const formatDateSafe = (
@@ -1379,6 +1975,11 @@ api.interceptors.request.use(
 );
 
 export const ActionsManagement: React.FC = () => {
+  // Language state
+  const [lang, setLang] = useState<"en" | "fr" | "rw">(
+    getLanguageFromCookies(),
+  );
+  
   // State
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [filteredLogs, setFilteredLogs] = useState<ActivityLog[]>([]);
@@ -1418,6 +2019,22 @@ export const ActionsManagement: React.FC = () => {
     details: "",
   });
 
+  // Get translations
+  const t = translations[lang];
+
+  // Listen for language changes in cookies
+  useEffect(() => {
+    const handleCookieChange = () => {
+      const newLang = getLanguageFromCookies();
+      if (newLang !== lang) {
+        setLang(newLang);
+      }
+    };
+
+    const interval = setInterval(handleCookieChange, 1000);
+    return () => clearInterval(interval);
+  }, [lang]);
+
   // Fetch logs using axios
   const fetchLogs = useCallback(async () => {
     try {
@@ -1439,9 +2056,28 @@ export const ActionsManagement: React.FC = () => {
         activities = [];
       }
 
-      setLogs(activities);
-      calculateStats(activities);
-      applyFilters(activities, filters);
+      // Translate dynamic content if language is not English
+      if (lang !== "en" && activities.length > 0) {
+        const translatedActivities = await Promise.all(
+          activities.map(async (log) => {
+            const translatedAction = await translateText(log.action, lang);
+            const translatedDescription = await translateText(log.description, lang);
+            return {
+              ...log,
+              action: translatedAction,
+              description: translatedDescription,
+            };
+          })
+        );
+        setLogs(translatedActivities);
+        calculateStats(translatedActivities);
+        applyFilters(translatedActivities, filters);
+      } else {
+        setLogs(activities);
+        calculateStats(activities);
+        applyFilters(activities, filters);
+      }
+      
       setSelectedIds([]);
     } catch (err) {
       const errorMessage = axios.isAxiosError(err)
@@ -1452,7 +2088,7 @@ export const ActionsManagement: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters, lang]);
 
   // Calculate statistics
   const calculateStats = (logsData: ActivityLog[]) => {
@@ -1628,81 +2264,80 @@ export const ActionsManagement: React.FC = () => {
   };
 
   // Confirm delete
-// Confirm delete
-const confirmDelete = async () => {
-  try {
-    setDeleting(true);
-    setError(null);
+  const confirmDelete = async () => {
+    try {
+      setDeleting(true);
+      setError(null);
 
-    let deletedCount = 0;
-    let deletedIds: string[] = [];
+      let deletedCount = 0;
+      let deletedIds: string[] = [];
 
-    if (deleteTarget === "bulk") {
-      // Bulk delete
-      await api.delete("/auth/activities/bulk", {
-        data: { ids: selectedIds },
-      });
-      deletedCount = selectedIds.length;
-      deletedIds = selectedIds;
+      if (deleteTarget === "bulk") {
+        // Bulk delete
+        await api.delete("/auth/activities/bulk", {
+          data: { ids: selectedIds },
+        });
+        deletedCount = selectedIds.length;
+        deletedIds = selectedIds;
+        
+        // Remove deleted items from state
+        const remainingLogs = logs.filter((log) => !selectedIds.includes(log._id));
+        setLogs(remainingLogs);
+        calculateStats(remainingLogs);
+        applyFilters(remainingLogs, filters);
+        setSelectedIds([]);
+
+        // Show success modal
+        showResultModal(
+          "success",
+          t.bulkDeleteSuccess,
+          t.bulkDeleteSuccessMessage.replace("{count}", String(deletedCount)),
+          `IDs: ${deletedIds.slice(0, 5).join(", ")}${deletedIds.length > 5 ? ` and ${deletedIds.length - 5} more` : ""}`
+        );
+      } else if (deleteTarget) {
+        // Single delete
+        await api.delete(`/auth/activities/${deleteTarget}`);
+        deletedCount = 1;
+        deletedIds = [deleteTarget];
+        
+        const remainingLogs = logs.filter((log) => log._id !== deleteTarget);
+        setLogs(remainingLogs);
+        calculateStats(remainingLogs);
+        applyFilters(remainingLogs, filters);
+        setSelectedIds(selectedIds.filter((id) => id !== deleteTarget));
+
+        // Show success modal
+        showResultModal(
+          "success",
+          t.deleteSuccess,
+          t.deleteSuccessMessage,
+          `ID: ${deleteTarget}`
+        );
+      }
+
+      setDeleteConfirmOpen(false);
+      setDeleteTarget(null);
+    } catch (err) {
+      const errorMessage = axios.isAxiosError(err)
+        ? err.response?.data?.message || err.message
+        : "An error occurred while deleting logs";
+      setError(errorMessage);
       
-      // Remove deleted items from state
-      const remainingLogs = logs.filter((log) => !selectedIds.includes(log._id));
-      setLogs(remainingLogs);
-      calculateStats(remainingLogs);
-      applyFilters(remainingLogs, filters);
-      setSelectedIds([]);
-
-      // Show success modal
+      // Show error modal
       showResultModal(
-        "success",
-        "Bulk Delete Successful",
-        `Successfully deleted ${deletedCount} activity log(s).`,
-        `IDs: ${deletedIds.slice(0, 5).join(", ")}${deletedIds.length > 5 ? ` and ${deletedIds.length - 5} more` : ""}`
+        "error",
+        t.deleteFailed,
+        errorMessage,
+        axios.isAxiosError(err) && err.response?.data?.details 
+          ? err.response.data.details 
+          : t.tryAgainLater
       );
-    } else if (deleteTarget) {
-      // Single delete
-      await api.delete(`/auth/activities/${deleteTarget}`);
-      deletedCount = 1;
-      deletedIds = [deleteTarget];
       
-      const remainingLogs = logs.filter((log) => log._id !== deleteTarget);
-      setLogs(remainingLogs);
-      calculateStats(remainingLogs);
-      applyFilters(remainingLogs, filters);
-      setSelectedIds(selectedIds.filter((id) => id !== deleteTarget));
-
-      // Show success modal
-      showResultModal(
-        "success",
-        "Delete Successful",
-        "Activity log has been deleted successfully.",
-        `ID: ${deleteTarget}`
-      );
+      console.error("Error deleting logs:", err);
+    } finally {
+      setDeleting(false);
     }
-
-    setDeleteConfirmOpen(false);
-    setDeleteTarget(null);
-  } catch (err) {
-    const errorMessage = axios.isAxiosError(err)
-      ? err.response?.data?.message || err.message
-      : "An error occurred while deleting logs";
-    setError(errorMessage);
-    
-    // Show error modal
-    showResultModal(
-      "error",
-      "Delete Failed",
-      errorMessage,
-      axios.isAxiosError(err) && err.response?.data?.details 
-        ? err.response.data.details 
-        : "Please try again later."
-    );
-    
-    console.error("Error deleting logs:", err);
-  } finally {
-    setDeleting(false);
-  }
-};
+  };
 
   // Export logs as PDF
   const exportLogsPDF = () => {
@@ -1721,13 +2356,13 @@ const confirmDelete = async () => {
     // Title
     doc.setFontSize(22);
     doc.setTextColor(255, 255, 255);
-    doc.text("Activity Logs Report", 14, 22);
+    doc.text(t.title, 14, 22);
 
     // Subtitle
     doc.setFontSize(10);
     doc.setTextColor(200, 200, 200);
     doc.text(`Generated: ${format(new Date(), "PPpp")}`, 14, 32);
-    doc.text(`Total Records: ${filteredLogs.length}`, doc.internal.pageSize.getWidth() - 14, 32, { align: "right" });
+    doc.text(`${t.totalLogs}: ${filteredLogs.length}`, doc.internal.pageSize.getWidth() - 14, 32, { align: "right" });
 
     // Prepare table data
     const tableData = filteredLogs.map((log) => [
@@ -1741,7 +2376,7 @@ const confirmDelete = async () => {
 
     // Add table with professional styling
     autoTable(doc, {
-      head: [["Time", "User", "Email", "Action", "Description", "IP Address"]],
+      head: [[t.createdAt, t.name, t.email, t.action, t.description, t.ipAddress]],
       body: tableData,
       startY: 48,
       styles: {
@@ -1774,7 +2409,7 @@ const confirmDelete = async () => {
         doc.setFontSize(8);
         doc.setTextColor(108, 117, 125);
         doc.text(
-          `Page ${data.pageNumber} of ${pageCount} - © ${new Date().getFullYear()} Activity Logs`,
+          `Page ${data.pageNumber} of ${pageCount} - © ${new Date().getFullYear()} ${t.title}`,
           doc.internal.pageSize.getWidth() / 2,
           doc.internal.pageSize.getHeight() - 8,
           { align: "center" },
@@ -1787,6 +2422,7 @@ const confirmDelete = async () => {
 
   // Get action icon
   const getActionIcon = (action: string) => {
+    const actionLower = action.toLowerCase();
     const iconMap: { [key: string]: JSX.Element } = {
       user_login: (
         <LoginIcon className="text-blue-600" style={{ fontSize: "20px" }} />
@@ -1849,42 +2485,49 @@ const confirmDelete = async () => {
         />
       ),
     };
+    
+    // Try exact match first, then partial match
+    for (const [key, icon] of Object.entries(iconMap)) {
+      if (actionLower.includes(key)) {
+        return icon;
+      }
+    }
+    
     return (
-      iconMap[action] || (
-        <InfoIcon className="text-gray-600" style={{ fontSize: "20px" }} />
-      )
+      <InfoIcon className="text-gray-600" style={{ fontSize: "20px" }} />
     );
   };
 
   // Get entity type icon
   const getEntityIcon = (action: string) => {
-    if (action.includes("user"))
+    const actionLower = action.toLowerCase();
+    if (actionLower.includes("user"))
       return (
         <PersonIcon className="text-gray-600" style={{ fontSize: "18px" }} />
       );
-    if (action.includes("house"))
+    if (actionLower.includes("house"))
       return (
         <HomeIcon className="text-gray-600" style={{ fontSize: "18px" }} />
       );
-    if (action.includes("booking"))
+    if (actionLower.includes("booking"))
       return (
         <BookOnlineIcon
           className="text-gray-600"
           style={{ fontSize: "18px" }}
         />
       );
-    if (action.includes("contact"))
+    if (actionLower.includes("contact"))
       return (
         <ContactMailIcon
           className="text-gray-600"
           style={{ fontSize: "18px" }}
         />
       );
-    if (action.includes("message"))
+    if (actionLower.includes("message"))
       return (
         <MessageIcon className="text-gray-600" style={{ fontSize: "18px" }} />
       );
-    if (action.includes("testimonial"))
+    if (actionLower.includes("testimonial"))
       return (
         <RateReviewIcon
           className="text-gray-600"
@@ -1896,17 +2539,19 @@ const confirmDelete = async () => {
 
   // Get entity type from action
   const getEntityType = (action: string): string => {
-    if (action.includes("user")) return "User";
-    if (action.includes("house")) return "House";
-    if (action.includes("booking")) return "Booking";
-    if (action.includes("contact")) return "Contact";
-    if (action.includes("message")) return "Message";
-    if (action.includes("testimonial")) return "Testimonial";
+    const actionLower = action.toLowerCase();
+    if (actionLower.includes("user")) return "User";
+    if (actionLower.includes("house")) return "House";
+    if (actionLower.includes("booking")) return "Booking";
+    if (actionLower.includes("contact")) return "Contact";
+    if (actionLower.includes("message")) return "Message";
+    if (actionLower.includes("testimonial")) return "Testimonial";
     return action;
   };
 
   // Get action badge style
   const getActionBadgeStyle = (action: string): string => {
+    const actionLower = action.toLowerCase();
     const styleMap: { [key: string]: string } = {
       user_login: "bg-blue-50 text-blue-700 border-blue-200",
       user_created: "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -1922,7 +2567,13 @@ const confirmDelete = async () => {
       message_created: "bg-indigo-50 text-indigo-700 border-indigo-200",
       testimonial_created: "bg-emerald-50 text-emerald-700 border-emerald-200",
     };
-    return styleMap[action] || "bg-gray-50 text-gray-700 border-gray-200";
+    
+    for (const [key, style] of Object.entries(styleMap)) {
+      if (actionLower.includes(key)) {
+        return style;
+      }
+    }
+    return "bg-gray-50 text-gray-700 border-gray-200";
   };
 
   useEffect(() => {
@@ -2000,11 +2651,11 @@ const confirmDelete = async () => {
               </div>
               <div>
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                  Activity Logs
+                  {t.title}
                 </h1>
                 <p className="text-sm text-slate-500 mt-1 flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  Real-time monitoring & analytics
+                  {t.subtitle}
                 </p>
               </div>
             </div>
@@ -2016,7 +2667,7 @@ const confirmDelete = async () => {
                   className="group inline-flex items-center gap-2.5 px-5 py-2.5 bg-gradient-to-r from-red-500 via-red-600 to-rose-600 text-white rounded-2xl hover:from-red-600 hover:via-red-700 hover:to-rose-700 hover:shadow-xl shadow-red-500/25 transition-all duration-300 text-sm font-medium"
                 >
                   <DeleteSweepIcon className="group-hover:scale-110 transition-transform duration-300" style={{ fontSize: "18px" }} />
-                  Delete Selected ({selectedIds.length})
+                  {t.deleteSelected} ({selectedIds.length})
                 </button>
               )}
               <button
@@ -2024,14 +2675,14 @@ const confirmDelete = async () => {
                 className="group inline-flex items-center gap-2.5 px-5 py-2.5 bg-white text-slate-700 border border-slate-200 rounded-2xl hover:bg-slate-50 hover:border-slate-300 hover:shadow-lg transition-all duration-300 text-sm font-medium"
               >
                 <RefreshIcon className="text-slate-500 group-hover:rotate-180 transition-transform duration-500" style={{ fontSize: "18px" }} />
-                Refresh
+                {t.refresh}
               </button>
               <button
                 onClick={exportLogsPDF}
                 className="group inline-flex items-center gap-2.5 px-5 py-2.5 bg-gradient-to-r from-rose-500 via-rose-600 to-pink-600 text-white rounded-2xl hover:from-rose-600 hover:via-rose-700 hover:to-pink-700 hover:shadow-xl shadow-rose-500/25 transition-all duration-300 text-sm font-medium"
               >
                 <DownloadIcon className="group-hover:scale-110 transition-transform duration-300" style={{ fontSize: "18px" }} />
-                Export PDF
+                {t.exportPDF}
               </button>
             </div>
           </div>
@@ -2043,7 +2694,7 @@ const confirmDelete = async () => {
                 <div>
                   <div className="text-sm font-medium text-blue-700/80 flex items-center gap-2">
                     <EventNoteIcon style={{ fontSize: "16px" }} />
-                    Total Activities
+                    {t.totalActivities}
                   </div>
                   <div className="text-3xl font-bold text-blue-900 mt-2">
                     {stats.totalActivities.toLocaleString()}
@@ -2055,7 +2706,7 @@ const confirmDelete = async () => {
               </div>
               <div className="mt-3 flex items-center gap-2">
                 <span className="text-xs font-medium text-blue-600 bg-blue-200/60 px-3 py-1 rounded-full">
-                  Last 30 days
+                  {t.last30Days}
                 </span>
               </div>
             </div>
@@ -2065,7 +2716,7 @@ const confirmDelete = async () => {
                 <div>
                   <div className="text-sm font-medium text-emerald-700/80 flex items-center gap-2">
                     <PeopleIcon style={{ fontSize: "16px" }} />
-                    Unique Users
+                    {t.uniqueUsers}
                   </div>
                   <div className="text-3xl font-bold text-emerald-900 mt-2">
                     {stats.uniqueUsers.toLocaleString()}
@@ -2077,7 +2728,7 @@ const confirmDelete = async () => {
               </div>
               <div className="mt-3 flex items-center gap-2">
                 <span className="text-xs font-medium text-emerald-600 bg-emerald-200/60 px-3 py-1 rounded-full">
-                  Active users
+                  {t.activeUsers}
                 </span>
               </div>
             </div>
@@ -2087,7 +2738,7 @@ const confirmDelete = async () => {
                 <div>
                   <div className="text-sm font-medium text-purple-700/80 flex items-center gap-2">
                     <TrendingUpIcon style={{ fontSize: "16px" }} />
-                    Most Active
+                    {t.mostActive}
                   </div>
                   <div className="text-lg font-bold text-purple-900 mt-2 truncate max-w-[140px]">
                     {Object.entries(stats.actionsByType)
@@ -2104,7 +2755,7 @@ const confirmDelete = async () => {
                   {Object.entries(stats.actionsByType).sort(
                     (a, b) => b[1] - a[1],
                   )[0]?.[1] || 0}{" "}
-                  occurrences
+                  {t.occurrences}
                 </span>
               </div>
             </div>
@@ -2114,7 +2765,7 @@ const confirmDelete = async () => {
                 <div>
                   <div className="text-sm font-medium text-amber-700/80 flex items-center gap-2">
                     <FilterListIcon style={{ fontSize: "16px" }} />
-                    Action Types
+                    {t.actionTypes}
                   </div>
                   <div className="text-3xl font-bold text-amber-900 mt-2">
                     {Object.keys(stats.actionsByType).length}
@@ -2126,7 +2777,7 @@ const confirmDelete = async () => {
               </div>
               <div className="mt-3 flex items-center gap-2">
                 <span className="text-xs font-medium text-amber-600 bg-amber-200/60 px-3 py-1 rounded-full">
-                  Different types
+                  {t.differentTypes}
                 </span>
               </div>
             </div>
@@ -2137,7 +2788,7 @@ const confirmDelete = async () => {
             <div className="relative flex-1 min-w-[200px] w-full sm:w-auto">
               <input
                 type="text"
-                placeholder="Search logs by user, action, IP, description..."
+                placeholder={t.searchPlaceholder}
                 value={filters.searchTerm}
                 onChange={handleSearch}
                 className="w-full px-4 py-3 pl-12 bg-white/80 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-200 text-sm placeholder:text-slate-400"
@@ -2153,7 +2804,7 @@ const confirmDelete = async () => {
               onChange={(e) => handleFilterChange("action", e.target.value)}
               className="px-4 py-3 bg-white/80 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent text-sm min-w-[150px] transition-all duration-200 hover:border-slate-300 cursor-pointer"
             >
-              <option value="all">All Actions</option>
+              <option value="all">{t.allActions}</option>
               {actionTypes.map((action) => (
                 <option key={action} value={action}>
                   {action.replace("_", " ")}
@@ -2166,10 +2817,10 @@ const confirmDelete = async () => {
               onChange={(e) => handleFilterChange("dateRange", e.target.value)}
               className="px-4 py-3 bg-white/80 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent text-sm min-w-[150px] transition-all duration-200 hover:border-slate-300 cursor-pointer"
             >
-              <option value="all">All Time</option>
-              <option value="today">Today</option>
-              <option value="week">This Week</option>
-              <option value="month">This Month</option>
+              <option value="all">{t.allTime}</option>
+              <option value="today">{t.today}</option>
+              <option value="week">{t.thisWeek}</option>
+              <option value="month">{t.thisMonth}</option>
             </select>
 
             <button
@@ -2177,7 +2828,7 @@ const confirmDelete = async () => {
               className="inline-flex items-center gap-1.5 px-5 py-3 bg-white/80 border border-slate-200 rounded-2xl hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 text-sm text-slate-700 font-medium hover:shadow-lg"
             >
               <ClearIcon style={{ fontSize: "18px" }} />
-              Clear
+              {t.clear}
             </button>
           </div>
         </div>
@@ -2220,32 +2871,32 @@ const confirmDelete = async () => {
                   <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
                     <div className="flex items-center gap-2">
                       <ScheduleIcon style={{ fontSize: "14px" }} />
-                      Time
+                      {t.createdAt}
                     </div>
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
                     <div className="flex items-center gap-2">
                       <PersonIcon style={{ fontSize: "14px" }} />
-                      User
+                      {t.name}
                     </div>
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
                     <div className="flex items-center gap-2">
                       <SettingsIcon style={{ fontSize: "14px" }} />
-                      Action
+                      {t.action}
                     </div>
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                    Description
+                    {t.description}
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
                     <div className="flex items-center gap-2">
                       <PublicIcon style={{ fontSize: "14px" }} />
-                      IP Address
+                      {t.ipAddress}
                     </div>
                   </th>
                   <th className="px-6 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                    Actions
+                    {t.action}
                   </th>
                 </tr>
               </thead>
@@ -2261,10 +2912,10 @@ const confirmDelete = async () => {
                           />
                         </div>
                         <p className="text-slate-500 font-semibold text-lg">
-                          No logs found
+                          {t.noLogsFound}
                         </p>
                         <p className="text-sm text-slate-400">
-                          Try adjusting your filters or search terms
+                          {t.adjustFilters}
                         </p>
                       </div>
                     </td>
@@ -2354,14 +3005,14 @@ const confirmDelete = async () => {
                               className="inline-flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 hover:shadow-lg shadow-blue-500/25 transition-all duration-300 text-xs font-medium group"
                             >
                               <VisibilityIcon className="group-hover:scale-110 transition-transform duration-300" style={{ fontSize: "16px" }} />
-                              View
+                              {t.view}
                             </button>
                             <button
                               onClick={() => handleDeleteSingle(log._id)}
                               className="inline-flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 hover:shadow-lg shadow-red-500/25 transition-all duration-300 text-xs font-medium group"
                             >
                               <DeleteIcon className="group-hover:scale-110 transition-transform duration-300" style={{ fontSize: "16px" }} />
-                              Delete
+                              {t.delete}
                             </button>
                           </div>
                         </td>
@@ -2376,7 +3027,7 @@ const confirmDelete = async () => {
           {filteredLogs.length > 0 && (
             <div className="px-6 py-4 flex flex-wrap justify-between items-center border-t border-slate-100 gap-3 bg-gradient-to-br from-slate-50/30 to-transparent backdrop-blur-sm">
               <div className="flex items-center gap-4">
-                <span className="text-sm text-slate-600 font-medium">Rows per page:</span>
+                <span className="text-sm text-slate-600 font-medium">{t.rowsPerPage}:</span>
                 <select
                   value={rowsPerPage}
                   onChange={handleChangeRowsPerPage}
@@ -2388,12 +3039,11 @@ const confirmDelete = async () => {
                   <option value={50}>50</option>
                 </select>
                 <span className="text-sm text-slate-500">
-                  {selectedIds.length} selected
+                  {selectedIds.length} {t.selected}
                 </span>
               </div>
               <div className="text-sm text-slate-600 font-medium">
-                <span className="text-slate-800">{filteredLogs.length}</span> total
-                logs
+                <span className="text-slate-800">{filteredLogs.length}</span> {t.totalLogs}
                 <span className="mx-2 text-slate-300">|</span>
                 <span className="text-slate-800">
                   {page * rowsPerPage + 1}
@@ -2412,7 +3062,7 @@ const confirmDelete = async () => {
                       : "bg-white/80 border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 hover:shadow-lg"
                   }`}
                 >
-                  Previous
+                  {t.previous}
                 </button>
                 <button
                   onClick={() => handleChangePage(page + 1)}
@@ -2425,7 +3075,7 @@ const confirmDelete = async () => {
                       : "bg-white/80 border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 hover:shadow-lg"
                   }`}
                 >
-                  Next
+                  {t.next}
                 </button>
               </div>
             </div>
@@ -2435,8 +3085,8 @@ const confirmDelete = async () => {
         {/* Footer */}
         <div className="mt-8 text-center">
           <p className="text-xs text-slate-400 font-medium">
-            Showing <span className="text-slate-600">{filteredLogs.length}</span> of{" "}
-            <span className="text-slate-600">{logs.length}</span> total activities
+            {t.showing} <span className="text-slate-600">{filteredLogs.length}</span> {t.of}{" "}
+            <span className="text-slate-600">{logs.length}</span> {t.totalActivitiesCount}
           </p>
         </div>
       </div>
@@ -2458,7 +3108,7 @@ const confirmDelete = async () => {
                   <span className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl text-white shadow-lg shadow-blue-500/25">
                     <InfoIcon style={{ fontSize: "22px" }} />
                   </span>
-                  Activity Details
+                  {t.activityDetails}
                 </h2>
                 <span
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border mt-2 ${getActionBadgeStyle(selectedLog.action)}`}
@@ -2483,24 +3133,24 @@ const confirmDelete = async () => {
                   <div className="p-1.5 bg-blue-500/10 rounded-lg">
                     <PersonIcon className="text-blue-600" style={{ fontSize: "18px" }} />
                   </div>
-                  User Information
+                  {t.userInformation}
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col">
-                    <span className="text-xs text-slate-500 font-medium">Name</span>
+                    <span className="text-xs text-slate-500 font-medium">{t.name}</span>
                     <span className="text-sm font-semibold text-slate-900 mt-1">
                       {getUserName(selectedLog)}
                     </span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs text-slate-500 font-medium">Email</span>
+                    <span className="text-xs text-slate-500 font-medium">{t.email}</span>
                     <span className="text-sm text-slate-700 mt-1">
                       {getUserEmail(selectedLog)}
                     </span>
                   </div>
                   {getUserRole(selectedLog) && (
                     <div className="flex flex-col">
-                      <span className="text-xs text-slate-500 font-medium">Role</span>
+                      <span className="text-xs text-slate-500 font-medium">{t.role}</span>
                       <span className="text-sm capitalize font-semibold text-slate-800 mt-1">
                         {getUserRole(selectedLog)}
                       </span>
@@ -2508,14 +3158,14 @@ const confirmDelete = async () => {
                   )}
                   {getUserPhone(selectedLog) && (
                     <div className="flex flex-col">
-                      <span className="text-xs text-slate-500 font-medium">Phone</span>
+                      <span className="text-xs text-slate-500 font-medium">{t.phone}</span>
                       <span className="text-sm text-slate-700 mt-1">
                         {getUserPhone(selectedLog)}
                       </span>
                     </div>
                   )}
                   <div className="flex flex-col col-span-full">
-                    <span className="text-xs text-slate-500 font-medium">User ID</span>
+                    <span className="text-xs text-slate-500 font-medium">{t.userId}</span>
                     <code className="text-xs font-mono bg-white px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600 truncate mt-1">
                       {getUserId(selectedLog)}
                     </code>
@@ -2525,7 +3175,7 @@ const confirmDelete = async () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
                 <div className="flex flex-col">
-                  <span className="text-xs text-slate-500 font-medium">Entity Type</span>
+                  <span className="text-xs text-slate-500 font-medium">{t.entityType}</span>
                   <div className="flex items-center gap-2 mt-1.5">
                     <div className="p-1.5 bg-slate-100 rounded-lg">
                       {getEntityIcon(selectedLog.action)}
@@ -2536,7 +3186,7 @@ const confirmDelete = async () => {
                   </div>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xs text-slate-500 font-medium">Action</span>
+                  <span className="text-xs text-slate-500 font-medium">{t.action}</span>
                   <span className="text-sm font-semibold text-slate-800 mt-1.5">
                     {selectedLog.action.replace("_", " ")}
                   </span>
@@ -2545,7 +3195,7 @@ const confirmDelete = async () => {
 
               {/* Description */}
               <div className="mb-5">
-                <span className="text-xs text-slate-500 font-medium">Description</span>
+                <span className="text-xs text-slate-500 font-medium">{t.description}</span>
                 <div className="mt-1.5 p-4 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-200/50">
                   <p className="text-sm text-slate-700 leading-relaxed">
                     {selectedLog.description}
@@ -2555,13 +3205,13 @@ const confirmDelete = async () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="flex flex-col">
-                  <span className="text-xs text-slate-500 font-medium">IP Address</span>
+                  <span className="text-xs text-slate-500 font-medium">{t.ipAddress}</span>
                   <code className="text-sm font-mono bg-white px-3 py-2 rounded-xl border border-slate-200 text-slate-600 mt-1.5">
                     {selectedLog.ipAddress || selectedLog.ipv4Address || "N/A"}
                   </code>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xs text-slate-500 font-medium">User Agent</span>
+                  <span className="text-xs text-slate-500 font-medium">{t.userAgent}</span>
                   <span className="text-xs text-slate-600 mt-1.5 break-all line-clamp-2 bg-white p-3 rounded-xl border border-slate-200">
                     {selectedLog.userAgent || "N/A"}
                   </span>
@@ -2570,7 +3220,7 @@ const confirmDelete = async () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-6 pt-6 border-t border-slate-100">
                 <div className="flex flex-col">
-                  <span className="text-xs text-slate-500 font-medium">Created At</span>
+                  <span className="text-xs text-slate-500 font-medium">{t.createdAt}</span>
                   <span className="text-sm font-semibold text-slate-800 mt-1">
                     {formatDateSafe(selectedLog.createdAt, "PPpp")}
                   </span>
@@ -2579,7 +3229,7 @@ const confirmDelete = async () => {
                   </span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xs text-slate-500 font-medium">Time Happened</span>
+                  <span className="text-xs text-slate-500 font-medium">{t.timeHappened}</span>
                   <span className="text-sm font-semibold text-slate-800 mt-1">
                     {selectedLog.timeHappened || "N/A"}
                   </span>
@@ -2589,7 +3239,7 @@ const confirmDelete = async () => {
               {selectedLog.updatedAt &&
                 selectedLog.updatedAt !== selectedLog.createdAt && (
                   <div className="mt-6 pt-6 border-t border-slate-100">
-                    <span className="text-xs text-slate-500 font-medium">Updated At</span>
+                    <span className="text-xs text-slate-500 font-medium">{t.updatedAt}</span>
                     <span className="text-sm font-semibold text-slate-800 block mt-1">
                       {formatDateSafe(selectedLog.updatedAt, "PPpp")}
                     </span>
@@ -2604,13 +3254,13 @@ const confirmDelete = async () => {
                 className="px-8 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl hover:from-red-600 hover:to-red-700 hover:shadow-xl shadow-red-500/25 transition-all duration-300 text-sm font-semibold flex items-center gap-2"
               >
                 <DeleteIcon style={{ fontSize: "18px" }} />
-                Delete
+                {t.delete}
               </button>
               <button
                 onClick={() => setDetailDialogOpen(false)}
                 className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl hover:from-blue-700 hover:to-blue-800 hover:shadow-xl shadow-blue-500/25 transition-all duration-300 text-sm font-semibold"
               >
-                Close
+                {t.close}
               </button>
             </div>
           </div>
@@ -2639,17 +3289,17 @@ const confirmDelete = async () => {
                 </div>
               </div>
               <h3 className="text-2xl font-bold text-center text-slate-800 mb-3">
-                {deleteTarget === "bulk" ? "Bulk Delete" : "Delete Activity"}
+                {deleteTarget === "bulk" ? t.bulkDelete : t.deleteActivity}
               </h3>
               <p className="text-center text-slate-600 mb-6">
                 {deleteTarget === "bulk"
-                  ? `Are you sure you want to delete ${selectedIds.length} selected activity log(s)? This action cannot be undone.`
-                  : "Are you sure you want to delete this activity log? This action cannot be undone."}
+                  ? t.confirmBulkDelete.replace("{count}", String(selectedIds.length))
+                  : t.confirmDelete}
               </p>
               {deleteTarget === "bulk" && selectedIds.length > 0 && (
                 <div className="bg-slate-50 rounded-xl p-4 mb-6 max-h-32 overflow-y-auto">
                   <p className="text-xs text-slate-500 font-medium mb-2">
-                    Selected Items ({selectedIds.length}):
+                    {t.selectedItems} ({selectedIds.length}):
                   </p>
                   <div className="flex flex-wrap gap-1">
                     {selectedIds.slice(0, 10).map((id) => (
@@ -2677,7 +3327,7 @@ const confirmDelete = async () => {
                   disabled={deleting}
                   className="flex-1 px-6 py-3 bg-slate-100 text-slate-700 rounded-2xl hover:bg-slate-200 transition-all duration-200 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Cancel
+                  {t.cancel}
                 </button>
                 <button
                   onClick={confirmDelete}
@@ -2690,12 +3340,12 @@ const confirmDelete = async () => {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Deleting...
+                      {t.deleting}
                     </>
                   ) : (
                     <>
                       <DeleteIcon style={{ fontSize: "18px" }} />
-                      Delete
+                      {t.delete}
                     </>
                   )}
                 </button>
@@ -2770,7 +3420,7 @@ const confirmDelete = async () => {
                       : "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-red-500/25"
                   }`}
                 >
-                  {resultModal.type === "success" ? "Done" : "Close"}
+                  {resultModal.type === "success" ? t.done : t.close}
                 </button>
               </div>
             </div>

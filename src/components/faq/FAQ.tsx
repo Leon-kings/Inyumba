@@ -39,7 +39,7 @@ const QUESTIONS_API_URL = 'https://inyumbaproject.eu1.hubfly.app/questions/submi
 const translations = {
   en: {
     faq: "Frequently Asked Questions",
-    tagline: "Find answers to the most common questions about INYUMBA PROJECT",
+    tagline: "Find answers to the most common questions about INYUMBA ",
     searchPlaceholder: "Search for answers...",
     noResults: "No results found for your search.",
     clearSearch: "Clear search",
@@ -98,7 +98,7 @@ const translations = {
   fr: {
     faq: "Foire Aux Questions",
     tagline:
-      "Trouvez des réponses aux questions les plus courantes sur INYUMBA PROJECT",
+      "Trouvez des réponses aux questions les plus courantes sur INYUMBA ",
     searchPlaceholder: "Rechercher des réponses...",
     noResults: "Aucun résultat trouvé pour votre recherche.",
     clearSearch: "Effacer la recherche",
@@ -157,7 +157,7 @@ const translations = {
   },
   rw: {
     faq: "Ibibazo Bikunze Kubazwa",
-    tagline: "Shakisha ibisubizo kubibazo bikunze kubazwa kuri INYUMBA PROJECT",
+    tagline: "Shakisha ibisubizo kubibazo bikunze kubazwa kuri INYUMBA ",
     searchPlaceholder: "Shakisha ibisubizo...",
     noResults: "Nta bisubizo byabonetse.",
     clearSearch: "Kuraho ibyashakishijwe",
@@ -581,7 +581,7 @@ export const FAQ: React.FC = () => {
     // General
     {
       id: 1,
-      question: "What is INYUMBA PROJECT?",
+      question: "What is INYUMBA ?",
       answer:
         "INYUMBA PROJECT is a student housing platform dedicated to connecting university students with verified, safe, and affordable accommodation near their campuses across Rwanda. We make finding a student home simple and stress-free.",
       category: "general",
