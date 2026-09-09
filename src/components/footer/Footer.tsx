@@ -41,7 +41,6 @@ const CONTACT_API = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-
 });
 
 // Add request/response interceptors for error handling only (no logging)
@@ -423,8 +422,8 @@ const translations = {
   rw: {
     about: "Ibijyanye Na Twe",
     description:
-      "INYUMBA PROJECT ni urubuga rw'amazu y'abanyeshuri rwateguwe kugira ngo rutange amazu meza, afite umutekano, kandi ari buhendutse kubanyeshuri bo mukaminuza mu Rwanda.",
-    quickLinks: "Ibyo Ukora",
+      "INYUMBA ni urubuga rw'amazu y'abanyeshuri rwateguwe kugira ngo rutange amazu meza, afite umutekano, kandi ahendutse ku banyeshuri bo mu makaminuza mu Rwanda.",
+    quickLinks: "Ibyo Dukora",
     home: "Ahabanza",
     houses: "Amazu",
     aboutPage: "Ibijyanye Na Twe",
@@ -432,8 +431,8 @@ const translations = {
     contact: "Twandikire",
     support: "Ubufasha",
     faq: "Ibibazo",
-    help: "Ikigo cy'Ubufasha",
-    privacy: "Amategeko Y'ibanga",
+    help: "Ubufasha",
+    privacy: "Amakuru yawe nibanga",
     terms: "Amategeko n'Amabwiriza",
     legal: "Amategeko",
     contactUs: "Twandikire",
@@ -441,37 +440,37 @@ const translations = {
     phone: "+250 780 414 088",
     email: "inyumbarental@gmail.com",
     followUs: "Dukurikire",
-    rights: "Uburenganzira bwose buraharanwa.",
+    rights: "Uburenganzira bwose burakurikizwa.",
     designedBy: "Byakozwe na",
     company: "INYUMBA",
-    privacyTitle: "Amategeko Y'ibanga",
+    privacyTitle: "Amakuru yawe nibanga",
     termsTitle: "Amategeko n'Amabwiriza",
-    privacyLastUpdated: "Byavuguruwe: Mutarama 2024",
-    termsLastUpdated: "Byavuguruwe: Mutarama 2024",
+    privacyLastUpdated: "Byavuguruwe: Nzeri 2026",
+    termsLastUpdated: "Byavuguruwe: Nzeri 2026",
     location: "Aho Turi",
     findUs: "Turebe",
-    visitUs: "Udukerere",
+    visitUs: "Wadusura",
     backToTop: "Garuka Hejuru",
     contactTitle: "Twandikire",
     contactSubtitle:
-      "Twishimira kumva ubutumwa bwawe! Dutume ubutumwa tuzagusubiza vuba.",
-    contactName: "Izina Risoze",
+      "Twishimira kumva ubutumwa bwawe! Dutumeho ubutumwa tuzagusubiza vuba.",
+    contactName: "Izina Ryawe",
     contactNamePlaceholder: "Andika izina ryawe ryose",
     contactEmail: "Adresi ya Email",
     contactEmailPlaceholder: "Andika adresi ya email yawe",
     contactMessage: "Ubutumwa",
     contactMessagePlaceholder: "Andika ubutumwa bwawe hano...",
     contactSend: "Ohereza Ubutumwa",
-    contactSending: "Birambura...",
+    contactSending: "Koherezwa ...",
     contactSuccess: "Ubutumwa Bwoherejwe Neza!",
-    contactSuccessMessage: "Urakoze kudutwara. Tuzagusubiza vuba.",
+    contactSuccessMessage: "Urakoze kudutumaho !!. Tuzagusubiza vuba.",
     contactError: "Ubutumwa ntabwo bwoherejwe",
     contactErrorRetry: "Nyamuneka ongera ugerageze nyuma.",
     contactClose: "Funga",
-    contactNameRequired: "Izina rirasabwa",
+    contactNameRequired: "Izina ningombwa",
     contactNameMin: "Izina rigomba kugira nibura inyuguti 2",
     contactNameMax: "Izina ntirigomba kurenga inyuguti 50",
-    contactEmailRequired: "Email irasabwa",
+    contactEmailRequired: "Email ningombwa",
     contactEmailValid: "Nyamuneka andika email ikwiye",
     contactMessageRequired: "Ubutumwa burasabwa",
     contactMessageMin: "Ubutumwa bugomba kugira nibura inyuguti 10",
@@ -483,9 +482,9 @@ const translations = {
     failModalMessage:
       "Ntabwo twashoboye kohereza ubutumwa bwawe. Nyamuneka reba isanduku ya interineti hanyuma ongera ugerageze.",
     failModalButton: "Ongera Ugerageze",
-    nameRequired: "Izina rirasabwa",
+    nameRequired: "Izina ningombwa",
     nameMin: "Izina rigomba kugira nibura inyuguti 2",
-    emailRequired: "Imeri irasabwa",
+    emailRequired: "Imeri ningombwa",
     emailInvalid: "Injiza aderesi ya imeri ikwiye",
     messageRequired: "Ubutumwa burasabwa",
     messageMin: "Ubutumwa bugomba kugira nibura inyuguti 10",
@@ -814,88 +813,6 @@ export const Footer: React.FC = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-
-  //   if (!validateForm()) {
-  //     setStatusModal({
-  //       isOpen: true,
-  //       type: "error",
-  //       title: "⚠️ Invalid Form",
-  //       message: "Please fix the errors before submitting.",
-  //       details: "Check all fields and try again.",
-  //     });
-  //     return;
-  //   }
-
-  //   setIsSubmitting(true);
-
-  //   try {
-  //     // FIXED: Using correct endpoint path
-  //     const response = await CONTACT_API.post("/contact", {
-  //       name: formData.name.trim(),
-  //       email: formData.email.trim().toLowerCase(),
-  //       message: formData.message.trim(),
-  //     });
-
-  //     if (response.data && response.data.success === true) {
-  //       setStatusModal({
-  //         isOpen: true,
-  //         type: "success",
-  //         title: t.successTitle,
-  //         message: response.data.message || t.success,
-  //         details: `Thank you, ${formData.name}! We'll get back to you soon.`,
-  //       });
-
-  //       setFormData({ name: "", email: "", message: "" });
-  //       setIsNameValid(null);
-  //       setIsEmailValid(null);
-  //       setIsMessageValid(null);
-  //       setIsFormValid(false);
-  //       setIsContactOpen(false);
-  //     } else {
-  //       const errorMsg = response.data?.message || t.fail;
-  //       setStatusModal({
-  //         isOpen: true,
-  //         type: "error",
-  //         title: t.errorTitle,
-  //         message: errorMsg,
-  //         details: `Please check your input and try again.`,
-  //       });
-  //       setIsContactOpen(false);
-  //     }
-  //   } catch (error) {
-  //     // Silent error handling - no user data exposed
-  //     let errorMessage = t.fail;
-  //     let errorDetails = "Please try again or contact support.";
-
-  //     if (axios.isAxiosError(error)) {
-  //       if (error.response) {
-  //         // Server responded with error
-  //         errorMessage = error.response.data?.message || t.serverError;
-  //         errorDetails = "We're experiencing technical issues. Please try again later.";
-  //       } else if (error.request) {
-  //         // No response from server
-  //         errorMessage = "Connection Error";
-  //         errorDetails = "Unable to reach our servers. Please check your internet connection.";
-  //       }
-  //     }
-
-  //     setStatusModal({
-  //       isOpen: true,
-  //       type: "error",
-  //       title: t.errorTitle,
-  //       message: errorMessage,
-  //       details: errorDetails,
-  //     });
-  //     setIsContactOpen(false);
-  //   } finally {
-  //     setIsSubmitting(false);
-  //   }
-  // };
-
-  // Listen for language changes in cookies
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -5,7 +5,7 @@
 // import React, { useState, useEffect } from "react";
 // import { motion } from "framer-motion";
 // import { toast } from "react-toastify";
-// import Cookies from 'js-cookie';
+// import Cookies from "js-cookie";
 
 // // Material-UI Icons
 // import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -169,7 +169,8 @@
 //     noData: "Aucune donnée disponible",
 //     fetchError: "Échec du chargement des données du tableau de bord",
 //     noUserEmail: "Aucun email utilisateur trouvé. Veuillez vous reconnecter.",
-//     profileUpdateFailed: "Échec de la mise à jour du profil. Veuillez réessayer.",
+//     profileUpdateFailed:
+//       "Échec de la mise à jour du profil. Veuillez réessayer.",
 //   },
 //   rw: {
 //     dashboard: "Ibikorwa",
@@ -231,20 +232,22 @@
 //     today: "Uyu Munsi",
 //     noData: "Nta makuru yabonetse",
 //     fetchError: "Kubura amakuru ya dashboard birananiranye",
-//     noUserEmail: "Nta imeri y'umukoresha yabonetse. Nyamuneka winjire undi munsi.",
-//     profileUpdateFailed: "Kuvugurura ibyawe birananiranye. Gerageza undi munsi.",
-//   }
+//     noUserEmail:
+//       "Nta imeri y'umukoresha yabonetse. Nyamuneka winjire undi munsi.",
+//     profileUpdateFailed:
+//       "Kuvugurura ibyawe birananiranye. Gerageza undi munsi.",
+//   },
 // };
 
 // // Helper function to get language from cookies
-// const getLanguageFromCookies = (): 'en' | 'fr' | 'rw' => {
-//   const lang = Cookies.get('language') as 'en' | 'fr' | 'rw';
-//   return lang || 'en';
+// const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
+//   const lang = Cookies.get("language") as "en" | "fr" | "rw";
+//   return lang || "en";
 // };
 
 // // Helper function to get user from localStorage
 // const getUserFromStorage = () => {
-//   const user = localStorage.getItem('user');
+//   const user = localStorage.getItem("user");
 //   if (user) {
 //     try {
 //       return JSON.parse(user);
@@ -258,7 +261,7 @@
 // // Helper function to get user email from localStorage
 // const getUserEmailFromStorage = (): string => {
 //   try {
-//     const userStr = localStorage.getItem('user');
+//     const userStr = localStorage.getItem("user");
 //     if (userStr) {
 //       const user = JSON.parse(userStr);
 //       if (user.email) {
@@ -339,7 +342,9 @@
 
 // export const UserDashboard: React.FC = () => {
 //   // Get language from cookies
-//   const [lang, setLang] = useState<'en' | 'fr' | 'rw'>(getLanguageFromCookies());
+//   const [lang, setLang] = useState<"en" | "fr" | "rw">(
+//     getLanguageFromCookies(),
+//   );
 //   const [user, setUser] = useState<any>(getUserFromStorage());
 //   const [loading, setLoading] = useState(false);
 //   const [fetching, setFetching] = useState(true);
@@ -357,7 +362,9 @@
 
 //   // Chart data
 //   const [bookingData, setBookingData] = useState<BookingDataPoint[]>([]);
-//   const [bookingDistributionData, setBookingDistributionData] = useState<{ name: string; value: number }[]>([]);
+//   const [bookingDistributionData, setBookingDistributionData] = useState<
+//     { name: string; value: number }[]
+//   >([]);
 
 //   // Profile edit state
 //   const [isEditing, setIsEditing] = useState(false);
@@ -384,7 +391,9 @@
 //         return;
 //       }
 
-//       const response = await fetch(`${API_BASE_URL}/bookings/email/${encodeURIComponent(userEmail)}`);
+//       const response = await fetch(
+//         `${API_BASE_URL}/bookings/email/${encodeURIComponent(userEmail)}`,
+//       );
 
 //       if (!response.ok) {
 //         if (response.status === 404) {
@@ -400,7 +409,7 @@
 //       let bookingsData: Booking[] = [];
 //       if (Array.isArray(data)) {
 //         bookingsData = data;
-//       } else if (data && typeof data === 'object') {
+//       } else if (data && typeof data === "object") {
 //         if (data._id) {
 //           bookingsData = [data];
 //         } else if (data.data && Array.isArray(data.data)) {
@@ -408,7 +417,9 @@
 //         } else if (data.bookings && Array.isArray(data.bookings)) {
 //           bookingsData = data.bookings;
 //         } else {
-//           const possibleArrays = Object.values(data).filter(val => Array.isArray(val));
+//           const possibleArrays = Object.values(data).filter((val) =>
+//             Array.isArray(val),
+//           );
 //           if (possibleArrays.length > 0) {
 //             bookingsData = possibleArrays[0];
 //           }
@@ -429,10 +440,20 @@
 //   const processBookingData = (bookingsData: Booking[]) => {
 //     // Calculate stats
 //     const total = bookingsData.length;
-//     const active = bookingsData.filter(b => b.status === 'confirmed').length;
-//     const completed = bookingsData.filter(b => b.status === 'completed').length;
-//     const cancelled = bookingsData.filter(b => b.status === 'cancelled').length;
-//     const totalSpent = bookingsData.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+//     const active = bookingsData.filter((b) => b.status === "confirmed").length;
+//     const completed = bookingsData.filter(
+//       (b) => b.status === "completed",
+//     ).length;
+//     const cancelled = bookingsData.filter(
+//       (b) => b.status === "cancelled",
+//     ).length;
+
+//     // Calculate total spent by adding monthlyRent and serviceFee for each booking
+//     const totalSpent = bookingsData.reduce((sum, b) => {
+//       const rent = b.monthlyRent || 0;
+//       const fee = b.serviceFee || 0;
+//       return sum + rent + fee;
+//     }, 0);
 
 //     setStats({
 //       totalBookings: total,
@@ -444,20 +465,37 @@
 //     });
 
 //     // Process monthly data for charts
-//     const monthlyMap: { [key: string]: { bookings: number; spent: number } } = {};
-//     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+//     const monthlyMap: { [key: string]: { bookings: number; spent: number } } =
+//       {};
+//     const months = [
+//       "Jan",
+//       "Feb",
+//       "Mar",
+//       "Apr",
+//       "May",
+//       "Jun",
+//       "Jul",
+//       "Aug",
+//       "Sep",
+//       "Oct",
+//       "Nov",
+//       "Dec",
+//     ];
 
-//     bookingsData.forEach(booking => {
+//     bookingsData.forEach((booking) => {
 //       const date = new Date(booking.createdAt);
 //       const monthName = months[date.getMonth()];
 //       if (!monthlyMap[monthName]) {
 //         monthlyMap[monthName] = { bookings: 0, spent: 0 };
 //       }
 //       monthlyMap[monthName].bookings += 1;
-//       monthlyMap[monthName].spent += booking.totalAmount || 0;
+//       // Calculate spent as monthlyRent + serviceFee
+//       const rent = booking.monthlyRent || 0;
+//       const fee = booking.serviceFee || 0;
+//       monthlyMap[monthName].spent += rent + fee;
 //     });
 
-//     const chartData = months.map(month => ({
+//     const chartData = months.map((month) => ({
 //       month,
 //       bookings: monthlyMap[month]?.bookings || 0,
 //       spent: monthlyMap[month]?.spent || 0,
@@ -466,12 +504,14 @@
 
 //     // Process distribution data
 //     const distribution = [
-//       { name: 'Active', value: active },
-//       { name: 'Completed', value: completed },
-//       { name: 'Cancelled', value: cancelled },
-//     ].filter(item => item.value > 0);
+//       { name: "Active", value: active },
+//       { name: "Completed", value: completed },
+//       { name: "Cancelled", value: cancelled },
+//     ].filter((item) => item.value > 0);
 
-//     setBookingDistributionData(distribution.length > 0 ? distribution : [{ name: 'No Data', value: 1 }]);
+//     setBookingDistributionData(
+//       distribution.length > 0 ? distribution : [{ name: "No Data", value: 1 }],
+//     );
 //   };
 
 //   // Listen for language changes in cookies
@@ -512,7 +552,7 @@
 //     setIsSaving(true);
 //     try {
 //       const updatedUser = { ...user, ...editForm };
-//       localStorage.setItem('user', JSON.stringify(updatedUser));
+//       localStorage.setItem("user", JSON.stringify(updatedUser));
 //       setUser(updatedUser);
 //       toast.success(`✅ ${t.profileUpdated}`);
 //       setIsEditing(false);
@@ -536,23 +576,35 @@
 
 //   const getStatusColor = (status: string) => {
 //     switch (status) {
-//       case "pending": return "bg-yellow-100 text-yellow-800";
-//       case "confirmed": return "bg-blue-100 text-blue-800";
-//       case "completed": return "bg-green-100 text-green-800";
-//       case "cancelled": return "bg-red-100 text-red-800";
-//       case "rejected": return "bg-gray-100 text-gray-800";
-//       default: return "bg-gray-100 text-gray-800";
+//       case "pending":
+//         return "bg-yellow-100 text-yellow-800";
+//       case "confirmed":
+//         return "bg-blue-100 text-blue-800";
+//       case "completed":
+//         return "bg-green-100 text-green-800";
+//       case "cancelled":
+//         return "bg-red-100 text-red-800";
+//       case "rejected":
+//         return "bg-gray-100 text-gray-800";
+//       default:
+//         return "bg-gray-100 text-gray-800";
 //     }
 //   };
 
 //   const getStatusLabel = (status: string) => {
 //     switch (status) {
-//       case "pending": return t.pending;
-//       case "confirmed": return t.confirmed;
-//       case "completed": return t.completed;
-//       case "cancelled": return t.cancelled;
-//       case "rejected": return t.rejected;
-//       default: return status;
+//       case "pending":
+//         return t.pending;
+//       case "confirmed":
+//         return t.confirmed;
+//       case "completed":
+//         return t.completed;
+//       case "cancelled":
+//         return t.cancelled;
+//       case "rejected":
+//         return t.rejected;
+//       default:
+//         return status;
 //     }
 //   };
 
@@ -570,7 +622,10 @@
 
 //   // Get recent bookings (last 5)
 //   const recentBookings = bookings
-//     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+//     .sort(
+//       (a, b) =>
+//         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+//     )
 //     .slice(0, 5);
 
 //   // Stat cards
@@ -580,14 +635,20 @@
 //       value: stats.totalBookings,
 //       icon: <BookingIcon />,
 //       color: "bg-blue-500",
-//       change: stats.totalBookings > 0 ? "+" + Math.round((stats.totalBookings / 12) * 100) + "%" : "0%",
+//       change:
+//         stats.totalBookings > 0
+//           ? "+" + Math.round((stats.totalBookings / 12) * 100) + "%"
+//           : "0%",
 //     },
 //     {
 //       title: t.activeBookings,
 //       value: stats.activeBookings,
 //       icon: <CheckCircleIcon />,
 //       color: "bg-green-500",
-//       change: stats.activeBookings > 0 ? "+" + Math.round((stats.activeBookings / 12) * 100) + "%" : "0%",
+//       change:
+//         stats.activeBookings > 0
+//           ? "+" + Math.round((stats.activeBookings / 12) * 100) + "%"
+//           : "0%",
 //     },
 //     {
 //       title: t.totalSpent,
@@ -643,7 +704,9 @@
 //                 className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
 //                 disabled={loading}
 //               >
-//                 <RefreshIcon className={`w-5 h-5 ${loading ? "animate-spin" : ""}`} />
+//                 <RefreshIcon
+//                   className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}
+//                 />
 //               </button>
 //             </div>
 //           </div>
@@ -665,7 +728,9 @@
 //                     <input
 //                       type="text"
 //                       value={editForm.name}
-//                       onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+//                       onChange={(e) =>
+//                         setEditForm({ ...editForm, name: e.target.value })
+//                       }
 //                       className="border border-gray-300 rounded-lg px-2 py-1 text-xl font-bold"
 //                     />
 //                   ) : (
@@ -690,7 +755,9 @@
 //                 </div>
 //                 <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
 //                   <VerifiedIcon className="w-4 h-4 text-green-500" />
-//                   <span className="text-green-600 font-medium">Verified Student</span>
+//                   <span className="text-green-600 font-medium">
+//                     Verified Student
+//                   </span>
 //                 </div>
 //               </div>
 //             </div>
@@ -744,7 +811,9 @@
 //                 <input
 //                   type="email"
 //                   value={editForm.email}
-//                   onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+//                   onChange={(e) =>
+//                     setEditForm({ ...editForm, email: e.target.value })
+//                   }
 //                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
 //                 />
 //               </div>
@@ -755,7 +824,9 @@
 //                 <input
 //                   type="text"
 //                   value={editForm.phone}
-//                   onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+//                   onChange={(e) =>
+//                     setEditForm({ ...editForm, phone: e.target.value })
+//                   }
 //                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
 //                 />
 //               </div>
@@ -766,7 +837,9 @@
 //                 <input
 //                   type="text"
 //                   value={editForm.university}
-//                   onChange={(e) => setEditForm({ ...editForm, university: e.target.value })}
+//                   onChange={(e) =>
+//                     setEditForm({ ...editForm, university: e.target.value })
+//                   }
 //                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
 //                 />
 //               </div>
@@ -777,7 +850,9 @@
 //                 <input
 //                   type="text"
 //                   value={editForm.location}
-//                   onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+//                   onChange={(e) =>
+//                     setEditForm({ ...editForm, location: e.target.value })
+//                   }
 //                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF385C] focus:border-transparent outline-none text-sm"
 //                 />
 //               </div>
@@ -821,20 +896,40 @@
 //                 {t.bookingTrend}
 //               </h3>
 //               <span className="text-sm text-green-500 font-medium">
-//                 {stats.totalBookings > 0 ? "+" + Math.round((stats.totalBookings / 12) * 100) + "%" : "0%"}
+//                 {stats.totalBookings > 0
+//                   ? "+" + Math.round((stats.totalBookings / 12) * 100) + "%"
+//                   : "0%"}
 //               </span>
 //             </div>
 //             <div className="h-64">
-//               {bookingData.some(d => d.bookings > 0) ? (
+//               {bookingData.some((d) => d.bookings > 0) ? (
 //                 <ResponsiveContainer width="100%" height="100%">
 //                   <AreaChart data={bookingData}>
 //                     <defs>
-//                       <linearGradient id="bookingGradient" x1="0" y1="0" x2="0" y2="1">
-//                         <stop offset="5%" stopColor="#FF385C" stopOpacity={0.3} />
-//                         <stop offset="95%" stopColor="#FF385C" stopOpacity={0} />
+//                       <linearGradient
+//                         id="bookingGradient"
+//                         x1="0"
+//                         y1="0"
+//                         x2="0"
+//                         y2="1"
+//                       >
+//                         <stop
+//                           offset="5%"
+//                           stopColor="#FF385C"
+//                           stopOpacity={0.3}
+//                         />
+//                         <stop
+//                           offset="95%"
+//                           stopColor="#FF385C"
+//                           stopOpacity={0}
+//                         />
 //                       </linearGradient>
 //                     </defs>
-//                     <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
+//                     <CartesianGrid
+//                       strokeDasharray="3 3"
+//                       stroke="#374151"
+//                       opacity={0.1}
+//                     />
 //                     <XAxis dataKey="month" stroke="#6B7280" fontSize={12} />
 //                     <YAxis stroke="#6B7280" fontSize={12} />
 //                     <Tooltip
@@ -873,14 +968,24 @@
 //               </span>
 //             </div>
 //             <div className="h-64">
-//               {bookingData.some(d => d.spent > 0) ? (
+//               {bookingData.some((d) => d.spent > 0) ? (
 //                 <ResponsiveContainer width="100%" height="100%">
 //                   <BarChart data={bookingData}>
-//                     <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
+//                     <CartesianGrid
+//                       strokeDasharray="3 3"
+//                       stroke="#374151"
+//                       opacity={0.1}
+//                     />
 //                     <XAxis dataKey="month" stroke="#6B7280" fontSize={12} />
-//                     <YAxis stroke="#6B7280" fontSize={12} tickFormatter={(value) => `RWF ${value/1000}K`} />
+//                     <YAxis
+//                       stroke="#6B7280"
+//                       fontSize={12}
+//                       tickFormatter={(value) => `RWF ${value / 1000}K`}
+//                     />
 //                     <Tooltip
-//                       formatter={(value: any) => `RWF ${value.toLocaleString()}`}
+//                       formatter={(value: any) =>
+//                         `RWF ${value.toLocaleString()}`
+//                       }
 //                       contentStyle={{
 //                         backgroundColor: "#1F2937",
 //                         border: "none",
@@ -908,7 +1013,9 @@
 //               {t.bookingDistribution}
 //             </h3>
 //             <div className="h-64">
-//               {bookingDistributionData.some(d => d.value > 0 && d.name !== 'No Data') ? (
+//               {bookingDistributionData.some(
+//                 (d) => d.value > 0 && d.name !== "No Data",
+//               ) ? (
 //                 <ResponsiveContainer width="100%" height="100%">
 //                   <PieChart>
 //                     <Pie
@@ -926,7 +1033,10 @@
 //                       labelLine={false}
 //                     >
 //                       {bookingDistributionData.map((_entry, index) => (
-//                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+//                         <Cell
+//                           key={`cell-${index}`}
+//                           fill={COLORS[index % COLORS.length]}
+//                         />
 //                       ))}
 //                     </Pie>
 //                     <Tooltip
@@ -959,14 +1069,24 @@
 //               </span>
 //             </div>
 //             <div className="h-64">
-//               {bookingData.some(d => d.spent > 0) ? (
+//               {bookingData.some((d) => d.spent > 0) ? (
 //                 <ResponsiveContainer width="100%" height="100%">
 //                   <LineChart data={bookingData}>
-//                     <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
+//                     <CartesianGrid
+//                       strokeDasharray="3 3"
+//                       stroke="#374151"
+//                       opacity={0.1}
+//                     />
 //                     <XAxis dataKey="month" stroke="#6B7280" fontSize={12} />
-//                     <YAxis stroke="#6B7280" fontSize={12} tickFormatter={(value) => `RWF ${value/1000}K`} />
+//                     <YAxis
+//                       stroke="#6B7280"
+//                       fontSize={12}
+//                       tickFormatter={(value) => `RWF ${value / 1000}K`}
+//                     />
 //                     <Tooltip
-//                       formatter={(value: any) => `RWF ${value.toLocaleString()}`}
+//                       formatter={(value: any) =>
+//                         `RWF ${value.toLocaleString()}`
+//                       }
 //                       contentStyle={{
 //                         backgroundColor: "#1F2937",
 //                         border: "none",
@@ -1000,7 +1120,7 @@
 //             </h3>
 //             <button
 //               className="text-sm text-[#FF385C] hover:underline flex items-center gap-1"
-//               onClick={() => window.location.href = '/user/bookings'}
+//               onClick={() => (window.location.href = "/user/bookings")}
 //             >
 //               {t.viewAll}
 //               <ArrowForwardIcon className="w-4 h-4" />
@@ -1034,7 +1154,8 @@
 //                     <div className="flex flex-wrap items-center gap-2 mt-1">
 //                       <span className="text-xs text-gray-500">
 //                         <CalendarTodayIcon className="w-3 h-3 inline mr-0.5" />
-//                         {formatDate(booking.checkIn)} - {formatDate(booking.checkOut)}
+//                         {formatDate(booking.checkIn)} -{" "}
+//                         {formatDate(booking.checkOut)}
 //                       </span>
 //                       <span className="text-xs text-gray-500">
 //                         • {booking.months} months
@@ -1043,9 +1164,13 @@
 //                   </div>
 //                   <div className="text-right flex-shrink-0">
 //                     <p className="text-sm font-bold text-[#FF385C]">
-//                       {formatCurrency(booking.totalAmount || 0)}
+//                       {formatCurrency(
+//                         (booking.monthlyRent || 0) + (booking.serviceFee || 0),
+//                       )}
 //                     </p>
-//                     <span className={`px-2 py-0.5 text-xs rounded-full ${getStatusColor(booking.status)}`}>
+//                     <span
+//                       className={`px-2 py-0.5 text-xs rounded-full ${getStatusColor(booking.status)}`}
+//                     >
 //                       {getStatusLabel(booking.status)}
 //                     </span>
 //                   </div>
@@ -1068,6 +1193,14 @@
 //     </div>
 //   );
 // };
+
+
+
+
+
+
+
+
 
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/set-state-in-effect */
@@ -1113,6 +1246,8 @@ import {
   AreaChart,
   Area,
 } from "recharts";
+
+// MyMemory Translation API (no CORS issues)
 
 // Translations
 const translations = {
@@ -1178,6 +1313,12 @@ const translations = {
     fetchError: "Failed to load dashboard data",
     noUserEmail: "No user email found. Please login again.",
     profileUpdateFailed: "Failed to update profile. Please try again.",
+    verifiedStudent: "Verified Student",
+    notProvided: "Not provided",
+    guest: "Guest",
+    user: "User",
+    dashboardRefreshed: "Dashboard refreshed!",
+    refreshing: "Refreshing dashboard...",
   },
   fr: {
     dashboard: "Tableau de Bord",
@@ -1242,6 +1383,12 @@ const translations = {
     noUserEmail: "Aucun email utilisateur trouvé. Veuillez vous reconnecter.",
     profileUpdateFailed:
       "Échec de la mise à jour du profil. Veuillez réessayer.",
+    verifiedStudent: "Étudiant Vérifié",
+    notProvided: "Non fourni",
+    guest: "Invité",
+    user: "Utilisateur",
+    dashboardRefreshed: "Tableau de bord rafraîchi !",
+    refreshing: "Rafraîchissement du tableau de bord...",
   },
   rw: {
     dashboard: "Ibikorwa",
@@ -1307,6 +1454,12 @@ const translations = {
       "Nta imeri y'umukoresha yabonetse. Nyamuneka winjire undi munsi.",
     profileUpdateFailed:
       "Kuvugurura ibyawe birananiranye. Gerageza undi munsi.",
+    verifiedStudent: "Umunyeshuri Wemejwe",
+    notProvided: "Ntabwo byatanzwe",
+    guest: "Umushyitsi",
+    user: "Umukoresha",
+    dashboardRefreshed: "Ibikorwa byavuguruwe!",
+    refreshing: "Ibikorwa biravugururwa...",
   },
 };
 
@@ -1575,13 +1728,13 @@ export const UserDashboard: React.FC = () => {
 
     // Process distribution data
     const distribution = [
-      { name: "Active", value: active },
-      { name: "Completed", value: completed },
-      { name: "Cancelled", value: cancelled },
+      { name: t.activeBookings, value: active },
+      { name: t.completedBookings, value: completed },
+      { name: t.cancelledBookings, value: cancelled },
     ].filter((item) => item.value > 0);
 
     setBookingDistributionData(
-      distribution.length > 0 ? distribution : [{ name: "No Data", value: 1 }],
+      distribution.length > 0 ? distribution : [{ name: t.noData, value: 1 }],
     );
   };
 
@@ -1637,11 +1790,11 @@ export const UserDashboard: React.FC = () => {
 
   const handleRefresh = () => {
     setLoading(true);
-    toast.info("Refreshing dashboard...");
+    toast.info(t.refreshing);
     fetchBookings();
     setTimeout(() => {
       setLoading(false);
-      toast.success("Dashboard refreshed!");
+      toast.success(t.dashboardRefreshed);
     }, 500);
   };
 
@@ -1764,7 +1917,7 @@ export const UserDashboard: React.FC = () => {
                     {t.userDashboard}
                   </h1>
                   <p className="text-sm text-gray-500">
-                    {t.welcome}, {user?.name || "Guest"}!
+                    {t.welcome}, {user?.name || t.guest}!
                   </p>
                 </div>
               </div>
@@ -1805,7 +1958,7 @@ export const UserDashboard: React.FC = () => {
                       className="border border-gray-300 rounded-lg px-2 py-1 text-xl font-bold"
                     />
                   ) : (
-                    user?.name || "User"
+                    user?.name || t.user
                   )}
                 </h2>
                 <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -1814,20 +1967,20 @@ export const UserDashboard: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                   <PhoneIcon className="w-4 h-4" />
-                  <span>{user?.phone || "Not provided"}</span>
+                  <span>{user?.phone || t.notProvided}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                   <SchoolIcon className="w-4 h-4" />
-                  <span>{user?.university || "Not provided"}</span>
+                  <span>{user?.university || t.notProvided}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                   <LocationOnIcon className="w-4 h-4" />
-                  <span>{user?.location || "Not provided"}</span>
+                  <span>{user?.location || t.notProvided}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
                   <VerifiedIcon className="w-4 h-4 text-green-500" />
                   <span className="text-green-600 font-medium">
-                    Verified Student
+                    {t.verifiedStudent}
                   </span>
                 </div>
               </div>
@@ -1877,7 +2030,7 @@ export const UserDashboard: React.FC = () => {
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
+                  {t.email}
                 </label>
                 <input
                   type="email"
@@ -1890,7 +2043,7 @@ export const UserDashboard: React.FC = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone
+                  {t.phone}
                 </label>
                 <input
                   type="text"
@@ -1903,7 +2056,7 @@ export const UserDashboard: React.FC = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  University
+                  {t.university}
                 </label>
                 <input
                   type="text"
@@ -1916,7 +2069,7 @@ export const UserDashboard: React.FC = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Location
+                  {t.location}
                 </label>
                 <input
                   type="text"
@@ -2085,7 +2238,7 @@ export const UserDashboard: React.FC = () => {
             </h3>
             <div className="h-64">
               {bookingDistributionData.some(
-                (d) => d.value > 0 && d.name !== "No Data",
+                (d) => d.value > 0 && d.name !== t.noData,
               ) ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -2229,7 +2382,7 @@ export const UserDashboard: React.FC = () => {
                         {formatDate(booking.checkOut)}
                       </span>
                       <span className="text-xs text-gray-500">
-                        • {booking.months} months
+                        • {booking.months} {t.nights}
                       </span>
                     </div>
                   </div>

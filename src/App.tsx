@@ -116,7 +116,7 @@
 //   data?: any;
 //   groupKey?: string;
 //   duplicateCount?: number;
-//   allIds?: string[]; // Array of all duplicate IDs
+//   allIds?: string[]; // ALL duplicate IDs for this notification group
 // }
 
 // // API endpoints
@@ -126,7 +126,6 @@
 // // NOTIFICATION API ENDPOINTS
 // // ============================================================
 // const API_ENDPOINTS = {
-//   // AUTH NOTIFICATION ROUTES
 //   notifications: `${API_BASE_URL}/auth/notifications`,
 //   notificationsByEmail: (email: string) =>
 //     `${API_BASE_URL}/auth/notifications/email/${email}`,
@@ -136,11 +135,7 @@
 //   notificationDelete: (id: string) =>
 //     `${API_BASE_URL}/auth/notifications/${id}`,
 //   notificationBulkDelete: `${API_BASE_URL}/auth/notifications/bulk`,
-
-//   // ACTIVITY NOTIFICATION ROUTES
 //   activityDelete: (id: string) => `${API_BASE_URL}/auth/notifications/${id}`,
-
-//   // BOOKING NOTIFICATION ROUTES
 //   bookingNotifications: `${API_BASE_URL}/bookings/notifications`,
 //   bookingNotificationsByEmail: (email: string) =>
 //     `${API_BASE_URL}/bookings/notifications/email/${email}`,
@@ -149,8 +144,6 @@
 //   bookingNotificationMarkAllRead: `${API_BASE_URL}/bookings/notifications/mark-all-read`,
 //   bookingNotificationDelete: (id: string) =>
 //     `${API_BASE_URL}/bookings/notifications/${id}`,
-
-//   // CONTACT NOTIFICATION ROUTES
 //   contactNotifications: `${API_BASE_URL}/contact/notifications`,
 //   contactNotificationsByEmail: (email: string) =>
 //     `${API_BASE_URL}/contact/notifications/${email}`,
@@ -159,8 +152,6 @@
 //   contactNotificationMarkAllRead: `${API_BASE_URL}/contact/notifications/mark-all-read`,
 //   contactNotificationDelete: (id: string) =>
 //     `${API_BASE_URL}/contact/notifications/${id}`,
-
-//   // HOUSE NOTIFICATION ROUTES
 //   houseNotifications: `${API_BASE_URL}/houses/notifications`,
 //   houseNotificationsByEmail: (email: string) =>
 //     `${API_BASE_URL}/houses/notifications/${email}`,
@@ -171,8 +162,6 @@
 //   houseNotificationDelete: (id: string) =>
 //     `${API_BASE_URL}/houses/notifications/${id}`,
 //   houseNotificationBulkDelete: `${API_BASE_URL}/houses/notifications/bulk`,
-
-//   // REQUEST NOTIFICATION ROUTES
 //   requestNotifications: `${API_BASE_URL}/requests/notifications`,
 //   requestNotificationsByEmail: (email: string) =>
 //     `${API_BASE_URL}/requests/notifications/${email}`,
@@ -182,15 +171,11 @@
 //     `${API_BASE_URL}/requests/notifications/${id}/mark-all-read`,
 //   requestNotificationDelete: (id: string) =>
 //     `${API_BASE_URL}/requests/notifications/${id}`,
-
-//   // TESTIMONIAL NOTIFICATION ROUTES
 //   testimonials: `${API_BASE_URL}/testimonials`,
 //   testimonialNotificationRead: (id: string) =>
 //     `${API_BASE_URL}/testimonials/notifications/${id}/read`,
 //   testimonialNotificationDelete: (id: string) =>
 //     `${API_BASE_URL}/testimonials/notifications/${id}`,
-
-//   // QUESTION NOTIFICATION ROUTES
 //   questionNotifications: `${API_BASE_URL}/questions/notifications`,
 //   questionNotificationsByEmail: (email: string) =>
 //     `${API_BASE_URL}/questions/notifications/email/${email}`,
@@ -204,7 +189,6 @@
 // // NOTIFICATION COMPONENTS
 // // ============================================================
 
-// // Get source icon based on notification source
 // const getSourceIcon = (source: Notification["source"]) => {
 //   switch (source) {
 //     case "house":
@@ -380,7 +364,7 @@
 // };
 
 // // ============================================================
-// // NOTIFICATIONS MODAL
+// // NOTIFICATIONS MODAL - RESPONSIVE VERSION
 // // ============================================================
 // const NotificationsModal = ({
 //   isOpen,
@@ -417,22 +401,22 @@
 //         onClick={onClose}
 //       />
 
-//       <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
-//         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col animate-in fade-in zoom-in duration-300">
-//           {/* Header */}
-//           <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50 rounded-t-2xl">
+//       <div className="fixed inset-0 z-[1000] flex items-center justify-center p-2 sm:p-4">
+//         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col animate-in fade-in zoom-in duration-300 mx-2 sm:mx-4">
+//           {/* Header - Responsive */}
+//           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50 rounded-t-2xl gap-3 sm:gap-0">
 //             <div>
-//               <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-//                 <NotificationsIcon className="w-7 h-7 text-blue-600" />
+//               <h2 className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">
+//                 <NotificationsIcon className="w-6 h-6 sm:w-7 sm:h-7 text-blue-600" />
 //                 Notifications
 //               </h2>
 //               {unreadCount > 0 && (
-//                 <p className="text-sm text-blue-600 mt-1">
+//                 <p className="text-xs sm:text-sm text-blue-600 mt-1">
 //                   {unreadCount} unread notification{unreadCount > 1 ? "s" : ""}
 //                 </p>
 //               )}
 //             </div>
-//             <div className="flex items-center space-x-3">
+//             <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
 //               <button
 //                 onClick={onRefresh}
 //                 disabled={isLoading}
@@ -442,74 +426,78 @@
 //                 title="Refresh notifications"
 //               >
 //                 <RefreshIcon
-//                   className={`w-5 h-5 ${isLoading ? "animate-spin" : ""}`}
+//                   className={`w-4 h-4 sm:w-5 sm:h-5 ${isLoading ? "animate-spin" : ""}`}
 //                 />
 //               </button>
 
 //               {unreadCount > 0 && (
 //                 <button
 //                   onClick={onMarkAllAsRead}
-//                   className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
+//                   className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-1 sm:gap-2"
 //                 >
-//                   <CheckCircleIcon className="w-4 h-4" />
-//                   Mark all as read
+//                   <CheckCircleIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+//                   <span className="hidden xs:inline">Mark all as read</span>
+//                   <span className="xs:hidden">Read all</span>
 //                 </button>
 //               )}
 //               {canDelete && notifications.length > 0 && (
 //                 <button
 //                   onClick={onDeleteAll}
-//                   className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center gap-2"
+//                   className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center gap-1 sm:gap-2"
 //                 >
-//                   <DeleteIcon className="w-4 h-4" />
-//                   Delete all
+//                   <DeleteIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+//                   <span className="hidden xs:inline">Delete all</span>
+//                   <span className="xs:hidden">Delete</span>
 //                 </button>
 //               )}
 //               <button
 //                 onClick={onClose}
 //                 className="p-2 hover:bg-gray-200 rounded-full transition-colors"
 //               >
-//                 <CloseIcon className="w-6 h-6 text-gray-500" />
+//                 <CloseIcon className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500" />
 //               </button>
 //             </div>
 //           </div>
 
-//           {/* Notifications List */}
-//           <div className="flex-1 overflow-y-auto p-6">
+//           {/* Notifications List - Responsive */}
+//           <div className="flex-1 overflow-y-auto p-3 sm:p-6">
 //             {isLoading ? (
-//               <div className="text-center py-12">
-//                 <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-//                 <p className="mt-4 text-gray-500">Loading notifications...</p>
+//               <div className="text-center py-8 sm:py-12">
+//                 <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+//                 <p className="mt-3 sm:mt-4 text-sm sm:text-base text-gray-500">
+//                   Loading notifications...
+//                 </p>
 //               </div>
 //             ) : notifications.length === 0 ? (
-//               <div className="text-center py-12">
-//                 <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-//                   <NotificationsIcon className="w-12 h-12 text-gray-400" />
+//               <div className="text-center py-8 sm:py-12">
+//                 <div className="w-16 h-16 sm:w-24 sm:h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+//                   <NotificationsIcon className="w-8 h-8 sm:w-12 sm:h-12 text-gray-400" />
 //                 </div>
-//                 <p className="text-xl text-gray-500 font-medium">
+//                 <p className="text-lg sm:text-xl text-gray-500 font-medium">
 //                   No notifications yet
 //                 </p>
-//                 <p className="text-sm text-gray-400 mt-2">
+//                 <p className="text-xs sm:text-sm text-gray-400 mt-2">
 //                   New notifications will appear here
 //                 </p>
 //               </div>
 //             ) : (
-//               <div className="grid gap-4">
+//               <div className="grid gap-3 sm:gap-4">
 //                 {notifications.map((notification) => (
 //                   <div
 //                     key={notification.id}
-//                     className={`p-5 rounded-xl border-2 transition-all ${
+//                     className={`p-3 sm:p-5 rounded-xl border-2 transition-all ${
 //                       notification.read
 //                         ? "bg-white border-gray-200"
 //                         : `${getSourceColor(notification.source)} border-2`
 //                     }`}
 //                   >
-//                     <div className="flex items-start gap-4">
-//                       <div className="flex-shrink-0 mt-1">
+//                     <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+//                       <div className="flex-shrink-0 mt-0 sm:mt-1">
 //                         {getSourceIcon(notification.source)}
 //                       </div>
 
-//                       <div className="flex-1 min-w-0">
-//                         <div className="flex items-center gap-3 mb-1 flex-wrap">
+//                       <div className="flex-1 min-w-0 w-full">
+//                         <div className="flex flex-wrap items-center gap-2 mb-1">
 //                           <span
 //                             className={`text-xs font-medium px-2 py-1 rounded-full ${
 //                               notification.read
@@ -541,10 +529,10 @@
 //                               </span>
 //                             )}
 //                         </div>
-//                         <h3 className="text-lg font-semibold text-gray-800">
+//                         <h3 className="text-base sm:text-lg font-semibold text-gray-800">
 //                           {notification.title}
 //                         </h3>
-//                         <p className="text-gray-600 mt-1 text-base">
+//                         <p className="text-sm sm:text-base text-gray-600 mt-1">
 //                           {notification.message}
 //                         </p>
 //                         {notification.duplicateCount &&
@@ -557,7 +545,7 @@
 //                           )}
 //                       </div>
 
-//                       <div className="flex items-center gap-2 flex-shrink-0">
+//                       <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-end sm:justify-start">
 //                         {!notification.read && (
 //                           <button
 //                             onClick={() => onMarkAsRead(notification.id)}
@@ -569,7 +557,7 @@
 //                                 : "Mark as read"
 //                             }
 //                           >
-//                             <CheckCircleIcon className="w-5 h-5" />
+//                             <CheckCircleIcon className="w-4 h-4 sm:w-5 sm:h-5" />
 //                           </button>
 //                         )}
 //                         {canDelete && (
@@ -583,7 +571,7 @@
 //                                 : "Delete"
 //                             }
 //                           >
-//                             <DeleteIcon className="w-5 h-5" />
+//                             <DeleteIcon className="w-4 h-4 sm:w-5 sm:h-5" />
 //                           </button>
 //                         )}
 //                       </div>
@@ -594,10 +582,10 @@
 //             )}
 //           </div>
 
-//           {/* Footer */}
+//           {/* Footer - Responsive */}
 //           {notifications.length > 0 && !isLoading && (
-//             <div className="p-4 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
-//               <p className="text-sm text-gray-500 text-center">
+//             <div className="p-3 sm:p-4 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+//               <p className="text-xs sm:text-sm text-gray-500 text-center">
 //                 Showing {notifications.length} notification
 //                 {notifications.length > 1 ? "s" : ""}
 //                 {unreadCount > 0 && ` • ${unreadCount} unread`}
@@ -632,7 +620,6 @@
 // }) => {
 //   const navigate = useNavigate();
 
-//   // Admin Menu Items
 //   const adminMenuItems = [
 //     { id: "dashboard", label: "Dashboard", icon: <DashboardIcon /> },
 //     { id: "users", label: "Users", icon: <PeopleIcon /> },
@@ -646,7 +633,6 @@
 //     { id: "question", label: "Question", icon: <QuestionAnswerIcon /> },
 //   ];
 
-//   // User Menu Items
 //   const userMenuItems = [
 //     { id: "dashboard", label: "Dashboard", icon: <DashboardIcon /> },
 //     { id: "profile", label: "My Profile", icon: <PersonIcon /> },
@@ -655,7 +641,6 @@
 //     { id: "messages", label: "My Messages", icon: <EmailIcon /> },
 //   ];
 
-//   // Host Menu Items
 //   const hostMenuItems = [
 //     { id: "dashboard", label: "Dashboard", icon: <DashboardIcon /> },
 //     { id: "houses", label: " Houses", icon: <HouseIcon /> },
@@ -663,7 +648,6 @@
 //     { id: "clients", label: "Occupied house", icon: <People /> },
 //   ];
 
-//   // Manager Menu Items
 //   const managerMenuItems = [
 //     { id: "dashboard", label: "Dashboard", icon: <DashboardIcon /> },
 //     { id: "users", label: "Users", icon: <PeopleIcon /> },
@@ -888,7 +872,6 @@
 //   const [notifications, setNotifications] = useState<Notification[]>([]);
 //   const [isRefreshing, setIsRefreshing] = useState(false);
 
-//   // Modal states
 //   const [confirmationModal, setConfirmationModal] = useState<{
 //     isOpen: boolean;
 //     title: string;
@@ -930,18 +913,15 @@
 //   // FETCH NOTIFICATIONS FROM ALL SOURCES
 //   // ============================================================
 
-//   // Fetch auth notifications - Admin/Manager get all, User/Host get by email
 //   const fetchAuthNotifications = useCallback(async (userData: UserData) => {
 //     try {
 //       const token = localStorage.getItem("token");
 //       if (!token) return [];
 
 //       let url = "";
-//       // Admin and Manager see all notifications
 //       if (userData.role === "admin" || userData.role === "manager") {
 //         url = API_ENDPOINTS.notifications;
 //       } else {
-//         // User and Host see only their notifications by email
 //         url = API_ENDPOINTS.notificationsByEmail(userData.email);
 //       }
 
@@ -961,14 +941,12 @@
 //     }
 //   }, []);
 
-//   // Fetch booking notifications - Admin/Manager/Host get all, User get by email
 //   const fetchBookingNotifications = useCallback(async (userData: UserData) => {
 //     try {
 //       const token = localStorage.getItem("token");
 //       if (!token) return [];
 
 //       let url = "";
-//       // Admin, Manager, and Host see all booking notifications
 //       if (
 //         userData.role === "admin" ||
 //         userData.role === "manager" ||
@@ -976,7 +954,6 @@
 //       ) {
 //         url = API_ENDPOINTS.bookingNotifications;
 //       } else {
-//         // User sees only their booking notifications by email
 //         url = API_ENDPOINTS.bookingNotificationsByEmail(userData.email);
 //       }
 
@@ -1002,18 +979,15 @@
 //     }
 //   }, []);
 
-//   // Fetch house notifications - Admin/Manager get all, User/Host get by email
 //   const fetchHouseNotifications = useCallback(async (userData: UserData) => {
 //     try {
 //       const token = localStorage.getItem("token");
 //       if (!token) return [];
 
 //       let url = "";
-//       // Admin and Manager see all house notifications
 //       if (userData.role === "admin" || userData.role === "manager") {
 //         url = API_ENDPOINTS.houseNotifications;
 //       } else {
-//         // User and Host see only their house notifications by email
 //         url = API_ENDPOINTS.houseNotificationsByEmail(userData.email);
 //       }
 
@@ -1039,18 +1013,15 @@
 //     }
 //   }, []);
 
-//   // Fetch contact notifications - Admin/Manager get all, User/Host get by email
 //   const fetchContactNotifications = useCallback(async (userData: UserData) => {
 //     try {
 //       const token = localStorage.getItem("token");
 //       if (!token) return [];
 
 //       let url = "";
-//       // Admin and Manager see all contact notifications
 //       if (userData.role === "admin" || userData.role === "manager") {
 //         url = API_ENDPOINTS.contactNotifications;
 //       } else {
-//         // User and Host see only their contact notifications by email
 //         url = API_ENDPOINTS.contactNotificationsByEmail(userData.email);
 //       }
 
@@ -1070,18 +1041,15 @@
 //     }
 //   }, []);
 
-//   // Fetch request notifications - Admin/Manager get all, User/Host get by email
 //   const fetchRequestNotifications = useCallback(async (userData: UserData) => {
 //     try {
 //       const token = localStorage.getItem("token");
 //       if (!token) return [];
 
 //       let url = "";
-//       // Admin and Manager see all request notifications
 //       if (userData.role === "admin" || userData.role === "manager") {
 //         url = API_ENDPOINTS.requestNotifications;
 //       } else {
-//         // User and Host see only their request notifications by email
 //         url = API_ENDPOINTS.requestNotificationsByEmail(userData.email);
 //       }
 
@@ -1101,15 +1069,12 @@
 //     }
 //   }, []);
 
-//   // Fetch testimonial notifications - Admin/Manager get all, User/Host get by email
 //   const fetchTestimonialNotifications = useCallback(
 //     async (userData: UserData) => {
 //       try {
 //         const token = localStorage.getItem("token");
 //         if (!token) return [];
 
-//         // Admin and Manager see all testimonials
-//         // User and Host see only their testimonials
 //         const response = await axios.get(API_ENDPOINTS.testimonials, {
 //           headers: { Authorization: `Bearer ${token}` },
 //         });
@@ -1123,7 +1088,6 @@
 //           return [];
 //         }
 
-//         // For users and hosts, filter testimonials by email
 //         if (userData.role === "user" || userData.role === "host") {
 //           return data.filter(
 //             (notif: any) =>
@@ -1140,18 +1104,15 @@
 //     [],
 //   );
 
-//   // Fetch question notifications - All roles get by email
 //   const fetchQuestionNotifications = useCallback(async (userData: UserData) => {
 //     try {
 //       const token = localStorage.getItem("token");
 //       if (!token) return [];
 
 //       let url = "";
-//       // Admin and Manager can get all question notifications
 //       if (userData.role === "admin" || userData.role === "manager") {
 //         url = API_ENDPOINTS.questionNotifications;
 //       } else {
-//         // User and Host get by email
 //         url = API_ENDPOINTS.questionNotificationsByEmail(userData.email);
 //       }
 
@@ -1159,7 +1120,6 @@
 //         headers: { Authorization: `Bearer ${token}` },
 //       });
 
-//       // For admin/manager, if they got all notifications but need to filter for stats
 //       let data = [];
 //       if (response.data?.success && Array.isArray(response.data.data)) {
 //         data = response.data.data;
@@ -1174,7 +1134,6 @@
 //         return [];
 //       }
 
-//       // If admin/manager, they see all. For others, they already got filtered by email
 //       return data;
 //     } catch (error) {
 //       return [];
@@ -1234,7 +1193,6 @@
 //         allNotifications = [...allNotifications, ...questionNotifs];
 //       }
 
-//       // Deduplicate by ID
 //       const seenIds = new Set();
 //       const uniqueRawNotifications = allNotifications.filter((notif) => {
 //         const id = notif._id || notif.id;
@@ -1269,7 +1227,6 @@
 //       let source: Notification["source"] = "activity";
 //       let title = "📋 Notification";
 
-//       // Auth notifications (user)
 //       if (notif.type === "welcome") {
 //         source = "user";
 //         title = "👋 Welcome!";
@@ -1285,9 +1242,7 @@
 //       } else if (notif.type === "account_deletion") {
 //         source = "user";
 //         title = "🗑️ Account Deleted";
-//       }
-//       // Booking notifications
-//       else if (notif.type === "booking_created") {
+//       } else if (notif.type === "booking_created") {
 //         source = "booking";
 //         title = "📅 New Booking";
 //       } else if (notif.type === "booking_updated") {
@@ -1299,25 +1254,19 @@
 //       } else if (notif.type === "booking_confirmed") {
 //         source = "booking";
 //         title = "✅ Booking Confirmed";
-//       }
-//       // Contact notifications
-//       else if (
+//       } else if (
 //         notif.type === "contact_created" ||
 //         notif.type?.startsWith("contact_")
 //       ) {
 //         source = "contact";
 //         title = "📩 New Contact Message";
-//       }
-//       // Request notifications
-//       else if (notif.type === "request_created") {
+//       } else if (notif.type === "request_created") {
 //         source = "request";
 //         title = "📋 New Request";
 //       } else if (notif.type === "request_deleted") {
 //         source = "request";
 //         title = "🗑️ Request Deleted";
-//       }
-//       // House notifications
-//       else if (notif.type === "house_created") {
+//       } else if (notif.type === "house_created") {
 //         source = "house";
 //         title = "🏠 New House Listed";
 //       } else if (notif.type === "house_updated") {
@@ -1326,14 +1275,10 @@
 //       } else if (notif.type === "house_status_changed") {
 //         source = "house";
 //         title = "🔄 House Status Changed";
-//       }
-//       // Testimonial notifications
-//       else if (notif.type === "testimonial_created") {
+//       } else if (notif.type === "testimonial_created") {
 //         source = "testimonial";
 //         title = "⭐ New Testimonial";
-//       }
-//       // Question notifications
-//       else if (notif.type === "question_submitted") {
+//       } else if (notif.type === "question_submitted") {
 //         source = "question";
 //         title = "❓ New Question Submitted";
 //       } else if (notif.type === "question_answered") {
@@ -1342,10 +1287,7 @@
 //       } else if (notif.type?.startsWith("question_")) {
 //         source = "question";
 //         title = "❓ Question Notification";
-//       }
-//       // Activity notifications - FILTER OUT REGISTRATION AND UNWANTED ACTIVITIES
-//       else if (notif.action) {
-//         // Skip registration and unwanted activity notifications
+//       } else if (notif.action) {
 //         if (
 //           notif.action === "register" ||
 //           notif.action === "registration" ||
@@ -1353,7 +1295,7 @@
 //           notif.action === "user_registered" ||
 //           notif.action === "signup"
 //         ) {
-//           return; // Skip this notification entirely
+//           return;
 //         }
 
 //         source = "activity";
@@ -1374,11 +1316,9 @@
 //         } else if (notif.action === "house_deleted") {
 //           title = "🗑️ House Deleted";
 //         } else {
-//           // Skip any other activity notifications we don't want to show
 //           return;
 //         }
 //       } else {
-//         // Skip notifications without type or action
 //         return;
 //       }
 
@@ -1402,8 +1342,6 @@
 //       }
 
 //       const notificationId = notif._id || notif.id;
-
-//       // Create group key for duplicate detection
 //       const groupKey = `${title}|${message}|${source}`;
 
 //       newNotifications.push({
@@ -1419,20 +1357,16 @@
 //       });
 //     });
 
-//     // Additional filter to remove any remaining unwanted notifications
 //     return newNotifications.filter((notif) => {
-//       // Skip "Student" activity notifications
 //       if (notif.source === "activity" && notif.title.includes("Student")) {
 //         return false;
 //       }
-//       // Skip any "New Registration" notifications
 //       if (
 //         notif.title.includes("New Registration") ||
 //         notif.message.includes("registered")
 //       ) {
 //         return false;
 //       }
-//       // Skip "Student" in message
 //       if (notif.message.includes("Student")) {
 //         return false;
 //       }
@@ -1458,7 +1392,7 @@
 //         groups[key].push(notif);
 //       });
 
-//       // Build final notification list - ONE per group with count
+//       // Build final notification list - ONE per group with ALL IDs tracked
 //       const finalNotifications: Notification[] = [];
 //       Object.values(groups).forEach((group) => {
 //         // Sort by createdAt to get the latest one
@@ -1469,12 +1403,13 @@
 
 //         // Take the first (latest) notification as the representative
 //         const representative = group[0];
+//         // Collect ALL IDs from this group for bulk delete
 //         const allIds = group.map((n) => n.id);
 
 //         finalNotifications.push({
 //           ...representative,
 //           duplicateCount: group.length,
-//           allIds: allIds,
+//           allIds: allIds, // ALL IDs including duplicates
 //         });
 //       });
 
@@ -1490,7 +1425,7 @@
 //         notifications: rawNotifications,
 //       };
 //     } catch (error) {
-//       // Silent fail - no console logs
+//       // Silent fail
 //     }
 //   }, [fetchAllNotifications, processNotifications]);
 
@@ -1528,6 +1463,7 @@
 //       if (!targetNotif || !targetNotif.allIds) {
 //         return [notificationId];
 //       }
+//       // Returns ALL 4 duplicate IDs
 //       return targetNotif.allIds;
 //     },
 //     [notifications],
@@ -1538,10 +1474,9 @@
 //   // ============================================================
 //   const handleMarkAsRead = useCallback(
 //     async (id: string) => {
-//       // Get all duplicate IDs
 //       const allIds = getDuplicateIds(id);
 
-//       // Optimistically update UI - mark all as read
+//       // Optimistically update UI - mark ALL as read
 //       setNotifications((prev) =>
 //         prev.map((n) => (allIds.includes(n.id) ? { ...n, read: true } : n)),
 //       );
@@ -1550,12 +1485,11 @@
 //         const token = localStorage.getItem("token");
 //         if (!token) return;
 
-//         // Mark all duplicates as read
 //         const markPromises = [];
 //         let successCount = 0;
 
+//         // Mark ALL duplicates as read
 //         for (const notifId of allIds) {
-//           // Find the notification in the current state
 //           const notification = notifications.find((n) => n.id === notifId);
 //           if (!notification) continue;
 
@@ -1579,7 +1513,6 @@
 //               url = API_ENDPOINTS.houseNotificationRead(notifId);
 //               break;
 //             case "testimonial":
-//               // Testimonial doesn't have a read endpoint, skip
 //               successCount++;
 //               continue;
 //             case "question":
@@ -1603,8 +1536,6 @@
 //         }
 
 //         await Promise.allSettled(markPromises);
-
-//         // Refresh notifications after marking as read
 //         await fetchAndProcessData();
 
 //         if (successCount > 0) {
@@ -1641,14 +1572,12 @@
 //       return;
 //     }
 
-//     // Optimistically update UI - mark all as read
 //     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
 
 //     try {
 //       const token = localStorage.getItem("token");
 //       if (!token) return;
 
-//       // Collect all individual notification IDs (including duplicates)
 //       const allUnreadIds: string[] = [];
 //       for (const notification of unreadNotifications) {
 //         if (notification.allIds) {
@@ -1714,8 +1643,6 @@
 //       }
 
 //       await Promise.allSettled(markPromises);
-
-//       // Refresh notifications
 //       await fetchAndProcessData();
 
 //       if (successCount > 0) {
@@ -1726,7 +1653,6 @@
 //         );
 //       }
 //     } catch (error) {
-//       // Revert optimistic update
 //       setNotifications((prev) =>
 //         prev.map((n) => (unreadIds.includes(n.id) ? { ...n, read: false } : n)),
 //       );
@@ -1735,7 +1661,7 @@
 //   }, [notifications, fetchAndProcessData]);
 
 //   // ============================================================
-//   // DELETE NOTIFICATION - DELETE ALL COPIES AUTOMATICALLY
+//   // DELETE NOTIFICATION - DELETE ALL 4 COPIES AT ONCE
 //   // ============================================================
 //   const handleDelete = useCallback(
 //     async (id: string) => {
@@ -1748,11 +1674,10 @@
 //         return;
 //       }
 
-//       // Get all duplicate IDs
+//       // Get ALL duplicate IDs (all 4 of them)
 //       const allIds = getDuplicateIds(id);
 //       const duplicateCount = allIds.length;
 
-//       // Show confirmation
 //       setConfirmationModal({
 //         isOpen: true,
 //         title:
@@ -1769,9 +1694,9 @@
 //         onConfirm: async () => {
 //           setConfirmationModal((prev) => ({ ...prev, isOpen: false }));
 
-//           // Remove from UI immediately
+//           // Remove the SINGLE displayed notification from UI immediately
 //           setNotifications((prev) =>
-//             prev.filter((n) => !allIds.includes(n.id)),
+//             prev.filter((n) => n.id !== id),
 //           );
 
 //           try {
@@ -1781,12 +1706,12 @@
 //             const deletePromises = [];
 //             let deleteCount = 0;
 
-//             // Find all notifications with these IDs
+//             // Find ALL notifications with these IDs (all 4 duplicates)
 //             const notificationsToDelete = notifications.filter((n) =>
 //               allIds.includes(n.id),
 //             );
 
-//             // Delete all duplicate notifications
+//             // Delete ALL duplicate notifications from database
 //             for (const notif of notificationsToDelete) {
 //               const source = notif.source;
 //               let url = "";
@@ -1844,7 +1769,6 @@
 //             // Refresh to sync with server
 //             setTimeout(() => fetchAndProcessData(), 500);
 //           } catch (error) {
-//             // Restore if failed
 //             await fetchAndProcessData();
 //             showStatusModal(
 //               "Error",
@@ -1889,7 +1813,6 @@
 //             return;
 //           }
 
-//           // Collect all individual notification IDs
 //           const allIds: string[] = [];
 //           for (const notif of notifications) {
 //             if (notif.allIds) {
@@ -2510,6 +2433,11 @@
 
 
 
+
+
+
+
+
 /* eslint-disable no-useless-assignment */
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -2524,6 +2452,7 @@ import {
 } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Cookies from "js-cookie";
 
 // Material Icons
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -2600,6 +2529,245 @@ import { HostClientManagement } from "./components/dashboard/host/components/cli
 import { QuestionManagement } from "./components/dashboard/admin/components/question/QuestionManagement";
 import { ResetPassword } from "./components/verify/ResetPassword";
 
+
+// Translations for UI text
+const translations = {
+  en: {
+    inyumba: "Inyumba",
+    adminPanel: "Admin Panel",
+    hostPanel: "Host Panel",
+    managerPanel: "Manager Panel",
+    userPanel: "User Panel",
+    dashboard: "Dashboard",
+    users: "Users",
+    team: "Team",
+    bookings: "Bookings",
+    requests: "Requests",
+    houses: "Houses",
+    messages: "Messages",
+    testimonials: "Testimonials",
+    logs: "Logs",
+    question: "Question",
+    myProfile: "My Profile",
+    myBookings: "My Bookings",
+    myRequests: "My Requests",
+    myMessages: "My Messages",
+    housesLabel: "Houses",
+    clients: "Occupied house",
+    logout: "Logout",
+    notifications: "Notifications",
+    noNotifications: "No notifications yet",
+    newNotificationsHere: "New notifications will appear here",
+    loadingNotifications: "Loading notifications...",
+    markAllAsRead: "Mark all as read",
+    readAll: "Read all",
+    deleteAll: "Delete all",
+    delete: "Delete",
+    markAsRead: "Mark as read",
+    unread: "Unread",
+    new: "New",
+    copies: "copies",
+    showing: "Showing",
+    notification: "notification",
+    notificationsCount: "notifications",
+    unreadCount: "unread",
+    confirmDelete: "Delete Notification",
+    confirmDeleteMessage: "Are you sure you want to delete this notification? This action cannot be undone.",
+    confirmDeleteAll: "Delete All Notifications",
+    confirmDeleteAllMessage: "Are you sure you want to delete all {count} notifications? This action cannot be undone.",
+    confirmBulkDelete: "Delete {count} Duplicate Notifications",
+    confirmBulkDeleteMessage: "This notification has {count} copies. They will all be deleted automatically.",
+    cancel: "Cancel",
+    success: "Success",
+    error: "Error",
+    info: "Info",
+    permissionDenied: "Permission Denied",
+    noPermission: "You do not have permission to delete notifications",
+    loggedOut: "Logged Out",
+    loggedOutMessage: "You have been logged out successfully.",
+    loadingDashboard: "Loading dashboard...",
+    dataLoaded: "Data loaded successfully!",
+    failedToFetch: "Failed to fetch data",
+    refresh: "Refresh",
+    export: "Export",
+    print: "Print",
+    total: "total",
+    housesLabelShort: "houses",
+    guests: "guests",
+    newUsers: "new users",
+    topRatedHouses: "Top Rated Houses",
+    houseDistributionByProvince: "House Distribution by Province",
+    exporting: "Exporting data...",
+    noUsersFound: "No users found",
+    noRecentActivity: "No recent activity",
+    justNow: "Just now",
+    daysAgo: "d ago",
+    hoursAgo: "h ago",
+    minutesAgo: "m ago",
+    activeUserAccountCreated: "Active user account created",
+    userAccountCreatedInactive: "User account created (inactive)",
+    totalBookingsCount: "{count} total bookings",
+    newUsersCount: "+{count} new users",
+    activeUsersLabel: "Active users",
+  },
+  fr: {
+    inyumba: "Inyumba",
+    adminPanel: "Panneau Admin",
+    hostPanel: "Panneau Hôte",
+    managerPanel: "Panneau Gestionnaire",
+    userPanel: "Panneau Utilisateur",
+    dashboard: "Tableau de Bord",
+    users: "Utilisateurs",
+    team: "Équipe",
+    bookings: "Réservations",
+    requests: "Demandes",
+    houses: "Maisons",
+    messages: "Messages",
+    testimonials: "Témoignages",
+    logs: "Journaux",
+    question: "Question",
+    myProfile: "Mon Profil",
+    myBookings: "Mes Réservations",
+    myRequests: "Mes Demandes",
+    myMessages: "Mes Messages",
+    housesLabel: "Maisons",
+    clients: "Maison occupée",
+    logout: "Déconnexion",
+    notifications: "Notifications",
+    noNotifications: "Aucune notification",
+    newNotificationsHere: "Les nouvelles notifications apparaîtront ici",
+    loadingNotifications: "Chargement des notifications...",
+    markAllAsRead: "Tout marquer comme lu",
+    readAll: "Tout lire",
+    deleteAll: "Tout supprimer",
+    delete: "Supprimer",
+    markAsRead: "Marquer comme lu",
+    unread: "Non lu",
+    new: "Nouveau",
+    copies: "copies",
+    showing: "Affichage",
+    notification: "notification",
+    notificationsCount: "notifications",
+    unreadCount: "non lus",
+    confirmDelete: "Supprimer la Notification",
+    confirmDeleteMessage: "Êtes-vous sûr de vouloir supprimer cette notification ? Cette action est irréversible.",
+    confirmDeleteAll: "Supprimer Toutes les Notifications",
+    confirmDeleteAllMessage: "Êtes-vous sûr de vouloir supprimer toutes les {count} notifications ? Cette action est irréversible.",
+    confirmBulkDelete: "Supprimer {count} Notifications Dupliquées",
+    confirmBulkDeleteMessage: "Cette notification a {count} copies. Elles seront toutes supprimées automatiquement.",
+    cancel: "Annuler",
+    success: "Succès",
+    error: "Erreur",
+    info: "Info",
+    permissionDenied: "Permission Refusée",
+    noPermission: "Vous n'avez pas la permission de supprimer les notifications",
+    loggedOut: "Déconnecté",
+    loggedOutMessage: "Vous avez été déconnecté avec succès.",
+    loadingDashboard: "Chargement du tableau de bord...",
+    dataLoaded: "Données chargées avec succès !",
+    failedToFetch: "Échec du chargement des données",
+    refresh: "Rafraîchir",
+    export: "Exporter",
+    print: "Imprimer",
+    total: "total",
+    housesLabelShort: "maisons",
+    guests: "invités",
+    newUsers: "nouveaux utilisateurs",
+    topRatedHouses: "Maisons les Mieux Notées",
+    houseDistributionByProvince: "Distribution des Maisons par Province",
+    exporting: "Exportation des données...",
+    noUsersFound: "Aucun utilisateur trouvé",
+    noRecentActivity: "Aucune activité récente",
+    justNow: "À l'instant",
+    daysAgo: "j",
+    hoursAgo: "h",
+    minutesAgo: "min",
+    activeUserAccountCreated: "Compte utilisateur actif créé",
+    userAccountCreatedInactive: "Compte utilisateur créé (inactif)",
+    totalBookingsCount: "{count} réservations au total",
+    newUsersCount: "+{count} nouveaux utilisateurs",
+    activeUsersLabel: "Utilisateurs actifs",
+  },
+  rw: {
+    inyumba: "Inyumba",
+    adminPanel: "Ubuyobozi",
+    hostPanel: "Akarere k'Umukoresha",
+    managerPanel: "Akarere k'Umuyobozi",
+    userPanel: "Akarere k'Umukoresha",
+    dashboard: "Ibikorwa",
+    users: "Abakoresha",
+    team: "Ikipe",
+    bookings: "Ibyanditswe",
+    requests: "Ibisabwa",
+    houses: "Amazu",
+    messages: "Ubutumwa",
+    testimonials: "Ubuhamya",
+    logs: "Ibyakozwe",
+    question: "Ikibazo",
+    myProfile: "Indangamuntu",
+    myBookings: "Ibyanditswe Byanjye",
+    myRequests: "Ibisabwa Byanjye",
+    myMessages: "Ubutumwa Bwanjye",
+    housesLabel: "Amazu",
+    clients: "Inzu y'Abakoresha",
+    logout: "Sohoka",
+    notifications: "Imenyesha",
+    noNotifications: "Nta menyesha",
+    newNotificationsHere: "Imenyesha nshya zizagaragara hano",
+    loadingNotifications: "Imenyesha zirakururwa...",
+    markAllAsRead: "Zose zisomwe",
+    readAll: "Soma Zose",
+    deleteAll: "Siba Zose",
+    delete: "Siba",
+    markAsRead: "Soma",
+    unread: "Ntizisomwe",
+    new: "Nshya",
+    copies: "kopi",
+    showing: "Kwerekana",
+    notification: "imenyesha",
+    notificationsCount: "imenyesha",
+    unreadCount: "ntizisomwe",
+    confirmDelete: "Siba Imenyesha",
+    confirmDeleteMessage: "Uri gushaka niba ushaka gusiba iyi menyesha? Iyi nkora ntishobora gusubizwa.",
+    confirmDeleteAll: "Siba Imenyesha Zose",
+    confirmDeleteAllMessage: "Uri gushaka niba ushaka gusiba {count} imenyesha zose? Iyi nkora ntishobora gusubizwa.",
+    confirmBulkDelete: "Siba {count} Imenyesha Zikubiyemo",
+    confirmBulkDeleteMessage: "Iyi menyesha ifite {count} kopi. Zose zizasibwa mu buryo bwihuse.",
+    cancel: "Hagarika",
+    success: "Byagenze Neza",
+    error: "Ikosa",
+    info: "Amakuru",
+    permissionDenied: "Ntabwo Uruhushya",
+    noPermission: "Ntabwo ufite uruhushya rwo gusiba imenyesha",
+    loggedOut: "Wasohotse",
+    loggedOutMessage: "Wasohotse neza.",
+    loadingDashboard: "Ibikorwa birakururwa...",
+    dataLoaded: "Amakuru yakuwe neza!",
+    failedToFetch: "Amakuru ntabwo yakuwe",
+    refresh: "Vugurura",
+    export: "Kuvanamo",
+    print: "Capa",
+    total: "byose",
+    housesLabelShort: "amazu",
+    guests: "abashyitsi",
+    newUsers: "abakoresha bashya",
+    topRatedHouses: "Amazu Afite Ibipimo Byinshi",
+    houseDistributionByProvince: "Ibyiciro by'Amazu mu Ntara",
+    exporting: "Amakuru arimo gusohoka...",
+    noUsersFound: "Nta bakoresha babonetse",
+    noRecentActivity: "Nta bikorwa vubi",
+    justNow: "Ubu",
+    daysAgo: "iminsi ishize",
+    hoursAgo: "amasaha ishize",
+    minutesAgo: "iminota ishize",
+    activeUserAccountCreated: "Konti y'umukoresha ikora yaremwe",
+    userAccountCreatedInactive: "Konti y'umukoresha yaremwe (ntikora)",
+    totalBookingsCount: "{count} ibyanditswe byose",
+    newUsersCount: "+{count} abakoresha bashya",
+    activeUsersLabel: "Abakoresha bakora",
+  },
+};
+
 // Types
 interface UserData {
   id: number;
@@ -2628,8 +2796,14 @@ interface Notification {
   data?: any;
   groupKey?: string;
   duplicateCount?: number;
-  allIds?: string[]; // ALL duplicate IDs for this notification group
+  allIds?: string[];
 }
+
+// Helper function to get language from cookies
+const getLanguageFromCookies = (): "en" | "fr" | "rw" => {
+  const lang = Cookies.get("language") as "en" | "fr" | "rw";
+  return lang || "en";
+};
 
 // API endpoints
 const API_BASE_URL = "https://inyumbaproject.eu1.hubfly.app";
@@ -2889,6 +3063,7 @@ const NotificationsModal = ({
   onRefresh,
   isLoading = false,
   userRole,
+  t,
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -2900,6 +3075,7 @@ const NotificationsModal = ({
   onRefresh: () => void;
   isLoading?: boolean;
   userRole?: string;
+  t: any;
 }) => {
   const unreadCount = notifications.filter((n) => !n.read).length;
   const canDelete = userRole === "admin" || userRole === "manager";
@@ -2920,11 +3096,11 @@ const NotificationsModal = ({
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">
                 <NotificationsIcon className="w-6 h-6 sm:w-7 sm:h-7 text-blue-600" />
-                Notifications
+                {t.notifications}
               </h2>
               {unreadCount > 0 && (
                 <p className="text-xs sm:text-sm text-blue-600 mt-1">
-                  {unreadCount} unread notification{unreadCount > 1 ? "s" : ""}
+                  {unreadCount} {t.unreadCount} {t.notification}{unreadCount > 1 ? "s" : ""}
                 </p>
               )}
             </div>
@@ -2935,7 +3111,7 @@ const NotificationsModal = ({
                 className={`p-2 text-gray-600 hover:bg-gray-200 rounded-lg transition-colors ${
                   isLoading ? "opacity-50 cursor-not-allowed" : ""
                 }`}
-                title="Refresh notifications"
+                title={t.refresh}
               >
                 <RefreshIcon
                   className={`w-4 h-4 sm:w-5 sm:h-5 ${isLoading ? "animate-spin" : ""}`}
@@ -2948,8 +3124,8 @@ const NotificationsModal = ({
                   className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-1 sm:gap-2"
                 >
                   <CheckCircleIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden xs:inline">Mark all as read</span>
-                  <span className="xs:hidden">Read all</span>
+                  <span className="hidden xs:inline">{t.markAllAsRead}</span>
+                  <span className="xs:hidden">{t.readAll}</span>
                 </button>
               )}
               {canDelete && notifications.length > 0 && (
@@ -2958,8 +3134,8 @@ const NotificationsModal = ({
                   className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center gap-1 sm:gap-2"
                 >
                   <DeleteIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden xs:inline">Delete all</span>
-                  <span className="xs:hidden">Delete</span>
+                  <span className="hidden xs:inline">{t.deleteAll}</span>
+                  <span className="xs:hidden">{t.delete}</span>
                 </button>
               )}
               <button
@@ -2977,7 +3153,7 @@ const NotificationsModal = ({
               <div className="text-center py-8 sm:py-12">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
                 <p className="mt-3 sm:mt-4 text-sm sm:text-base text-gray-500">
-                  Loading notifications...
+                  {t.loadingNotifications}
                 </p>
               </div>
             ) : notifications.length === 0 ? (
@@ -2986,10 +3162,10 @@ const NotificationsModal = ({
                   <NotificationsIcon className="w-8 h-8 sm:w-12 sm:h-12 text-gray-400" />
                 </div>
                 <p className="text-lg sm:text-xl text-gray-500 font-medium">
-                  No notifications yet
+                  {t.noNotifications}
                 </p>
                 <p className="text-xs sm:text-sm text-gray-400 mt-2">
-                  New notifications will appear here
+                  {t.newNotificationsHere}
                 </p>
               </div>
             ) : (
@@ -3031,13 +3207,13 @@ const NotificationsModal = ({
                           </span>
                           {!notification.read && (
                             <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">
-                              New
+                              {t.new}
                             </span>
                           )}
                           {notification.duplicateCount &&
                             notification.duplicateCount > 1 && (
                               <span className="text-xs bg-purple-500 text-white px-2 py-0.5 rounded-full">
-                                {notification.duplicateCount} copies
+                                {notification.duplicateCount} {t.copies}
                               </span>
                             )}
                         </div>
@@ -3066,7 +3242,7 @@ const NotificationsModal = ({
                               notification.duplicateCount &&
                               notification.duplicateCount > 1
                                 ? `Mark all ${notification.duplicateCount} copies as read`
-                                : "Mark as read"
+                                : t.markAsRead
                             }
                           >
                             <CheckCircleIcon className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -3080,7 +3256,7 @@ const NotificationsModal = ({
                               notification.duplicateCount &&
                               notification.duplicateCount > 1
                                 ? `Delete all ${notification.duplicateCount} copies`
-                                : "Delete"
+                                : t.delete
                             }
                           >
                             <DeleteIcon className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -3098,9 +3274,9 @@ const NotificationsModal = ({
           {notifications.length > 0 && !isLoading && (
             <div className="p-3 sm:p-4 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
               <p className="text-xs sm:text-sm text-gray-500 text-center">
-                Showing {notifications.length} notification
+                {t.showing} {notifications.length} {t.notification}
                 {notifications.length > 1 ? "s" : ""}
-                {unreadCount > 0 && ` • ${unreadCount} unread`}
+                {unreadCount > 0 && ` • ${unreadCount} ${t.unreadCount}`}
               </p>
             </div>
           )}
@@ -3121,6 +3297,7 @@ const Sidebar = ({
   location,
   onNotificationsClick,
   unreadCount,
+  t,
 }: {
   user: UserData | null;
   onLogout: () => void;
@@ -3129,47 +3306,48 @@ const Sidebar = ({
   location: any;
   onNotificationsClick: () => void;
   unreadCount: number;
+  t: any;
 }) => {
   const navigate = useNavigate();
 
   const adminMenuItems = [
-    { id: "dashboard", label: "Dashboard", icon: <DashboardIcon /> },
-    { id: "users", label: "Users", icon: <PeopleIcon /> },
-    { id: "team", label: "Team", icon: <PeopleIcon /> },
-    { id: "bookings", label: "Bookings", icon: <AttachMoneyIcon /> },
-    { id: "requests", label: "Requests", icon: <TrendingUpIcon /> },
-    { id: "houses", label: "Houses", icon: <HouseRounded /> },
-    { id: "messages", label: "Messages", icon: <EmailIcon /> },
-    { id: "testimonials", label: "Testimonials", icon: <TextSnippet /> },
-    { id: "logs", label: "Logs", icon: <LoginSharp /> },
-    { id: "question", label: "Question", icon: <QuestionAnswerIcon /> },
+    { id: "dashboard", label: t.dashboard, icon: <DashboardIcon /> },
+    { id: "users", label: t.users, icon: <PeopleIcon /> },
+    { id: "team", label: t.team, icon: <PeopleIcon /> },
+    { id: "bookings", label: t.bookings, icon: <AttachMoneyIcon /> },
+    { id: "requests", label: t.requests, icon: <TrendingUpIcon /> },
+    { id: "houses", label: t.houses, icon: <HouseRounded /> },
+    { id: "messages", label: t.messages, icon: <EmailIcon /> },
+    { id: "testimonials", label: t.testimonials, icon: <TextSnippet /> },
+    { id: "logs", label: t.logs, icon: <LoginSharp /> },
+    { id: "question", label: t.question, icon: <QuestionAnswerIcon /> },
   ];
 
   const userMenuItems = [
-    { id: "dashboard", label: "Dashboard", icon: <DashboardIcon /> },
-    { id: "profile", label: "My Profile", icon: <PersonIcon /> },
-    { id: "bookings", label: "My Bookings", icon: <AttachMoneyIcon /> },
-    { id: "requests", label: "My Requests", icon: <TrendingUpIcon /> },
-    { id: "messages", label: "My Messages", icon: <EmailIcon /> },
+    { id: "dashboard", label: t.dashboard, icon: <DashboardIcon /> },
+    { id: "profile", label: t.myProfile, icon: <PersonIcon /> },
+    { id: "bookings", label: t.myBookings, icon: <AttachMoneyIcon /> },
+    { id: "requests", label: t.myRequests, icon: <TrendingUpIcon /> },
+    { id: "messages", label: t.myMessages, icon: <EmailIcon /> },
   ];
 
   const hostMenuItems = [
-    { id: "dashboard", label: "Dashboard", icon: <DashboardIcon /> },
-    { id: "houses", label: " Houses", icon: <HouseIcon /> },
-    { id: "bookings", label: "Bookings", icon: <AttachMoneyIcon /> },
-    { id: "clients", label: "Occupied house", icon: <People /> },
+    { id: "dashboard", label: t.dashboard, icon: <DashboardIcon /> },
+    { id: "houses", label: t.housesLabel, icon: <HouseIcon /> },
+    { id: "bookings", label: t.bookings, icon: <AttachMoneyIcon /> },
+    { id: "clients", label: t.clients, icon: <People /> },
   ];
 
   const managerMenuItems = [
-    { id: "dashboard", label: "Dashboard", icon: <DashboardIcon /> },
-    { id: "users", label: "Users", icon: <PeopleIcon /> },
-    { id: "bookings", label: "Bookings", icon: <AttachMoneyIcon /> },
-    { id: "houses", label: "Houses", icon: <HouseRounded /> },
-    { id: "messages", label: "Messages", icon: <EmailIcon /> },
-    { id: "testimonials", label: "Testimonials", icon: <TextSnippet /> },
-    { id: "requests", label: "Requests", icon: <TrendingUpIcon /> },
-    { id: "logs", label: "Logs", icon: <LoginSharp /> },
-    { id: "question", label: "Question", icon: <QuestionAnswerIcon /> },
+    { id: "dashboard", label: t.dashboard, icon: <DashboardIcon /> },
+    { id: "users", label: t.users, icon: <PeopleIcon /> },
+    { id: "bookings", label: t.bookings, icon: <AttachMoneyIcon /> },
+    { id: "houses", label: t.houses, icon: <HouseRounded /> },
+    { id: "messages", label: t.messages, icon: <EmailIcon /> },
+    { id: "testimonials", label: t.testimonials, icon: <TextSnippet /> },
+    { id: "requests", label: t.requests, icon: <TrendingUpIcon /> },
+    { id: "logs", label: t.logs, icon: <LoginSharp /> },
+    { id: "question", label: t.question, icon: <QuestionAnswerIcon /> },
   ];
 
   const getMenuItems = () => {
@@ -3230,10 +3408,10 @@ const Sidebar = ({
   };
 
   const getPanelLabel = () => {
-    if (user?.role === "admin") return "Admin Panel";
-    if (user?.role === "host") return "Host Panel";
-    if (user?.role === "manager") return "Manager Panel";
-    return "User Panel";
+    if (user?.role === "admin") return t.adminPanel;
+    if (user?.role === "host") return t.hostPanel;
+    if (user?.role === "manager") return t.managerPanel;
+    return t.userPanel;
   };
 
   const handleNavigation = (path: string) => {
@@ -3279,7 +3457,7 @@ const Sidebar = ({
               </div>
               <div className="min-w-0">
                 <h1 className="text-lg sm:text-xl font-bold text-gray-800 truncate">
-                  Inyumba
+                  {t.inyumba}
                 </h1>
                 <p className="text-xs text-gray-500 truncate">
                   {getPanelLabel()}
@@ -3336,7 +3514,7 @@ const Sidebar = ({
             >
               <NotificationsIcon className="w-5 h-5 flex-shrink-0" />
               <span className="font-medium text-sm sm:text-base">
-                Notifications
+                {t.notifications}
               </span>
               {unreadCount > 0 && (
                 <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
@@ -3354,7 +3532,7 @@ const Sidebar = ({
             >
               <LogoutIcon className="w-5 h-5 text-white flex-shrink-0" />
               <span className="font-medium text-sm text-white sm:text-base">
-                Logout
+                {t.logout}
               </span>
             </button>
           </div>
@@ -3383,6 +3561,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lang, setLang] = useState<"en" | "fr" | "rw">(
+    getLanguageFromCookies(),
+  );
 
   const [confirmationModal, setConfirmationModal] = useState<{
     isOpen: boolean;
@@ -3420,6 +3601,21 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   }>({
     notifications: [],
   });
+
+  const t = translations[lang];
+
+  // Listen for language changes in cookies
+  useEffect(() => {
+    const handleCookieChange = () => {
+      const newLang = getLanguageFromCookies();
+      if (newLang !== lang) {
+        setLang(newLang);
+      }
+    };
+
+    const interval = setInterval(handleCookieChange, 1000);
+    return () => clearInterval(interval);
+  }, [lang]);
 
   // ============================================================
   // FETCH NOTIFICATIONS FROM ALL SOURCES
@@ -3894,7 +4090,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       const rawNotifications = await fetchAllNotifications();
       const processedNotifs = processNotifications(rawNotifications);
 
-      // Group notifications by groupKey
       const groups: Record<string, Notification[]> = {};
       processedNotifs.forEach((notif) => {
         const key = notif.groupKey || `${notif.id}`;
@@ -3904,28 +4099,23 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         groups[key].push(notif);
       });
 
-      // Build final notification list - ONE per group with ALL IDs tracked
       const finalNotifications: Notification[] = [];
       Object.values(groups).forEach((group) => {
-        // Sort by createdAt to get the latest one
         group.sort(
           (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         );
 
-        // Take the first (latest) notification as the representative
         const representative = group[0];
-        // Collect ALL IDs from this group for bulk delete
         const allIds = group.map((n) => n.id);
 
         finalNotifications.push({
           ...representative,
           duplicateCount: group.length,
-          allIds: allIds, // ALL IDs including duplicates
+          allIds: allIds,
         });
       });
 
-      // Sort by createdAt (newest first)
       finalNotifications.sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
@@ -3975,7 +4165,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       if (!targetNotif || !targetNotif.allIds) {
         return [notificationId];
       }
-      // Returns ALL 4 duplicate IDs
       return targetNotif.allIds;
     },
     [notifications],
@@ -3988,7 +4177,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     async (id: string) => {
       const allIds = getDuplicateIds(id);
 
-      // Optimistically update UI - mark ALL as read
       setNotifications((prev) =>
         prev.map((n) => (allIds.includes(n.id) ? { ...n, read: true } : n)),
       );
@@ -4000,7 +4188,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         const markPromises = [];
         let successCount = 0;
 
-        // Mark ALL duplicates as read
         for (const notifId of allIds) {
           const notification = notifications.find((n) => n.id === notifId);
           if (!notification) continue;
@@ -4052,24 +4239,19 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
         if (successCount > 0) {
           showStatusModal(
-            "Success",
-            `${successCount} notification(s) marked as read`,
+            t.success,
+            `${successCount} ${t.notification}${successCount > 1 ? "s" : ""} ${t.markAsRead}`,
             "success",
           );
         }
       } catch (error) {
-        // Revert optimistic update
         setNotifications((prev) =>
           prev.map((n) => (allIds.includes(n.id) ? { ...n, read: false } : n)),
         );
-        showStatusModal(
-          "Error",
-          "Failed to mark notifications as read",
-          "error",
-        );
+        showStatusModal(t.error, "Failed to mark notifications as read", "error");
       }
     },
-    [notifications, fetchAndProcessData, getDuplicateIds],
+    [notifications, fetchAndProcessData, getDuplicateIds, t],
   );
 
   // ============================================================
@@ -4080,7 +4262,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     const unreadIds = unreadNotifications.map((n) => n.id);
 
     if (unreadNotifications.length === 0) {
-      showStatusModal("Info", "No unread notifications", "info");
+      showStatusModal(t.info, "No unread notifications", "info");
       return;
     }
 
@@ -4159,8 +4341,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
       if (successCount > 0) {
         showStatusModal(
-          "Success",
-          `${successCount} notification(s) marked as read`,
+          t.success,
+          `${successCount} ${t.notification}${successCount > 1 ? "s" : ""} ${t.markAsRead}`,
           "success",
         );
       }
@@ -4168,9 +4350,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       setNotifications((prev) =>
         prev.map((n) => (unreadIds.includes(n.id) ? { ...n, read: false } : n)),
       );
-      showStatusModal("Error", "Failed to mark notifications as read", "error");
+      showStatusModal(t.error, "Failed to mark notifications as read", "error");
     }
-  }, [notifications, fetchAndProcessData]);
+  }, [notifications, fetchAndProcessData, t]);
 
   // ============================================================
   // DELETE NOTIFICATION - DELETE ALL 4 COPIES AT ONCE
@@ -4179,14 +4361,13 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     async (id: string) => {
       if (!user || (user.role !== "admin" && user.role !== "manager")) {
         showStatusModal(
-          "Permission Denied",
-          "You do not have permission to delete notifications",
+          t.permissionDenied,
+          t.noPermission,
           "error",
         );
         return;
       }
 
-      // Get ALL duplicate IDs (all 4 of them)
       const allIds = getDuplicateIds(id);
       const duplicateCount = allIds.length;
 
@@ -4194,19 +4375,18 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         isOpen: true,
         title:
           duplicateCount > 1
-            ? `Delete ${duplicateCount} Duplicate Notifications`
-            : "Delete Notification",
+            ? t.confirmBulkDelete.replace("{count}", String(duplicateCount))
+            : t.confirmDelete,
         message:
           duplicateCount > 1
-            ? `This notification has ${duplicateCount} copies. They will all be deleted automatically.`
-            : "Are you sure you want to delete this notification? This action cannot be undone.",
+            ? t.confirmBulkDeleteMessage.replace("{count}", String(duplicateCount))
+            : t.confirmDeleteMessage,
         confirmText:
-          duplicateCount > 1 ? `Delete All ${duplicateCount}` : "Delete",
+          duplicateCount > 1 ? `Delete All ${duplicateCount}` : t.delete,
         confirmColor: "bg-red-600",
         onConfirm: async () => {
           setConfirmationModal((prev) => ({ ...prev, isOpen: false }));
 
-          // Remove the SINGLE displayed notification from UI immediately
           setNotifications((prev) =>
             prev.filter((n) => n.id !== id),
           );
@@ -4218,12 +4398,10 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             const deletePromises = [];
             let deleteCount = 0;
 
-            // Find ALL notifications with these IDs (all 4 duplicates)
             const notificationsToDelete = notifications.filter((n) =>
               allIds.includes(n.id),
             );
 
-            // Delete ALL duplicate notifications from database
             for (const notif of notificationsToDelete) {
               const source = notif.source;
               let url = "";
@@ -4272,18 +4450,17 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
             if (deleteCount > 0) {
               showStatusModal(
-                "Success",
-                `${deleteCount} notification(s) deleted successfully`,
+                t.success,
+                `${deleteCount} ${t.notification}${deleteCount > 1 ? "s" : ""} ${t.delete}d successfully`,
                 "success",
               );
             }
 
-            // Refresh to sync with server
             setTimeout(() => fetchAndProcessData(), 500);
           } catch (error) {
             await fetchAndProcessData();
             showStatusModal(
-              "Error",
+              t.error,
               "Failed to delete notifications. Please try again.",
               "error",
             );
@@ -4293,7 +4470,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         duplicateIds: allIds,
       });
     },
-    [notifications, fetchAndProcessData, user, getDuplicateIds],
+    [notifications, fetchAndProcessData, user, getDuplicateIds, t],
   );
 
   // ============================================================
@@ -4302,8 +4479,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const handleDeleteAll = useCallback(async () => {
     if (!user || (user.role !== "admin" && user.role !== "manager")) {
       showStatusModal(
-        "Permission Denied",
-        "You do not have permission to delete notifications",
+        t.permissionDenied,
+        t.noPermission,
         "error",
       );
       return;
@@ -4311,8 +4488,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
     setConfirmationModal({
       isOpen: true,
-      title: "Delete All Notifications",
-      message: `Are you sure you want to delete all ${notifications.length} notifications? This action cannot be undone.`,
+      title: t.confirmDeleteAll,
+      message: t.confirmDeleteAllMessage.replace("{count}", String(notifications.length)),
       confirmText: "Delete All",
       confirmColor: "bg-red-600",
       onConfirm: async () => {
@@ -4390,8 +4567,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
           if (deleteCount > 0) {
             showStatusModal(
-              "Success",
-              `${deleteCount} notification(s) deleted`,
+              t.success,
+              `${deleteCount} ${t.notification}${deleteCount > 1 ? "s" : ""} ${t.delete}d`,
               "success",
             );
           }
@@ -4400,7 +4577,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         } catch (error) {
           await fetchAndProcessData();
           showStatusModal(
-            "Error",
+            t.error,
             "Failed to delete all notifications",
             "error",
           );
@@ -4408,7 +4585,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       },
       type: "delete-all",
     });
-  }, [notifications, fetchAndProcessData, user]);
+  }, [notifications, fetchAndProcessData, user, t]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -4476,8 +4653,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     setStatusModal({
       isOpen: true,
       type: "info",
-      title: "👋 Logged Out",
-      message: "You have been logged out successfully.",
+      title: t.loggedOut,
+      message: t.loggedOutMessage,
     });
 
     window.location.href = "/";
@@ -4488,7 +4665,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+          <p className="mt-4 text-gray-600">{t.loadingDashboard}</p>
         </div>
       </div>
     );
@@ -4522,6 +4699,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         location={location}
         onNotificationsClick={() => setIsNotificationsOpen(true)}
         unreadCount={unreadCount}
+        t={t}
       />
 
       <NotificationsModal
@@ -4535,6 +4713,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         onRefresh={handleRefresh}
         isLoading={isRefreshing}
         userRole={user?.role}
+        t={t}
       />
 
       <ConfirmationModal
@@ -4546,7 +4725,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         title={confirmationModal.title}
         message={confirmationModal.message}
         confirmText={confirmationModal.confirmText}
-        cancelText="Cancel"
+        cancelText={t.cancel}
         confirmColor={confirmationModal.confirmColor}
       />
 

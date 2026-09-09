@@ -1,3 +1,4 @@
+
 // /* eslint-disable @typescript-eslint/no-unused-vars */
 // /* eslint-disable react-hooks/set-state-in-effect */
 // /* eslint-disable react-hooks/immutability */
@@ -33,6 +34,10 @@
 //   Schedule as ScheduleIcon,
 //   Public as PublicIcon,
 //   Language as LanguageIcon,
+//   Delete as DeleteIcon,
+//   DeleteSweep as DeleteSweepIcon,
+//   CheckCircle as CheckCircleIcon,
+//   Warning as WarningIcon,
 // } from "@mui/icons-material";
 
 // // ============================================
@@ -93,6 +98,22 @@
 //     translating: "Translating...",
 //     monitorActivities: "Monitor user activities and system events",
 //     view: "View",
+//     delete: "Delete",
+//     deleteSelected: "Delete Selected",
+//     bulkDelete: "Bulk Delete",
+//     deleteConfirm: "Delete Confirmation",
+//     deleteConfirmMessage: "Are you sure you want to delete this activity log? This action cannot be undone.",
+//     bulkDeleteConfirmMessage: "Are you sure you want to delete {count} selected activity log(s)? This action cannot be undone.",
+//     deleteSuccess: "Delete Successful",
+//     deleteSuccessMessage: "Activity log has been deleted successfully.",
+//     bulkDeleteSuccessMessage: "Successfully deleted {count} activity log(s).",
+//     deleteFailed: "Delete Failed",
+//     deleteFailedMessage: "An error occurred while deleting logs.",
+//     selectedItems: "Selected Items",
+//     cancel: "Cancel",
+//     done: "Done",
+//     details: "Details",
+//     deleteError: "Failed to delete activity log",
 //   },
 //   fr: {
 //     title: "Journaux d'Activité",
@@ -148,6 +169,22 @@
 //     translating: "Traduction en cours...",
 //     monitorActivities: "Surveiller les activités des utilisateurs et les événements système",
 //     view: "Voir",
+//     delete: "Supprimer",
+//     deleteSelected: "Supprimer la Sélection",
+//     bulkDelete: "Suppression en Masse",
+//     deleteConfirm: "Confirmation de Suppression",
+//     deleteConfirmMessage: "Êtes-vous sûr de vouloir supprimer ce journal d'activité ? Cette action est irréversible.",
+//     bulkDeleteConfirmMessage: "Êtes-vous sûr de vouloir supprimer {count} journal(aux) d'activité sélectionné(s) ? Cette action est irréversible.",
+//     deleteSuccess: "Suppression Réussie",
+//     deleteSuccessMessage: "Le journal d'activité a été supprimé avec succès.",
+//     bulkDeleteSuccessMessage: "{count} journal(aux) d'activité ont été supprimé(s) avec succès.",
+//     deleteFailed: "Échec de la Suppression",
+//     deleteFailedMessage: "Une erreur est survenue lors de la suppression des journaux.",
+//     selectedItems: "Éléments Sélectionnés",
+//     cancel: "Annuler",
+//     done: "Terminé",
+//     details: "Détails",
+//     deleteError: "Échec de la suppression du journal d'activité",
 //   },
 //   rw: {
 //     title: "Akarongo k'ibikorwa",
@@ -203,6 +240,22 @@
 //     translating: "Birahindurwa...",
 //     monitorActivities: "Kurikirana ibikorwa by'abakoresha n'ibyabaye muri sisitemu",
 //     view: "Reba",
+//     delete: "Kuraho",
+//     deleteSelected: "Kuraho ibyatoranyijwe",
+//     bulkDelete: "Kuraho byinshi",
+//     deleteConfirm: "Kwemeza kuraho",
+//     deleteConfirmMessage: "Urahatiye ko ushaka kuraho iyi karongo y'ibikorwa? Iki gikorwa ntigishobora guhindurwa.",
+//     bulkDeleteConfirmMessage: "Urahatiye ko ushaka kuraho {count} akarongo y'ibikorwa yatoranyijwe? Iki gikorwa ntigishobora guhindurwa.",
+//     deleteSuccess: "Byakuweho neza",
+//     deleteSuccessMessage: "Akarongo k'ibikorwa yakuvyeho neza.",
+//     bulkDeleteSuccessMessage: "{count} akarongo y'ibikorwa yakuvyeho neza.",
+//     deleteFailed: "Kuraho birananiranye",
+//     deleteFailedMessage: "Habaye ikibazo mu gihe cyo kuraho akarongo.",
+//     selectedItems: "Ibyatoranyijwe",
+//     cancel: "Reka",
+//     done: "Byakozwe",
+//     details: "Ibisobanuro",
+//     deleteError: "Kuraho akarongo k'ibikorwa birananiranye",
 //   },
 // };
 
@@ -392,7 +445,7 @@
 //   const [translating, setTranslating] = useState(false);
 //   const [error, setError] = useState<string | null>(null);
 //   const [page, setPage] = useState(0);
-//   const [rowsPerPage, setRowsPerPage] = useState(10);
+//   const [rowsPerPage, setRowsPerPage] = useState(20);
 //   const [selectedLog, setSelectedLog] = useState<ActivityLog | null>(null);
 //   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 //   const [filters, setFilters] = useState<FilterOptions>({
@@ -404,6 +457,26 @@
 //     totalActivities: 0,
 //     uniqueUsers: 0,
 //     actionsByType: {},
+//   });
+
+//   // State for delete functionality
+//   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+//   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+//   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+//   const [deleting, setDeleting] = useState(false);
+//   // State for success/failure modals
+//   const [resultModal, setResultModal] = useState<{
+//     open: boolean;
+//     type: "success" | "error";
+//     title: string;
+//     message: string;
+//     details?: string;
+//   }>({
+//     open: false,
+//     type: "success",
+//     title: "",
+//     message: "",
+//     details: "",
 //   });
 
 //   // Listen for language changes
@@ -587,6 +660,7 @@
 //       setLogs(activities);
 //       calculateStats(activities);
 //       applyFilters(activities, filters);
+//       setSelectedIds([]);
 //     } catch (err) {
 //       const errorMessage = axios.isAxiosError(err)
 //         ? err.response?.data?.message || err.message
@@ -614,6 +688,135 @@
 //   const handleViewDetails = (log: ActivityLog) => {
 //     setSelectedLog(log);
 //     setDetailDialogOpen(true);
+//   };
+
+//   // Handle checkbox selection
+//   const handleSelect = (id: string) => {
+//     setSelectedIds((prev) =>
+//       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+//     );
+//   };
+
+//   const handleSelectAll = () => {
+//     const currentPageIds = filteredLogs
+//       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+//       .map((log) => log._id);
+//     const allSelected = currentPageIds.every((id) => selectedIds.includes(id));
+    
+//     if (allSelected) {
+//       setSelectedIds(selectedIds.filter((id) => !currentPageIds.includes(id)));
+//     } else {
+//       const newIds = [...selectedIds];
+//       currentPageIds.forEach((id) => {
+//         if (!newIds.includes(id)) newIds.push(id);
+//       });
+//       setSelectedIds(newIds);
+//     }
+//   };
+
+//   // Delete single activity
+//   const handleDeleteSingle = (id: string) => {
+//     setDeleteTarget(id);
+//     setDeleteConfirmOpen(true);
+//   };
+
+//   // Delete bulk activities
+//   const handleDeleteBulk = () => {
+//     if (selectedIds.length === 0) return;
+//     setDeleteTarget("bulk");
+//     setDeleteConfirmOpen(true);
+//   };
+
+//   // Show result modal
+//   const showResultModal = (
+//     type: "success" | "error",
+//     title: string,
+//     message: string,
+//     details?: string
+//   ) => {
+//     setResultModal({
+//       open: true,
+//       type,
+//       title,
+//       message,
+//       details,
+//     });
+//   };
+
+//   // Confirm delete
+//   const confirmDelete = async () => {
+//     try {
+//       setDeleting(true);
+//       setError(null);
+
+//       let deletedCount = 0;
+//       let deletedIds: string[] = [];
+
+//       if (deleteTarget === "bulk") {
+//         // Bulk delete
+//         await api.delete("/auth/activities/bulk", {
+//           data: { ids: selectedIds },
+//         });
+//         deletedCount = selectedIds.length;
+//         deletedIds = selectedIds;
+        
+//         // Remove deleted items from state
+//         const remainingLogs = logs.filter((log) => !selectedIds.includes(log._id));
+//         setLogs(remainingLogs);
+//         calculateStats(remainingLogs);
+//         applyFilters(remainingLogs, filters);
+//         setSelectedIds([]);
+
+//         // Show success modal
+//         showResultModal(
+//           "success",
+//           t.deleteSuccess,
+//           t.bulkDeleteSuccessMessage.replace("{count}", String(deletedCount)),
+//           `${t.selectedItems}: ${deletedIds.slice(0, 5).join(", ")}${deletedIds.length > 5 ? ` and ${deletedIds.length - 5} more` : ""}`
+//         );
+//       } else if (deleteTarget) {
+//         // Single delete
+//         await api.delete(`/auth/activities/${deleteTarget}`);
+//         deletedCount = 1;
+//         deletedIds = [deleteTarget];
+        
+//         const remainingLogs = logs.filter((log) => log._id !== deleteTarget);
+//         setLogs(remainingLogs);
+//         calculateStats(remainingLogs);
+//         applyFilters(remainingLogs, filters);
+//         setSelectedIds(selectedIds.filter((id) => id !== deleteTarget));
+
+//         // Show success modal
+//         showResultModal(
+//           "success",
+//           t.deleteSuccess,
+//           t.deleteSuccessMessage,
+//           `${t.details}: ${deleteTarget}`
+//         );
+//       }
+
+//       setDeleteConfirmOpen(false);
+//       setDeleteTarget(null);
+//     } catch (err) {
+//       const errorMessage = axios.isAxiosError(err)
+//         ? err.response?.data?.message || err.message
+//         : t.deleteFailedMessage;
+//       setError(errorMessage);
+      
+//       // Show error modal
+//       showResultModal(
+//         "error",
+//         t.deleteFailed,
+//         errorMessage,
+//         axios.isAxiosError(err) && err.response?.data?.details 
+//           ? err.response.data.details 
+//           : t.deleteError
+//       );
+      
+//       console.error("Error deleting logs:", err);
+//     } finally {
+//       setDeleting(false);
+//     }
 //   };
 
 //   // Export logs as PDF
@@ -831,9 +1034,6 @@
 //     return styleMap[action] || "bg-gray-50 text-gray-700 border-gray-200";
 //   };
 
-//   // Get action color for dialog - REMOVED as it's not used
-//   // const getActionColor = (action: string): string => { ... }
-
 //   useEffect(() => {
 //     fetchLogs();
 //   }, [fetchLogs]);
@@ -935,6 +1135,16 @@
 //               </div>
 //             </div>
 //             <div className="flex flex-wrap gap-3">
+//               {/* Bulk Delete Button */}
+//               {selectedIds.length > 0 && (
+//                 <button
+//                   onClick={handleDeleteBulk}
+//                   className="group inline-flex items-center gap-2.5 px-5 py-2.5 bg-gradient-to-r from-red-500 via-red-600 to-rose-600 text-white rounded-2xl hover:from-red-600 hover:via-red-700 hover:to-rose-700 hover:shadow-xl shadow-red-500/25 transition-all duration-300 text-sm font-medium"
+//                 >
+//                   <DeleteSweepIcon className="group-hover:scale-110 transition-transform duration-300" style={{ fontSize: "18px" }} />
+//                   {t.deleteSelected} ({selectedIds.length})
+//                 </button>
+//               )}
 //               <button
 //                 onClick={fetchLogs}
 //                 className="group inline-flex items-center gap-2.5 px-5 py-2.5 bg-white text-slate-700 border border-slate-200 rounded-2xl hover:bg-slate-50 hover:border-slate-300 hover:shadow-lg transition-all duration-300 text-sm font-medium"
@@ -1120,6 +1330,19 @@
 //             <table className="w-full border-collapse text-sm">
 //               <thead>
 //                 <tr className="bg-gradient-to-br from-slate-50/80 to-slate-100/50">
+//                   <th className="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+//                     <input
+//                       type="checkbox"
+//                       checked={
+//                         filteredLogs.length > 0 &&
+//                         filteredLogs
+//                           .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+//                           .every((log) => selectedIds.includes(log._id))
+//                       }
+//                       onChange={handleSelectAll}
+//                       className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+//                     />
+//                   </th>
 //                   <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
 //                     <div className="flex items-center gap-2">
 //                       <ScheduleIcon style={{ fontSize: "14px" }} />
@@ -1148,14 +1371,14 @@
 //                     </div>
 //                   </th>
 //                   <th className="px-6 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">
-//                     Details
+//                     Actions
 //                   </th>
 //                 </tr>
 //               </thead>
 //               <tbody className="divide-y divide-slate-100">
 //                 {filteredLogs.length === 0 ? (
 //                   <tr>
-//                     <td colSpan={6} className="py-20 text-center">
+//                     <td colSpan={7} className="py-20 text-center">
 //                       <div className="flex flex-col items-center gap-3">
 //                         <div className="p-4 bg-slate-100 rounded-full">
 //                           <InfoIcon
@@ -1180,8 +1403,16 @@
 //                         key={log._id}
 //                         className={`hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-transparent transition-all duration-300 group ${
 //                           index % 2 === 0 ? "bg-white/50" : "bg-slate-50/30"
-//                         }`}
+//                         } ${selectedIds.includes(log._id) ? "bg-blue-50/50" : ""}`}
 //                       >
+//                         <td className="px-4 py-4">
+//                           <input
+//                             type="checkbox"
+//                             checked={selectedIds.includes(log._id)}
+//                             onChange={() => handleSelect(log._id)}
+//                             className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+//                           />
+//                         </td>
 //                         <td className="px-6 py-4">
 //                           <div className="flex flex-col">
 //                             <span className="text-sm font-semibold text-slate-700">
@@ -1243,13 +1474,22 @@
 //                           </code>
 //                         </td>
 //                         <td className="px-6 py-4 text-right">
-//                           <button
-//                             onClick={() => handleViewDetails(log)}
-//                             className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 hover:shadow-lg shadow-blue-500/25 transition-all duration-300 text-sm font-medium group"
-//                           >
-//                             <VisibilityIcon className="group-hover:scale-110 transition-transform duration-300" style={{ fontSize: "16px" }} />
-//                             {t.view}
-//                           </button>
+//                           <div className="flex items-center justify-end gap-2">
+//                             <button
+//                               onClick={() => handleViewDetails(log)}
+//                               className="inline-flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 hover:shadow-lg shadow-blue-500/25 transition-all duration-300 text-xs font-medium group"
+//                             >
+//                               <VisibilityIcon className="group-hover:scale-110 transition-transform duration-300" style={{ fontSize: "16px" }} />
+//                               {t.view}
+//                             </button>
+//                             <button
+//                               onClick={() => handleDeleteSingle(log._id)}
+//                               className="inline-flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 hover:shadow-lg shadow-red-500/25 transition-all duration-300 text-xs font-medium group"
+//                             >
+//                               <DeleteIcon className="group-hover:scale-110 transition-transform duration-300" style={{ fontSize: "16px" }} />
+//                               {t.delete}
+//                             </button>
+//                           </div>
 //                         </td>
 //                       </tr>
 //                     ))
@@ -1261,7 +1501,7 @@
 //           {/* Premium Pagination */}
 //           {filteredLogs.length > 0 && (
 //             <div className="px-6 py-4 flex flex-wrap justify-between items-center border-t border-slate-100 gap-3 bg-gradient-to-br from-slate-50/30 to-transparent backdrop-blur-sm">
-//               <div className="flex items-center gap-3">
+//               <div className="flex items-center gap-4">
 //                 <span className="text-sm text-slate-600 font-medium">{t.rowsPerPage}:</span>
 //                 <select
 //                   value={rowsPerPage}
@@ -1273,6 +1513,9 @@
 //                   <option value={25}>25</option>
 //                   <option value={50}>50</option>
 //                 </select>
+//                 <span className="text-sm text-slate-500">
+//                   {selectedIds.length} selected
+//                 </span>
 //               </div>
 //               <div className="text-sm text-slate-600 font-medium">
 //                 <span className="text-slate-800">{filteredLogs.length}</span> total
@@ -1481,13 +1724,181 @@
 //             </div>
 
 //             {/* Modal Footer */}
-//             <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm px-8 py-5 border-t border-slate-100 flex justify-end">
+//             <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm px-8 py-5 border-t border-slate-100 flex justify-end gap-3">
+//               <button
+//                 onClick={() => handleDeleteSingle(selectedLog._id)}
+//                 className="px-8 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl hover:from-red-600 hover:to-red-700 hover:shadow-xl shadow-red-500/25 transition-all duration-300 text-sm font-semibold flex items-center gap-2"
+//               >
+//                 <DeleteIcon style={{ fontSize: "18px" }} />
+//                 {t.delete}
+//               </button>
 //               <button
 //                 onClick={() => setDetailDialogOpen(false)}
 //                 className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl hover:from-blue-700 hover:to-blue-800 hover:shadow-xl shadow-blue-500/25 transition-all duration-300 text-sm font-semibold"
 //               >
 //                 {t.close}
 //               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Delete Confirmation Dialog */}
+//       {deleteConfirmOpen && (
+//         <div
+//           className="fixed inset-0 bg-black/60 backdrop-blur-md flex justify-center items-center z-50 p-4 animate-in fade-in duration-300"
+//           onClick={() => {
+//             if (!deleting) {
+//               setDeleteConfirmOpen(false);
+//               setDeleteTarget(null);
+//             }
+//           }}
+//         >
+//           <div
+//             className="bg-white rounded-3xl max-w-md w-full shadow-2xl shadow-black/25 animate-in slide-in-from-bottom-10 duration-300"
+//             onClick={(e) => e.stopPropagation()}
+//           >
+//             <div className="p-8">
+//               <div className="flex items-center justify-center mb-6">
+//                 <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
+//                   <WarningIcon className="text-red-600" style={{ fontSize: "40px" }} />
+//                 </div>
+//               </div>
+//               <h3 className="text-2xl font-bold text-center text-slate-800 mb-3">
+//                 {deleteTarget === "bulk" ? t.bulkDelete : t.deleteConfirm}
+//               </h3>
+//               <p className="text-center text-slate-600 mb-6">
+//                 {deleteTarget === "bulk"
+//                   ? t.bulkDeleteConfirmMessage.replace("{count}", String(selectedIds.length))
+//                   : t.deleteConfirmMessage}
+//               </p>
+//               {deleteTarget === "bulk" && selectedIds.length > 0 && (
+//                 <div className="bg-slate-50 rounded-xl p-4 mb-6 max-h-32 overflow-y-auto">
+//                   <p className="text-xs text-slate-500 font-medium mb-2">
+//                     {t.selectedItems} ({selectedIds.length}):
+//                   </p>
+//                   <div className="flex flex-wrap gap-1">
+//                     {selectedIds.slice(0, 10).map((id) => (
+//                       <span
+//                         key={id}
+//                         className="text-xs font-mono bg-white px-2 py-1 rounded border border-slate-200 text-slate-600"
+//                       >
+//                         {id.slice(0, 8)}...
+//                       </span>
+//                     ))}
+//                     {selectedIds.length > 10 && (
+//                       <span className="text-xs text-slate-400">
+//                         +{selectedIds.length - 10} more
+//                       </span>
+//                     )}
+//                   </div>
+//                 </div>
+//               )}
+//               <div className="flex gap-3">
+//                 <button
+//                   onClick={() => {
+//                     setDeleteConfirmOpen(false);
+//                     setDeleteTarget(null);
+//                   }}
+//                   disabled={deleting}
+//                   className="flex-1 px-6 py-3 bg-slate-100 text-slate-700 rounded-2xl hover:bg-slate-200 transition-all duration-200 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+//                 >
+//                   {t.cancel}
+//                 </button>
+//                 <button
+//                   onClick={confirmDelete}
+//                   disabled={deleting}
+//                   className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl hover:from-red-600 hover:to-red-700 hover:shadow-xl shadow-red-500/25 transition-all duration-300 text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+//                 >
+//                   {deleting ? (
+//                     <>
+//                       <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+//                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+//                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+//                       </svg>
+//                       {t.loading}
+//                     </>
+//                   ) : (
+//                     <>
+//                       <DeleteIcon style={{ fontSize: "18px" }} />
+//                       {t.delete}
+//                     </>
+//                   )}
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Success/Error Result Modal */}
+//       {resultModal.open && (
+//         <div
+//           className="fixed inset-0 bg-black/60 backdrop-blur-md flex justify-center items-center z-50 p-4 animate-in fade-in duration-300"
+//           onClick={() => {
+//             if (!deleting) {
+//               setResultModal({ ...resultModal, open: false });
+//             }
+//           }}
+//         >
+//           <div
+//             className="bg-white rounded-3xl max-w-lg w-full shadow-2xl shadow-black/25 animate-in slide-in-from-bottom-10 duration-300"
+//             onClick={(e) => e.stopPropagation()}
+//           >
+//             <div className="p-8">
+//               <div className="flex items-center justify-center mb-6">
+//                 <div
+//                   className={`w-24 h-24 rounded-full flex items-center justify-center ${
+//                     resultModal.type === "success"
+//                       ? "bg-emerald-100"
+//                       : "bg-red-100"
+//                   }`}
+//                 >
+//                   {resultModal.type === "success" ? (
+//                     <CheckCircleIcon
+//                       className="text-emerald-600"
+//                       style={{ fontSize: "56px" }}
+//                     />
+//                   ) : (
+//                     <ErrorIcon
+//                       className="text-red-600"
+//                       style={{ fontSize: "56px" }}
+//                     />
+//                   )}
+//                 </div>
+//               </div>
+//               <h3
+//                 className={`text-2xl font-bold text-center mb-3 ${
+//                   resultModal.type === "success"
+//                     ? "text-emerald-800"
+//                     : "text-red-800"
+//                 }`}
+//               >
+//                 {resultModal.title}
+//               </h3>
+//               <p className="text-center text-slate-600 mb-4">
+//                 {resultModal.message}
+//               </p>
+//               {resultModal.details && (
+//                 <div className="bg-slate-50 rounded-xl p-4 mb-6 max-h-32 overflow-y-auto">
+//                   <p className="text-xs text-slate-500 font-medium mb-2">{t.details}:</p>
+//                   <code className="text-xs font-mono text-slate-700 break-all">
+//                     {resultModal.details}
+//                   </code>
+//                 </div>
+//               )}
+//               <div className="flex gap-3">
+//                 <button
+//                   onClick={() => setResultModal({ ...resultModal, open: false })}
+//                   className={`flex-1 px-6 py-3 text-white rounded-2xl transition-all duration-300 text-sm font-semibold shadow-lg ${
+//                     resultModal.type === "success"
+//                       ? "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-emerald-500/25"
+//                       : "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-red-500/25"
+//                   }`}
+//                 >
+//                   {resultModal.type === "success" ? t.done : t.close}
+//                 </button>
+//               </div>
 //             </div>
 //           </div>
 //         </div>
@@ -1502,7 +1913,10 @@
 
 
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
+
+
+
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect, useCallback, type JSX } from "react";
@@ -1763,41 +2177,26 @@ const translations = {
 };
 
 // ============================================
-// GOOGLE TRANSLATE API FOR ACTIVITY LOGS
+// MYMEMORY TRANSLATION API (No CORS issues)
 // ============================================
-const GOOGLE_TRANSLATE_API_URL =
-  "https://translate.googleapis.com/translate_a/single";
-
-const translateText = async (
-  text: string,
-  targetLang: string,
-): Promise<string> => {
+const translateText = async (text: string, targetLang: string): Promise<string> => {
   if (!text || text.trim() === "") return text;
   if (targetLang === "en") return text;
-
+  
+  const langMap: Record<string, string> = {
+    fr: "fr-FR",
+    rw: "rw-RW",
+  };
+  
   try {
-    const response = await axios.get(GOOGLE_TRANSLATE_API_URL, {
-      params: {
-        client: "gtx",
-        sl: "auto",
-        tl: targetLang,
-        dt: "t",
-        q: text,
-      },
-    });
-
-    if (response.data && Array.isArray(response.data) && response.data[0]) {
-      let translated = "";
-      for (const part of response.data[0]) {
-        if (part && part[0]) {
-          translated += part[0];
-        }
-      }
-      return translated || text;
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${langMap[targetLang] || targetLang}`;
+    const response = await axios.get(url);
+    
+    if (response.data && response.data.responseData && response.data.responseData.translatedText) {
+      return response.data.responseData.translatedText;
     }
     return text;
-  } catch (_error) {
-    // Silently return original text on translation failure
+  } catch {
     return text;
   }
 };
@@ -1833,6 +2232,13 @@ interface ActivityLog {
   updatedAt: string;
   timeHappened: string;
   __v?: number;
+}
+
+// Translated Activity Log
+interface TranslatedActivityLog extends ActivityLog {
+  translatedAction?: string;
+  translatedDescription?: string;
+  translatedUserName?: string;
 }
 
 interface FilterOptions {
@@ -1936,20 +2342,21 @@ api.interceptors.request.use(
 
 export const ActivitiesManagement: React.FC = () => {
   // Language
-  const [lang, setLang] = useState<"en" | "fr" | "rw">(
+  const [lang] = useState<"en" | "fr" | "rw">(
     getLanguageFromCookies(),
   );
   const t = translations[lang];
 
   // State
   const [logs, setLogs] = useState<ActivityLog[]>([]);
-  const [filteredLogs, setFilteredLogs] = useState<ActivityLog[]>([]);
+  const [translatedLogs, setTranslatedLogs] = useState<TranslatedActivityLog[]>([]);
+  const [filteredLogs, setFilteredLogs] = useState<TranslatedActivityLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [translating, setTranslating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
-  const [selectedLog, setSelectedLog] = useState<ActivityLog | null>(null);
+  const [selectedLog, setSelectedLog] = useState<TranslatedActivityLog | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [filters, setFilters] = useState<FilterOptions>({
     action: "all",
@@ -1982,66 +2389,75 @@ export const ActivitiesManagement: React.FC = () => {
     details: "",
   });
 
-  // Listen for language changes
-  useEffect(() => {
-    const handleCookieChange = () => {
-      const newLang = getLanguageFromCookies();
-      if (newLang !== lang) {
-        setLang(newLang);
-      }
-    };
+  // Translate logs function
+  const translateLogs = useCallback(async (logsData: ActivityLog[]): Promise<TranslatedActivityLog[]> => {
+    if (lang === "en") {
+      return logsData.map(log => ({
+        ...log,
+        translatedAction: log.action,
+        translatedDescription: log.description,
+        translatedUserName: getUserName(log),
+      }));
+    }
 
-    const interval = setInterval(handleCookieChange, 1000);
-    return () => clearInterval(interval);
+    try {
+      const translated = await Promise.all(
+        logsData.map(async (log) => {
+          const translatedAction = await translateText(log.action, lang);
+          const translatedDescription = await translateText(log.description, lang);
+          const translatedUserName = await translateText(getUserName(log), lang);
+          
+          return {
+            ...log,
+            translatedAction,
+            translatedDescription,
+            translatedUserName,
+          };
+        })
+      );
+      return translated;
+    } catch {
+      return logsData.map(log => ({
+        ...log,
+        translatedAction: log.action,
+        translatedDescription: log.description,
+        translatedUserName: getUserName(log),
+      }));
+    }
   }, [lang]);
 
-  // Translate action names and descriptions
-  const translateLogs = useCallback(
-    async (logsData: ActivityLog[]) => {
-      if (lang === "en") return logsData;
+  // Apply translations when language or logs change
+  useEffect(() => {
+    const applyTranslations = async () => {
+      if (logs.length === 0) {
+        setTranslatedLogs([]);
+        setFilteredLogs([]);
+        return;
+      }
 
       setTranslating(true);
       try {
-        const translatedLogs = await Promise.all(
-          logsData.map(async (log) => {
-            const translatedDescription = await translateText(
-              log.description,
-              lang,
-            );
-            const translatedAction = await translateText(log.action, lang);
-            return {
-              ...log,
-              description: translatedDescription,
-              action: translatedAction,
-            };
-          }),
-        );
-        return translatedLogs;
-      } catch (_error) {
-        // Silently return original logs on translation failure
-        return logsData;
+        const translated = await translateLogs(logs);
+        setTranslatedLogs(translated);
+        calculateStats(translated);
+        applyFilters(translated, filters);
+      } catch {
+        setTranslatedLogs(logs.map(log => ({
+          ...log,
+          translatedAction: log.action,
+          translatedDescription: log.description,
+          translatedUserName: getUserName(log),
+        })));
       } finally {
         setTranslating(false);
       }
-    },
-    [lang],
-  );
-
-  // Apply translations when language changes
-  useEffect(() => {
-    const applyTranslations = async () => {
-      if (logs.length > 0) {
-        const translated = await translateLogs(logs);
-        setLogs(translated);
-        calculateStats(translated);
-        applyFilters(translated, filters);
-      }
     };
+
     applyTranslations();
-  }, [lang, logs, filters, translateLogs]);
+  }, [logs, lang, filters, translateLogs]);
 
   // Calculate statistics
-  const calculateStats = (logsData: ActivityLog[]) => {
+  const calculateStats = (logsData: TranslatedActivityLog[]) => {
     const uniqueUsers = new Set(
       logsData.map((log) => getUserEmail(log) || getUserId(log)),
     ).size;
@@ -2049,7 +2465,8 @@ export const ActivitiesManagement: React.FC = () => {
     const actionsByType: { [key: string]: number } = {};
 
     logsData.forEach((log) => {
-      actionsByType[log.action] = (actionsByType[log.action] || 0) + 1;
+      const actionKey = log.translatedAction || log.action;
+      actionsByType[actionKey] = (actionsByType[actionKey] || 0) + 1;
     });
 
     setStats({
@@ -2061,13 +2478,16 @@ export const ActivitiesManagement: React.FC = () => {
 
   // Apply filters
   const applyFilters = (
-    logsData: ActivityLog[],
+    logsData: TranslatedActivityLog[],
     currentFilters: FilterOptions,
   ) => {
     let filtered = [...logsData];
 
     if (currentFilters.action !== "all") {
-      filtered = filtered.filter((log) => log.action === currentFilters.action);
+      filtered = filtered.filter((log) => {
+        const actionKey = log.translatedAction || log.action;
+        return actionKey === currentFilters.action;
+      });
     }
 
     const now = new Date();
@@ -2106,11 +2526,14 @@ export const ActivitiesManagement: React.FC = () => {
     if (currentFilters.searchTerm.trim()) {
       const search = currentFilters.searchTerm.toLowerCase().trim();
       filtered = filtered.filter((log) => {
+        const userName = log.translatedUserName || getUserName(log);
+        const action = log.translatedAction || log.action;
+        const description = log.translatedDescription || log.description;
         return (
           getUserEmail(log).toLowerCase().includes(search) ||
-          getUserName(log).toLowerCase().includes(search) ||
-          log.action.toLowerCase().includes(search) ||
-          log.description?.toLowerCase().includes(search) ||
+          userName.toLowerCase().includes(search) ||
+          action.toLowerCase().includes(search) ||
+          description?.toLowerCase().includes(search) ||
           log.ipAddress?.includes(search)
         );
       });
@@ -2123,7 +2546,7 @@ export const ActivitiesManagement: React.FC = () => {
   const handleFilterChange = (key: keyof FilterOptions, value: string) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
-    applyFilters(logs, newFilters);
+    applyFilters(translatedLogs, newFilters);
   };
 
   // Handle search
@@ -2139,7 +2562,7 @@ export const ActivitiesManagement: React.FC = () => {
       searchTerm: "",
     };
     setFilters(defaultFilters);
-    applyFilters(logs, defaultFilters);
+    applyFilters(translatedLogs, defaultFilters);
   };
 
   // Fetch logs using axios
@@ -2161,19 +2584,16 @@ export const ActivitiesManagement: React.FC = () => {
       }
 
       setLogs(activities);
-      calculateStats(activities);
-      applyFilters(activities, filters);
       setSelectedIds([]);
     } catch (err) {
       const errorMessage = axios.isAxiosError(err)
         ? err.response?.data?.message || err.message
         : "An error occurred while fetching logs";
       setError(errorMessage);
-      console.error("Error fetching logs:", err);
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, []);
 
   // Handle pagination
   const handleChangePage = (newPage: number) => {
@@ -2188,7 +2608,7 @@ export const ActivitiesManagement: React.FC = () => {
   };
 
   // View log details
-  const handleViewDetails = (log: ActivityLog) => {
+  const handleViewDetails = (log: TranslatedActivityLog) => {
     setSelectedLog(log);
     setDetailDialogOpen(true);
   };
@@ -2256,21 +2676,16 @@ export const ActivitiesManagement: React.FC = () => {
       let deletedIds: string[] = [];
 
       if (deleteTarget === "bulk") {
-        // Bulk delete
         await api.delete("/auth/activities/bulk", {
           data: { ids: selectedIds },
         });
         deletedCount = selectedIds.length;
         deletedIds = selectedIds;
         
-        // Remove deleted items from state
         const remainingLogs = logs.filter((log) => !selectedIds.includes(log._id));
         setLogs(remainingLogs);
-        calculateStats(remainingLogs);
-        applyFilters(remainingLogs, filters);
         setSelectedIds([]);
 
-        // Show success modal
         showResultModal(
           "success",
           t.deleteSuccess,
@@ -2278,18 +2693,14 @@ export const ActivitiesManagement: React.FC = () => {
           `${t.selectedItems}: ${deletedIds.slice(0, 5).join(", ")}${deletedIds.length > 5 ? ` and ${deletedIds.length - 5} more` : ""}`
         );
       } else if (deleteTarget) {
-        // Single delete
         await api.delete(`/auth/activities/${deleteTarget}`);
         deletedCount = 1;
         deletedIds = [deleteTarget];
         
         const remainingLogs = logs.filter((log) => log._id !== deleteTarget);
         setLogs(remainingLogs);
-        calculateStats(remainingLogs);
-        applyFilters(remainingLogs, filters);
         setSelectedIds(selectedIds.filter((id) => id !== deleteTarget));
 
-        // Show success modal
         showResultModal(
           "success",
           t.deleteSuccess,
@@ -2306,7 +2717,6 @@ export const ActivitiesManagement: React.FC = () => {
         : t.deleteFailedMessage;
       setError(errorMessage);
       
-      // Show error modal
       showResultModal(
         "error",
         t.deleteFailed,
@@ -2315,8 +2725,6 @@ export const ActivitiesManagement: React.FC = () => {
           ? err.response.data.details 
           : t.deleteError
       );
-      
-      console.error("Error deleting logs:", err);
     } finally {
       setDeleting(false);
     }
@@ -2344,14 +2752,19 @@ export const ActivitiesManagement: React.FC = () => {
     doc.text(`Generated: ${format(new Date(), "PPpp")}`, 14, 32);
     doc.text(`Total Records: ${filteredLogs.length}`, doc.internal.pageSize.getWidth() - 14, 32, { align: "right" });
 
-    const tableData = filteredLogs.map((log) => [
-      formatDateSafe(log.createdAt, "MMM d, yyyy HH:mm"),
-      getUserName(log),
-      getUserEmail(log),
-      log.action.replace("_", " "),
-      log.description?.substring(0, 50) + (log.description?.length > 50 ? "..." : ""),
-      log.ipAddress || log.ipv4Address || "N/A",
-    ]);
+    const tableData = filteredLogs.map((log) => {
+      const userName = log.translatedUserName || getUserName(log);
+      const action = log.translatedAction || log.action;
+      const description = log.translatedDescription || log.description;
+      return [
+        formatDateSafe(log.createdAt, "MMM d, yyyy HH:mm"),
+        userName,
+        getUserEmail(log),
+        action.replace("_", " "),
+        description?.substring(0, 50) + (description?.length > 50 ? "..." : ""),
+        log.ipAddress || log.ipv4Address || "N/A",
+      ];
+    });
 
     autoTable(doc, {
       head: [["Time", "User", "Email", "Action", "Description", "IP Address"]],
@@ -2595,8 +3008,10 @@ export const ActivitiesManagement: React.FC = () => {
     );
   }
 
-  // Get unique action types for filters
-  const actionTypes = Array.from(new Set(logs.map((log) => log.action)));
+  // Get unique action types for filters - use translated actions
+  const actionTypes = Array.from(
+    new Set(translatedLogs.map((log) => log.translatedAction || log.action))
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 p-4 sm:p-6 lg:p-8 mt-4">
@@ -2638,7 +3053,6 @@ export const ActivitiesManagement: React.FC = () => {
               </div>
             </div>
             <div className="flex flex-wrap gap-3">
-              {/* Bulk Delete Button */}
               {selectedIds.length > 0 && (
                 <button
                   onClick={handleDeleteBulk}
@@ -2901,101 +3315,107 @@ export const ActivitiesManagement: React.FC = () => {
                 ) : (
                   filteredLogs
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((log, index) => (
-                      <tr
-                        key={log._id}
-                        className={`hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-transparent transition-all duration-300 group ${
-                          index % 2 === 0 ? "bg-white/50" : "bg-slate-50/30"
-                        } ${selectedIds.includes(log._id) ? "bg-blue-50/50" : ""}`}
-                      >
-                        <td className="px-4 py-4">
-                          <input
-                            type="checkbox"
-                            checked={selectedIds.includes(log._id)}
-                            onChange={() => handleSelect(log._id)}
-                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                          />
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex flex-col">
-                            <span className="text-sm font-semibold text-slate-700">
-                              {formatDistanceSafe(log.createdAt)}
-                            </span>
-                            <span className="text-xs text-slate-400 mt-0.5">
-                              {formatDateSafe(
-                                log.createdAt,
-                                "MMM d, yyyy HH:mm",
-                              )}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="relative">
-                              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 via-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-500/25">
-                                {getUserName(log).charAt(0).toUpperCase()}
-                              </div>
-                              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white"></div>
-                            </div>
+                    .map((log, index) => {
+                      const userName = log.translatedUserName || getUserName(log);
+                      const action = log.translatedAction || log.action;
+                      const description = log.translatedDescription || log.description;
+                      
+                      return (
+                        <tr
+                          key={log._id}
+                          className={`hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-transparent transition-all duration-300 group ${
+                            index % 2 === 0 ? "bg-white/50" : "bg-slate-50/30"
+                          } ${selectedIds.includes(log._id) ? "bg-blue-50/50" : ""}`}
+                        >
+                          <td className="px-4 py-4">
+                            <input
+                              type="checkbox"
+                              checked={selectedIds.includes(log._id)}
+                              onChange={() => handleSelect(log._id)}
+                              className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                            />
+                          </td>
+                          <td className="px-6 py-4">
                             <div className="flex flex-col">
-                              <span className="text-sm font-semibold text-slate-800">
-                                {getUserName(log)}
+                              <span className="text-sm font-semibold text-slate-700">
+                                {formatDistanceSafe(log.createdAt)}
                               </span>
-                              <span className="text-xs text-slate-500">
-                                {getUserEmail(log)}
+                              <span className="text-xs text-slate-400 mt-0.5">
+                                {formatDateSafe(
+                                  log.createdAt,
+                                  "MMM d, yyyy HH:mm",
+                                )}
                               </span>
-                              {getUserRole(log) && (
-                                <span className="text-xs font-medium text-slate-400 capitalize">
-                                  {getUserRole(log)}
-                                </span>
-                              )}
                             </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border ${getActionBadgeStyle(log.action)} shadow-sm`}
-                          >
-                            {getActionIcon(log.action)}
-                            {log.action.replace("_", " ")}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex flex-col gap-0.5 max-w-[240px]">
-                            <span className="text-sm text-slate-700 truncate">
-                              {log.description}
-                            </span>
-                            <span className="flex items-center gap-1.5 text-xs text-slate-400">
-                              {getEntityIcon(log.action)}
-                              {getEntityType(log.action)}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <code className="text-xs font-mono bg-slate-100/80 px-3 py-1.5 rounded-xl text-slate-600 border border-slate-200/50">
-                            {log.ipAddress || log.ipv4Address || "N/A"}
-                          </code>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <button
-                              onClick={() => handleViewDetails(log)}
-                              className="inline-flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 hover:shadow-lg shadow-blue-500/25 transition-all duration-300 text-xs font-medium group"
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="relative">
+                                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 via-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-500/25">
+                                  {userName.charAt(0).toUpperCase()}
+                                </div>
+                                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white"></div>
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="text-sm font-semibold text-slate-800">
+                                  {userName}
+                                </span>
+                                <span className="text-xs text-slate-500">
+                                  {getUserEmail(log)}
+                                </span>
+                                {getUserRole(log) && (
+                                  <span className="text-xs font-medium text-slate-400 capitalize">
+                                    {getUserRole(log)}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border ${getActionBadgeStyle(log.action)} shadow-sm`}
                             >
-                              <VisibilityIcon className="group-hover:scale-110 transition-transform duration-300" style={{ fontSize: "16px" }} />
-                              {t.view}
-                            </button>
-                            <button
-                              onClick={() => handleDeleteSingle(log._id)}
-                              className="inline-flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 hover:shadow-lg shadow-red-500/25 transition-all duration-300 text-xs font-medium group"
-                            >
-                              <DeleteIcon className="group-hover:scale-110 transition-transform duration-300" style={{ fontSize: "16px" }} />
-                              {t.delete}
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
+                              {getActionIcon(log.action)}
+                              {action.replace("_", " ")}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex flex-col gap-0.5 max-w-[240px]">
+                              <span className="text-sm text-slate-700 truncate">
+                                {description}
+                              </span>
+                              <span className="flex items-center gap-1.5 text-xs text-slate-400">
+                                {getEntityIcon(log.action)}
+                                {getEntityType(log.action)}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <code className="text-xs font-mono bg-slate-100/80 px-3 py-1.5 rounded-xl text-slate-600 border border-slate-200/50">
+                              {log.ipAddress || log.ipv4Address || "N/A"}
+                            </code>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => handleViewDetails(log)}
+                                className="inline-flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 hover:shadow-lg shadow-blue-500/25 transition-all duration-300 text-xs font-medium group"
+                              >
+                                <VisibilityIcon className="group-hover:scale-110 transition-transform duration-300" style={{ fontSize: "16px" }} />
+                                {t.view}
+                              </button>
+                              <button
+                                onClick={() => handleDeleteSingle(log._id)}
+                                className="inline-flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 hover:shadow-lg shadow-red-500/25 transition-all duration-300 text-xs font-medium group"
+                              >
+                                <DeleteIcon className="group-hover:scale-110 transition-transform duration-300" style={{ fontSize: "16px" }} />
+                                {t.delete}
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
                 )}
               </tbody>
             </table>
@@ -3065,7 +3485,7 @@ export const ActivitiesManagement: React.FC = () => {
         <div className="mt-8 text-center">
           <p className="text-xs text-slate-400 font-medium">
             Showing <span className="text-slate-600">{filteredLogs.length}</span> of{" "}
-            <span className="text-slate-600">{logs.length}</span> total activities
+            <span className="text-slate-600">{translatedLogs.length}</span> total activities
           </p>
         </div>
       </div>
@@ -3093,7 +3513,7 @@ export const ActivitiesManagement: React.FC = () => {
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border ${getActionBadgeStyle(selectedLog.action)}`}
                 >
                   {getActionIcon(selectedLog.action)}
-                  {selectedLog.action.replace("_", " ")}
+                  {(selectedLog.translatedAction || selectedLog.action).replace("_", " ")}
                 </span>
               </div>
               <button
@@ -3118,7 +3538,7 @@ export const ActivitiesManagement: React.FC = () => {
                   <div className="flex flex-col">
                     <span className="text-xs text-slate-500 font-medium">Name</span>
                     <span className="text-sm font-semibold text-slate-900 mt-1">
-                      {getUserName(selectedLog)}
+                      {selectedLog.translatedUserName || getUserName(selectedLog)}
                     </span>
                   </div>
                   <div className="flex flex-col">
@@ -3167,7 +3587,7 @@ export const ActivitiesManagement: React.FC = () => {
                 <div className="flex flex-col">
                   <span className="text-xs text-slate-500 font-medium">{t.action}</span>
                   <span className="text-sm font-semibold text-slate-800 mt-1.5">
-                    {selectedLog.action.replace("_", " ")}
+                    {(selectedLog.translatedAction || selectedLog.action).replace("_", " ")}
                   </span>
                 </div>
               </div>
@@ -3177,7 +3597,7 @@ export const ActivitiesManagement: React.FC = () => {
                 <span className="text-xs text-slate-500 font-medium">{t.description}</span>
                 <div className="mt-1.5 p-4 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-200/50">
                   <p className="text-sm text-slate-700 leading-relaxed">
-                    {selectedLog.description}
+                    {selectedLog.translatedDescription || selectedLog.description}
                   </p>
                 </div>
               </div>
